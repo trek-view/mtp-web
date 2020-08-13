@@ -49,7 +49,8 @@ TWO_FACTOR_CALL_GATEWAY = None
 
 TWO_FACTOR_SMS_GATEWAY = None
 LOGIN_URL = 'two_factor:login'
-# LOGIN_REDIRECT_URL = 'two_factor:profile'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 CORS_ORIGIN_ALLOW_ALL = True
 TWO_FACTOR_TOTP_DIGITS = 6
 
@@ -106,9 +107,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
