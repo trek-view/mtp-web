@@ -1,0 +1,1439 @@
+{% extends 'layouts/guidebook/base.html' %}
+{% block title %}Edit Guidebook{% endblock %}
+{% load static %}
+
+{% block content %}
+    <link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
+    <link href='{% static 'css/dropzone.min.css' %}' type='text/css' rel='stylesheet'>
+    <script src='{% static 'js/dropzone.min.js' %}' type='text/javascript'></script>
+    <style>
+        .dz-image img {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .dz-image {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 0px !important;
+        }
+        .dz-preview.dz-image-preview {
+            width: 100% !important;
+            height: 100% !important;
+            padding: 0px !important;
+            margin: 0px !important;
+        }
+        form.dropzone {
+            padding: 0px !important;
+            width: 330px !important;
+            height: 220px !important;
+        }
+        .dropzone .dz-preview .dz-error-message {
+            left: 103px;
+        }
+
+        .dropzone .dz-preview:hover .dz-image img {
+            -webkit-transform: unset;
+            transform: unset;
+            -webkit-filter: unset;
+            filter: unset;
+        }
+    </style>
+
+<div class="main-body">
+    <div class="left-side p-3">
+        <div class="guidebook-detail card p-2">
+            <div class="guidebook-cover-image mt-3 mb-1">
+                <div class="{% if guidebook.cover_image == '' or guidebook.cover_image is None %}d-none{% endif %}" id="guidebook_cover_image">
+                    <div class="dz-image-cover">
+                        {% if guidebook.cover_image != '' and guidebook.cover_image != None %}
+                         <img class="w-100 "  src="{{ STATIC_URL }}{{ guidebook.cover_image }}">
+                        {% endif %}
+                    </div>
+                    <div class="text-right mt-3">
+                        <button type="button" class="btn btn-sm btn-warning" id="change_file">Change Cover Image</button>
+                    </div>
+                </div>
+                <div class="{% if guidebook.cover_image != '' and guidebook.cover_image != None %}d-none{% endif %}" id="file-upload">
+                    <form action="{% url 'guidebook.ajax_upload_file' unique_id=guidebook.unique_id %}" class="dropzone ml-auto mr-auto d-flex align-items-center justify-content-center">
+                      <div class="fallback">
+                        <input name="cover_image" type="file" multiple="false" />
+                      </div>
+                    </form>
+                    <div class="text-right mt-3">
+                        <button type="button" class="btn btn-sm btn-primary d-none" id='uploadfile'>Upload</button>
+                        <button type="button" class="btn btn-sm btn-danger d-none" id="removefile">Remove</button>
+                        <button type="button" class="btn btn-sm btn-dark {% if guidebook.cover_image == '' or guidebook.cover_image is None %}d-none{% endif %}" id="cancelfile">Cancel</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr class="mt-2 mb-2" />
+
+            <div class="main-guidebook">
+                <div class="guidebook-title text-center text-info mt-1">
+                <h3>
+                    {{ guidebook.name }}
+                </h3>
+            </div>
+
+                <div class="guidebook-description">
+                    <p class="mb-1">
+                        {{ guidebook.description }}
+                    </p>
+                </div>
+
+                <div class="guidebook-category mt-2" style="color: blueviolet;">
+                    <p class="mb-1">
+                        {{ guidebook.category }}
+                    </p>
+                </div>
+
+                <div class="guidebook-tag mt-2" style="min-height: 24px;">
+                    {% for tag_name in guidebook.getTags %}
+                        <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                            {{ tag_name }}
+                        </span>
+                    {% endfor %}
+                </div>
+
+                <div class="guidebook-created-at text-secondary mt-2 d-flex justify-content-between align-items-center">
+                    <div class="created_at mr-auto">
+                        <span class="">
+                            {{ guidebook.created_at }}
+                        </span>
+                    </div>
+
+                    <div class="username ml-auto">
+                        <span class="" style="color: brown;">
+                            {{ guidebook.user }}
+                        </span>
+                    </div>
+
+
+                </div>
+
+                <div class="action text-right mt-2">
+                    <button type="button" class="btn btn-sm btn-primary" id="edit_button">Edit</button>
+                </div>
+            </div>
+
+            <div class="main-guidebook-form d-none">
+                <form method="POST" class="post-form" id="guidebook_edit_form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ g_form.as_p }}
+                    <div class="form-group d-flex justify-content-between">
+                        <button type="button" class="btn btn-sm btn-primary save-btn" id="guidebook_save_button">Save</button>
+                        <button type="button" class="btn btn-sm btn-dark" id="guidebook_cancel_button">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <hr class="mt-3 mb-1" />
+
+            <div class="guidebook-others float-right d-flex flex-row justify-content-between mt-2">
+                <div class="scenes text-center">
+                    {% if guidebook.getSceneCount == 0 %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                    {% else %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                    {% endif %}
+                    <span class="text-center m-0">
+                        {{ guidebook.getSceneCount }} Photos
+                    </span>
+                </div>
+                <div class="like text-center">
+                    {% if guidebook.getLikeCount == 0 %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
+                    {% else %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
+                    {% endif %}
+                    <span class="text-center m-0">
+                        {{ guidebook.getLikeCount }} Likes
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-2 mt-2">
+            <div class="">
+                <form method="POST" id="delete_guidebook_form" class="d-flex align-items-center" action="{% url 'guidebook.guidebook_delete' unique_id=guidebook.unique_id %}">
+                    {% csrf_token %}
+                    <div class="col publish-guidebook text-center {% if guidebook.getSceneCount == 0 %}d-none{% endif %} ">
+                        {% if guidebook.is_approved and guidebook.is_published %}
+                            <button type="button" class="btn btn-success" id="publish_swithch_guidebook">Published</button>
+                        {% elif guidebook.is_approved and not guidebook.is_published %}
+                            <button type="button" class="btn btn-dark" id="publish_swithch_guidebook">Unpublished</button>
+                        {% endif %}
+                    </div>
+
+                    <div class="col preview-guidebook text-center">
+                        <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
+                            <button type="button" class="btn btn-info" id="publish_swithch_guidebook">Preview</button>
+                        </a>
+                    </div>
+
+                    <div class="col text-center delete-gudiebook">
+                        <button type="button" id="delete_guidebook" class="btn btn-danger">Delete</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <h4>
+                Scene List:
+            </h4>
+        </div>
+
+        <div class="mt-2 p-1 border scene-list list_container" id="scene_list">
+            {% for scene in guidebook.getScenes %}
+                <div class="list_item">
+                    <div class="scene-box p-1 mt-2 mb-2" id="scene_{{ scene.pk }}" data-scene-id="{{ scene.pk }}" data-image_key="{{ scene.image_key }}" style="cursor: pointer">
+                        <form method="POST" class="post-form has-validation-callback" id="add_scene_form_{{ scene.pk }}">
+                            {% csrf_token %}
+                            <input type="number" name="scene_id" class="d-none" value="{{ scene.pk }}" id="id_scene_id">
+                            <input type="text" name="image_key" class="form-control d-none" value="{{ scene.image_key }}" required="" id="id_image_key">
+                            <input type="text" name="title" class="form-control mb-1" disabled="disabled" value="{{ scene.title }}" placeholder="Scene Title" required="" id="id_title">
+                            <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_description">{{ scene.description }}</textarea>
+                            <input type="text" name="lat" class="form-control d-none" value="{{ scene.lat }}" required="" id="id_lat">
+                            <input type="text" name="lng" class="form-control d-none" value="{{ scene.lng }}" required="" id="id_lng">
+                            <div class="text-right">
+                                <button type="button" class="btn btn-info point_list" data-scene-id="{{ scene.pk }}">Point List</button>
+                                <button type="button" class="btn btn-primary delete_scene_button" data-scene-id="{{ scene.pk }}" style="background: #993333 !important; border-color: #993333;">Delete</button>
+                                <button type="button" id="change_scene_button" class="save btn btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Change</button>
+                                <button type="button" id="save_scene_button" class="save btn btn-primary save-btn d-none" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', {{ scene.pk }})">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="mt-3">
+            <h5>
+                New Scene:
+            </h5>
+        </div>
+        <div class="card mt-2 p-1 add-scene-form">
+            <p class="mt-2 mb-2 text-center">
+                Please add a new scene.
+            </p>
+            <div class="scene-box p-1 mt-2 mb-2" id="scene_0" data-scene-id="0">
+                <form method="POST" class="post-form has-validation-callback" id="add_scene_form_0">
+                    {% csrf_token %}
+                    <input type="number" name="scene_id" class="d-none" id="id_new_scene_id" disabled value="0">
+                    <input type="text" name="image_key" class="form-control d-none" disabled required="" id="id_new_image_key">
+                    <input type="text" name="title" class="form-control mb-1" disabled placeholder="Scene Title" required="" id="id_new_title">
+                    <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_new_description">{{ scene.description }}</textarea>
+                    <input type="text" name="lat" class="form-control d-none " disabled  required="" id="id_new_lat">
+                    <input type="text" name="lng" class="form-control d-none" disabled  required="" id="id_new_lng">
+                    <div class="text-right">
+                        <button type="button" id="save_scene_button" class="save btn btn-primary save-btn" disabled="" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', 0)">Add New Scene</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="left-side poi-box d-none">
+        <div class="hide-poi-box text-right p-2 mt-3">
+            <button class="btn btn-info" onclick="hide_poi_box()">
+                Back To Scenes
+            </button>
+        </div>
+        <div class="poi-list p-2">
+            <div class="">
+                <p>
+                    Add point's of interest to this scene to give viewers more information.
+                </p>
+            </div>
+            <div class="text-right mb-3">
+                <button type="button" class="btn btn-primary" id="add_poi" onclick="add_new_poi()">
+                    Add new POI
+                </button>
+            </div>
+            <div class="accordion" id="poi_list">
+            </div>
+        </div>
+    </div>
+
+    <div class="right-board">
+        <div class="board">
+            <div class="full-screen">
+                <div class="switch-full-screen switch_screen d-none">
+                    <img class="w-100" src="{% static 'images/icon/icons8-toggle-full-screen-64.png' %}">
+                </div>
+                <div class="map-board w-100 display" id="map">
+                </div>
+            </div>
+            <div class="small-screen small d-none">
+                <div class="switch-full-screen switch_screen" >
+                    <img class="w-100" src="{% static 'images/icon/icons8-toggle-full-screen-64.png' %}">
+                </div>
+                <div class="poi-icon d-none" id="poi_icon">
+                    <img class="w-100 d-none" onclick="add_new_poi()" src="{% static 'images/icon/icons8-love-path-64.png' %}">
+                </div>
+                <div class="delete-icon disabled" id="delete_icon">
+                    <img class="w-100 d-none" src="{% static 'images/icon/icons8-trash-50.png' %}">
+                </div>
+                <div id='mapillary_image_box' class="image-box display"></div>
+            </div>
+            <div class="show-or-hide">
+                <div class="minimize-button d-none" onclick="showOrHide()">
+                    <img class="w-100" src="{% static 'images/icon/icons8-minimize-window-48.png' %}">
+                </div>
+                <div class="maximize-button d-none" onclick="showOrHide()">
+                    <img class="w-100" src="{% static 'images/icon/icons8-maximize-window-48.png' %}">
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var add_new_scene = false;
+    $('#add_scene_button').click(function () {
+        $('.add-scene-form').removeClass('d-none');
+        add_new_scene = true;
+    });
+
+    $.ajaxSetup({
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+
+    $('#edit_button').click(function () {
+        $('.main-guidebook').addClass('d-none');
+        $('.main-guidebook-form').removeClass('d-none');
+    });
+    $('#guidebook_cancel_button').click(function () {
+        $('.main-guidebook-form').addClass('d-none');
+        $('.main-guidebook').removeClass('d-none');
+    });
+    $('#guidebook_save_button').click(function () {
+         $.ajax({
+            url: "{% url 'guidebook.ajax_guidebook_update' unique_id=guidebook.unique_id %}",
+            type: 'POST',
+            data: $('#guidebook_edit_form').serialize(),
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else
+                {
+                    toastr.success(data.message);
+                    var guidebook = data.guidebook;
+                    $('.main-guidebook .guidebook-title').html('<h3>' + guidebook.title + '</h3>');
+                    $('.main-guidebook .guidebook-description').html('<p class="mb-1">' + guidebook.description + '</p>');
+                    $('.main-guidebook .guidebook-category').html('<p class="mb-1">' + guidebook.category + '</p>');
+                    var html = '';
+                    for (var i = 0; i < guidebook.tag.length; i++) {
+                        html += '<span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">' + guidebook.tag[i] + '</span>';
+                    }
+                    $('.main-guidebook .guidebook-tag').html(html);
+                    $('.main-guidebook').removeClass('d-none');
+                    $('.main-guidebook-form').addClass('d-none');
+                }
+            }
+        });
+    });
+
+
+
+    Dropzone.autoDiscover = false;
+    {% if guidebook.cover_image == '' or guidebook.cover_image is None %}
+        var server_image = false;
+    {% else %}
+        var server_image = true;
+    {% endif %}
+
+    var myDropzone = new Dropzone(".dropzone", {
+        autoProcessQueue: false,
+        uploadMultiple: false,
+        parallelUploads: 1,
+        paramName: "cover_image", // The name that will be used to transfer the file
+        maxFilesize: 20,
+        {#addRemoveLinks: true,#}
+        maxFiles: 1,
+        thumbnailWidth: 350,
+        thumbnailHeight: 230,
+        sending: function(file, xhr, formData) {
+            formData.append("csrfmiddlewaretoken", '{{ csrf_token }}');
+        },
+        init: function() {
+            this.on("maxfilesexceeded", function(file) {
+                this.removeAllFiles();
+                this.addFile(file);
+            });
+            this.on("success", function(file, responseText) {
+                toastr.success('A cover image is updated successfully.');
+            });
+            this.on("thumbnail", function(file, dataUrl) {
+                $('.dz-image').css('border-radius', '0px');
+                $('.dz-image img').css('width', '100%');
+                $('.dz-image img').css('height', '100%');
+                $('.dz-details').remove();
+                $('.dropzone .dz-preview').off('hover');
+            });
+            this.on('addedfile', function () {
+                $('#uploadfile').removeClass('d-none');
+                $('#removefile').removeClass('d-none');
+                if (server_image)
+                    $('#cancelfile').removeClass('d-none');
+                else
+                    $('#cancelfile').addClass('d-none');
+            });
+            this.on('removedfile', function () {
+                $('#uploadfile').addClass('d-none');
+                $('#removefile').addClass('d-none');
+            });
+            this.on('complete', function () {
+                var h = $('.dz-image').html();
+                $('.dz-image-cover').html(h);
+                server_image = true;
+                this.removeAllFiles();
+                $('#cancelfile').addClass('d-none');
+                $('#file-upload').addClass('d-none');
+                $('#guidebook_cover_image').removeClass('d-none');
+            });
+
+            $('#change_file').click(function () {
+                $('#guidebook_cover_image').addClass('d-none');
+                $('#file-upload').removeClass('d-none');
+            });
+        }
+    });
+
+    $('#cancelfile').click(function () {
+        myDropzone.removeAllFiles();
+        $('#guidebook_cover_image').removeClass('d-none');
+        $('#file-upload').addClass('d-none');
+    });
+
+    $('#removefile').click(function () {
+        myDropzone.removeAllFiles();
+    });
+
+    $('#uploadfile').click(function(){
+        myDropzone.processQueue();
+    });
+</script>
+<script>
+    var poi_clicking = false;
+
+    var poi_mouseup = function (e) {
+        poi_clicking = false;
+        var poi_id = e.target['data-poi-id'];
+    };
+    var poi_mousemove = function (e) {
+        console.log('mousemove', e.target['data-poi-id'])
+    };
+    var poi_mousedown = function (e) {
+        poi_clicking = true;
+        console.log('mousedown', e)
+    };
+    var poi_mouseover = function (e) {
+        console.log('mouseover', e)
+        refresh_mapillery_classes();
+    };
+    var poi_click = function (e) {
+        console.log('mouseclick', e)
+    };
+    var selected_poi_id = 0;
+</script>
+<script src="{% static 'js/mapillary.js' %}"></script>
+<script>
+
+    function hide_poi_box() {
+        $('.left-side.poi-box').addClass('d-none');
+    }
+    var current_scene_id = 0;
+    var current_node_point = null;
+    var current_node_key = '';
+    var current_order_number = 0;
+    toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    };
+
+    var scene_positions = [];
+    var key_list = [];
+    var sceneData = [];
+    var item = {};
+
+    $('.scene-box').each(function (index) {
+        if ($(this).attr('data-scene-id') == '0')
+            return;
+        var lat = $(this).find('input[name=lat]').val();
+        var lng = $(this).find('input[name=lng]').val();
+        var key = $(this).find('input[name=image_key]').val();
+        scene_positions.push([lng, lat]);
+        key_list.push(key);
+        item = {
+            "type": "Feature",
+            "properties": {"key": key},
+            "geometry": {
+                "coordinates": [lng, lat],
+                "type": "Point"
+            }
+        };
+        sceneData.push(item);
+    });
+
+    var init_node = null;
+    if (key_list.length > 0) {
+        init_node = "{{ guidebook.getFirstSceneKey }}";
+        $('.small').each(function (i) {
+            $(this).removeClass('d-none');
+        });
+        $('.minimize-button').removeClass('d-none');
+    }
+
+    function  enable_scene_form(id) {
+        var $form = $('#add_scene_form_' + id);
+        $form.find('input').each(function (index) {
+            $(this).attr('disabled', false)
+        });
+        $form.find('textarea').each(function (index) {
+            $(this).attr('disabled', false)
+        });
+        $form.find('select').each(function (index) {
+            $(this).attr('disabled', false)
+        });
+        $form.find('#save_scene_button').removeClass('d-none');
+        $form.find('#change_scene_button').addClass('d-none');
+    }
+
+    var mapillaryViewer = new Mapillary.Viewer(
+            'mapillary_image_box',
+            mapillaryClientId,
+            init_node,
+            {
+                component: {
+                    cover: false,
+                    tag: true,
+                },
+            }
+        );
+
+    $('.scene-box').click(function () {
+        var image_key = $(this).data('image_key');
+        mapillaryViewer.moveToKey(image_key);
+    });
+    function init_modal() {
+        if ($('.minimize-button').hasClass('d-none') && $('.maximize-button').hasClass('d-none'))
+        {
+            $('.small').each(function (i) {
+                $(this).removeClass('d-none');
+            });
+            $('.minimize-button').removeClass('d-none');
+        }
+    }
+    mapboxgl.accessToken = mapboxToken;
+    if (scene_positions.length > 0)
+    {
+        var first_point = scene_positions[0];
+        init_modal();
+    }
+    else
+        var first_point = [-87.622088, 41.878781];
+    console.log('first_point', first_point)
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+        center: first_point, // starting position
+        zoom: 14, // starting zoom
+        attributionControl: true
+    });
+
+    map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+    map.on("load", function() {
+        // Add Mapillary sequence layer.
+        // https://www.mapillary.com/developer/tiles-documentation/#sequence-layer
+        map.addLayer({
+            "id": "mapillary",
+            "type": "line",
+            "source": {
+                "type": "vector",
+                "tiles": ["https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"],
+                "minzoom": 1,
+            },
+            "source-layer": "mapillary-sequences",
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-opacity": 0.6,
+                "line-color": "#7880bd",
+                "line-width": 2
+            }
+        }, "waterway-label");
+
+        map.addLayer({
+          "id": "mapillary-images",
+          "type": "circle",
+          "source": {
+              "type": "vector",
+              "tiles": ["https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"],
+              "minzoom": 6,
+              "maxzoom": 14
+          },
+          "source-layer": "mapillary-images",
+          "paint": {
+              "circle-color": "#7880bd",
+              "circle-radius": 6
+          }
+      }, "waterway-label");
+
+    });
+
+    // Create a popup, but don't add it to the map yet.
+    var popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
+
+    map.on('mouseenter', 'mapillary-images', function(e) {
+      // Change the cursor style as a UI indicator.
+      map.getCanvas().style.cursor = 'pointer';
+
+      var coordinates = e.features[0].geometry.coordinates.slice();
+      var key = e.features[0].properties.key;
+      var url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+
+      // Ensure that if the map is zoomed out such that multiple
+      // copies of the feature are visible, the popup appears
+      // over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+      // Populate the popup and set its coordinates
+      // based on the feature found.
+      popup.setLngLat(coordinates)
+      .setHTML("<img src='" + url + "' width='160'/>")
+      .addTo(map);
+    });
+
+    map.on('click', 'mapillary-images', function (e) {
+        var key = e.features[0].properties.key;
+        selected_poi_id = 0;
+        init_modal();
+        mapillaryViewer.resize();
+        mapillaryViewer.moveToKey(key);
+
+    });
+
+    map.on('mouseleave', 'mapillary-images', function() {
+      map.getCanvas().style.cursor = '';
+      popup.remove();
+    });
+    var mapillery_clicking = false;
+    mapillaryViewer.on('mousedown', function () {
+        mapillery_clicking = true;
+    });
+    mapillaryViewer.on('mousedown', function () {
+        mapillery_clicking = false;
+    });
+    mapillaryViewer.on('mousemove', function () {
+        if (mapillery_clicking)
+        {
+            refresh_mapillery_classes()
+        }
+    });
+
+    mapillaryViewer.on(Mapillary.Viewer.nodechanged, function (node) {
+        console.log(node);
+        current_node_point = [node.latLon.lat, node.latLon.lon];
+        current_node_key = node.key;
+        current_order_number = key_list.indexOf(current_node_key);
+        selected_poi_id = 0;
+        $('#poi_list').html('');
+        $.ajax({
+            url: "{% url 'guidebook.ajax_get_edit_scene' unique_id=guidebook.unique_id %}",
+            type: 'GET',
+            data: {'image_key': node.key},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                {
+                    new_scene();
+                    $('#id_new_image_key').val(node.key);
+                    $('#id_new_lat').val(current_node_point[0]);
+                    $('#id_new_lng').val(current_node_point[1]);
+                }
+                else {
+                    current_scene_id = data.scene[0].pk;
+                    old_scene();
+                    var position_x = 0;
+                    var position_y = 0;
+                    for (i = 0; i < data.poi_list.length; i++)
+                    {
+                        position_x = data.poi_list[i].poi[0].fields.position_x;
+                        position_y = data.poi_list[i].poi[0].fields.position_y;
+                        var spotTag = new Mapillary.TagComponent.PointGeometry([position_x, position_y]);
+                        add_tag(data.poi_list[i], spotTag);
+                    }
+                    refresh_poi_list();
+                    refresh_mapillery_classes();
+                }
+                set_select_scene();
+            }
+        });
+    });
+
+     function set_select_scene() {
+        $('.scene-box.selected').removeClass('selected');
+        $('#scene_' + current_scene_id).addClass('selected');
+        if (current_scene_id != 0 || current_scene_id != '0')
+        {
+            $('#add_scene_form_0').find('input').each(function (index) {
+                $(this).attr('disabled', true);
+            });
+            $('#add_scene_form_0').find('select').each(function (index) {
+                $(this).attr('disabled', true);
+            });
+            $('#add_scene_form_0').find('textarea').each(function (index) {
+                $(this).attr('disabled', true);
+            });
+            $('#add_scene_form_0').find('#save_scene_button').attr('disabled', true);
+            $('.add-scene-form p').text('This scene already exists in this guidebook.');
+        }
+        else {
+            $('#add_scene_form_0').find('input').each(function (index) {
+                $(this).attr('disabled', false);
+            });
+            $('#add_scene_form_0').find('select').each(function (index) {
+                $(this).attr('disabled', false);
+            });
+            $('#add_scene_form_0').find('textarea').each(function (index) {
+                $(this).attr('disabled', false);
+            });
+            $('#add_scene_form_0').find('#save_scene_button').attr('disabled', false);
+            $('.add-scene-form p').text('Please add a new scene.');
+        }
+    }
+
+    $.ajax({
+        url: "{% url 'guidebook.ajax_get_scene_list' unique_id=guidebook.unique_id %}",
+        type: 'GET',
+        data: {},
+        dataType: 'json',
+        success: function (data) {
+            if (data.status == 'failed')
+            {
+                toastr.error(data.message)
+            }
+            else {
+                console.log(data)
+            }
+        }
+    });
+
+    $('.switch_screen').click(function () {
+         var full_screen = $('.full-screen');
+         var small_screen = $('.small-screen');
+         full_screen.removeClass('full-screen').removeClass('board-w-400').addClass('small-screen').addClass('small');
+         small_screen.removeClass('small-screen').removeClass('small').addClass('full-screen').addClass('board-w-400');
+         $('.switch_screen').each(function (i) {
+             $(this).removeClass('d-none');
+         });
+         $(this).addClass('d-none');
+
+
+         if (!$('.left-side.poi-box').hasClass('d-none')) {
+            $('.board-w-400').removeClass('board-w-400');
+            $('.full-screen').addClass('board-w-400');
+         }
+         mapillaryViewer.resize();
+         map.resize();
+    });
+
+    function saveScene(url, id = 0) {
+        var $form = $('#add_scene_form_' + id);
+        if ($('#add_scene_form_' + id + ' [name="image_key"]').val() == '')
+        {
+            toastr.error('Please select scene!.');
+            return;
+        }
+        if ($('#add_scene_form_' + id + ' [name="title"]').val() == '')
+        {
+            toastr.error('Scene title is required!.');
+            return;
+        }
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: $form.serialize(),
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else
+                {
+                    toastr.success(data.message);
+                    console.log(data);
+                    current_scene_id = data.scene_id;
+                    old_scene();
+                    var scene_box_html = data.scene_box_html;
+                    var scene_count = data.scene_count;
+                    if (typeof scene_box_html != "undefined" && data.type == 'new')
+                    {
+                        $('#scene_list').append(scene_box_html);
+                        reorder_scene();
+                        $('.publish-guidebook').removeClass('d-none');
+                        $('.guidebook-others .scenes span').text(data.scene_count + " Photos");
+                        set_delete_scene();
+                        $('.publish-guidebook').removeClass('d-none');
+                    }
+                    else if (data.type == 'update')
+                    {
+                        $('#scene_' + data.scene_id + ' .scene-title').html('<h6>' + data.title + '</h6>');
+                        $('#scene_' + data.scene_id + ' .scene-description').html('<span>' + data.description + '</span>');
+                        var $form = $('#add_scene_form_' + data.scene_id);
+                        $form.find('input').each(function (index) {
+                            $(this).attr('disabled', true)
+                        });
+                        $form.find('textarea').each(function (index) {
+                            $(this).attr('disabled', true)
+                        });
+                        $form.find('select').each(function (index) {
+                            $(this).attr('disabled', true)
+                        });
+                        $form.find('#save_scene_button').addClass('d-none');
+                        $form.find('#change_scene_button').removeClass('d-none');
+                    }
+                    console.log(scene_box_html);
+                    set_select_scene();
+
+                }
+            }
+        });
+    }
+
+    function showOrHide() {
+        if ($('.minimize-button').hasClass('d-none') && $('.maximize-button').hasClass('d-none'))
+        {
+            $('.small').each(function (i) {
+                $(this).removeClass('d-none');
+            });
+            $('.minimize-button').removeClass('d-none');
+        }
+        else {
+            if ($('.minimize-button').hasClass('d-none'))
+            {
+                $('.minimize-button').removeClass('d-none');
+                $('.maximize-button').addClass('d-none');
+                $('.small').each(function (i) {
+                    $(this).removeClass('d-none');
+                });
+                mapillaryViewer.resize();
+                map.resize();
+            }
+            else if ($('.maximize-button').hasClass('d-none'))
+            {
+                $('.maximize-button').removeClass('d-none');
+                $('.minimize-button').addClass('d-none');
+                $('.small').each(function (i) {
+                    $(this).addClass('d-none');
+                });
+            }
+        }
+
+    }
+
+    // Retrieve tag component
+    var tagComponent = mapillaryViewer.getComponent("tag");
+
+    // Change mode on button clicks
+    function changeMode(tagMode) {
+        tagComponent.changeMode(tagMode);
+    }
+
+    // Create and add editable tags based on created geometry type
+    var createdIndex = 0;
+    var tags = [];
+    var is_existing_new_point = false;
+    function add_new_poi() {
+        changeMode(Mapillary.TagComponent.TagMode.CreatePoint);
+    }
+    tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
+        $.ajax({
+            url: 'ajax/save_poi/' + current_scene_id + '/',
+            type: 'POST',
+            data: {
+                'type': 'new',
+                'position_x': geometry.point[0],
+                'position_y': geometry.point[1],
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else
+                {
+                    console.log(data);
+                    add_tag(data, geometry);
+                    refresh_poi_list(true);
+                    refresh_mapillery_classes();
+                    $('.left-side.poi-box').removeClass('d-none');
+                }
+            }
+        });
+
+    });
+    function add_tag(data, geometry) {
+        $('#poi_list').prepend(data.poi_box_html);
+        var id = data.poi[0].pk;
+        var tag = new Mapillary.TagComponent.SpotTag(id, geometry, { editable: true});
+        var onTagGeometryChanged = function(tag) {
+            var poi_form = $('#poi_body_' + tag.id).find('form');
+            poi_form.find('.position-x').text(tag.geometry.point[0]);
+            poi_form.find('.position-y').text(tag.geometry.point[1]);
+        };
+        tag.on(Mapillary.TagComponent.OutlineTag.geometrychanged, onTagGeometryChanged);
+        tagComponent.add([tag]);
+    }
+
+    function refresh_poi_list(show = false) {
+        $('.collapse-button').off('click');
+        $('.collapse-button').click(function () {
+            selected_poi_id = $(this).data('poi-id');
+            console.log(selected_poi_id);
+            $('.TagVertex.selected').each(function (i) {
+                $(this).removeClass('selected');
+            });
+            if ($('#poi_body_' + selected_poi_id).hasClass('show'))
+            {
+                selected_poi_id = 0;
+                $('.delete-icon').addClass('disabled');
+            }
+            else
+            {
+                $('#tagVertex_' + selected_poi_id).addClass('selected');
+                $('.delete-icon').removeClass('disabled');
+            }
+        });
+        if (show)
+            $('#poi_list').find('.card-header').eq(0).find('button').trigger('click');
+        $('.save-poi-button').off('click');
+        $('.save-poi-button').click(function () {
+            var poi_id = $(this).data('poi-id');
+            var poi_form = $('#poi_' + poi_id).find('form');
+            var title = poi_form.find("input[name=title]").val();
+            var description = poi_form.find("textarea[name=description]").val();
+            var category_id = poi_form.find("select[name=category]").val();
+            $.ajax({
+                url: 'ajax/save_poi/' + current_scene_id + '/',
+                type: 'POST',
+                data: {
+                    'type': 'update',
+                    'poi_id': poi_id,
+                    'title': title,
+                    'category_id': category_id,
+                    'description': description
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                        toastr.error(data.message);
+                    else {
+                        toastr.success(data.message);
+                        $('#poi_header_' + poi_id).find('button').text(title)
+                    }
+                }
+            });
+        });
+        $('.delete-poi-button').off('click');
+        $('.delete-poi-button').click(function () {
+            var poi_id = $(this).attr('data-poi-id');
+            if ($(this).hasClass('disabled') || $(this).hasClass('d-none'))
+                return;
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.value) {
+                     $.ajax({
+                        url: 'ajax/delete_poi/' + current_scene_id + '/',
+                        type: 'POST',
+                        data: {
+                            'poi_id': selected_poi_id,
+                        },
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.status == 'failed')
+                                toastr.error(data.message);
+                            else
+                            {
+                                toastr.success(data.message);
+                                $('#poi_' + selected_poi_id).remove();
+                                tagComponent.remove([selected_poi_id]);
+                                selected_poi_id = 0;
+                                $('.delete-icon').addClass('disabled');
+                                refresh_mapillery_classes();
+                            }
+                        }
+                    });
+                }
+            })
+        })
+    }
+
+    function refresh_mapillery_classes() {
+
+        $('.TagSpotInteractor').off('mousedown');
+        $('.TagSpotInteractor').mousedown(function () {
+            var id = $(this).attr('id');
+            var tagVertex_id = id.replace('tagSpotInteractor', 'tagVertex');
+
+            if (tagVertex_id != $('.TagVertex.selected').attr('id'))
+                $('.TagVertex.selected').removeClass('selected');
+
+            $('#' + tagVertex_id).addClass('selected');
+            var poi_id = id.replace('tagSpotInteractor_', '');
+            selected_poi_id = poi_id;
+            console.log('TagSpot', selected_poi_id);
+
+            if (!$('#poi_body_' + poi_id).hasClass('show'))
+                $('#poi_' + poi_id).find('.card-header').find('button').trigger('click');
+            $('.left-side.poi-box').removeClass('d-none');
+        });
+        $('.TagSpotInteractor').off('mouseup');
+        $('.TagSpotInteractor').mouseup(function () {
+            if (selected_poi_id == 0)
+                return;
+            var poi_id = selected_poi_id;
+            var poi_form = $('#poi_body_' + poi_id).find('form');
+            var position_x = poi_form.find(".position-x").text();
+            var position_y = poi_form.find(".position-y").text();
+            $.ajax({
+                url: 'ajax/save_poi/' + current_scene_id + '/',
+                type: 'POST',
+                data: {
+                    'type': 'move',
+                    'poi_id': poi_id,
+                    'position_x': position_x,
+                    'position_y': position_y,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                        toastr.error(data.message);
+                    /*********
+                    else {
+                        {#toastr.success(data.message);#}
+                    }
+                     *********/
+                }
+            });
+        });
+        {#if ($('#poi_list').html() == '' || selected_poi_id == 0)#}
+        {#    $('.delete-icon').addClass('disabled');#}
+        {#else#}
+        {#    $('.delete-icon').removeClass('disabled');#}
+    }
+
+    // Tags are related to a specific node, remove them when node changes
+    mapillaryViewer.on(Mapillary.Viewer.nodechanged, function(node) {
+        tagComponent.removeAll();
+    });
+
+    function new_scene() {
+        $('.delete-icon').addClass('disabled');
+        $('.poi-icon').addClass('d-none');
+        $('.delete-icon').addClass('d-none');
+        $('#id_new_title').val('');
+        $('#id_new_description').val('');
+        current_scene_id = 0;
+    }
+
+    function old_scene() {
+        $('.poi-icon').removeClass('d-none');
+        $('.delete-icon').removeClass('d-none');
+        $('#id_new_image_key').val('');
+        $('#id_new_lat').val('');
+        $('#id_new_lng').val('');
+        $('#id_new_title').val('');
+        $('#id_new_description').val('');
+    }
+
+    function new_poi() {
+        $('#save_poi_button').text('Save');
+        $('#add_poi_form').find("input[type=text], textarea").val("");
+    }
+
+    function old_poi() {
+        $('#save_poi_button').text('Update');
+        $('#add_poi_form').find("input[type=text], textarea").val("");
+    }
+
+    function save_poi() {
+        console.log('test')
+    }
+
+    $('.point_list').click(function () {
+        var scene_id = $(this).attr('data-scene-id');
+        $('.left-side.poi-box').removeClass('d-none');
+        if ($('#mapillary_image_box').parent().hasClass('small-screen'))
+            $('#mapillary_image_box').parent().find('.switch-full-screen').trigger('click');
+        $('.full-screen').addClass('board-w-400');
+        if (!$('.minimize-button').hasClass('d-none'))
+            $('.minimize-button').trigger('click');
+        mapillaryViewer.resize();
+        map.resize();
+    });
+
+    $('.delete-icon').click(function () {
+        if ($(this).hasClass('disabled') || $(this).hasClass('d-none'))
+            return;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                 $.ajax({
+                    url: 'ajax/delete_poi/' + current_scene_id + '/',
+                    type: 'POST',
+                    data: {
+                        'poi_id': selected_poi_id,
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.status == 'failed')
+                            toastr.error(data.message);
+                        else
+                        {
+                            toastr.success(data.message);
+                            $('#poi_' + selected_poi_id).remove();
+                            tagComponent.remove([selected_poi_id]);
+                            selected_poi_id = 0;
+                            $('.delete-icon').addClass('disabled');
+                            refresh_mapillery_classes();
+                        }
+                    }
+                });
+            }
+        })
+    });
+
+    function set_delete_scene() {
+        $('.delete_scene_button').off('click');
+        $('.delete_scene_button').click(function () {
+            var scene_id = $(this).attr('data-scene-id');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.value) {
+                     $.ajax({
+                        url: 'ajax/delete_scene/' + scene_id + '/',
+                        type: 'POST',
+                        data: {},
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.status == 'failed')
+                                toastr.error(data.message);
+                            else
+                            {
+
+                                toastr.success(data.message);
+                                $('#scene_' + scene_id).parent().remove();
+                                if ($('.scene-list').html() == '') {
+                                    $('#publish_swithch_guidebook').removeClass('btn-success').addClass('btn-dark').text('Unpublished');
+                                }
+                                key_list.splice(current_order_number, 1);
+                                sceneData.splice(current_order_number, 1);
+                                scene_positions.splice(current_order_number, 1);
+
+                                new_scene();
+                                $('#id_new_image_key').val(current_node_key);
+                                $('#id_new_lat').val(current_node_point[0]);
+                                $('#id_new_lng').val(current_node_point[1]);
+                                $('.guidebook-others .scenes span').text(data.scene_count + " Photos");
+                                if (data.scene_count == 0)
+                                {
+                                    $('.publish-guidebook').addClass('d-none');
+                                    $('.publish-guidebook').find('button').removeClass('btn-success').addClass('btn-dark').text('Unpublished');
+                                }
+                                reorder_scene();
+                                set_select_scene();
+                                set_delete_scene();
+                                tagComponent.removeAll();
+                            }
+                        }
+                    });
+                }
+            })
+        });
+    }
+    set_delete_scene();
+
+    $('#delete_guidebook').click(function () {
+        if ($(this).hasClass('disabled') || $(this).hasClass('d-none'))
+            return;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                 $('#delete_guidebook_form').submit();
+            }
+        })
+    });
+
+    $('#publish_swithch_guidebook').click(function () {
+        $.ajax({
+            url: "{% url 'guidebook.check_publish' unique_id=guidebook.unique_id %}",
+            type: 'POST',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                {
+                    toastr.error(data.message)
+                }
+                else {
+                    if (data.is_published)
+                    {
+                        $('#publish_swithch_guidebook').removeClass('btn-dark').addClass('btn-success').text('Published');
+                    }
+                    else
+                    {
+                        $('#publish_swithch_guidebook').removeClass('btn-success').addClass('btn-dark').text('Unpublished');
+                    }
+                }
+            }
+        });
+    });
+
+    window.addEventListener('resize', function() { mapillaryViewer.resize(); map.resize(); });
+
+    function getPos(a, b) { // a == topPos, b == selectionHeight
+        return Math.round((a / b) + 1);
+    }
+
+    function moveThings(a, b, c) { // a == oldPos, b == newPos, c == selectedHeight
+        var first = 'item_' + (b - 1);
+        var $newEl = $('.list_container .' + first);
+
+        if (a < b) { // oldPos less than newPos
+            var second = 'item_' + (b - 2);
+            var newTop = parseInt($newEl.css('top')) - c;
+        } else { // oldPos more than newPos
+            var second = 'item_' + b;
+            var newTop = parseInt($newEl.css('top')) + c;
+        }
+
+        $newEl.css('top', parseInt($newEl.css('top')));
+        $newEl.removeClass(first);
+        $newEl.animate({
+            top: newTop
+        }, 300, function () {
+            $newEl.removeAttr('style');
+        });
+        $newEl.addClass(second);
+
+        return false; // Cleans up animations
+    }
+
+    function setNewClass(e, a) { // e == selected element, a == newPos
+        e.attr('class', 'list_item').addClass('item_' + (a - 1));
+    }
+
+    var item_list = [];
+
+    var margin = 0;
+    var margin_top = 0;
+    var $el;
+    var oldPos = 0;
+    var newPos = 0;
+    var dragging = false;
+
+    var classInfo = '';
+    var item_count = 0;
+
+    var selectionHeight = 186;
+    for (var i = 0; i < 200; i ++) {
+        classInfo += '.' + 'item_' + i + ' {top: ' + (margin_top + i * selectionHeight) + 'px;}\n';
+    }
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerHTML = classInfo;
+    document.getElementsByTagName('head')[0].appendChild(style);
+    var order_ary = [];
+    var old_item_class = '';
+    function  reorder_scene() {
+
+        item_count = $('.list_container .list_item').length;
+        $('.list_container').height(selectionHeight * item_count);
+        item_list = [];
+        for (var i = 0; i < order_ary.length; i++)
+        {
+            if (typeof $('.list_item.item_' + i).html() != "undefined")
+                item_list.push($('.list_item.item_' + i).html())
+        }
+
+        $('.list_container .list_item').each(function (index) {
+            $(this).attr('class', 'list_item');
+            $(this).attr('style', '');
+            $(this).addClass('item_' + index);
+            if (typeof item_list[index] != "undefined")
+            {
+                console.log('test');
+                $(this).html(item_list[index]);
+            }
+        });
+
+        $('.scene-box').off('click');
+        $('.scene-box').click(function () {
+            var image_key = $(this).data('image_key');
+            mapillaryViewer.moveToKey(image_key);
+        });
+
+        $('.list_item').off('mousedown');
+        $('.list_item').mousedown(function (ev) {
+            $el = $(this);
+            old_item_class = $(this).attr('class');
+            oldPos = $el.index() + 1;
+            newPos = oldPos;
+            dragging = true;
+            startY = ev.clientY;
+            startT = parseInt($el.css('top'));
+            $el.addClass('selected');
+        });
+
+        $('.point_list').off('click');
+        $('.point_list').click(function () {
+            var scene_id = $(this).attr('data-scene-id');
+            $('.left-side.poi-box').removeClass('d-none');
+            if ($('#mapillary_image_box').parent().hasClass('small-screen'))
+                $('#mapillary_image_box').parent().find('.switch-full-screen').trigger('click');
+            $('.full-screen').addClass('board-w-400');
+            if(!$('.minimize-button').hasClass('d-none'))
+                $('.minimize-button').trigger('click');
+            mapillaryViewer.resize();
+            map.resize();
+        });
+    }
+
+    $(window).mousemove(function (ev) {
+        if (dragging) {
+            $el.attr('class', 'list_item')
+            $el.addClass('selected');
+
+            // ----- calculate new top
+            var newTop = startT + (ev.clientY - startY);
+            $el.css('cursor', 'pointer');
+            // ------
+
+            //------ stay in parent
+            var maxTop = $el.parent().height() - $el.height();
+            newTop = newTop < 0 ? 0 : newTop > maxTop ? maxTop : newTop;
+            $el.css('top', newTop);
+            //------
+
+            newPos = getPos(newTop, selectionHeight);
+
+            if (oldPos != newPos) {
+                moveThings(oldPos, newPos, selectionHeight);
+                oldPos = newPos;
+            }
+        }
+    }).mouseup(function (ev) {
+        if (dragging) {
+            $el.attr('class', 'list_item')
+            $el.addClass('selected');
+
+            // ----- calculate new top
+            var newTop = startT + (ev.clientY - startY);
+            $el.css('cursor', 'pointer');
+            // ------
+
+            //------ stay in parent
+            var maxTop = $el.parent().height() - $el.height();
+            newTop = newTop < 0 ? 0 : newTop > maxTop ? maxTop : newTop;
+            $el.css('top', newTop);
+            //------
+
+            newPos = getPos(newTop, selectionHeight);
+
+            if (oldPos != newPos) {
+                moveThings(oldPos, newPos, selectionHeight);
+                oldPos = newPos;
+            }
+            dragging = false;
+            $el.removeClass('selected');
+            setNewClass($el, newPos);
+            $el.css('top', (newPos - 1) * selectionHeight);
+
+            var order_list = '';
+            var scene_id = 0;
+            order_ary = [];
+            for (var i = 0; i < item_count; i++) {
+                scene_id = $('.list_item.item_' + i).find('.scene-box').attr('data-scene-id');
+                if (order_list == '')
+                    order_list = scene_id;
+                else
+                    order_list += "," + scene_id;
+                order_ary.push(scene_id);
+            }
+            if ($el.attr('class') != old_item_class)
+                $.ajax({
+                    url: '{% url "guidebook.ajax_order_scene" unique_id=guidebook.unique_id %}',
+                    type: 'POST',
+                    data: {'order_list': order_list},
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.status == 'failed')
+                            toastr.error(data.message);
+                        else
+                        {
+                            toastr.success(data.message);
+                        }
+                    }
+                });
+        }
+    });
+
+    reorder_scene()
+</script>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends 'layouts/marketplace/base.html' %}
+
+{% block title %}Hire Photographer{% endblock %}
+
+{% block content %}
+
+<div class="main-body">
+    <div class="left-side">
+        <div class="p-4 mt-3">
+
+            <div class="card p-3 mt-3 mb-3" id="photographer_{{ photographer.unique_id }}" data-photographer-id="{{ photographer.unique_id }}">
+                <div class="photographer-title text-info">
+                    <h5>
+                        {{ photographer.name }}
+                    </h5>
+                </div>
+                
+                <div class="photographer-description">
+                    <p>
+                        {{ photographer.getShortDescription }}
+                    </p>
+                </div>
+
+                <div class="photographer-options">
+                    <p>
+                        {{ photographer.getCaptureType }}, {{ photographer.getCaptureMethod }}
+                    </p>
+                </div>
+
+                <div class="photographer-created-at text-secondary">
+                    <h6>
+                        {{ photographer.created_at }}
+                    </h6>
+                </div>
+                
+                <div class="photographer-geometry d-none">{{ photographer.geometry }}</div>
+            </div>
+
+            <h4>Contact this photographer</h4>
+
+            <p>Send an email to this photographer to find out more about their services by filling in the form below. Don't forget to include links to further information about your job(s).</p>
+
+            <form method="POST" class="post-form mt-3">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="form-group text-right">
+                    <button type="submit" class="save btn btn-primary">Send</button>
+                </div>
+            </form>
+
+            <div class="photographer-geometry d-none">{{ photographer.geometry }}</div>
+        </div>
+    </div>
+    <div class="right-fixed-board bg-light">
+        <div id="map"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    // TO MAKE THE MAP APPEAR YOU MUST
+	// ADD YOUR ACCESS TOKEN FROM
+	// https://account.mapbox.com
+    mapboxgl.accessToken = mapboxToken;
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+        center: [-74.5, 40], // starting position
+        zoom: "{{ photographer.zoom }}" // starting zoom
+    });
+
+    var photographerGeometryElements = $('.photographer-geometry');
+    var polygonData = [];
+    for (i = 0; i < photographerGeometryElements.length; i++)
+    {
+        var item = photographerGeometryElements.eq(i);
+        var geometryData = item.text();
+        var geometryDataJson = JSON.parse(geometryData);
+        geometryDataJson.forEach(function (item, index) {
+            polygonData.push(item);
+        });
+    }
+
+    map.on('load', function() {
+        map.addSource('states', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': polygonData
+            }
+        });
+        map.addLayer({
+            'id': 'states-layer',
+            'type': 'fill',
+            'source': 'states',
+            'layout': {},
+            'paint': {
+                'fill-color': 'rgba(200, 100, 240, 0.4)',
+                'fill-outline-color': 'rgba(200, 100, 240, 1)'
+            }
+        });
+    });
+
+    getPhotographerDetail("{{ photographer.unique_id }}");
+    
+    function getPhotographerDetail(id) {
+        var geometryDataJson = JSON.parse($('.photographer-geometry').text());
+        var coorXSum = 0;
+        var coorYSum = 0;
+        var countSum = 0;
+        var minX = 0;
+        var maxX = 0;
+        var minY = 0;
+        var maxY = 0;
+        for(j = 0; j < geometryDataJson.length; j++)
+        {
+            var coordinates = geometryDataJson[j].geometry.coordinates;
+
+            for (i = 0; i < coordinates[0].length; i++)
+            {
+                coorXSum += coordinates[0][i][0];
+                coorYSum += coordinates[0][i][1];
+                countSum++;
+                if (coordinates[0][i][0] < minX)
+                    minX = coordinates[0][i][0];
+                if (coordinates[0][i][0] > maxX)
+                    maxX = coordinates[0][i][0];
+                if (coordinates[0][i][1] < minY)
+                    minY = coordinates[0][i][0];
+                if (coordinates[0][i][1] > maxY)
+                    maxY = coordinates[0][i][1];
+            }
+        }
+
+        var coorX = coorXSum / countSum;
+        var coorY = coorYSum / countSum;
+        map.flyTo({ center: [coorX, coorY] });
+    }
+</script>
+{% endblock %}

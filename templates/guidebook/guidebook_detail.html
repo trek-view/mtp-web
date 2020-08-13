@@ -1,0 +1,711 @@
+{% extends 'layouts/guidebook/base.html' %}
+{% block title %}Guidebook Detail{% endblock %}
+{% load static %}
+
+{% block content %}
+<link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
+    <style>
+        .small-screen {
+            margin-bottom: 55px;
+        }
+        .TagSpotInteractor {
+            cursor: pointer !important;
+        }
+
+    </style>
+<div class="main-body">
+    <div class="left-side p-3">
+        <div class="text-right mt-2 mb-2">
+            <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
+        </div>
+        <div class="guidebook-detail card p-2">
+            <div class="guidebook-title text-center text-info mt-1">
+                <h3>
+                    {{ guidebook.name }}
+                </h3>
+            </div>
+
+            <div class="guidebook-cover-image mt-3 mb-3">
+                <img class="w-100" src="{{ STATIC_URL }}{{ guidebook.cover_image }}">
+            </div>
+
+            <div class="guidebook-description">
+                <p class="mb-1">
+                    {{ guidebook.description }}
+                </p>
+            </div>
+
+            <div class="guidebook-cetegory mt-2" style="color: blueviolet;">
+                <p class="mb-1">
+                    {{ guidebook.category }}
+                </p>
+            </div>
+
+            <div class="guidebook-tag mt-2">
+                {% for tag_name in guidebook.getTags %}
+                    <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                        {{ tag_name }}
+                    </span>
+                {% endfor %}
+            </div>
+
+            <div class="guidebook-created-at text-secondary mt-2">
+                <span class="float-left">
+                    {{ guidebook.created_at }}
+                </span>
+                <span class="float-right" style="color: brown;">
+                    {{ guidebook.user }}
+                </span>
+            </div>
+            <div class="guidebook-others float-right d-flex flex-row justify-content-between mt-2">
+                <div class="scenes text-center">
+                    {% if guidebook.getSceneCount == 0 %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                    {% else %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                    {% endif %}
+                    <span class="text-center m-0">
+                        {{ guidebook.getSceneCount }} Photos
+                    </span>
+                </div>
+                <div class="like text-center">
+                    {% if guidebook.getLikeCount == 0 %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
+                    {% else %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
+                    {% endif %}
+                    <span class="text-center m-0">
+                        {{ guidebook.getLikeCount }} Likes
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        {% if request.user.is_authenticated and request.user == guidebook.user %}
+            <div class="card p-2 mt-2">
+                <div class="">
+                    <form method="POST" id="delete_guidebook_form" class="d-flex align-items-center" action="{% url 'guidebook.guidebook_delete' unique_id=guidebook.unique_id %}">
+                        {% csrf_token %}
+                        {% if guidebook.getSceneCount > 0 %}
+                            <div class="col ">
+                                {% if guidebook.is_approved and guidebook.is_published %}
+                                    <button type="button" class="btn btn-success" id="publish_swithch_guidebook">Published</button>
+                                {% elif guidebook.is_approved and not guidebook.is_published %}
+                                    <button type="button" class="btn btn-dark" id="publish_swithch_guidebook">Unpublished</button>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        <div class="col ">
+                            <a href="{% url 'guidebook.add_scene' unique_id=guidebook.unique_id %}">
+                                <button type="button" class="btn btn-primary">Edit</button>
+                            </a>
+                        </div>
+
+                        <div class="col delete-gudiebook">
+                            <button type="button" id="delete_guidebook" class="btn btn-danger">Delete</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="mt-3">
+            <h4>
+                Scene List:
+            </h4>
+        </div>
+
+        <div class="mt-2 p-1 border scene-list" id="scene_list">
+            {% if guidebook.getSceneCount > 0  %}
+                {% for scene in guidebook.getScenes %}
+                    <div class="card mb-2 scene-box" id="scene_{{ scene.pk }}" data-image_key="{{ scene.image_key }}" style="cursor: pointer">
+                        <div class="card-body">
+                            <div class="scene-title">
+                                <h6>{{ scene.title }}</h6>
+                            </div>
+                            <div class="scene-description">
+                                <span>{{ scene.description }}</span>
+                            </div>
+                            <div class="d-none scene-position">
+                                <p class="image_key">{{ scene.image_key }}</p>
+                                <p class="lat">{{ scene.lat }}</p>
+                                <p class="lng">{{ scene.lng }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h5 class="p-3 text-center">No Scene</h5>
+            {% endif %}
+        </div>
+    </div>
+    <div class="left-side poi-box d-none">
+        <div class="hide-poi-box text-right p-2 mt-3">
+            <button class="btn btn-info" onclick="hide_poi_box()">
+                Back to Scenes
+            </button>
+        </div>
+        <div class="poi-list p-2">
+            <div class="accordion" id="poi_list">
+            </div>
+        </div>
+    </div>
+    <div class="right-board">
+        <div class="board">
+            <div class="small-screen small">
+                <div class="switch-full-screen switch_screen">
+                    <img class="w-100" src="{% static 'images/icon/icons8-toggle-full-screen-64.png' %}">
+                </div>
+                <div class="map-board w-100 display" id="map">
+                </div>
+            </div>
+            <div class="full-screen board-w-400">
+                <div class="SequenceContainer PrevOrNext d-none">
+                    <div class="SequenceStepper d-flex flex-row">
+                        <div class="SequenceStepPrev" style="border-bottom-left-radius: 8px; border-top-left-radius: 8px; width: 30px">
+                            <div class="SequenceComponentIcon"></div>
+                        </div>
+                        <div class="SequencePlay" style="font-size: 16px; color: white; width: 80px; text-align: center">
+                            Scene 1
+                        </div>
+                        <div class="SequenceStepNext" style="border-bottom-right-radius: 8px; border-top-right-radius: 8px; width: 30px">
+                            <div class="SequenceComponentIcon"></div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="switch-full-screen switch_screen d-none" >
+                    <img class="w-100" src="{% static 'images/icon/icons8-toggle-full-screen-64.png' %}">
+                </div>
+                <div id='mapillary_image_box' class="image-box display"></div>
+            </div>
+            <div class="show-or-hide">
+                <div class="minimize-button" onclick="showOrHide()">
+                    <img class="w-100" src="{% static 'images/icon/icons8-minimize-window-48.png' %}">
+                </div>
+                <div class="maximize-button d-none" onclick="showOrHide()">
+                    <img class="w-100" src="{% static 'images/icon/icons8-maximize-window-48.png' %}">
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var point_moving = false;
+
+    var poi_mouseup = function (e) {
+        var poi_id = e.target['data-poi-id'];
+    };
+    var poi_mousemove = function (e) {
+        return false;
+    };
+    var poi_mousedown = function (e) {
+        return false;
+    };
+    var poi_mouseover = function (e) {
+        refresh_mapillery_classes();
+    };
+    var poi_click = function (e) {
+        return false;
+    };
+    var selected_poi_id = 0;
+</script>
+<script src="{% static 'js/mapillary.js' %}"></script>
+<script>
+    $.ajaxSetup({
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+
+    function hide_poi_box() {
+        $('.left-side.poi-box').addClass('d-none');
+    }
+
+    {% if not request.user.is_authenticated %}
+        $('.guidebook-others .like img').css('cursor', 'pointer');
+        $('.guidebook-others .like img').click(function () {
+            Swal.fire({
+                title: 'Need to login!',
+                html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
+                        "If you don't have your account, please <a href=\"{% url 'signup' %}\">sign up</a>",
+                showCancelButton: false,
+                confirmButtonText: 'OK'
+            })
+        });
+    {% elif request.user != guidebook.user %}
+        $('.guidebook-others .like img').css('cursor', 'pointer');
+        $('.guidebook-others .like img').click(function () {
+            $.ajax({
+                url: "{% url 'guidebook.check_like' unique_id=guidebook.unique_id %}",
+                type: 'POST',
+                data: {},
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                    {
+                        toastr.error(data.message)
+                    }
+                    else {
+                        var loved = "{% static 'images/icon/icons8-love-48.png' %}";
+                        var unloved = "{% static 'images/icon/icons8-love-100.png' %}"
+                        $('.guidebook-others .like span').text(data.liked_count + ' Likes');
+                        if (data.liked_count == 0)
+                            $('.guidebook-others .like img').attr('src', unloved)
+                        else
+                            $('.guidebook-others .like img').attr('src', loved)
+                    }
+                }
+            });
+        });
+    {% endif %}
+
+    $('#publish_swithch_guidebook').click(function () {
+        $.ajax({
+            url: "{% url 'guidebook.check_publish' unique_id=guidebook.unique_id %}",
+            type: 'POST',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                {
+                    toastr.error(data.message)
+                }
+                else {
+                    if (data.is_published)
+                    {
+                        $('#publish_swithch_guidebook').removeClass('btn-dark').addClass('btn-success').text('Published');
+                    }
+                    else
+                    {
+                        $('#publish_swithch_guidebook').addClass('btn-dark').removeClass('btn-success').text('Unpublished');
+                    }
+                }
+            }
+        });
+    });
+
+    var scene_id = 0;
+    var current_node_point = null;
+    var current_node_key = '';
+    var current_order_number = 0;
+    toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    };
+
+    var scene_positions = [];
+    var key_list = [];
+    var sceneData = [];
+    var item = {};
+    $('.scene-position').each(function (index) {
+        var lat = $(this).find('.lat').text();
+        var lng = $(this).find('.lng').text();
+        var key = $(this).find('.image_key').text();
+        scene_positions.push([lng, lat]);
+        key_list.push(key);
+        item = {
+            "type": "Feature",
+            "properties": {"key": key},
+            "geometry": {
+                "coordinates": [lng, lat],
+                "type": "Point"
+            }
+        };
+        sceneData.push(item);
+    });
+
+    var mapillaryViewer = new Mapillary.Viewer(
+        'mapillary_image_box',
+        mapillaryClientId,
+        "{{ guidebook.getFirstSceneKey }}",
+        {
+            component: {
+                cover: false,
+                tag: true,
+                direction: false,
+                sequence: false,
+            },
+        }
+    );
+
+    $('.scene-box').click(function () {
+        var image_key = $(this).data('image_key');
+        mapillaryViewer.moveToKey(image_key);
+    });
+
+    mapboxgl.accessToken = mapboxToken;
+    if (scene_positions.length > 0)
+        var first_point = scene_positions[0];
+    else
+        var first_point = [-87.622088, 41.878781];
+    console.log(first_point);
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+        center: first_point, // starting position
+        zoom: 14, // starting zoom
+        attributionControl: false
+    });
+
+    map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+    map.on('load', function() {
+
+        map.addSource('points', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': sceneData
+            }
+        });
+        map.addLayer({
+            'id': 'mapillary-images',
+            'type': 'circle',
+            'source': 'points',
+            "paint": {
+                "circle-color": "#039825",
+                "circle-radius": 6
+            }
+        });
+        if (map.getLayer('markers')) map.removeLayer('markers');
+        if (map.getSource('markers')) map.removeSource('markers');
+        map.addSource('markers', {
+             type: 'geojson',
+             data: {
+                 type: 'Feature',
+                 geometry: {
+                     type: 'Point',
+                     coordinates: first_point
+                 },
+                 properties: {
+                     title: 'You are here!',
+                     'marker-symbol': 'marker'
+                 }
+             }
+        });
+        map.addLayer({
+             id: 'markers',
+             type: 'circle',
+             source: 'markers',
+             paint: {
+                 "circle-color": "#e0400e",
+                 "circle-radius": 9
+             }
+        });
+
+    });
+
+    // Create a popup, but don't add it to the map yet.
+    var popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
+
+    map.on('mouseenter', 'mapillary-images', function(e) {
+      // Change the cursor style as a UI indicator.
+      map.getCanvas().style.cursor = 'pointer';
+
+      var coordinates = e.features[0].geometry.coordinates.slice();
+      var key = e.features[0].properties.key;
+      var url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+
+      // Ensure that if the map is zoomed out such that multiple
+      // copies of the feature are visible, the popup appears
+      // over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+      // Populate the popup and set its coordinates
+      // based on the feature found.
+      popup.setLngLat(coordinates)
+      .setHTML("<img src='" + url + "' width='160'/>")
+      .addTo(map);
+    });
+
+    map.on('click', 'mapillary-images', function (e) {
+        var key = e.features[0].properties.key;
+        selected_poi_id = 0;
+        if ($('.minimize-button').hasClass('d-none') && $('.maximize-button').hasClass('d-none'))
+        {
+            $('.small').each(function (i) {
+                $(this).removeClass('d-none');
+            });
+            $('.minimize-button').removeClass('d-none');
+        }
+        mapillaryViewer.resize();
+        mapillaryViewer.moveToKey(key);
+    });
+
+    map.on('mouseleave', 'mapillary-images', function() {
+      map.getCanvas().style.cursor = '';
+      popup.remove();
+    });
+    var mapillery_clicking = false;
+    mapillaryViewer.on('mousedown', function () {
+        mapillery_clicking = true;
+    });
+    mapillaryViewer.on('mousedown', function () {
+        mapillery_clicking = false;
+    });
+    mapillaryViewer.on('mousemove', function () {
+        if (mapillery_clicking)
+        {
+            refresh_mapillery_classes()
+        }
+    });
+
+    mapillaryViewer.on(Mapillary.Viewer.nodechanged, function (node) {
+        current_node_point = [node.latLon.lat, node.latLon.lon];
+        current_node_key = node.key;
+        current_order_number = key_list.indexOf(current_node_key);
+
+        if (key_list.length > 1)
+        {
+            $('.PrevOrNext .SequencePlay').text('Scene ' + (current_order_number + 1))
+            $('.PrevOrNext').removeClass('d-none');
+            if (current_order_number == 0)
+            {
+                $('.PrevOrNext .SequenceStepPrev').addClass('disabled');
+            }
+            else
+                $('.PrevOrNext .SequenceStepPrev').removeClass('disabled');
+            if (current_order_number == key_list.length - 1)
+            {
+                $('.PrevOrNext .SequenceStepNext').addClass('disabled');
+            }
+            else
+                $('.PrevOrNext .SequenceStepNext').removeClass('disabled');
+        }
+        else
+            $('.PrevOrNext').addClass('d-none');
+        $('#poi_list').html('');
+        if (map.getLayer('markers')) map.removeLayer('markers');
+        if (map.getSource('markers')) map.removeSource('markers');
+        map.addSource('markers', {
+             type: 'geojson',
+             data: {
+                 type: 'Feature',
+                 geometry: {
+                     type: 'Point',
+                     coordinates: [current_node_point[1], current_node_point[0]]
+                 },
+                 properties: {
+                     title: 'You are here!',
+                     'marker-symbol': 'marker'
+                 }
+             }
+        });
+        map.addLayer({
+             id: 'markers',
+             type: 'circle',
+             source: 'markers',
+             paint: {
+                 "circle-color": "#e0400e",
+                 "circle-radius": 9
+             }
+        });
+        map.flyTo({center: [current_node_point[1], current_node_point[0]]});
+        selected_poi_id = 0;
+        $.ajax({
+            url: "{% url 'guidebook.ajax_get_scene' unique_id=guidebook.unique_id %}",
+            type: 'GET',
+            data: {'image_key': node.key},
+            dataType: 'json',
+            success: function (data) {
+                var scene = data.scene[0].fields;
+                scene_id = data.scene[0].pk;
+                var position_x = 0;
+                var position_y = 0;
+                for (i = 0; i < data.poi_list.length; i++)
+                {
+                    position_x = data.poi_list[i].poi[0].fields.position_x;
+                    position_y = data.poi_list[i].poi[0].fields.position_y;
+                    var spotTag = new Mapillary.TagComponent.PointGeometry([position_x, position_y]);
+                    add_tag(data.poi_list[i], spotTag);
+                }
+                refresh_poi_list();
+                refresh_mapillery_classes();
+            }
+        });
+    });
+
+    $('.PrevOrNext .SequenceStepPrev').click(function () {
+        if ($(this).hasClass('disabled'))
+            return false;
+        if (key_list.length < 2 || current_order_number == 0)
+            return false;
+        mapillaryViewer.moveToKey(key_list[current_order_number - 1])
+    });
+
+    $('.PrevOrNext .SequenceStepNext').click(function () {
+        if ($(this).hasClass('disabled'))
+            return false;
+        if (key_list.length < 2 || current_order_number == key_list.length - 1)
+            return false;
+        mapillaryViewer.moveToKey(key_list[current_order_number + 1])
+    });
+
+    $('.switch_screen').click(function () {
+         var full_screen = $('.full-screen');
+         var small_screen = $('.small-screen');
+         full_screen.removeClass('full-screen').removeClass('board-w-400').addClass('small-screen').addClass('small');
+         small_screen.removeClass('small-screen').removeClass('small').addClass('full-screen').addClass('board-w-400');
+         $('.switch_screen').each(function (i) {
+             $(this).removeClass('d-none');
+         });
+         $(this).addClass('d-none');
+
+
+         if (!$('.left-side.poi-box').hasClass('d-none')) {
+            $('.board-w-400').removeClass('board-w-400');
+            $('.full-screen').addClass('board-w-400');
+         }
+         mapillaryViewer.resize();
+         map.resize();
+    });
+
+    function showOrHide() {
+        if ($('.minimize-button').hasClass('d-none') && $('.maximize-button').hasClass('d-none'))
+        {
+            $('.small').each(function (i) {
+                $(this).removeClass('d-none');
+            });
+            $('.minimize-button').removeClass('d-none');
+        }
+        else {
+            if ($('.minimize-button').hasClass('d-none'))
+            {
+                $('.minimize-button').removeClass('d-none');
+                $('.maximize-button').addClass('d-none');
+                $('.small').each(function (i) {
+                    $(this).removeClass('d-none');
+                });
+                mapillaryViewer.resize();
+                map.resize();
+            }
+            else if ($('.maximize-button').hasClass('d-none'))
+            {
+                $('.maximize-button').removeClass('d-none');
+                $('.minimize-button').addClass('d-none');
+                $('.small').each(function (i) {
+                    $(this).addClass('d-none');
+                });
+            }
+        }
+
+    }
+
+    // Retrieve tag component
+    var tagComponent = mapillaryViewer.getComponent("tag");
+
+    // Change mode on button clicks
+    function changeMode(tagMode) {
+        tagComponent.changeMode(tagMode);
+    }
+
+    // Create and add editable tags based on created geometry type
+    var createdIndex = 0;
+    var tags = [];
+    var is_existing_new_point = false;
+    function add_new_poi() {
+        changeMode(Mapillary.TagComponent.TagMode.CreatePoint);
+    }
+    function add_tag(data, geometry) {
+        $('#poi_list').prepend(data.poi_box_html);
+        var id = data.poi[0].pk;
+        var tag = new Mapillary.TagComponent.SpotTag(id, geometry, { editable: true});
+        var onTagGeometryChanged = function(tag) {
+            var poi_form = $('#poi_body_' + tag.id).find('form');
+            poi_form.find('.position-x').text(tag.geometry.point[0]);
+            poi_form.find('.position-y').text(tag.geometry.point[1]);
+        };
+        tag.on(Mapillary.TagComponent.OutlineTag.geometrychanged, onTagGeometryChanged);
+        tagComponent.add([tag]);
+    }
+
+    function refresh_poi_list(show = false) {
+        $('.card.poi .collapse-button').off('click');
+        $('.card.poi .collapse-button').click(function () {
+            selected_poi_id = $(this).data('poi-id');
+            $('.TagVertex.selected').each(function (i) {
+                $(this).removeClass('selected');
+            });
+            if ($('#poi_body_' + selected_poi_id).hasClass('show'))
+            {
+                selected_poi_id = 0;
+            }
+            else
+            {
+                $('#tagVertex_' + selected_poi_id).addClass('selected');
+            }
+        });
+        if (show)
+            $('#poi_list').find('.card-header').eq(0).find('button').trigger('click');
+    }
+
+    function refresh_mapillery_classes() {
+
+        $('.TagSpotInteractor').off('mousedown');
+        $('.TagSpotInteractor').mousedown(function () {
+            var id = $(this).attr('id');
+            var tagVertex_id = id.replace('tagSpotInteractor', 'tagVertex');
+
+            if (tagVertex_id != $('.TagVertex.selected').attr('id'))
+                $('.TagVertex.selected').removeClass('selected');
+
+            $('.left-side.poi-box').removeClass('d-none');
+            $('#' + tagVertex_id).addClass('selected');
+            var poi_id = id.replace('tagSpotInteractor_', '');
+            selected_poi_id = poi_id;
+            if (!$('#poi_body_' + poi_id).hasClass('show'))
+                $('#poi_' + poi_id).find('.card-header').find('button').trigger('click');
+
+        });
+    }
+
+    // Tags are related to a specific node, remove them when node changes
+    mapillaryViewer.on(Mapillary.Viewer.nodechanged, function(node) {
+        tagComponent.removeAll();
+    });
+
+    $('#point_list').click(function () {
+        if ($('.left-side.poi-box').hasClass('d-none')) {
+            $(this).text('Hide POI List');
+            $('.left-side.poi-box').removeClass('d-none');
+
+            if ($('#mapillary_image_box').parent().hasClass('small-screen'))
+                $('#mapillary_image_box').parent().find('.switch-full-screen').trigger('click');
+            $('.full-screen').addClass('board-w-400');
+            $('.minimize-button').trigger('click');
+            mapillaryViewer.resize();
+            map.resize();
+        }
+        else {
+            $(this).text('Show POI List');
+            $('.left-side.poi-box').addClass('d-none');
+            $('.board-w-400').removeClass('board-w-400');
+            mapillaryViewer.resize();
+            map.resize();
+        }
+    });
+
+    window.addEventListener('resize', function() { mapillaryViewer.resize(); map.resize(); });
+</script>
+{% endblock %}

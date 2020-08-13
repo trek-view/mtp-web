@@ -1,0 +1,16 @@
+{% extends 'layouts/marketplace/base.html' %}
+{% block title %}Apply Job{% endblock %}
+{% block content %}
+{% load static %}
+<div class="error-404-box text-center" style="padding-top: 150px;">
+    <div class="">
+        <img src="{% static 'images/global/404.png' %}">
+
+        <h4 class="mt-4">We couldn't find the page you were looking for.</h4>
+        
+        <h5 class="mt-4"><a href="{% url 'home' %}">Time to head home?</a></h5>
+    </div>
+    
+</div>
+
+{% endblock %}

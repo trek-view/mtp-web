@@ -1,0 +1,130 @@
+.full-screen {
+    height: calc(100vh - 100px);
+    width: 100%;
+    position: fixed;
+    top: 100px;
+    z-index: 0;
+}
+
+.board-w-400 {
+    width: calc(100vw - 400px) !important;
+}
+
+.map-board {
+    height: 100%;
+    width: 100%;
+}
+.main-body .board {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
+.image-box {
+    width: 100%;
+    height: 100%;
+}
+
+.small-screen {
+    height: 300px;
+}
+
+.small-screen .display {
+    border-radius: 8px;
+    box-shadow: 3px 3px 0px 0px rgb(4 4 4 / 5%), 4px 7px 20px 0px rgb(0 0 0 / 86%);
+}
+
+.small {
+    width: 400px;
+    z-index: 200;
+    position: relative;
+    margin-left: 10px;
+}
+
+
+.scene-form input, .scene-form textarea {
+    background: #0a1b23;
+    color: white;
+    box-shadow: 3px 3px 0px 0px rgb(4 4 4 / 5%), 4px 7px 20px 0px rgb(0 0 0 / 86%);
+    border: 0px;
+}
+
+.scene-form .form-control:focus {
+    background: #030b0e;
+    border: 0px;
+    color: #9fcdff;
+    box-shadow: 3px 3px 0px 0px rgb(4 4 4 / 5%), 4px 7px 20px 0px rgb(0 0 0 / 86%);
+}
+
+.scene-form .btn-primary {
+    background-color: #08192b;
+    border: 1px #08192b solid;
+    box-shadow: 3px 3px 0px 0px rgb(4 4 4 / 5%), 4px 7px 20px 0px rgb(0 0 0 / 86%);
+}
+
+.scene-form .btn-primary:hover {
+    border: 1px #beecff solid;
+}
+
+.minimize-button, .maximize-button {
+    width: 35px;
+    position: absolute;
+    cursor: pointer;
+    left: 10px;
+    bottom: 10px;
+    z-index: 300;
+}
+
+.switch-full-screen {
+    position: absolute;
+    right: 0px;
+    width: 40px;
+    z-index: 300;
+    cursor: pointer;
+}
+
+.poi-icon {
+    position: absolute;
+    left: 10px;
+    width: 40px;
+    z-index: 300;
+    cursor: pointer;
+    background: #00000082;
+    top: 10px;
+    border-radius: 7px;
+}
+
+.delete-icon {
+    position: absolute;
+    left: 10px;
+    width: 40px;
+    z-index: 300;
+    cursor: pointer;
+    background: #00000082;
+    top: 60px;
+    border-radius: 7px;
+}
+
+.delete-icon.disabled {
+    cursor: unset !important;
+    opacity: .4 !important;
+}
+
+.popup-tag {
+    width: 100px;
+    height: 100px;
+    background: white;
+    z-index: 300;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+.TagVertex.selected {
+    opacity: .9;
+}
+
+.TagVertex {
+    opacity: .6;
+}

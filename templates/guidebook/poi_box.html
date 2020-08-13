@@ -1,0 +1,21 @@
+<div class="card poi" id="poi_{{ poi.pk }}">
+    <div class="card-header " id="poi_header_{{ poi.pk }}">
+        <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left collapse-button" data-poi-id="{{ poi.pk }}" type="button" data-toggle="collapse" data-target="#poi_body_{{ poi.pk }}" aria-expanded="true" aria-controls="collapseOne">
+                {{ poi.title }}
+            </button>
+        </h2>
+    </div>
+    <div id="poi_body_{{ poi.pk }}" class="collapse" aria-labelledby="poi_header_{{ poi.pk }}" data-parent="#poi_list">
+        <div class="card-body">
+            <div class="poi-description">
+                <span>{{ poi.description }}</span>
+            </div>
+            <div class="poi-cetegory mt-2" style="color: blueviolet;">
+                <p class="mb-1">
+                    {{ poi.category }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

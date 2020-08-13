@@ -1,0 +1,5 @@
+<body>
+    <p>
+        <a href="{{ BASE_URL }}{% url 'admin:accounts_customuser_change' object_id=request.user.pk %}">{{ request.user.username }}</a> created <a href="{{ BASE_URL }}{% url 'admin:marketplace_job_change' object_id=job.pk %}">{{ job.name }}</a>
+    </p>
+</body>

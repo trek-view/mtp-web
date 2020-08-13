@@ -1,0 +1,29 @@
+{% extends 'layouts/auth/base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+{% load static %}
+{% block content %}
+    <div class="container">
+        <div class="content p-5">
+            <div class="card login ml-auto mr-auto">
+                <div class="card-header d-flex align-items-center">
+                    <a href="{% url 'home' %}">
+                        <img src="{% static 'images/iconified/apple-touch-icon-57x57.png' %}">
+                    </a>
+                    <h2 class="ml-4">Sign up</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="d-flex flex-row justify-content-between align-items-center">
+                            <a href="{% url 'login' %}">Login</a>
+                            <button type="submit" class="btn btn-primary">Sign Up</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

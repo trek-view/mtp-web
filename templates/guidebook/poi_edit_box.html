@@ -1,0 +1,30 @@
+<div class="card poi" id="poi_{{ poi.pk }}">
+    <div class="card-header " id="poi_header_{{ poi.pk }}">
+        <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left collapse-button" data-poi-id="{{ poi.pk }}" type="button" data-toggle="collapse" data-target="#poi_body_{{ poi.pk }}" aria-expanded="true" aria-controls="collapseOne">
+{#                {{ poi.pk }}#}
+                {{ poi.title }}
+            </button>
+        </h2>
+    </div>
+
+    <div id="poi_body_{{ poi.pk }}" class="collapse" aria-labelledby="poi_header_{{ poi.pk }}" data-parent="#poi_list">
+        <div class="card-body">
+            <form method="post">
+                {{ poi_form.as_p }}
+
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="text-left">
+                        <div class="d-none"><span>X: </span><span class="position-x">{{ poi.position_x }}</span></div>
+                        <div class="d-none"><span>Y: </span><span class="position-y">{{ poi.position_y }}</span></div>
+                    </div>
+
+                    <div class="text-right">
+                        <button type="button" class="save btn btn-danger delete-btn delete-poi-button" data-poi-id="{{ poi.pk }}" >Delete</button>
+                        <button type="button" class="save btn btn-primary save-btn save-poi-button" data-poi-id="{{ poi.pk }}" >Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

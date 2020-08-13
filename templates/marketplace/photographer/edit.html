@@ -1,0 +1,126 @@
+{% extends 'layouts/marketplace/base.html' %}
+
+{% block title %}Edit Photographer{% endblock %}
+
+{% block content %}
+
+<div class="main-body">
+    <div class="left-side">
+        <div class="p-4">
+            <h4 class="text-center text-primary">Edit Photographer</h4>
+
+            <p>Draw the areas you need to capture street-level imagery of:</p>
+
+            <div class="mapbox-actions d-flex justify-content-between mb-3">
+                <div class="col-6 pl-0 pr-1">
+                    <button class="btn btn-primary w-100" id="draw_polygon">Draw Polygon</button>
+                </div>
+
+                <div class="col-6 pr-0 pl-1">
+                    <button class="btn btn-danger w-100" id="delete_polygon">Delete Polygon</button>
+                </div>
+            </div>
+
+            <form method="POST" class="post-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="form-group text-right">
+                    <button type="submit" class="save btn btn-primary save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="right-fixed-board bg-light">
+        <div id="map"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    var geometryData = $('#id_geometry').text();
+    console.log(geometryData);
+    var geometryDataJson = JSON.parse(geometryData);
+    console.log(geometryDataJson);
+
+    // TO MAKE THE MAP APPEAR YOU MUST
+	// ADD YOUR ACCESS TOKEN FROM
+	// https://account.mapbox.com
+	mapboxgl.accessToken = mapboxToken;
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+        center: [-74.5, 40], // starting position
+        zoom: 3 // starting zoom
+    });
+
+    var draw = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: {
+            polygon: true,
+            trash: true
+        },
+    });
+    map.addControl(draw);
+
+    map.on('draw.create', updateArea);
+    map.on('draw.delete', updateArea);
+    map.on('draw.update', updateArea);
+
+    function updateArea(e) {
+
+        var data = draw.getAll();
+        var zoom = map.getZoom();
+        console.log(zoom);
+        console.log(data);
+        var geometryData = [];
+        data.features.forEach(function (item, index) {
+            geometryData.push(item);
+        });
+        var geometryDataStr = JSON.stringify(geometryData);
+        $('#id_geometry').val(geometryDataStr);
+
+    }
+
+    var feature = {
+        'type': 'FeatureCollection',
+        'features': geometryDataJson
+    }
+
+    $('#draw_polygon').click(function() {
+        $('.mapbox-gl-draw_polygon').trigger('click');
+    })
+
+    $('#delete_polygon').click(function() {
+        $('.mapbox-gl-draw_trash').trigger('click');
+    })
+
+    var featureIds = draw.add(feature);
+
+    var featureIds = draw.add(feature);
+
+    function checkForm() {
+        if ($('#id_geometry').val() == '')
+        {
+            alert('Please select one or more area');
+            return false;
+        }
+        return true;
+    }
+
+    $('.save-btn').click(function() {
+        if ($('#id_geometry').val() == '' || $('#id_geometry').val() == '[]')
+        {
+            Swal.fire({
+                title: 'Required One or More Area.',
+                icon: 'error',
+                showCloseButton: true,
+            })
+            return false;
+        }
+        $('#job_create_form').submit()
+        return true;
+    })
+  </script>
+{% endblock %}

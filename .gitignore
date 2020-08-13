@@ -1,0 +1,9 @@
+.DS_Store
+*.pyc
+/venv/
+.idea
+/.env
+/config/settings_dev.py
+/config/_settings.py
+/sent_emails/
+/config/settings/dev.py

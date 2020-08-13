@@ -1,0 +1,41 @@
+{% extends 'layouts/auth/base.html' %}
+
+{% block title %}Login{% endblock %}
+{% load static %}
+{% block content %}
+    <div class="container">
+        <div class="content p-5">
+            <div class="card login ml-auto mr-auto">
+                <div class="card-header d-flex align-items-center">
+                    <a href="{% url 'home' %}">
+                        <img src="{% static 'images/iconified/apple-touch-icon-57x57.png' %}">
+                    </a>
+                    <h2 class="ml-4">Login</h2>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    <form method="post" class="mb-3">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="d-flex flex-row justify-content-between align-items-center">
+                            <a href="{% url 'signup' %}">Sign Up</a>
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                    </form>
+                    <div class="text-right">
+                        <a class="" href="{% url 'password_reset' %}">Forgot Password</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

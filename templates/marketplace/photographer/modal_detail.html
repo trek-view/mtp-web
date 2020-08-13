@@ -1,0 +1,68 @@
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="photographerDetailModalTitle">{{ photographer.name }}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="photographer-description">
+                <p>
+                    {{ photographer.description }}
+                </p>
+            </div>
+
+            <div class="photographer-business">
+                <a href="{{ photographer.business_website }}" target="_bank">
+                    <p>
+                        {{ photographer.business_name }}
+                    </p>
+                </a>
+            </div>
+
+            <div class="photographer-options">
+                <p>
+                    {{ photographer.options }}
+                </p>
+            </div>
+
+            <div class="photographer-created-at text-secondary">
+                <h6>
+                    {{ photographer.created_at }}
+                </h6>
+            </div>
+        </div>
+        {% if is_mine %}
+            <div class="modal-footer d-flex flex-row justify-content-end">
+                <a type="button" href="{% url 'marketplace.my_photographer_edit' unique_id=photographer.unique_id %}" id="edit_button" class="btn btn-primary text-light" >Edit</a>
+                <button type="button" id="delete_button" class="btn btn-danger text-light" >Delete</button>
+                <form method="POST" action="{% url 'marketplace.my_photographer_delete' unique_id=photographer.unique_id %}" id="delete_form">
+                    {% csrf_token %}
+                </form>
+            </div>
+        {% else %}
+            <div class="modal-footer d-flex flex-row justify-content-end">
+                <a type="button" href="{{ hire_url }}" id="hire_button" class="btn btn-success text-light" >Hire this photographer</a>
+            </div>
+        {% endif %}  
+    </div>
+</div>
+
+<script>
+    $('#delete_button').click(function() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                $('#delete_form').submit()
+            }
+        })
+    })
+</script>

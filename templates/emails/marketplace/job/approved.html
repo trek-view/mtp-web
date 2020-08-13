@@ -1,0 +1,9 @@
+<body>
+    <div>
+        <h2>{{ subject }}</h2>
+    </div>
+    <p>
+        <a href="{{ BASE_URL }}{% url 'marketplace.my_job_edit' unique_id=job.unique_id %}">{{ job.name }}</a> is approved. You will receive e-mails from prospective applicants.
+    </p>
+
+</body>

@@ -1,0 +1,345 @@
+{% extends 'layouts/marketplace/base.html' %}
+
+{% block title %}Jobs{% endblock %}
+
+{% block content %}
+
+<div class="main-body">
+    <div class="left-side">
+        <div class="market p-3">
+            <div class="market-header pt-3 mb-3">
+                <h2>
+                    Marketplace
+                </h2>
+            </div>
+            <div class="market-body">
+                <p>
+                    Find or offer help on image collection projects to create fresh street level map data in locations where it's needed for Google Street View, Mapillary, and more...
+                </p>
+                <p>
+                    Created by the team at <a href="https://www.trekview.org/" target="_blank">Trek View</a>.
+                </p>
+            </div>
+        </div>
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% if user.is_authenticated %}
+            <ul class="nav nav-tabs text-center border-bottom-0 justify-content-center" id="myTab" role="tablist">
+                <li class="nav-item" style="width: 22%;">
+                    <a class="nav-link {% if pageName == 'job-list' or pageName == 'job-detail' %}active{% endif %}" href="{% url 'marketplace.job_list' page=1 %}">All</a>
+                </li>
+                <li class="nav-item" style="width: 32%;">
+                    <a class="nav-link {% if pageName == 'my-job-list' or pageName == 'my-job-detail' %}active{% endif %}" href="{% url 'marketplace.my_job_list' page=1 %}">My Jobs</a>
+                </li>
+                <li class="nav-item" style="width: 46%;">
+                    <a class="nav-link {% if pageName == 'my-photographer-list' or pageName == 'my-photographer-list' %}active{% endif %}" href="{% url 'marketplace.my_photographer_list' page=1 %}">My Photographers</a>
+                </li>
+            </ul>
+        {% endif %}
+        <div class="jobs p-2">
+            <h4>Open job listings</h4>
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+                <p class="mr-auto mb-0"><em><a href="{% url 'marketplace.photographer_list' page=1 %}">Looking for a photographer?</a></em></p>
+                <a href="{% url 'marketplace.job_create' %}" class="btn btn-outline-primary">Create Job</a>
+            </div>
+            <div class="accordion" id="accordionExample">
+                <div class="card">
+                    <button class="card-header d-flex flex-row justify-content-between align-items-center pr-2 btn collapsed" id="headingOne" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        Search Job
+                        <i class="fa fa-chevron-down fa-1x"></i>
+                        <i class="fa fa-chevron-up d-none fa-1x"></i>
+                    </button>
+                    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                        <div class="card-body">
+                            <div class="search-form">
+                                <form method="GET" action="{% url 'marketplace.job_list' page=1 %}" class="post-form" id="search_form">
+                                    {{ form.as_p }}
+                                    <div class="form-group text-right mt-3">
+                                        <button type="submit" class="save btn btn-primary">Search</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="job-card mt-2 mb-2">
+                <div class="job-list">
+                    <div class="card job p-3 mt-3 mb-3" id="job_{{ job.unique_id }}" data-job-id="{{ job.unique_id }}" onclick="getJobDetail('{{ job.unique_id }}')">
+                        <div class="job-title text-info">
+                            <h5>
+                                {{ job.name }}
+                            </h5>
+                        </div>
+
+                        <div class="job-description">
+                            <p>
+                                {{ job.getShortDescription }}
+                            </p>
+                        </div>
+
+                        <div class="job-options">
+                            <p>
+                                {{ job.getOrganisationCategory }}, {{ job.getCaptureType }}, {{ job.getCaptureMethod }}
+                            </p>
+                        </div>
+
+                        <div class="job-created-at text-secondary">
+                            <h6>
+                                {{ job.created_at }}
+                            </h6>
+                        </div>
+
+                        <div class="job-geometry d-none">{{ job.geometry }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="right-fixed-board bg-light">
+        <div id="map"></div>
+    </div>
+
+    <!-- Modal -->
+    <div class="job-detail modal fade" id="jobDetailModal">
+        {{ job_html_detail }}
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Pagination
+    $('.paginator-btn').click(function() {
+        var pageNum = $(this).data('page');
+        location.assign("{% url 'marketplace.job_list' %}" + pageNum + '?' + $('#search_form').serialize());
+    })
+
+    $('#headingOne').click(function () {
+        if ($(this).hasClass('collapsed'))
+        {
+            $(this).find('.fa-chevron-down').addClass('d-none');
+            $(this).find('.fa-chevron-up').removeClass('d-none');
+        }
+        else
+        {
+            $(this).find('.fa-chevron-down').removeClass('d-none');
+            $(this).find('.fa-chevron-up').addClass('d-none');
+        }
+    });
+    // TO MAKE THE MAP APPEAR YOU MUST
+	// ADD YOUR ACCESS TOKEN FROM
+	// https://account.mapbox.com
+    mapboxgl.accessToken = mapboxToken;
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+        center: [-74.5, 40], // starting position
+        zoom: {{ job.zoom }} // starting zoom
+    });
+
+    var jobGeometryElements = $('.job-geometry');
+    var polygonData = [];
+    var centerPointerData = [];
+    for (i = 0; i < jobGeometryElements.length; i++)
+    {
+        var item = jobGeometryElements.eq(i);
+        var geometryData = item.text();
+        var geometryDataJson = JSON.parse(geometryData);
+        geometryDataJson.forEach(function (item, index) {
+            polygonData.push(item);
+
+            var minX = 0;
+            var maxX = 0;
+            var minY = 0;
+            var maxY = 0;
+            var coorXSum = 0;
+            var coorYSum = 0;
+            var countSum = 0;
+
+            var coordinates = item.geometry.coordinates;
+            for (j = 0; j < coordinates[0].length; j++)
+            {
+                coorXSum += coordinates[0][j][0];
+                coorYSum += coordinates[0][j][1];
+                countSum++;
+                if (coordinates[0][j][0] < minX)
+                    minX = coordinates[0][j][0];
+                if (coordinates[0][j][0] > maxX)
+                    maxX = coordinates[0][j][0];
+                if (coordinates[0][j][1] < minY)
+                    minY = coordinates[0][j][1];
+                if (coordinates[0][j][1] > maxY)
+                    maxY = coordinates[0][j][1];
+            }
+            var centerItem = {
+                "type": "Feature", 
+                "properties": {"job_id": item.properties.job_id}, 
+                "geometry": {
+                    "coordinates": [coorXSum / countSum, coorYSum / countSum], 
+                    "type": "Point"
+                }
+            };
+            centerPointerData.push(centerItem);
+        });
+    }
+
+    map.on('load', function() {
+        map.loadImage(
+            'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
+            function(error, image) {
+                if (error) throw error;
+                map.addImage('custom-marker', image);
+                map.addSource('points', {
+                    'type': 'geojson',
+                    'data': {
+                        'type': 'FeatureCollection',
+                        'features': centerPointerData
+                    }
+                });
+                map.addLayer({
+                    'id': 'points',
+                    'type': 'symbol',
+                    'source': 'points',
+                    'maxzoom': 6,
+                    'layout': {
+                        'icon-image': 'custom-marker',
+                        // get the title name from the source's "title" property
+                        // 'text-field': ['get', 'title'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold'
+                        ],
+                        'text-offset': [0, 1.25],
+                        'text-anchor': 'top'
+                    }
+                });
+            }
+        )
+        map.addSource('states', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': polygonData
+            }
+        });
+        map.addLayer({
+            'id': 'states-layer',
+            'type': 'fill',
+            'source': 'states',
+            'minzoom': 6,
+            'layout': {},
+            'paint': {
+                'fill-color': 'rgba(200, 100, 240, 0.2)',
+                'fill-outline-color': 'rgba(200, 100, 240, 0.8)'
+            }
+        });
+        // When a click event occurs on a feature in the states layer, open a popup at the
+        // location of the click, with description HTML from its properties.
+        map.on('click', 'states-layer', function (e) {
+            getJobDetail(e.features[0].properties.job_id);
+        });
+
+        // Change the cursor to a pointer when the mouse is over the states layer.
+        map.on('mouseenter', 'states-layer', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'states-layer', function () {
+            map.getCanvas().style.cursor = '';
+        });
+
+        map.on('click', 'points', function (e) {
+            getJobDetail(e.features[0].properties.job_id);
+
+        });
+
+        // Change the cursor to a pointer when the mouse is over the states layer.
+        map.on('mouseenter', 'points', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'points', function () {
+            map.getCanvas().style.cursor = '';
+        });
+        getJobDetail();
+    });
+
+
+    function getJobDetail() {
+        var geometry = $('.job-geometry').text();
+        var geometryDataJson = JSON.parse(geometry.toString());
+        if (map.getLayer('selected-layer')) map.removeLayer('selected-layer');
+        if (map.getSource('selected-source')) map.removeSource('selected-source');
+        map.addSource('selected-source', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': geometryDataJson
+            }
+        });
+        map.addLayer({
+            'id': 'selected-layer',
+            'type': 'fill',
+            'source': 'selected-source',
+            'layout': {},
+            'paint': {
+                'fill-color': 'rgba(100, 100, 240, 0.2)',
+                'fill-outline-color': 'rgba(200, 100, 240, 0.8)'
+            }
+        });
+        var zoom = {{ job.zoom }};
+        var coorXSum = 0;
+        var coorYSum = 0;
+        var countSum = 0;
+        var minX = 0;
+        var maxX = 0;
+        var minY = 0;
+        var maxY = 0;
+        for(j = 0; j < geometryDataJson.length; j++)
+        {
+            var coordinates = geometryDataJson[j].geometry.coordinates;
+
+            for (i = 0; i < coordinates[0].length; i++)
+            {
+                coorXSum += coordinates[0][i][0];
+                coorYSum += coordinates[0][i][1];
+                countSum++;
+                if (coordinates[0][i][0] < minX)
+                    minX = coordinates[0][i][0];
+                if (coordinates[0][i][0] > maxX)
+                    maxX = coordinates[0][i][0];
+                if (coordinates[0][i][1] < minY)
+                    minY = coordinates[0][i][1];
+                if (coordinates[0][i][1] > maxY)
+                    maxY = coordinates[0][i][1];
+            }
+        }
+
+        var coorX = coorXSum / countSum;
+        var coorY = coorYSum / countSum;
+        map.flyTo({ center: [coorX, coorY], zoom: zoom});
+
+        $('#delete_form').html(getCSRFTokenValue());
+
+        $('#jobDetailModal').modal({
+            'backdrop': false,
+            'show': true,
+        });
+    }
+
+</script>
+{% endblock %}

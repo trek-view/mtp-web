@@ -1,0 +1,17 @@
+{% extends 'layouts/guidebook/base.html' %}
+{% block title %}Create Guidebook{% endblock %}
+
+{% block content %}
+<div class="main-body">
+    <div class="w-100 mt-5 d-flex justify-content-center">
+        <form method="POST" class="post-form" id="guidebook_create_form" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="form-group d-flex justify-content-between">
+                <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
+                <button type="submit" class="save btn btn-primary save-btn">Continue</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

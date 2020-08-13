@@ -1,0 +1,9 @@
+<body>
+    <div>
+        <h2>{{ subject }}</h2>
+    </div>
+    <p>
+        Hi {{ user.username }}, You created a job: <a href="{{ BASE_URL }}{% url 'marketplace.my_job_edit' unique_id=job.unique_id %}">{{ job.name }}</a>. It is currently being reviewed. This process takes no more than 72 hours. You will receive another email when it is approved.
+    </p>
+
+</body>

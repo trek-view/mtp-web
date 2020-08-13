@@ -1,0 +1,19 @@
+<div class="list_item">
+    <div class="scene-box p-1 mt-2 mb-2" id="scene_{{ scene.pk }}" data-scene-id="{{ scene.pk }}" data-image_key="{{ scene.image_key }}" style="cursor: pointer">
+        <form method="POST" class="post-form has-validation-callback" id="add_scene_form_{{ scene.pk }}">
+            {% csrf_token %}
+            <input type="number" name="scene_id" class="d-none" value="{{ scene.pk }}" id="id_scene_id">
+            <input type="text" name="image_key" class="form-control d-none" value="{{ scene.image_key }}" required="" id="id_image_key">
+            <input type="text" name="title" class="form-control mb-1" disabled="disabled" value="{{ scene.title }}" placeholder="Scene Title" required="" id="id_title">
+            <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_description">{{ scene.description }}</textarea>
+            <input type="text" name="lat" class="form-control d-none" value="{{ scene.lat }}" required="" id="id_lat">
+            <input type="text" name="lng" class="form-control d-none" value="{{ scene.lng }}" required="" id="id_lng">
+            <div class="text-right">
+                <button type="button" class="btn btn-info point_list" data-scene-id="{{ scene.pk }}">Point List</button>
+                <button type="button" class="btn btn-primary delete_scene_button" data-scene-id="{{ scene.pk }}" style="background: #993333 !important; border-color: #993333;">Delete</button>
+                <button type="button" id="change_scene_button" class="save btn btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Change</button>
+                <button type="button" id="save_scene_button" class="save btn btn-primary save-btn d-none" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', {{ scene.pk }})">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
