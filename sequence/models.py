@@ -17,7 +17,7 @@ UserModel = get_user_model()
 
 class TransportType(models.Model):
     name = models.CharField(max_length=50)
-    description = models.TextField(default=None, blank=True, null=True)
+    description = models.TextField(default=None, null=True)
 
     def __str__(self):
         return self.name
