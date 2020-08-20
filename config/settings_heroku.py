@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'marketplace.apps.MapPathsConfig',
     'guidebook.apps.GuidebookConfig',
+    'sequence.apps.SequenceConfig',
     'lib.apps.LibConfig',
     # 'oauth2_provider',
     # 'corsheaders',
