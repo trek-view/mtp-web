@@ -1,5 +1,4 @@
 appdirs==1.4.4
-
 asgiref==3.2.10
 Babel==2.8.0
 beautifulsoup4==4.9.1
@@ -15,6 +14,7 @@ distlib==0.3.1
 dj-database-url==0.5.0
 Django==3.0.3
 django-appconf==1.0.4
+django-bootstrap-datepicker-plus==3.0.5
 django-bootstrap-form==3.4
 django-bootstrap4==2.2.0
 django-cleanup==5.0.0
@@ -31,7 +31,8 @@ django-redis==4.12.1
 django-robots==4.0
 django-s3-folder-storage==0.1
 django-select2==7.4.2
--e git://github.com/digi604/django-smart-selects.git@f5f7b826a543da2e6eeac37729edff9b7b8e8a64#egg=django_smart_selects
+# Editable Git install with no remote (django-smart-selects==1.0.9.3)
+-e d:\python\20200709_python_django_trek-view\mtp\venv\src\django-smart-selects
 django-storages==1.9.1
 django-two-factor-auth==1.12.1
 docutils==0.15.2
