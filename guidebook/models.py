@@ -53,7 +53,7 @@ class Guidebook(models.Model):
     description = models.TextField(null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     cover_image = models.ImageField(upload_to=image_directory_path, null=True)
-    tag = ArrayField(models.CharField(default='0', max_length=30), null=True)
+    tag = ArrayField(models.CharField(default='0', max_length=6), null=True)
     is_published = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=datetime.now, blank=True)

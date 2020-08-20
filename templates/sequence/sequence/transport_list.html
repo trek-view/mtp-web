@@ -1,0 +1,470 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %}Sequences{% endblock %}
+{% block app_sequence %}active{% endblock %}
+{% block app_style %}<link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">{% endblock %}
+
+{% block content %}
+
+<div class="main-body">
+    <div class="left-side">
+        <div class="pl-3 pr-3 mt-5 mb-3 text-right">
+            <em>
+                <a href="{% url 'sequence.index' %}">
+                    Go to Sequence List
+                </a>
+            </em>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert m-3 alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="mt-4">
+
+        </div>
+
+        <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
+            <li class="nav-item" style="width: 50%;">
+                <a class="nav-link {% if action == 'filter' %}active{% endif %}" href="javascript:switch_action('filter');" id="switch_filter">
+                    Filter Mapillary
+                </a>
+            </li>
+            <li class="nav-item" style="width: 40%">
+                <a class="nav-link {% if action == 'restore' %}active{% endif %}" href="javascript:switch_action('restore');" id="switch_restore">
+                    Restore Trash
+                </a>
+            </li>
+        </ul>
+
+        <div class="p-3" style="border-top: 1px solid #dee2e6;">
+            <form id="search_form">
+                {% load bootstrap4 %}
+                {% bootstrap_css %}
+                {{ search_form.media }}
+                {{ search_form.as_p }}
+                <input type="text" class="d-none" name="action" value="{{ action }}">
+                <div class="form-group text-right mt-3">
+                    <button type="submit" class="save btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="right-board bg-light">
+        <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
+            {% if seq_count > 0 %}
+                <div class="save-added-form m-3 text-right">
+                    <form method="post" id="added_form_data" class="d-none">
+                    </form>
+                    {% if action == 'filter' %}
+                        <button type="button" class="btn btn-primary" id="save_added_form_next" onclick="submit_form_data(true)">
+                            Save and Next Page
+                        </button>
+                        <button type="button" class="btn btn-primary" id="save_added_form" onclick="submit_form_data(false);">
+                            Save
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" id="save_added_form_next" onclick="submit_form_data(true)">
+                            Save
+                        </button>
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% if action == 'restore' %}
+                <div class="paginator">
+                    {% if sequences.has_other_pages %}
+                        <ul class="pagination justify-content-center">
+                            {% if sequences.number != 1 %}
+                                <li class="page-item">
+                                    <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                                </li>
+                            {% endif %}
+                            {% for i in sequences.paginator.pages %}
+                                {% if sequences.number == i %}
+                                    <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                                {% else %}
+                                    <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if sequences.number != sequences.paginator.num_pages %}
+                                <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ sequences.paginator.num_pages }}'>&raquo;</a></li>
+                            {% else %}
+                                <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <div class="sequence-list">
+                {% if seq_count > 0 %}
+                    {% for sequence in sequences %}
+                        <div class="card sequence pt-3 pb-3 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}">
+                            <div class="col-md-6 d-flex flex-row border-right">
+                                <div class="min-map-box" style="height: 208px" id="map-{{ sequence.unique_id }}">
+                                </div>
+                                <div class="detail-box pl-3">
+                                    <div class="sequence-main float-left">
+                                        <div class="sequence-captured-at text-info">
+                                            <span>Captured:</span>
+                                            <h6>
+                                                {{ sequence.captured_at }}
+                                            </h6>
+                                        </div>
+
+                                        <div class="sequence-created-at">
+                                            <span>Uploaded:</span>
+                                            <p class="mb-1">
+                                                {{ sequence.created_at }}
+                                            </p>
+                                        </div>
+
+                                        <div class="sequence-camera-make" style="color: blueviolet;">
+                                            <span>Camera Make:</span>
+                                            <p class="mb-1">
+                                                {{ sequence.camera_make }}
+                                            </p>
+                                        </div>
+
+                                        <div class="sequence-image-count" style="color: #a79f9f;">
+                                            <span>Number of photos:</span>
+                                            <p class="mb-1">
+                                                {{ sequence.getImageCount }}
+                                            </p>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="transport-btn text-center">
+                                    <button type="button" class="btn btn-warning " onclick="show_add_modal('{{ sequence.unique_id }}')">
+                                        Transport into Map the Paths
+                                    </button>
+                                </div>
+
+                                <div class="added-form d-none">
+                                    <div class="sequence-name">
+                                        <p class="w-25 mb-0" style="color: #FF9800;">Name: </p>
+                                        <p class="w-75 contents">Test Name</p>
+                                    </div>
+                                    <div class="sequence-description">
+                                        <p class="w-25 mb-0" style="color: #9E9E9E;">Description: </p>
+                                        <p class="w-75 contents">This is my first test. so I want to transport </p>
+                                    </div>
+                                    <div class="sequence-transport-type" style="color: blueviolet;">
+                                        <p class="w-25 mb-0">Transport Type: </p>
+                                        <p class="w-75 contents">Type 1</p>
+                                    </div>
+                                    <div class="sequence-tag">
+                                        <p class="w-25 mb-0">Tags: </p>
+                                        <p class="w-75 contents">
+                                        </p>
+                                    </div>
+                                    <div class="actions text-right">
+                                        <button type="button" class="btn btn-sm btn-primary" onclick="show_add_modal('{{ sequence.unique_id }}')">
+                                            Edit
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="reset_added_form('{{ sequence.unique_id }}')">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-results d-flex justify-content-center align-items-center">
+                        <h5 class="text-info">No results match your criteria.</h5>
+                    </div>
+                {% endif %}
+            </div>
+            {% if action == 'restore' %}
+                <div class="paginator">
+                    {% if sequences.has_other_pages %}
+                        <ul class="pagination justify-content-center">
+                            {% if sequences.number != 1 %}
+                                <li class="page-item">
+                                    <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                                </li>
+                            {% endif %}
+                            {% for i in sequences.paginator.pages %}
+                                {% if sequences.number == i %}
+                                    <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                                {% else %}
+                                    <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if sequences.number != sequences.paginator.num_pages %}
+                                <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ sequences.paginator.num_pages }}'>&raquo;</a></li>
+                            {% else %}
+                                <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% if seq_count > 0 %}
+                <div class="save-added-form m-3 text-right">
+                    <form method="post" id="added_form_data" class="d-none">
+                    </form>
+                    {% if action == 'filter' %}
+                        <button type="button" class="btn btn-primary" id="save_added_form_next" onclick="submit_form_data(true)">
+                            Save and Next Page
+                        </button>
+                        <button type="button" class="btn btn-primary" id="save_added_form" onclick="submit_form_data(false);">
+                            Save
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" id="save_added_form_next" onclick="submit_form_data(true)">
+                            Save
+                        </button>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="add_form_modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="add_form_modal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Information for Map the Paths</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <form id="add_form">
+              {{ addSequenceForm.as_p }}
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-save" onclick="save_add_form()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $.ajaxSetup({
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+
+    mapboxgl.accessToken = mapboxToken;
+    var positions = [];
+    var sequences = {};
+    var all_tags = {};
+    var all_transport_types = {};
+    {% for tag in all_tags %}
+        all_tags["{{ tag.id }}"] = "{{ tag.name }}";
+    {% endfor %}
+    {% for type in all_transport_types %}
+        all_transport_types["{{ type.id }}"] = "{{ type.name }}";
+    {% endfor %}
+    {% for sequence in sequences %}
+        sequences['{{ sequence.unique_id }}'] = {
+            'name': '',
+            'description': '',
+            'transport_type': 0,
+            'tags': []
+        };
+        positions.push({{ sequence.geometry_coordinates_ary }});
+    {% endfor %}
+    $('.paginator-btn').click(function() {
+        if ($('.transport-btn.d-none').length > 0) {
+            Swal.fire({
+              icon: 'info',
+              text: 'You have not saved your changes.!',
+            })
+        }
+        else {
+            var pageNum = $(this).data('page');
+            var url = "{% url 'sequence.transport_sequence_list' %}?page="+ pageNum + "&" + $('#search_form').serialize();
+            location.assign(url);
+        }
+    });
+    function draw_map(data) {
+        var obj = $('.min-map-box').eq(i);
+        var obj_id = obj.attr('id');
+        var sceneData = [];
+        var item = {};
+        var scene_positions = [];
+        for (var j = 0; j < data.length; j++)
+        {
+            var lat = data[j][1];
+            var lng = data[j][0];
+            scene_positions.push([lng, lat]);
+            item = {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "coordinates": [lng, lat],
+                    "type": "Point"
+                }
+            };
+            sceneData.push(item);
+        }
+
+        if (scene_positions.length > 0)
+            var first_point = scene_positions[0];
+        else
+            var first_point = null;
+
+        console.log('positions', sceneData)
+        if (first_point != null) {
+            var map = new mapboxgl.Map({
+                container: obj_id, // container id
+                style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+                center: first_point, // starting position
+                zoom: 12, // starting zoom
+                attributionControl: false
+            });
+        }
+        else {
+            var map = new mapboxgl.Map({
+                container: obj_id, // container id
+                style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+                center: [-87.622088, 41.878781], // starting position
+                zoom: 12, // starting zoom
+                attributionControl: false
+            });
+        }
+        map.on('load', function() {
+            map.addSource('points', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'FeatureCollection',
+                    'features': sceneData
+                }
+            });
+            map.addLayer({
+                'id': 'mapillary-images',
+                'type': 'circle',
+                'source': 'points',
+                "paint": {
+                    "circle-color": "#039825",
+                    "circle-radius": 6
+                }
+            });
+        });
+    }
+
+    for (i = 0; i < positions.length; i++)
+    {
+        draw_map(positions[i])
+    }
+
+    var selected_sequence_id = '';
+
+    function show_add_modal(id) {
+        selected_sequence_id = id;
+        var name = sequences[id]['name'];
+        var description = sequences[id]['description'];
+        console.log(description);
+        var transport_type = sequences[id]['transport_type'];
+        var tags = sequences[id]['tags'];
+        var modal_form = $('#add_form_modal .modal-body');
+        modal_form.find('input[name="name"]').val(name);
+        modal_form.find('textarea[name="description"]').val(description);
+        modal_form.find('select[name="transport_type"]').val(transport_type);
+        modal_form.find('select[name="tag"]').val(tags);
+        $('#add_form_modal').modal('show');
+    }
+
+    function reset_added_form(id) {
+        selected_sequence_id = id;
+        sequences[selected_sequence_id]['name'] = '';
+        sequences[selected_sequence_id]['description'] = '';
+        sequences[selected_sequence_id]['transport_type'] = 0;
+        sequences[selected_sequence_id]['tags'] = [];
+
+        var added_form = $('#sequence_' + selected_sequence_id).find('.added-form');
+        var transport_btn = $('#sequence_' + selected_sequence_id).find('.transport-btn');
+
+        added_form.addClass('d-none');
+        transport_btn.removeClass('d-none');
+    }
+
+    function save_add_form() {
+
+        if (!$('#add_form').isValid())
+            return;
+
+        var modal_form = $('#add_form_modal .modal-body');
+        var name = modal_form.find('input[name="name"]').val();
+        var description = modal_form.find('textarea[name="description"]').val();
+        var transport_type = modal_form.find('select[name="transport_type"]').val();
+        var tags = modal_form.find('select[name="tag"]').val();
+
+        sequences[selected_sequence_id]['name'] = name;
+        sequences[selected_sequence_id]['description'] = description;
+        sequences[selected_sequence_id]['transport_type'] = transport_type;
+        sequences[selected_sequence_id]['tags'] = tags;
+
+        var added_form = $('#sequence_' + selected_sequence_id).find('.added-form');
+        var transport_btn = $('#sequence_' + selected_sequence_id).find('.transport-btn');
+
+        added_form.removeClass('d-none');
+        transport_btn.addClass('d-none');
+
+        added_form.find('.sequence-name .contents').text(name);
+        added_form.find('.sequence-description .contents').text(description);
+        added_form.find('.sequence-transport-type .contents').text(all_transport_types[transport_type]);
+        var tag_html = '';
+        console.log(all_tags)
+        for (var i = 0; i < tags.length; i++) {
+            tag_html += '<span class="tag">' + all_tags[tags[i]] + '</span>';
+        }
+        added_form.find('.sequence-tag .contents').html(tag_html);
+
+        $('#add_form_modal').modal('hide');
+    }
+
+    function submit_form_data(next) {
+        $.ajax({
+            url: "{% url 'sequence.ajax_transport' %}",
+            type: 'POST',
+            data: {'sequence_json': JSON.stringify(sequences)},
+            dataType: 'json',
+            success: function (data) {
+                if (next)
+                    location.reload();
+                else
+                    location.assign("{% url "guidebook.home" %}")
+            }
+        });
+    }
+
+    var page = 1;
+
+    function switch_action(action) {
+        var month = $('input[name="month"]').val();
+        if (action == 'filter')
+            location.assign("{% url 'sequence.transport_sequence_list' %}?action=filter");
+        else
+            location.assign("{% url 'sequence.transport_sequence_list' %}?page=1&action=restore");
+    }
+
+</script>
+{% endblock %}

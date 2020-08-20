@@ -15,10 +15,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'django_email_verification',
+    # ========================
+    # custom apps
     'accounts.apps.AccountsConfig',
     'marketplace.apps.MapPathsConfig',
     'guidebook.apps.GuidebookConfig',
     'lib.apps.LibConfig',
+    'sequence.apps.SequenceConfig',
+    # ========================
     # 'oauth2_provider',
     # 'corsheaders',
     'django_otp',
@@ -28,6 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.sitemaps',
     'django_cleanup.apps.CleanupConfig',
+    'bootstrap4',
+    'bootstrap_datepicker_plus',
 ]
 
 

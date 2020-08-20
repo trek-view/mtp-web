@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.validators import RegexValidator
+from datetime import datetime
 # Create your models here.
 
 class CustomUserManager(BaseUserManager):
@@ -46,7 +47,7 @@ class CustomUser(AbstractUser):
     username = models.CharField(max_length=100, unique=True, validators=[alphanumeric])
     is_active = models.BooleanField(default=False)
     is_maillist = models.BooleanField(default=False)
-
+    mapillary_access_token = models.TextField(default='', null=True)
     verify_email_key = models.CharField(max_length=100, default='')
 
     USERNAME_FIELD = 'email'
@@ -66,4 +67,16 @@ class CustomUser(AbstractUser):
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None
-            
+
+class MapillaryUser(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    username = models.CharField(max_length=100, null=True)
+    key = models.CharField(max_length=100, null=True)
+    email = models.CharField(max_length=100, null=True)
+    avatar = models.CharField(max_length=255, null=True)
+    about = models.TextField(null=True)
+    created_at = models.DateTimeField(null=True)
+    is_active = models.BooleanField(default=True)
+    iamges_total_count = models.IntegerField(default=0)
+    sequences_total_count = models.IntegerField(default=0)
+    updated_at = models.DateTimeField(default=datetime.now, blank=True)

@@ -1,0 +1,395 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %}Sequences{% endblock %}
+{% block app_sequence %}active{% endblock %}
+{% block app_style %}<link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">{% endblock %}
+{% block content %}
+<link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
+<div class="main-body">
+    <div class="left-side p-3">
+        <div class="pl-3 pr-3 mt-4 mb-3 text-right">
+            <em>
+                <a href="{% url 'sequence.tour_list' %}">
+                    Go to Tour List
+                </a>
+            </em>
+        </div>
+        <div class="tour-detail card p-2">
+            <div class="tour-name text-center text-info mt-1">
+                <h3>
+                    {{ tour.name }}
+                </h3>
+            </div>
+
+            <div class="tour-description mt-3 mb-3">
+                {{ tour.description }}
+            </div>
+            <div class="tour-tag">
+                {% for tag_name in tour.getTags %}
+                    <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                        {{ tag_name }}
+                    </span>
+                {% endfor %}
+            </div>
+
+            <hr class="mt-3 mb-1">
+
+            <div class="tour-others float-right d-flex flex-row justify-content-between mt-2">
+                <div class="scenes text-center">
+                    {% if tour.getImageCount == 0 %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                    {% else %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                    {% endif %}
+                    <span class="text-center m-0">
+                        {{ tour.getImageCount }} Photos
+                    </span>
+                </div>
+                <div class="like text-center">
+                    {% if tour.getLikeCount == 0 %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
+                    {% else %}
+                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
+                    {% endif %}
+                    <span class="text-center m-0">
+                        {{ tour.getLikeCount }} Likes
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        {% if request.user.is_authenticated and request.user == tour.user %}
+            <div class="card p-2 mt-2">
+                <div class="">
+                    <form method="POST" id="delete_tour_form" class="d-flex align-items-center" action="{% url 'sequence.tour_delete' unique_id=tour.unique_id %}">
+                        {% csrf_token %}
+                        {% if tour.getSequenceCount > 0 %}
+                            <div class="col text-center">
+                                {% if tour.is_published %}
+                                    <button type="button" class="btn btn-success" id="publish_swithch_tour">Published</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-dark" id="publish_swithch_tour">Unpublished</button>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        <div class="col text-center">
+                            <a href="{% url 'sequence.tour_add_sequence' unique_id=tour.unique_id %}">
+                                <button type="button" class="btn btn-primary">Edit</button>
+                            </a>
+                        </div>
+
+                        <div class="col delete-tour text-center">
+                            <button type="button" id="delete_tour" class="btn btn-danger">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <div class="right-board bg-light">
+        <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
+            <div class="sequence-viewer" id="sequence_viewer">
+
+            </div>
+            {% if sequence_count > 0 %}
+                <div class="w-100 text-center">
+                    <div class="mt-3">
+                        <button class="btn btn-info btn-prev" disabled>
+                            Prev
+                        </button>
+                        <button class="btn btn-info btn-next">
+                            Next
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="item-list">
+                {% if sequence_count > 0 %}
+                    {% for sequence in sequences %}
+                        <div class="card sequence p-3 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}" >
+                            <div class="min-map-box" id="map-{{ sequence.unique_id }}">
+                            </div>
+                            <div class="item-detail-box pl-3 pr-3">
+                                <div class="item-main w-100 float-left">
+                                    <div class="item-title text-info d-flex flex-row justify-content-between">
+                                        <a target="_blank" href="{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}">
+                                            <h6>{{ sequence.name }}</h6>
+                                        </a>
+                                    </div>
+
+                                    <div class="item-description">
+                                        <p class="mb-1">
+                                            {{ sequence.getShortDescription }}
+                                        </p>
+                                    </div>
+
+                                    <div class="w-100 d-flex flex-row">
+                                        <p class="mb-1 mr-3 item-transport-type">
+                                            {{ sequence.transport_type }}
+                                        </p>
+                                        <p>
+                                            {{ sequence.getImageCount }} Panos
+                                        </p>
+                                    </div>
+
+                                    <div class="item-tag" style="min-height: 24px;">
+                                        {% for tag_name in sequence.getTags %}
+                                            <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                                                {{ tag_name }}
+                                            </span>
+                                        {% endfor %}
+
+                                    </div>
+
+                                    <div class="item-user">
+                                        <span class="user">{{ sequence.user.username }}</span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="text-center" style="width: 150px; font-size: 13px;">
+                                <a target="_blank" href="https://www.mapillary.com/profile/{{ sequence.username }}">
+                                    <h6>{{ sequence.username }}</h6>
+                                </a>
+                                <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
+                                    <img class="w-100 mt-1" src="{% static "images/icon/mapillary_icon.png" %}">
+                                </a>
+                                <p class="mt-1 mb-2">{{ sequence.captured_at }}</p>
+                                <p class="mb-2">{{ sequence.created_at }}</p>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-results d-flex justify-content-center align-items-center">
+                        <h5 class="text-info">No results match your criteria.</h5>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/mapillary.js' %}"></script>
+<script>
+    $.ajaxSetup({
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+    $('.paginator-btn').click(function() {
+        var pageNum = $(this).data('page');
+        $('#search_form').find('input[name="page"]').val(pageNum);
+        location.assign("{% url 'sequence.tour_add_sequence' unique_id=tour.unique_id %}?" + $('#search_form').serialize());
+    });
+
+    mapboxgl.accessToken = mapboxToken;
+    var positions = [];
+    {% for sequence in sequences %}
+        positions.push({{ sequence.geometry_coordinates_ary }});
+    {% endfor %}
+
+    console.log(positions);
+    function draw_map(data) {
+        var obj = $('.min-map-box').eq(i);
+        var obj_id = obj.attr('id');
+        var sceneData = [];
+        var item = {};
+        var scene_positions = [];
+        for (var j = 0; j < data.length; j++)
+        {
+            var lat = data[j][1];
+            var lng = data[j][0];
+            scene_positions.push([lng, lat]);
+            item = {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "coordinates": [lng, lat],
+                    "type": "Point"
+                }
+            };
+            sceneData.push(item);
+        }
+
+        if (scene_positions.length > 0)
+            var first_point = scene_positions[0];
+        else
+            var first_point = null;
+
+        console.log('positions', sceneData)
+        if (first_point != null) {
+            var map = new mapboxgl.Map({
+                container: obj_id, // container id
+                style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+                center: first_point, // starting position
+                zoom: 12, // starting zoom
+                attributionControl: false
+            });
+        }
+        else {
+            var map = new mapboxgl.Map({
+                container: obj_id, // container id
+                style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+                center: [-87.622088, 41.878781], // starting position
+                zoom: 12, // starting zoom
+                attributionControl: false
+            });
+        }
+        map.on('load', function() {
+            map.addSource('points', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'FeatureCollection',
+                    'features': sceneData
+                }
+            });
+            map.addLayer({
+                'id': 'mapillary-images',
+                'type': 'circle',
+                'source': 'points',
+                "paint": {
+                    "circle-color": "#039825",
+                    "circle-radius": 6
+                }
+            });
+        });
+    }
+
+    for (i = 0; i < positions.length; i++)
+    {
+        draw_map(positions[i])
+    }
+
+    var currenct_sequence_index = 0;
+    var first_image_keys = [];
+    {% if sequence_count > 0 %}
+        {% for sequence in sequences %}
+            first_image_keys.push("{{ sequence.getFirstImageKey }}");
+        {% endfor %}
+    {% endif %}
+    {% if first_image_key != '' %}
+        currenct_sequence_id = 0;
+    {% endif %}
+    var mapillaryViewer = new Mapillary.Viewer(
+        'sequence_viewer',
+        mapillaryClientId,
+        first_image_keys[0],
+        {
+            component: {
+                cover: false,
+                tag: true,
+            },
+        }
+    );
+    window.addEventListener('resize', function() { mapillaryViewer.resize(); });
+
+    $('.btn-prev').click(function () {
+        if (currenct_sequence_index == 0)
+            return;
+        currenct_sequence_index--;
+        mapillaryViewer.moveToKey(first_image_keys[currenct_sequence_index]);
+        if (currenct_sequence_index == 0)
+        {
+            $('.btn-prev').addClass('disabled').attr('disabled', true);
+        }
+        $('.btn-next').removeClass('disabled').attr('disabled', false);
+    });
+
+    $('.btn-next').click(function () {
+        if (currenct_sequence_index == first_image_keys.length - 1)
+            return;
+        currenct_sequence_index++;
+        mapillaryViewer.moveToKey(first_image_keys[currenct_sequence_index]);
+        if (currenct_sequence_index == first_image_keys.length - 1)
+        {
+            $('.btn-next').addClass('disabled').attr('disabled', true);
+        }
+        $('.btn-prev').removeClass('disabled').attr('disabled', false);
+    });
+
+    $('#publish_swithch_tour').click(function () {
+        $.ajax({
+            url: "{% url 'sequence.ajax_tour_check_publish' unique_id=tour.unique_id %}",
+            type: 'POST',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                {
+                    toastr.error(data.message)
+                }
+                else {
+                    if (data.is_published)
+                    {
+                        $('#publish_swithch_tour').removeClass('btn-dark').addClass('btn-success').text('Published');
+                    }
+                    else
+                    {
+                        $('#publish_swithch_tour').addClass('btn-dark').removeClass('btn-success').text('Unpublished');
+                    }
+                }
+            }
+        });
+    });
+
+    $('#delete_tour').click(function () {
+        if ($(this).hasClass('disabled') || $(this).hasClass('d-none'))
+            return;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                 $('#delete_tour_form').submit();
+            }
+        })
+    });
+
+    {% if not request.user.is_authenticated %}
+        $('.tour-others .like img').css('cursor', 'pointer');
+        $('.tour-others .like img').click(function () {
+            Swal.fire({
+                title: 'Need to login!',
+                html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
+                        "If you don't have your account, please <a href=\"{% url 'signup' %}\">sign up</a>",
+                showCancelButton: false,
+                confirmButtonText: 'OK'
+            })
+        });
+    {% elif request.user != guidebook.user %}
+        $('.tour-others .like img').css('cursor', 'pointer');
+        $('.tour-others .like img').click(function () {
+            $.ajax({
+                url: "{% url 'sequence.ajax_tour_check_like' unique_id=tour.unique_id %}",
+                type: 'POST',
+                data: {},
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                    {
+                        toastr.error(data.message)
+                    }
+                    else {
+                        var loved = "{% static 'images/icon/icons8-love-48.png' %}";
+                        var unloved = "{% static 'images/icon/icons8-love-100.png' %}"
+                        $('.tour-others .like span').text(data.liked_count + ' Likes');
+                        if (data.liked_count == 0)
+                            $('.tour-others .like img').attr('src', unloved);
+                        else
+                            $('.tour-others .like img').attr('src', loved);
+                    }
+                }
+            });
+        });
+    {% endif %}
+
+
+</script>
+{% endblock %}

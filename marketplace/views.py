@@ -19,7 +19,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 
 ## Custom Libs ##
-from lib.functions import send_mail_with_html
+from lib.functions import *
 
 ## Project packages
 from accounts.models import CustomUser
@@ -46,7 +46,7 @@ from .forms import *
 def home(request):
     return redirect('marketplace.job_list', page=1)
 
-@login_required
+@my_login_required
 def job_create(request):
     if request.method == "POST":
         form = JobForm(request.POST)
@@ -91,7 +91,7 @@ def job_create(request):
         form = JobForm()
     return render(request, 'marketplace/job/create.html', {'form': form, 'pageName': 'job-create'})
 
-@login_required
+@my_login_required
 def job_apply(request, unique_id):
     job = get_object_or_404(Job, unique_id=unique_id)
     if request.method == "POST":
@@ -131,7 +131,7 @@ def job_apply(request, unique_id):
         form = JobApplicationForm()
     return render(request, 'marketplace/job/apply.html', {'form': form, 'job': job, 'pageName': 'job-apply'})
 
-@login_required
+@my_login_required
 def job_edit(request, unique_id):
     job = get_object_or_404(Job, unique_id=unique_id)
     if job.is_approved:
@@ -159,7 +159,7 @@ def job_edit(request, unique_id):
         form.set_is_approved(is_approved=is_approved)
     return render(request, 'marketplace/job/edit.html', {'form': form, 'pageName': 'job-edit'})
 
-@login_required
+@my_login_required
 def my_job_delete(request, unique_id):
     job = get_object_or_404(Job, unique_id=unique_id)
     if job.user == request.user:
@@ -240,7 +240,7 @@ def job_detail(request, unique_id):
 
     return render(request, 'marketplace/job/job_detail.html', {'job': job, 'form': form, 'geometry': geometry, 'job_html_detail': job_html_detail, 'pageName': 'job-detail'})
 
-@login_required
+@my_login_required
 def my_job_list(request, page):
     jobs = None
     if request.method == "GET":
@@ -312,7 +312,7 @@ def ajax_job_detail(request, unique_id):
 
     return JsonResponse(data)
 
-@login_required
+@my_login_required
 def photographer_create(request):
     if request.method == "POST":
         form = PhotographerForm(request.POST)
@@ -360,7 +360,7 @@ def photographer_create(request):
         form = PhotographerForm()
     return render(request, 'marketplace/photographer/create.html', {'form': form, 'pageName': 'photographer-create'})
 
-@login_required
+@my_login_required
 def photographer_hire(request, unique_id):
     photographer = get_object_or_404(Photographer, unique_id=unique_id)
     if request.method == "POST":
@@ -400,7 +400,7 @@ def photographer_hire(request, unique_id):
         form = PhotographerEnquireForm()
     return render(request, 'marketplace/photographer/hire.html', {'form': form, 'photographer': photographer, 'pageName': 'photographer-hire'})
 
-@login_required
+@my_login_required
 def photographer_edit(request, unique_id):
     photographer = get_object_or_404(Photographer, unique_id=unique_id)
     if photographer.is_approved:
@@ -427,7 +427,7 @@ def photographer_edit(request, unique_id):
         form.set_is_approved(is_approved=is_approved)
     return render(request, 'marketplace/photographer/edit.html', {'form': form, 'pageName': 'photographer-edit'})
 
-@login_required
+@my_login_required
 def my_photographer_delete(request, unique_id):
     photographer = get_object_or_404(Photographer, unique_id=unique_id)
     if photographer.user == request.user:
@@ -522,7 +522,7 @@ def photographer_detail(request, unique_id):
               'pageName': 'photographer-detail'
           })
 
-@login_required
+@my_login_required
 def my_photographer_list(request, page):
     photographers = None
     if request.method == "GET":

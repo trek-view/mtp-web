@@ -12,10 +12,12 @@ from datetime import datetime
 from mailerlite import MailerLiteApi
 import secrets
 
-from lib.functions import send_mail_with_html
+from lib.functions import *
 
-from .models import CustomUser
+from .models import CustomUser, MapillaryUser
 from .forms import UserSignUpForm, UserProfileForm
+
+import requests
 
 def signup(request):
     if request.method == "POST":
@@ -81,11 +83,11 @@ def email_verify(request, key):
             print('email sending error!')
         messages.success(request, 'Your account is confirmed. You can now login.')
     else:
-        message.error(request, 'Error, invalid token!')
+        messages.error(request, 'Error, invalid token!')
     return redirect('login')
     # return render(request, 'registration/confirm_template.html', {'success': False})
 
-@login_required
+@my_login_required
 def profile_edit(request):
     user = request.user
     if request.method == "POST":
@@ -103,3 +105,44 @@ def profile_edit(request):
 def change_password_success(request):
     messages.success(request, 'Your password is updated successfully.')
     return redirect('change_password')
+
+@my_login_required
+def check_mapillary_oauth(request):
+    if request.method == 'GET':
+        mapillary_access_token = request.GET.get('access_token')
+        user = request.user
+        user.mapillary_access_token = mapillary_access_token
+        user.save()
+
+        token = user.mapillary_access_token
+        map_user_data = get_mapillary_user(token)
+
+        if map_user_data is None:
+            messages.error(request, "Unauthorized for Mapillary")
+            return redirect('home')
+
+        data = MapillaryUser.objects.filter(key=map_user_data['key'], user=request.user)
+        if data.count() == 0:
+            map_user = MapillaryUser()
+        else:
+            map_user = data[0]
+
+        if 'about' in map_user_data:
+            map_user.about = map_user_data['about']
+        if 'avatar' in map_user_data:
+            map_user.avatar = map_user_data['avatar']
+        if 'created_at' in map_user_data:
+            map_user.created_at = map_user_data['created_at']
+        if 'email' in map_user_data:
+            map_user.email = map_user_data['email']
+        if 'key' in map_user_data:
+            map_user.key = map_user_data['key']
+        if 'username' in map_user_data:
+            map_user.username = map_user_data['username']
+
+        map_user.user = request.user
+        map_user.save()
+        return redirect('sequence.index')
+    else:
+        messages.error(request, 'Error, mapillary invalid token!')
+        return redirect('home')

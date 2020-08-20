@@ -72,10 +72,10 @@
 
             <div class="main-guidebook">
                 <div class="guidebook-title text-center text-info mt-1">
-                <h3>
-                    {{ guidebook.name }}
-                </h3>
-            </div>
+                    <h3>
+                        {{ guidebook.name }}
+                    </h3>
+                </div>
 
                 <div class="guidebook-description">
                     <p class="mb-1">
@@ -122,8 +122,8 @@
                 <form method="POST" class="post-form" id="guidebook_edit_form" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ g_form.as_p }}
-                    <div class="form-group d-flex justify-content-between">
-                        <button type="button" class="btn btn-sm btn-primary save-btn" id="guidebook_save_button">Save</button>
+                    <div class="form-group d-flex justify-content-end">
+                        <button type="button" class="btn btn-sm btn-primary save-btn mr-2" id="guidebook_save_button">Save</button>
                         <button type="button" class="btn btn-sm btn-dark" id="guidebook_cancel_button">Cancel</button>
                     </div>
                 </form>

@@ -23,7 +23,7 @@ from django.template.loader import render_to_string
 from django.contrib.gis.geos import Point
 
 ## Custom Libs ##
-from lib.functions import send_mail_with_html
+from lib.functions import *
 
 ## Project packages
 from accounts.models import CustomUser
@@ -87,7 +87,7 @@ def guidebook_list(request, page):
     pGuidebooks.count = len(pGuidebooks)
     return render(request, 'guidebook/guidebook_list.html', {'guidebooks': pGuidebooks, 'form': form, 'pageName': 'guidebook-list'})
 
-@login_required
+@my_login_required
 def my_guidebook_list(request, page):
     guidebooks = None
     if request.method == "GET":
@@ -152,13 +152,13 @@ def guidebook_detail(request, unique_id):
     poi_form = PointOfInterestForm()
     return render(request, 'guidebook/guidebook_detail.html', {'guidebook': guidebook, 'is_liked': is_liked, 'form': form, 'poi_form': poi_form, 'pageName': 'guidebook-detail'})
 
-@login_required
-def guidebook_create(request, unique_id = None):
+@my_login_required
+def guidebook_create(request, unique_id=None):
     if request.method == "POST":
         form = GuidebookForm(request.POST, request.FILES)
 
         if form.is_valid():
-            if not unique_id:
+            if unique_id is None:
                 guidebook = form.save(commit=False)
                 guidebook.user = request.user
                 guidebook.save()
@@ -207,7 +207,7 @@ def guidebook_create(request, unique_id = None):
             form = GuidebookForm()
     return render(request, 'guidebook/create_main.html', {'form': form, 'pageName': 'guidebook-create'})
 
-@login_required
+@my_login_required
 def ajax_guidebook_update(request, unique_id = None):
     if request.method == "POST":
         form = GuidebookForm(request.POST)
@@ -229,7 +229,7 @@ def ajax_guidebook_update(request, unique_id = None):
             print(guidebook.getTagStr)
             return JsonResponse({
                 'status': 'success',
-                'message': 'A cover image is uploaded successfully.',
+                'message': 'Guidebook was uploaded successfully.',
                 'guidebook': {
                     'title': guidebook.name,
                     'description': guidebook.description,
@@ -243,7 +243,7 @@ def ajax_guidebook_update(request, unique_id = None):
         'message': 'The Guidebook does not exist or has no access.'
     })
 
-@login_required
+@my_login_required
 def add_scene(request, unique_id):
     guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
     if guidebook.user != request.user:
@@ -254,7 +254,7 @@ def add_scene(request, unique_id):
     g_form = GuidebookForm(instance=guidebook)
     return render(request, 'guidebook/add_scene.html', {'guidebook': guidebook, 'g_form': g_form, 'form': form, 'poi_form': poi_form, 'pageName': 'add-scene'})
 
-@login_required
+@my_login_required
 def ajax_upload_file(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
@@ -274,7 +274,7 @@ def ajax_upload_file(request, unique_id):
                 'message': 'A cover image is uploaded successfully.'
             })
 
-@login_required
+@my_login_required
 def ajax_add_scene(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
@@ -346,7 +346,7 @@ def ajax_add_scene(request, unique_id):
         'message': 'It failed to save Scene!'
     })
 
-@login_required
+@my_login_required
 def ajax_order_scene(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
@@ -382,7 +382,7 @@ def ajax_order_scene(request, unique_id):
         'message': 'It failed to save Scene!'
     })
 
-@login_required
+@my_login_required
 def ajax_save_poi(request, unique_id, pk):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
@@ -457,7 +457,7 @@ def ajax_save_poi(request, unique_id, pk):
         'message': 'It failed to save Point of Interest!'
     })
 
-@login_required
+@my_login_required
 def ajax_delete_poi(request, unique_id, pk):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
@@ -534,7 +534,7 @@ def ajax_get_scene(request, unique_id):
             'poi_list': poi_list
         })
 
-@login_required
+@my_login_required
 def ajax_get_edit_scene(request, unique_id):
     image_key = request.GET['image_key']
     guidebook = Guidebook.objects.get(unique_id=unique_id)
@@ -579,7 +579,7 @@ def ajax_get_edit_scene(request, unique_id):
             'poi_list': poi_list
         })
 
-@login_required
+@my_login_required
 def ajax_get_scene_list(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
@@ -600,7 +600,7 @@ def ajax_get_scene_list(request, unique_id):
         'scene_list': scenes_json
     })
 
-@login_required
+@my_login_required
 def ajax_delete_scene(request, unique_id, pk):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
@@ -645,7 +645,7 @@ def ajax_delete_scene(request, unique_id, pk):
         'message': 'It failed to delete Scene!'
     })
 
-@login_required
+@my_login_required
 def check_like(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
@@ -692,7 +692,7 @@ def check_like(request, unique_id):
             'liked_count': liked_count
         })
 
-@login_required
+@my_login_required
 def check_publish(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
@@ -726,7 +726,7 @@ def check_publish(request, unique_id):
         'is_published': guidebook.is_published
     })
 
-@login_required
+@my_login_required
 def guidebook_delete(request, unique_id):
     guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
     if guidebook.user == request.user:

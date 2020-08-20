@@ -1,7 +1,8 @@
-{% extends 'layouts/guidebook/base.html' %}
+{% extends 'layouts/base.html' %}
 {% load static %}
 {% block title %}GuideBooks{% endblock %}
-
+{% block app_guidebook %}active{% endblock %}
+{% block app_style %}<link rel="stylesheet" href="{% static 'css/guidebook_style.css' %}">{% endblock %}
 {% block content %}
 
 <div class="main-body">
@@ -50,7 +51,7 @@
         </div>
     </div>
     <div class="right-board bg-light">
-        <div class="guidebook-box mt-4 mb-2 ml-auto mr-auto">
+        <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
             <div class="guidebook-paginator">
                 {% if guidebooks.has_other_pages %}
                     <ul class="pagination justify-content-center">

@@ -141,8 +141,8 @@ class GuidebookSearchForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.fields['name'] = forms.CharField(
-            label='',
-            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Guidebook Name'}),
+            label='Guidebook Name',
+            widget=forms.TextInput(attrs={'class': 'form-control'}),
             required=False
         )
         self.fields['category'] = forms.ModelChoiceField(
@@ -150,6 +150,7 @@ class GuidebookSearchForm(forms.Form):
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
             queryset=Category.objects.all(),
+            empty_label=None
         )
         self.fields['tag'] = forms.MultipleChoiceField(
             required=False,
@@ -158,8 +159,8 @@ class GuidebookSearchForm(forms.Form):
         )
 
         self.fields['username'] = forms.CharField(
-            label='',
-            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
+            label='Username',
+            widget=forms.TextInput(attrs={'class': 'form-control'}),
             required=False
         )
 

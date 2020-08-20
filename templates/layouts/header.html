@@ -1,0 +1,34 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-success justify-content-between">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="logo">
+        <a href="{% url 'home' %}"><img src="{% static 'images/iconified/map-the-paths-text-logo.png' %}"></a>
+    </div>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <ul class="navbar-nav mr-4 ml-auto mt-2 mt-lg-0">
+            <li class="nav-item {% block app_sequence %}{% endblock %}">
+                <a class="nav-link" href="{% url 'sequence.index' %}">Sequence</a>
+            </li>
+
+            <li class="nav-item {% block app_guidebook %}{% endblock %}">
+                <a class="nav-link" href="{% url 'guidebook.home' %}">Guidebooks</a>
+            </li>
+
+            <li class="nav-item {% block app_marketpalce %}{% endblock %}">
+                <a class="nav-link" href="{% url 'marketplace.home' %}">Marketplace</a>
+            </li>
+        </ul>
+        {% if user.is_authenticated %}
+        <div>
+            <a href="{% url 'profile' %}" class="text-white">{{ request.user.username }}</a>
+            <a href="{% url 'logout' %}" class="text-white">Logout</a>
+        </div>
+        {% else %}
+        <a href="{% url 'login' %}" class="text-white">Login</a>
+        {% endif %}
+    </div>
+    
+</nav>

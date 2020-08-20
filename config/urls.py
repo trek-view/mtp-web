@@ -63,35 +63,19 @@ class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
 # handler404 = marketplaceViews.handler404
 # handler500 = marketplaceViews.handler500
 
-admin.site.__class__ = AdminSiteOTPRequiredMixinRedirSetup
+# admin.site.__class__ = AdminSiteOTPRequiredMixinRedirSetup
 
 urlpatterns = [
-    # Home URL
     # path('', views.index, name='home'),
     path('', RedirectView.as_view(url='guidebook', permanent=False), name='home'),
     # path('', RedirectView.as_view(url='marketplace', permanent=False), name='home'),
 
-    # path('', include(tf_urls)),
-
-
-
-    # Account URL
     path('accounts/', include('accounts.urls')),
-
-    # Email URL
     path('email/', include(mail_urls)),
-
-    ## App urls ##
-
-    # Marketplace URL
     path('marketplace/', include('marketplace.urls')),
-    path('sitemap.xml', sitemap,
-         {'sitemaps': sitemaps},
-         name='django.contrib.sitemaps.views.sitemap'),
-
-    # Marketplace URL
     path('guidebook/', include('guidebook.urls')),
-
+    path('sequence/', include('sequence.urls')),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     # path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     re_path(r'', include(tf_urls)),
     path('mission-control/', admin.site.urls, name='admin'),

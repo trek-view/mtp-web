@@ -130,3 +130,16 @@ form ul li .help-block.form-error {
     background: #ff000099;
     color: white;
 }
+
+.card .min-map-box {
+    width: 220px;
+    height: 160px;
+}
+
+.main-list-board {
+    max-width: 950px;
+}
+
+.card .detail-box span {
+    font-size: 13px;
+}

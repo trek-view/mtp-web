@@ -35,5 +35,5 @@ urlpatterns = [
     ),
     path('change-password-success/', views.change_password_success, name='change_password_success'),
     path('profile/', views.profile_edit, name='profile'),
-
+    path('check-mapillary-oauth', views.check_mapillary_oauth, name='check_mapillary_oauth'),
 ]
