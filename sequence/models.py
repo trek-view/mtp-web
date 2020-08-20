@@ -15,19 +15,7 @@ from django.urls import reverse
 
 UserModel = get_user_model()
 
-class TransportType(models.Model):
-    name = models.CharField(max_length=50)
-    description = models.TextField(default=None, null=True)
 
-    def __str__(self):
-        return self.name
-
-def getAllCaptureType():
-    items = TransportType.objects.all()
-    itemsTuple = ()
-    for item in items:
-        itemsTuple = itemsTuple + ((item.pk, item.name),)
-    return itemsTuple
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -43,6 +31,20 @@ def getAllTags():
     for item in items:
         itemsTuple = itemsTuple + ((item.pk, item.name),)
     print(itemsTuple)
+    return itemsTuple
+
+class TransportType(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.TextField(default=None, null=True)
+
+    def __str__(self):
+        return self.name
+
+def getAllCaptureType():
+    items = TransportType.objects.all()
+    itemsTuple = ()
+    for item in items:
+        itemsTuple = itemsTuple + ((item.pk, item.name),)
     return itemsTuple
 
 class Sequence(models.Model):
