@@ -31,8 +31,7 @@ django-redis==4.12.1
 django-robots==4.0
 django-s3-folder-storage==0.1
 django-select2==7.4.2
-# Editable Git install with no remote (django-smart-selects==1.0.9.3)
--e d:\python\20200709_python_django_trek-view\mtp\venv\src\django-smart-selects
+
 django-storages==1.9.1
 django-two-factor-auth==1.12.1
 docutils==0.15.2
