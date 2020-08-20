@@ -19,6 +19,7 @@ SECURE_SSL_REDIRECT = True
 DATABASES = {
     'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 ROBOTS_USE_SITEMAP = False
 
