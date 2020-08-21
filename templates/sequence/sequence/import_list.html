@@ -461,9 +461,9 @@
     function switch_action(action) {
         var month = $('input[name="month"]').val();
         if (action == 'filter')
-            location.assign("{% url 'sequence.transport_sequence_list' %}?action=filter");
+            location.assign("{% url 'sequence.import_sequence_list' %}?action=filter");
         else
-            location.assign("{% url 'sequence.transport_sequence_list' %}?page=1&action=restore");
+            location.assign("{% url 'sequence.import_sequence_list' %}?page=1&action=restore");
     }
 
 </script>
