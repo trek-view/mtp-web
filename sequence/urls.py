@@ -14,9 +14,9 @@ urlpatterns = [
     path('sequence/<str:unique_id>/ajax_sequence_check_publish', views.ajax_sequence_check_publish, name='sequence.ajax_sequence_check_publish'),
     path('sequence/<str:unique_id>/ajax_sequence_check_like', views.ajax_sequence_check_like, name='sequence.ajax_sequence_check_like'),
 
-    path('sequence/transport-sequence-list', views.transport_sequence_list, name='sequence.transport_sequence_list'),
-    path('sequence/transport-sequence', views.transport_sequence, name='sequence.transport_sequence'),
-    path('sequence/transport', views.ajax_transport, name='sequence.ajax_transport'),
+    path('sequence/import-sequence-list', views.import_sequence_list, name='sequence.import_sequence_list'),
+    path('sequence/import-sequence', views.import_sequence, name='sequence.import_sequence'),
+    path('sequence/import', views.ajax_import, name='sequence.ajax_import'),
 
     # Tour
 

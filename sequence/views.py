@@ -38,14 +38,14 @@ from .forms import *
 def index(request):
     return redirect('sequence.sequence_list')
 
-def transport_sequence(request):
+def import_sequence(request):
     if request.user.mapillary_access_token == '' or request.user.mapillary_access_token is None:
         return redirect(settings.MAPILLARY_AUTHENTICATION_URL)
     else:
         map_user = get_mapillary_user(request.user.mapillary_access_token)
         if map_user is None:
             return redirect(settings.MAPILLARY_AUTHENTICATION_URL)
-        return redirect('sequence.transport_sequence_list')
+        return redirect('sequence.import_sequence_list')
 
 def sequence_list(request):
     sequences = None
@@ -328,7 +328,7 @@ def ajax_save_sequence(request, unique_id):
     })
 
 @my_login_required
-def transport_sequence_list(request):
+def import_sequence_list(request):
     sequences = []
     search_form = TransportSearchForm()
     page = 1
@@ -476,10 +476,10 @@ def transport_sequence_list(request):
         'action': action,
         'page': page
     }
-    return render(request, 'sequence/sequence/transport_list.html', content)
+    return render(request, 'sequence/sequence/import_list.html', content)
 
 @my_login_required
-def ajax_transport(request):
+def ajax_import(request):
     if request.method == 'POST':
         sequence_str = request.POST.get('sequence_json')
         sequence_json = json.loads(sequence_str)
@@ -594,7 +594,7 @@ def ajax_sequence_check_like(request, unique_id):
 def tour_create(request, unique_id=None):
     mapillary_user = MapillaryUser.objects.get(user=request.user)
     if not mapillary_user:
-        messages.error(request, "You don't have any sequences. Please upload sequence or transport from Mapillary.")
+        messages.error(request, "You don't have any sequences. Please upload sequence or import from Mapillary.")
         return redirect('sequence.index')
 
     if request.method == "POST":

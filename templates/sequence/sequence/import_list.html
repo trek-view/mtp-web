@@ -300,7 +300,7 @@
         }
         else {
             var pageNum = $(this).data('page');
-            var url = "{% url 'sequence.transport_sequence_list' %}?page="+ pageNum + "&" + $('#search_form').serialize();
+            var url = "{% url 'sequence.import_sequence_list' %}?page="+ pageNum + "&" + $('#search_form').serialize();
             location.assign(url);
         }
     });
@@ -443,7 +443,7 @@
 
     function submit_form_data(next) {
         $.ajax({
-            url: "{% url 'sequence.ajax_transport' %}",
+            url: "{% url 'sequence.ajax_import' %}",
             type: 'POST',
             data: {'sequence_json': JSON.stringify(sequences)},
             dataType: 'json',
