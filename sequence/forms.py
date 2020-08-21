@@ -151,7 +151,7 @@ class TourSearchForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.fields['username'] = forms.CharField(
-            label='Mapillary Username',
+            label='Username',
             widget=forms.TextInput(attrs={'class': 'form-control'}),
             required=False
         )
