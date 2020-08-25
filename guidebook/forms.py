@@ -22,7 +22,8 @@ class GuidebookForm(forms.ModelForm):
         widget=forms.Select(
             attrs={'class': 'form-control', 'data-validation': 'required'}),
         queryset=Category.objects.all(),
-        to_field_name='pk'
+        to_field_name='pk',
+        empty_label=None
     )
 
     tag = forms.ModelChoiceField(
