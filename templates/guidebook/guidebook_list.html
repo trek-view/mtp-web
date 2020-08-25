@@ -95,7 +95,12 @@
 
                                 </div>
                                 <div class="cover-image-box ml-3 mr-3">
-                                    <img class="w-100" src="{{ STATIC_URL }}{{ guidebook.cover_image }}">
+                                    {% if guidebook.getCoverImage is None %}
+                                        <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
+                                    {% else %}
+                                        <img class="w-100" src="https://images.mapillary.com/{{ guidebook.getCoverImage }}/thumb-320.jpg">
+                                    {% endif %}
+
                                 </div>
                                 <div class="detail-box w-100">
                                     <div class="guidebook-main float-left">

@@ -4,72 +4,9 @@
 
 {% block content %}
     <link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
-    <link href='{% static 'css/dropzone.min.css' %}' type='text/css' rel='stylesheet'>
-    <script src='{% static 'js/dropzone.min.js' %}' type='text/javascript'></script>
-    <style>
-        .dz-image img {
-            width: 100% !important;
-            height: 100% !important;
-        }
-        .dz-image {
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 0px !important;
-        }
-        .dz-preview.dz-image-preview {
-            width: 100% !important;
-            height: 100% !important;
-            padding: 0px !important;
-            margin: 0px !important;
-        }
-        form.dropzone {
-            padding: 0px !important;
-            width: 330px !important;
-            height: 220px !important;
-        }
-        .dropzone .dz-preview .dz-error-message {
-            left: 103px;
-        }
-
-        .dropzone .dz-preview:hover .dz-image img {
-            -webkit-transform: unset;
-            transform: unset;
-            -webkit-filter: unset;
-            filter: unset;
-        }
-    </style>
-
 <div class="main-body">
     <div class="left-side p-3">
         <div class="guidebook-detail card p-2">
-            <div class="guidebook-cover-image mt-3 mb-1">
-                <div class="{% if guidebook.cover_image == '' or guidebook.cover_image is None %}d-none{% endif %}" id="guidebook_cover_image">
-                    <div class="dz-image-cover">
-                        {% if guidebook.cover_image != '' and guidebook.cover_image != None %}
-                         <img class="w-100 "  src="{{ STATIC_URL }}{{ guidebook.cover_image }}">
-                        {% endif %}
-                    </div>
-                    <div class="text-right mt-3">
-                        <button type="button" class="btn btn-sm btn-warning" id="change_file">Change Cover Image</button>
-                    </div>
-                </div>
-                <div class="{% if guidebook.cover_image != '' and guidebook.cover_image != None %}d-none{% endif %}" id="file-upload">
-                    <form action="{% url 'guidebook.ajax_upload_file' unique_id=guidebook.unique_id %}" class="dropzone ml-auto mr-auto d-flex align-items-center justify-content-center">
-                      <div class="fallback">
-                        <input name="cover_image" type="file" multiple="false" />
-                      </div>
-                    </form>
-                    <div class="text-right mt-3">
-                        <button type="button" class="btn btn-sm btn-primary d-none" id='uploadfile'>Upload</button>
-                        <button type="button" class="btn btn-sm btn-danger d-none" id="removefile">Remove</button>
-                        <button type="button" class="btn btn-sm btn-dark {% if guidebook.cover_image == '' or guidebook.cover_image is None %}d-none{% endif %}" id="cancelfile">Cancel</button>
-                    </div>
-                </div>
-
-            </div>
-
-            <hr class="mt-2 mb-2" />
-
             <div class="main-guidebook">
                 <div class="guidebook-title text-center text-info mt-1">
                     <h3>
@@ -338,86 +275,6 @@
                 }
             }
         });
-    });
-
-
-
-    Dropzone.autoDiscover = false;
-    {% if guidebook.cover_image == '' or guidebook.cover_image is None %}
-        var server_image = false;
-    {% else %}
-        var server_image = true;
-    {% endif %}
-
-    var myDropzone = new Dropzone(".dropzone", {
-        autoProcessQueue: false,
-        uploadMultiple: false,
-        parallelUploads: 1,
-        paramName: "cover_image", // The name that will be used to transfer the file
-        maxFilesize: 20,
-        {#addRemoveLinks: true,#}
-        maxFiles: 1,
-        thumbnailWidth: 350,
-        thumbnailHeight: 230,
-        sending: function(file, xhr, formData) {
-            formData.append("csrfmiddlewaretoken", '{{ csrf_token }}');
-        },
-        init: function() {
-            this.on("maxfilesexceeded", function(file) {
-                this.removeAllFiles();
-                this.addFile(file);
-            });
-            this.on("success", function(file, responseText) {
-                toastr.success('A cover image is updated successfully.');
-            });
-            this.on("thumbnail", function(file, dataUrl) {
-                $('.dz-image').css('border-radius', '0px');
-                $('.dz-image img').css('width', '100%');
-                $('.dz-image img').css('height', '100%');
-                $('.dz-details').remove();
-                $('.dropzone .dz-preview').off('hover');
-            });
-            this.on('addedfile', function () {
-                $('#uploadfile').removeClass('d-none');
-                $('#removefile').removeClass('d-none');
-                if (server_image)
-                    $('#cancelfile').removeClass('d-none');
-                else
-                    $('#cancelfile').addClass('d-none');
-            });
-            this.on('removedfile', function () {
-                $('#uploadfile').addClass('d-none');
-                $('#removefile').addClass('d-none');
-            });
-            this.on('complete', function () {
-                var h = $('.dz-image').html();
-                $('.dz-image-cover').html(h);
-                server_image = true;
-                this.removeAllFiles();
-                $('#cancelfile').addClass('d-none');
-                $('#file-upload').addClass('d-none');
-                $('#guidebook_cover_image').removeClass('d-none');
-            });
-
-            $('#change_file').click(function () {
-                $('#guidebook_cover_image').addClass('d-none');
-                $('#file-upload').removeClass('d-none');
-            });
-        }
-    });
-
-    $('#cancelfile').click(function () {
-        myDropzone.removeAllFiles();
-        $('#guidebook_cover_image').removeClass('d-none');
-        $('#file-upload').addClass('d-none');
-    });
-
-    $('#removefile').click(function () {
-        myDropzone.removeAllFiles();
-    });
-
-    $('#uploadfile').click(function(){
-        myDropzone.processQueue();
     });
 </script>
 <script>

@@ -125,6 +125,12 @@ class Guidebook(models.Model):
                 tags.append(tag.name)
         return tags
 
+    def getCoverImage(self):
+        scenes = Scene.objects.filter(guidebook=self)
+        if scenes.count() > 0:
+            return scenes[0].image_key
+        else:
+            return None
 
 class GuidebookLike(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
