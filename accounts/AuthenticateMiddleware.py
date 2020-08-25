@@ -36,9 +36,5 @@ class AuthMd(MiddlewareMixin):
             if request.path == reverse('login') or request.path == reverse('signup'):
                 return redirect('/')
             return None
-        print(request.user.is_authenticated)
-        print(reverse('login'))
-        print(reverse('signup'))
-        print(request.path)
         # Explicitly return None for all non-matching requests
         return None
