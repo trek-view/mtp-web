@@ -94,7 +94,7 @@
                     <form method="POST" id="delete_guidebook_form" class="d-flex align-items-center" action="{% url 'guidebook.guidebook_delete' unique_id=guidebook.unique_id %}">
                         {% csrf_token %}
                         {% if guidebook.getSceneCount > 0 %}
-                            <div class="col ">
+                            <div class="col text-center">
                                 {% if guidebook.is_approved and guidebook.is_published %}
                                     <button type="button" class="btn btn-success" id="publish_swithch_guidebook">Published</button>
                                 {% elif guidebook.is_approved and not guidebook.is_published %}
@@ -102,13 +102,13 @@
                                 {% endif %}
                             </div>
                         {% endif %}
-                        <div class="col ">
+                        <div class="col text-center">
                             <a href="{% url 'guidebook.add_scene' unique_id=guidebook.unique_id %}">
                                 <button type="button" class="btn btn-primary">Edit</button>
                             </a>
                         </div>
 
-                        <div class="col delete-gudiebook">
+                        <div class="col delete-gudiebook text-center">
                             <button type="button" id="delete_guidebook" class="btn btn-danger">Delete</button>
                         </div>
 
@@ -133,6 +133,14 @@
                             </div>
                             <div class="scene-description">
                                 <span>{{ scene.description }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <div class="poi-count">
+                                    <span style="color: blueviolet;">{{ scene.getPOICategories }}</span>
+                                </div>
+                                <div class="poi-category">
+                                    <span>POI: {{ scene.getPOICount }}</span>
+                                </div>
                             </div>
                             <div class="d-none scene-position">
                                 <p class="image_key">{{ scene.image_key }}</p>
