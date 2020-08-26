@@ -27,6 +27,7 @@
 
 .small-screen {
     height: 300px;
+    margin-bottom: 55px;
 }
 
 .small-screen .display {
@@ -42,7 +43,7 @@
 }
 
 
-.scene-form input, .scene-form textarea {
+.scene-form input, .scene-form textarea, .scene-form select {
     background: #0a1b23;
     color: white;
     box-shadow: 3px 3px 0px 0px rgb(4 4 4 / 5%), 4px 7px 20px 0px rgb(0 0 0 / 86%);
@@ -67,7 +68,7 @@
 }
 
 .minimize-button, .maximize-button {
-    width: 35px;
+    width: 30px;
     position: absolute;
     cursor: pointer;
     left: 10px;
@@ -75,12 +76,31 @@
     z-index: 300;
 }
 
+.maximize-button {
+    height: 40px;
+    width: 40px;
+    padding: 6px 8px 0px 8px;
+    border-radius: 50%;
+    background: #0000008c;
+}
+
 .switch-full-screen {
     position: absolute;
     right: 0px;
-    width: 40px;
+    width: 47px;
+    height: 47px;
     z-index: 300;
     cursor: pointer;
+}
+
+.switch-cover {
+    position: absolute;
+    right: -23px;
+    top: -6px;
+    width: 70px;
+    height: 35px;
+    z-index: 200;
+    transform: rotate(45deg);
 }
 
 .poi-icon {
@@ -119,12 +139,148 @@
 
 body {
     overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .TagVertex.selected {
     opacity: .9;
+    border: 1px solid #e0e8e0;
+    border-radius: 50%;
 }
 
 .TagVertex {
     opacity: .6;
+}
+
+.guidebook-box {
+    max-width: 950px;
+}
+
+.guidebook-list .card.guidebook .map-box{
+    width: 220px;
+    height: 160px;
+    background: #79aec8;
+    border-radius: 5px;
+}
+
+.guidebook-list .card.guidebook .cover-image-box  {
+    width: 180px;
+    height: 140px;
+    background: #79aec8;
+    border-radius: 5px;
+}
+
+.guidebook-list .card.guidebook .cover-image-box > img {
+    width: 100%;
+    height: 100%;
+}
+
+.detail-box .guidebook-main {
+    width: calc(100% - 80px);
+}
+.detail-box .guidebook-others {
+    width: 70px;
+    height: 160px;
+}
+
+.detail-box {
+    max-width: 450px;
+}
+
+.detail-box .guidebook-others img {
+    width: 45px;
+}
+
+.guidebook-tag .tag {
+    border-radius: 3px;
+    border: 1px solid lightsteelblue;
+}
+
+.left-side .check-like {
+    cursor: pointer;
+}
+
+.left-side {
+    /*background: aliceblue;*/
+}
+
+.left-side.poi-box {
+    position: absolute;
+}
+
+.PrevOrNext {
+    position: absolute;
+    top: 30px;
+}
+
+.PrevOrNext .disabled {
+    cursor: unset !important;
+    opacity: .4 !important;
+}
+
+.PrevOrNext .SequenceControls, .PrevOrNext .SequenceStepper {
+    cursor: unset;
+}
+
+.PrevOrNext .SequenceStepPrev, .PrevOrNext .SequenceStepNext, .PrevOrNext .SequencePlay {
+    opacity: .8;
+}
+
+.PrevOrNext .SequenceStepPrev, .PrevOrNext .SequenceStepNext {
+    cursor: pointer;
+}
+
+.PrevOrNext .SequenceStepper {
+    height: 25px; width: auto;
+
+}
+
+.scene-title {
+    color: #45b93d;
+}
+
+.list_container {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    position: relative;
+}
+.list_item {
+    /*height: 120px;*/
+    width: 98%;
+    position: absolute;
+    z-index: 0;
+    cursor: pointer;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 1%;
+    left: 0px;
+    margin: 0px;
+    -webkit-user-select: none;
+}
+.list_item.selected {
+    opacity: 0.8;
+    z-index: 1000;
+    cursor: pointer;
+}
+.list_item:active, .list_item:hover {
+    cursor: pointer;
+}
+
+.scene-box {
+    background: white;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+}
+
+.scene-box.selected {
+    background: currentColor;
+}
+
+.left-side.poi-box {
+    background: white;
 }

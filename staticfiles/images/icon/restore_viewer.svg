@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="24px" height="22px" viewBox="0 0 24 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.7.2 (28276) - http://www.bohemiancoding.com/sketch -->
+    <title>maximize_photo</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="maximize_photo" transform="translate(-8.000000, -7.000000)" fill="#FFFFFF">
+            <g transform="translate(8.000000, 7.000000)">
+                <path d="M0.0861505408,21.814067 C0.0861505408,16.0801054 4.68719226,1.71052076 6.13059149,3.77900761 C7.57399072,5.84749445 9.8807042,13.8819771 10.3517912,15.8204093 C10.8228783,17.7588414 14.7680563,8.39089478 17.5413164,11.8970698 C20.3145765,15.4032449 23.8910912,21.762458 23.8910912,21.762458 C23.8910912,21.762458 8.43482818,21.7624577 0.0861505408,21.814067 Z" id="Path-183"></path>
+                <circle id="Oval-60" cx="15.5" cy="3.5" r="3.5"></circle>
+            </g>
+        </g>
+    </g>
+</svg>

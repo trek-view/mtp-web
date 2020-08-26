@@ -158,6 +158,22 @@ class Scene(models.Model):
     sort = models.IntegerField(default=1, null=True)
     image_url = models.CharField(max_length=100, null=True)
 
+    def getPOICount(self):
+        pois = PointOfInterest.objects.filter(scene=self)
+        return pois.count()
+
+    def getPOICategories(self):
+        pois = PointOfInterest.objects.filter(scene=self)
+        categories = []
+        if pois.count() > 0:
+            for poi in pois:
+                if not poi.category.name in categories:
+                    categories.append(poi.category.name)
+        if len(categories) > 0:
+            return ', '.join(categories)
+        else:
+            return ''
+
 
 class PointOfInterest(models.Model):
     scene = models.ForeignKey(Scene, on_delete=models.CASCADE)

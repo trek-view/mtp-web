@@ -68,7 +68,7 @@
 }
 
 .minimize-button, .maximize-button {
-    width: 35px;
+    width: 30px;
     position: absolute;
     cursor: pointer;
     left: 10px;
@@ -76,12 +76,31 @@
     z-index: 300;
 }
 
+.maximize-button {
+    height: 40px;
+    width: 40px;
+    padding: 6px 8px 0px 8px;
+    border-radius: 50%;
+    background: #0000008c;
+}
+
 .switch-full-screen {
     position: absolute;
     right: 0px;
-    width: 40px;
+    width: 47px;
+    height: 47px;
     z-index: 300;
     cursor: pointer;
+}
+
+.switch-cover {
+    position: absolute;
+    right: -23px;
+    top: -6px;
+    width: 70px;
+    height: 35px;
+    z-index: 200;
+    transform: rotate(45deg);
 }
 
 .poi-icon {
@@ -260,4 +279,8 @@ body {
 
 .scene-box.selected {
     background: currentColor;
+}
+
+.left-side.poi-box {
+    background: white;
 }

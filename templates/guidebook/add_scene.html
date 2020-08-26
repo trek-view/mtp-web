@@ -209,14 +209,14 @@
         <div class="board">
             <div class="full-screen">
                 <div class="switch-full-screen switch_screen d-none">
-                    <img class="w-100" src="{% static 'images/icon/icons8-toggle-full-screen-64.png' %}">
+                    <img class="w-100" src="{% static 'images/icon/flap.svg' %}">
                 </div>
                 <div class="map-board w-100 display" id="map">
                 </div>
             </div>
             <div class="small-screen small d-none">
                 <div class="switch-full-screen switch_screen" >
-                    <img class="w-100" src="{% static 'images/icon/icons8-toggle-full-screen-64.png' %}">
+                    <img class="w-100" src="{% static 'images/icon/flap.svg' %}">
                 </div>
                 <div class="poi-icon d-none" id="poi_icon">
                     <img class="w-100 d-none" onclick="add_new_poi()" src="{% static 'images/icon/icons8-love-path-64.png' %}">
@@ -228,10 +228,10 @@
             </div>
             <div class="show-or-hide">
                 <div class="minimize-button d-none" onclick="showOrHide()">
-                    <img class="w-100" src="{% static 'images/icon/icons8-minimize-window-48.png' %}">
+                    <img class="w-100" src="data:image/svg+xml;charset=utf-8,%3C?xml version='1.0' encoding='UTF-8' standalone='no'?%3E %3Csvg width='22px' height='18px' viewBox='0 0 22 18' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E %3C!-- Generator: sketchtool 3.7.2 (28276) - http://www.bohemiancoding.com/sketch --%3E %3Ctitle%3E390F95AB-67C8-42FF-B9FF-C317EDED2467%3C/title%3E %3Cdesc%3ECreated with sketchtool.%3C/desc%3E %3Cdefs%3E %3Crect id='path-1' x='0' y='0' width='22' height='17' rx='4'/%3E %3Cfilter x='-50%25' y='-50%25' width='200%25' height='200%25' filterUnits='objectBoundingBox' id='filter-2'%3E %3CfeOffset dx='0' dy='1' in='SourceAlpha' result='shadowOffsetOuter1'/%3E %3CfeColorMatrix values='0 0 0 0 0.278431373 0 0 0 0 0.290196078 0 0 0 0 0.305882353 0 0 0 0.4 0' type='matrix' in='shadowOffsetOuter1'/%3E %3C/filter%3E %3C/defs%3E %3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E %3Cg id='view_component_photo' transform='translate(-12.000000, -12.000000)'%3E %3Cg id='minimize' transform='translate(12.000000, 12.000000)'%3E %3Cg id='Rectangle-211'%3E %3Cuse fill='black' fill-opacity='1' filter='url(%23filter-2)' xlink:href='%23path-1'/%3E %3Cuse fill='%23FFFFFF' fill-rule='evenodd' xlink:href='%23path-1'/%3E %3C/g%3E %3Crect id='Rectangle-210' fill='%23474A4E' x='4' y='10' width='14' height='2' rx='100'/%3E %3C/g%3E %3C/g%3E %3C/g%3E %3C/svg%3E">
                 </div>
                 <div class="maximize-button d-none" onclick="showOrHide()">
-                    <img class="w-100" src="{% static 'images/icon/icons8-maximize-window-48.png' %}">
+                    <img class="w-100" src="{% static 'images/icon/restore_viewer.svg' %}">
                 </div>
             </div>
         </div>
@@ -615,6 +615,8 @@
         }
     });
 
+    var is_mapillary_viewer = false;
+
     $('.switch_screen').click(function () {
          var full_screen = $('.full-screen');
          var small_screen = $('.small-screen');
@@ -624,6 +626,17 @@
              $(this).removeClass('d-none');
          });
          $(this).addClass('d-none');
+
+         if (is_mapillary_viewer)
+         {
+             is_mapillary_viewer = false;
+             $('.maximize-button img').attr('src', "{% static 'images/icon/restore_viewer.svg' %}")
+         }
+         else
+         {
+             is_mapillary_viewer = true;
+             $('.maximize-button img').attr('src', "{% static 'images/icon/restore_map.svg' %}")
+         }
 
 
          if (!$('.left-side.poi-box').hasClass('d-none')) {

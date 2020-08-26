@@ -442,7 +442,8 @@ def ajax_save_poi(request, unique_id, pk):
             poi = PointOfInterest()
             poi.title = 'Undefined Title'
             poi.description = ''
-            poi.category_id = 1
+            categories = POICategory.objects.all()
+            poi.category_id = categories[0].pk
             poi.position_x = request.POST.get('position_x')
             poi.position_y = request.POST.get('position_y')
             poi.scene = scene
