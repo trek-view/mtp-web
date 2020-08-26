@@ -35,6 +35,10 @@ from .forms import *
 
 ############################################################################
 
+MAIN_PAGE_DESCIPTION = "Sequences are collections of images continuously captured by a user at a give time. Browse those created by others, or import your own from Mapillary."
+
+############################################################################
+
 def index(request):
     return redirect('sequence.sequence_list')
 
@@ -111,7 +115,9 @@ def sequence_list(request):
     content = {
         'sequences': pSequences,
         'form': form,
-        'pageName': 'sequence-list',
+        'pageName': 'Sequences',
+        'pageTitle': 'Sequences',
+        'pageDescription': MAIN_PAGE_DESCIPTION,
         'page': page
     }
     return render(request, 'sequence/sequence/list.html', content)
@@ -181,7 +187,9 @@ def my_sequence_list(request):
     content = {
         'sequences': pSequences,
         'form': form,
-        'pageName': 'my-sequence-list',
+        'pageName': 'My Sequences',
+        'pageTitle': 'Sequences',
+        'pageDescription': MAIN_PAGE_DESCIPTION,
         'page': page
     }
     return render(request, 'sequence/sequence/list.html', content)
@@ -238,7 +246,9 @@ def sequence_detail(request, unique_id):
     content = {
         'sequence': sequence,
         'images': pImages,
-        'pageName': 'sequence-detail',
+        'pageName': 'Sequence Detail',
+        'pageTitle': 'Sequence',
+        'pageDescription': MAIN_PAGE_DESCIPTION,
         'page': page,
         'first_image': pImages[0],
         'addSequenceForm': addSequenceForm
@@ -469,7 +479,9 @@ def import_sequence_list(request):
         'search_form': search_form,
         'seq_count': len(sequences),
         'sequences': sequences,
-        'pageName': 'sequence-list',
+        'pageName': 'Sequences',
+        'pageTitle': 'Sequences',
+        'pageDescription': MAIN_PAGE_DESCIPTION,
         'addSequenceForm': addSequenceForm,
         'all_tags': all_tags,
         'all_transport_types': all_transport_types,
@@ -623,7 +635,13 @@ def tour_create(request, unique_id=None):
             form = TourForm(instance=tour)
         else:
             form = TourForm()
-    return render(request, 'sequence/tour/create.html', {'form': form, 'pageName': 'tour-create'})
+    content = {
+        'form': form,
+        'pageName': 'Create Tour',
+        'pageTitle': 'Tour',
+        'pageDescription': MAIN_PAGE_DESCIPTION,
+    }
+    return render(request, 'sequence/tour/create.html', content)
 
 @my_login_required
 def tour_add_sequence(request, unique_id):
@@ -714,7 +732,9 @@ def tour_add_sequence(request, unique_id):
             'sequences': pSequences,
             'sequence_count': len(pSequences),
             'form': form,
-            'pageName': 'search-sequence-list',
+            'pageName': 'Import Sequence',
+            'pageTitle': 'Sequence',
+            'pageDescription': MAIN_PAGE_DESCIPTION,
             'page': page,
             'tour': tour,
             'action': action,
@@ -728,7 +748,9 @@ def tour_add_sequence(request, unique_id):
             'sequences': sequences,
             'sequence_count': len(sequences),
             'form': form,
-            'pageName': 'search-sequence-list',
+            'pageName': 'Import Sequence',
+            'pageTitle': 'Sequence',
+            'pageDescription': MAIN_PAGE_DESCIPTION,
             'page': page,
             'tour': tour,
             'action': action,
@@ -793,7 +815,9 @@ def tour_list(request):
     content = {
         'tours': pTours,
         'form': form,
-        'pageName': 'tour-list',
+        'pageName': 'Tours',
+        'pageDescription': MAIN_PAGE_DESCIPTION,
+        'pageTitle': 'Tours',
         'page': page
     }
     return render(request, 'sequence/tour/list.html', content)
@@ -854,7 +878,9 @@ def my_tour_list(request):
     content = {
         'tours': pTours,
         'form': form,
-        'pageName': 'my-tour-list',
+        'pageName': 'My Tours',
+        'pageTitle': 'Tours',
+        'pageDescription': MAIN_PAGE_DESCIPTION,
         'page': page
     }
     return render(request, 'sequence/tour/list.html', content)
@@ -875,7 +901,9 @@ def tour_detail(request, unique_id):
     content = {
         'sequences': sequence_ary,
         'sequence_count': len(sequence_ary),
-        'pageName': 'search-sequence-list',
+        'pageName': 'Tour Detail',
+        'pageTitle': 'Tour',
+        'pageDescription': MAIN_PAGE_DESCIPTION,
         'tour': tour,
         'first_image_key': first_image_key,
         't_sequence_ary': t_sequence_ary

@@ -1,6 +1,5 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% block title %}Sequences{% endblock %}
 {% block app_sequence %}active{% endblock %}
 {% block app_style %}<link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">{% endblock %}
 {% block content %}
@@ -9,13 +8,13 @@
     <div class="left-side">
         <div class="p-3">
             <div class="pt-3 mb-3">
-                <h2>
+                <h3>
                     Sequences
-                </h2>
+                </h3>
             </div>
 
             <p>
-                Sequences are collections of images continuously captured by a user at a give time. Browse those created by others, or import your own from Mapillary.
+                {{ pageDescription }}
             </p>
         </div>
         <div class="pl-3 pr-3 mt-2 mb-3 text-right">
@@ -38,10 +37,10 @@
         {% if user.is_authenticated %}
             <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
                 <li class="nav-item" style="width: 30%;">
-                    <a class="nav-link {% if pageName == 'sequence-list' %}active{% endif %}" href="{% url 'sequence.index' %}">All</a>
+                    <a class="nav-link {% if pageName == 'Sequences' %}active{% endif %}" href="{% url 'sequence.index' %}">All</a>
                 </li>
                 <li class="nav-item" style="width: 50%">
-                    <a class="nav-link {% if pageName == 'my-sequence-list' %}active{% endif %}" href="{% url 'sequence.my_sequence_list' %}">My Sequences</a>
+                    <a class="nav-link {% if pageName == 'My Sequences' %}active{% endif %}" href="{% url 'sequence.my_sequence_list' %}">My Sequences</a>
                 </li>
             </ul>
         {% endif %}

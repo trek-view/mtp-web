@@ -1,8 +1,20 @@
-{% extends 'layouts/guidebook/base.html' %}
-{% block title %}Create Guidebook{% endblock %}
-
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block app_guidebook %}active{% endblock %}
+{% block app_style %}<link rel="stylesheet" href="{% static 'css/guidebook_style.css' %}">{% endblock %}
 {% block content %}
 <div class="main-body">
+    <div class="page-header d-none">
+        <div class="pt-3 mb-3">
+            <h4>
+                {{ pageName }}
+            </h4>
+        </div>
+
+        <p>
+            {{ pageDescription }}
+        </p>
+    </div>
     <div class="w-100 mt-5 d-flex justify-content-center">
         <form method="POST" class="post-form" id="guidebook_create_form" enctype="multipart/form-data">
             {% csrf_token %}

@@ -1,11 +1,22 @@
-{% extends 'layouts/guidebook/base.html' %}
-{% block title %}Edit Guidebook{% endblock %}
+{% extends 'layouts/base.html' %}
 {% load static %}
-
+{% block app_guidebook %}active{% endblock %}
+{% block app_style %}<link rel="stylesheet" href="{% static 'css/guidebook_style.css' %}">{% endblock %}
 {% block content %}
     <link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
 <div class="main-body">
     <div class="left-side p-3">
+        <div class="page-header">
+            <div class="pt-3 mb-3">
+                <h4>
+                    {{ pageName }}
+                </h4>
+            </div>
+
+            <p>
+                {{ pageDescription }}
+            </p>
+        </div>
         <div class="guidebook-detail card p-2">
             <div class="main-guidebook">
                 <div class="guidebook-title text-center text-info mt-1">

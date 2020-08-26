@@ -100,7 +100,7 @@ def profile_edit(request):
     else:
         form = UserProfileForm(instance=user)
 
-    return render(request, 'account/index.html', {'form': form})
+    return render(request, 'account/index.html', {'form': form, 'pageName': 'Profile'})
 
 def change_password_success(request):
     messages.success(request, 'Your password is updated successfully.')

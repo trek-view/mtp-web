@@ -28,8 +28,8 @@ urlpatterns = [
         'change-password/',
         authViews.PasswordChangeView.as_view(
             template_name='account/change-password.html',
-            success_url = '/accounts/change-password-success',
-            form_class = UserPasswordChangeForm
+            success_url='/accounts/change-password-success',
+            form_class=UserPasswordChangeForm
         ),
         name='change_password'
     ),

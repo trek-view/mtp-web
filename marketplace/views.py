@@ -43,6 +43,12 @@ from .forms import *
 
 ############################################################################
 
+MAIN_PAGE_DESCRIPTION = "Find or offer help on image collection projects to create fresh street level map data in locations where it's needed for Google Street View, Mapillary, and more..."
+JOB_PAGE_DESCRIPTION = ""
+PHOTOGRAPHER_PAGE_DESCRIPTION = ""
+
+############################################################################
+
 def home(request):
     return redirect('marketplace.job_list', page=1)
 
@@ -89,7 +95,13 @@ def job_create(request):
             return redirect('marketplace.my_job_list')
     else:
         form = JobForm()
-    return render(request, 'marketplace/job/create.html', {'form': form, 'pageName': 'job-create'})
+    content = {
+        'form': form,
+        'pageName': 'Create Job',
+        'pageTitle': 'Marketplace',
+        'pageDescription': MAIN_PAGE_DESCRIPTION
+    }
+    return render(request, 'marketplace/job/create.html', content)
 
 @my_login_required
 def job_apply(request, unique_id):
@@ -129,7 +141,13 @@ def job_apply(request, unique_id):
             return redirect('marketplace.job_list')
     else:
         form = JobApplicationForm()
-    return render(request, 'marketplace/job/apply.html', {'form': form, 'job': job, 'pageName': 'job-apply'})
+    content = {
+        'form': form,
+        'job': job,
+        'pageName': 'Apply Job',
+        'pageTitle': 'Job'
+    }
+    return render(request, 'marketplace/job/apply.html', content)
 
 @my_login_required
 def job_edit(request, unique_id):
@@ -157,7 +175,12 @@ def job_edit(request, unique_id):
     else:
         form = JobForm(instance=job)
         form.set_is_approved(is_approved=is_approved)
-    return render(request, 'marketplace/job/edit.html', {'form': form, 'pageName': 'job-edit'})
+    content = {
+        'form': form,
+        'pageName': 'Edit Job',
+        'pageTitle': 'Job'
+    }
+    return render(request, 'marketplace/job/edit.html', content)
 
 @my_login_required
 def my_job_delete(request, unique_id):
@@ -212,7 +235,14 @@ def job_list(request, page):
             last_num = pJobs.number + 3
     pJobs.paginator.pages = range(first_num, last_num + 1)
     pJobs.count = len(pJobs)
-    return render(request, 'marketplace/job/list.html', {'jobs': pJobs, 'form': form, 'pageName': 'job-list'})
+    content = {
+        'jobs': jobs,
+        'form': form,
+        'pageName': 'Jobs',
+        'pageTitle': 'Marketplace',
+        'pageDescription': MAIN_PAGE_DESCRIPTION
+    }
+    return render(request, 'marketplace/job/list.html', content)
 
 def job_detail(request, unique_id):
     job = get_object_or_404(Job, unique_id=unique_id)
@@ -237,8 +267,15 @@ def job_detail(request, unique_id):
     job.options = job.getOrganisationCategory() + ', ' + job.getCaptureType() + ', ' + job.getCaptureMethod()
     apply_url = reverse('marketplace.job_apply', kwargs={'unique_id': str(job.unique_id)})
     job_html_detail = render_to_string('marketplace/job/modal_detail.html', {'job': job, 'apply_url': apply_url, 'is_mine': is_mine})
-
-    return render(request, 'marketplace/job/job_detail.html', {'job': job, 'form': form, 'geometry': geometry, 'job_html_detail': job_html_detail, 'pageName': 'job-detail'})
+    content = {
+        'job': job,
+        'form': form,
+        'geometry': geometry,
+        'job_html_detail': job_html_detail,
+        'pageName': 'Job Detail',
+        'pageTitle': 'Job'
+    }
+    return render(request, 'marketplace/job/job_detail.html', content)
 
 @my_login_required
 def my_job_list(request, page):
@@ -289,7 +326,14 @@ def my_job_list(request, page):
     pJobs.paginator.pages = range(first_num, last_num + 1)
     pJobs.count = len(pJobs)
 
-    return render(request, 'marketplace/job/list.html', {'jobs': pJobs, 'form': form, 'pageName': 'my-job-list'})
+    content = {
+        'jobs': pJobs,
+        'form': form,
+        'pageName': 'My Jobs',
+        'pageTitle': 'Marketplace',
+        'pageDescription': MAIN_PAGE_DESCRIPTION
+    }
+    return render(request, 'marketplace/job/list.html', content)
 
 def ajax_job_detail(request, unique_id):
     job = Job.objects.get(unique_id=unique_id)
@@ -358,7 +402,12 @@ def photographer_create(request):
             return redirect('marketplace.my_photographer_list')
     else:
         form = PhotographerForm()
-    return render(request, 'marketplace/photographer/create.html', {'form': form, 'pageName': 'photographer-create'})
+    content = {
+        'form': form,
+        'pageName': 'Create Photographer',
+        'pageTitle': 'Photographer'
+    }
+    return render(request, 'marketplace/photographer/create.html', content)
 
 @my_login_required
 def photographer_hire(request, unique_id):
@@ -398,7 +447,13 @@ def photographer_hire(request, unique_id):
             return redirect('marketplace.photographer_list')
     else:
         form = PhotographerEnquireForm()
-    return render(request, 'marketplace/photographer/hire.html', {'form': form, 'photographer': photographer, 'pageName': 'photographer-hire'})
+    content = {
+        'form': form,
+        'photographer': photographer,
+        'pageName': 'Hire Photographer',
+        'PageTitle': 'Photographer'
+    }
+    return render(request, 'marketplace/photographer/hire.html', content)
 
 @my_login_required
 def photographer_edit(request, unique_id):
@@ -425,7 +480,12 @@ def photographer_edit(request, unique_id):
     else:
         form = PhotographerForm(instance=photographer)
         form.set_is_approved(is_approved=is_approved)
-    return render(request, 'marketplace/photographer/edit.html', {'form': form, 'pageName': 'photographer-edit'})
+    content = {
+        'form': form,
+        'pageName': 'Edit Photographer',
+        'pageTitle': 'Photographer'
+    }
+    return render(request, 'marketplace/photographer/edit.html', content)
 
 @my_login_required
 def my_photographer_delete(request, unique_id):
@@ -485,7 +545,15 @@ def photographer_list(request, page):
     pPhotographers.paginator.pages = range(first_num, last_num + 1)
     pPhotographers.count = len(pPhotographers)
 
-    return render(request, 'marketplace/photographer/list.html', {'photographers': pPhotographers, 'form': form, 'pageName': 'photographers-list'})
+    content = {
+        'photographers': pPhotographers,
+        'form': form,
+        'pageName': 'Photographers',
+        'pageTitle': 'Marketplace',
+        'pageDescription': MAIN_PAGE_DESCRIPTION
+    }
+
+    return render(request, 'marketplace/photographer/list.html', content)
 
 def photographer_detail(request, unique_id):
     photographer = get_object_or_404(Photographer, unique_id=unique_id)
@@ -519,7 +587,8 @@ def photographer_detail(request, unique_id):
               'photographer_html_detail': photographer_html_detail,
               'form': form,
               'geometry': geometry,
-              'pageName': 'photographer-detail'
+              'pageName': 'Photographer Detail',
+              'pageTitle': 'Photographer'
           })
 
 @my_login_required
@@ -564,8 +633,14 @@ def my_photographer_list(request, page):
             last_num = pPhotographers.number + 3
     pPhotographers.paginator.pages = range(first_num, last_num + 1)
     pPhotographers.count = len(pPhotographers)
-
-    return render(request, 'marketplace/photographer/list.html', {'photographers': pPhotographers, 'form': form, 'pageName': 'my-photographer-list'})
+    content = {
+        'photographers': pPhotographers,
+        'form': form,
+        'pageName': 'My Photographers',
+        'pageTitle': 'Marketplace',
+        'pageDescription': MAIN_PAGE_DESCRIPTION
+    }
+    return render(request, 'marketplace/photographer/list.html', content)
 
 def ajax_photographer_detail(request, unique_id):
     photographer = Photographer.objects.get(unique_id=unique_id)

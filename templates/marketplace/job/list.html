@@ -1,20 +1,20 @@
-{% extends 'layouts/marketplace/base.html' %}
-
-{% block title %}Jobs{% endblock %}
-
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block app_marketpalce %}active{% endblock %}
+{% block app_style %}<link rel="stylesheet" href="{% static 'css/marketplace_style.css' %}">{% endblock %}
 {% block content %}
 
 <div class="main-body">
     <div class="left-side">
         <div class="market p-3">
             <div class="market-header pt-3 mb-3">
-                <h2>
+                <h3>
                     Marketplace
-                </h2>
+                </h3>
             </div>
             <div class="market-body">
                 <p>
-                    Find or offer help on image collection projects to create fresh street level map data in locations where it's needed for Google Street View, Mapillary, and more...
+                    {{ pageDescription }}
                 </p>
                 <p>
                     Created by the team at <a href="https://www.trekview.org/" target="_blank">Trek View</a>.
@@ -34,13 +34,13 @@
         {% if user.is_authenticated %}
             <ul class="nav nav-tabs text-center border-bottom-0 justify-content-center" id="myTab" role="tablist">
                 <li class="nav-item" style="width: 22%;">
-                    <a class="nav-link {% if pageName == 'job-list' %}active{% endif %}" href="{% url 'marketplace.job_list' page=1 %}">All</a>
+                    <a class="nav-link {% if pageName == 'Jobs' %}active{% endif %}" href="{% url 'marketplace.job_list' page=1 %}">All</a>
                 </li>
                 <li class="nav-item" style="width: 32%;">
-                    <a class="nav-link {% if pageName == 'my-job-list' %}active{% endif %}" href="{% url 'marketplace.my_job_list' page=1 %}">My Jobs</a>
+                    <a class="nav-link {% if pageName == 'My Jobs' %}active{% endif %}" href="{% url 'marketplace.my_job_list' page=1 %}">My Jobs</a>
                 </li>
                 <li class="nav-item" style="width: 46%;">
-                    <a class="nav-link {% if pageName == 'my-photographer-list' %}active{% endif %}" href="{% url 'marketplace.my_photographer_list' page=1 %}">My Photographers</a>
+                    <a class="nav-link {% if pageName == 'My Photographers' %}active{% endif %}" href="{% url 'marketplace.my_photographer_list' page=1 %}">My Photographers</a>
                 </li>
             </ul>
         {% endif %}

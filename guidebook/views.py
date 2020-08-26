@@ -35,6 +35,11 @@ from .forms import *
 
 ############################################################################
 
+MAIN_PAGE_DESCRIPTION = 'Create a guidebook of street-level photos to show people around a location. View others people have created to help plan your next adventure.'
+
+
+############################################################################
+
 def home(request):
     return redirect('guidebook.guidebook_list', page=1)
 
@@ -85,7 +90,14 @@ def guidebook_list(request, page):
             last_num = pGuidebooks.number + 3
     pGuidebooks.paginator.pages = range(first_num, last_num + 1)
     pGuidebooks.count = len(pGuidebooks)
-    return render(request, 'guidebook/guidebook_list.html', {'guidebooks': pGuidebooks, 'form': form, 'pageName': 'guidebook-list'})
+    content = {
+        'guidebooks': pGuidebooks,
+        'form': form,
+        'pageName': 'Guidebooks',
+        'pageTitle': 'Guidebooks',
+        'pageDescription': MAIN_PAGE_DESCRIPTION
+    }
+    return render(request, 'guidebook/guidebook_list.html', content)
 
 @my_login_required
 def my_guidebook_list(request, page):
@@ -136,7 +148,15 @@ def my_guidebook_list(request, page):
             last_num = pGuidebooks.number + 3
     pGuidebooks.paginator.pages = range(first_num, last_num + 1)
     pGuidebooks.count = len(pGuidebooks)
-    return render(request, 'guidebook/guidebook_list.html', {'guidebooks': pGuidebooks, 'form': form, 'pageName': 'my-guidebook-list'})
+
+    content = {
+        'guidebooks': pGuidebooks,
+        'form': form,
+        'pageName': 'My Guidebooks',
+        'pageTitle': 'Guidebooks',
+        'pageDescription': MAIN_PAGE_DESCRIPTION
+    }
+    return render(request, 'guidebook/guidebook_list.html', content)
 
 def guidebook_detail(request, unique_id):
     guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
@@ -150,7 +170,15 @@ def guidebook_detail(request, unique_id):
         is_liked = False
     form = SceneForm()
     poi_form = PointOfInterestForm()
-    return render(request, 'guidebook/guidebook_detail.html', {'guidebook': guidebook, 'is_liked': is_liked, 'form': form, 'poi_form': poi_form, 'pageName': 'guidebook-detail'})
+    content = {
+        'guidebook': guidebook,
+        'is_liked': is_liked,
+        'form': form,
+        'poi_form': poi_form,
+        'pageTitle': 'Guidebook',
+        'pageName': 'Guidebook Detail'
+    }
+    return render(request, 'guidebook/guidebook_detail.html', content)
 
 @my_login_required
 def guidebook_create(request, unique_id=None):
@@ -205,7 +233,12 @@ def guidebook_create(request, unique_id=None):
             form = GuidebookForm(instance=guidebook)
         else:
             form = GuidebookForm()
-    return render(request, 'guidebook/create_main.html', {'form': form, 'pageName': 'guidebook-create'})
+    content = {
+        'form': form,
+        'pageName': 'Create Guidebook',
+        'pageTitle': 'Guidebook'
+    }
+    return render(request, 'guidebook/create_main.html', content)
 
 @my_login_required
 def ajax_guidebook_update(request, unique_id = None):
@@ -252,7 +285,15 @@ def add_scene(request, unique_id):
     form = SceneForm()
     poi_form = PointOfInterestForm()
     g_form = GuidebookForm(instance=guidebook)
-    return render(request, 'guidebook/add_scene.html', {'guidebook': guidebook, 'g_form': g_form, 'form': form, 'poi_form': poi_form, 'pageName': 'add-scene'})
+    content = {
+        'guidebook': guidebook,
+        'g_form': g_form,
+        'form': form,
+        'poi_form': poi_form,
+        'pageName': 'Edit Guidebook',
+        'pageTitle': 'Guidebook'
+    }
+    return render(request, 'guidebook/add_scene.html', content)
 
 @my_login_required
 def ajax_upload_file(request, unique_id):
