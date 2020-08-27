@@ -378,7 +378,6 @@
         history.pushState({
             id: 'Guidebook Detail'
         }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
-        //window.location.replace(href + '?scene=' + (index + 1));
         mapillaryViewer.moveToKey(image_key);
     });
 
@@ -574,6 +573,7 @@
                 }
                 refresh_poi_list();
                 refresh_mapillery_classes();
+                $('.left-side.poi-box').removeClass('d-none');
             }
         });
     });
