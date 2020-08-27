@@ -132,28 +132,38 @@
                 </div>
             {% endfor %}
         </div>
-        <div class="mt-3">
-            <h5>
-                New Scene:
-            </h5>
+
+        <div class="add-new-scene mt-3 text-right">
+            <button type="button" class="btn btn-primary">Add Scene</button>
         </div>
-        <div class="card mt-2 p-1 add-scene-form">
-            <p class="mt-2 mb-2 text-center">
-                Please add a new scene.
-            </p>
-            <div class="scene-box p-1 mt-2 mb-2" id="scene_0" data-scene-id="0">
-                <form method="POST" class="post-form has-validation-callback" id="add_scene_form_0">
-                    {% csrf_token %}
-                    <input type="number" name="scene_id" class="d-none" id="id_new_scene_id" disabled value="0">
-                    <input type="text" name="image_key" class="form-control d-none" disabled required="" id="id_new_image_key">
-                    <input type="text" name="title" class="form-control mb-1" disabled placeholder="Scene Title" required="" id="id_new_title">
-                    <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_new_description">{{ scene.description }}</textarea>
-                    <input type="text" name="lat" class="form-control d-none " disabled  required="" id="id_new_lat">
-                    <input type="text" name="lng" class="form-control d-none" disabled  required="" id="id_new_lng">
-                    <div class="text-right">
-                        <button type="button" id="save_scene_button" class="save btn btn-primary save-btn" disabled="" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', 0)">Add New Scene</button>
-                    </div>
-                </form>
+
+        <div class="new-scene-box d-none">
+            <div class="mt-3">
+                <h5>
+                    New Scene:
+                </h5>
+            </div>
+
+            <div class="card mt-2 p-1 add-scene-form">
+                <p class="mt-2 mb-2 text-center">
+                    Find an image on the map to use with this scene. When you're happy with the image, add a scene title and description and click save scene
+                </p>
+                <p class="error text-danger text-center">This scene already exists in this guidebook.</p>
+                <div class="scene-box p-1 mt-2 mb-2" id="scene_0" data-scene-id="0">
+                    <form method="POST" class="post-form has-validation-callback" id="add_scene_form_0">
+                        {% csrf_token %}
+                        <input type="number" name="scene_id" class="d-none" id="id_new_scene_id" disabled value="0">
+                        <input type="text" name="image_key" class="form-control d-none" disabled required="" id="id_new_image_key">
+                        <input type="text" name="title" class="form-control mb-1" disabled placeholder="Scene Title" required="" id="id_new_title">
+                        <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_new_description">{{ scene.description }}</textarea>
+                        <input type="text" name="lat" class="form-control d-none " disabled  required="" id="id_new_lat">
+                        <input type="text" name="lng" class="form-control d-none" disabled  required="" id="id_new_lng">
+                        <div class="text-right">
+                            <button type="button" id="save_scene_button" class="save btn btn-sm btn-primary save-btn" disabled="" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', 0)">Save New Scene</button>
+                            <button type="button" class="cancel btn btn-dark btn-sm">Abandon</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -314,9 +324,11 @@
 </script>
 <script src="{% static 'js/mapillary.js' %}"></script>
 <script>
-
+    var is_show_poi_list = false;
     function hide_poi_box() {
         $('.left-side.poi-box').addClass('d-none');
+        is_show_poi_list = false;
+        set_select_scene();
     }
     var current_scene_id = 0;
     var current_node_point = null;
@@ -583,7 +595,11 @@
                 $(this).attr('disabled', true);
             });
             $('#add_scene_form_0').find('#save_scene_button').attr('disabled', true);
-            $('.add-scene-form p').text('This scene already exists in this guidebook.');
+            $('.add-scene-form p.error').removeClass('d-none');
+            if (!is_show_poi_list) {
+                $('.small-screen').removeClass('d-none');
+                $('.minimize-button').removeClass('d-none');
+            }
         }
         else {
             $('#add_scene_form_0').find('input').each(function (index) {
@@ -596,7 +612,8 @@
                 $(this).attr('disabled', false);
             });
             $('#add_scene_form_0').find('#save_scene_button').attr('disabled', false);
-            $('.add-scene-form p').text('Please add a new scene.');
+
+            $('.add-scene-form p.error').addClass('d-none');
         }
     }
 
@@ -638,7 +655,6 @@
              is_mapillary_viewer = true;
              $('.maximize-button img').attr('src', "{% static 'images/icon/restore_map.svg' %}")
          }
-
 
          if (!$('.left-side.poi-box').hasClass('d-none')) {
             $('.board-w-400').removeClass('board-w-400');
@@ -685,6 +701,9 @@
                         $('.guidebook-others .scenes span').text(data.scene_count + " Photos");
                         set_delete_scene();
                         $('.publish-guidebook').removeClass('d-none');
+                        $('.add-new-scene').removeClass('d-none');
+                        $('.new-scene-box').addClass('d-none');
+                        $('#scene_' + current_scene_id).find('.point_list').trigger('click');
                     }
                     else if (data.type == 'update')
                     {
@@ -783,6 +802,7 @@
         });
 
     });
+
     function add_tag(data, geometry) {
         $('#poi_list').prepend(data.poi_box_html);
         var id = data.poi[0].pk;
@@ -989,7 +1009,36 @@
             $('.minimize-button').trigger('click');
         mapillaryViewer.resize();
         map.resize();
+        only_show_mapillary();
+        is_show_poi_list = true;
     });
+
+    function only_show_mapillary() {
+        $('.minimize-button').addClass('d-none');
+        $('.maximize-button').addClass('d-none');
+        $('.small-screen').addClass('d-none');
+        if (!is_mapillary_viewer) {
+            $('.switch_screen').trigger('click');
+            is_mapillary_viewer = true;
+        }
+    }
+
+    function only_show_minimize() {
+        $('.minimize-button').removeClass('d-none');
+        $('.maximize-button').addClass('d-none');
+        $('.small-screen').addClass('d-none');
+    }
+
+    function only_show_map() {
+        if (is_mapillary_viewer)
+        {
+            is_mapillary_viewer = false;
+            $('.switch_screen').eq(1).trigger('click');
+        }
+        $('.minimize-button').addClass('d-none');
+        $('.maximize-button').addClass('d-none');
+        $('.small-screen').addClass('d-none');
+    }
 
     $('.delete-icon').click(function () {
         if ($(this).hasClass('disabled') || $(this).hasClass('d-none'))
@@ -1104,6 +1153,37 @@
         })
     });
 
+    $('.add-new-scene button').click(function () {
+        $('.new-scene-box').removeClass('d-none');
+        $('.add-new-scene').addClass('d-none');
+        $('#add_scene_form_0').find('input').each(function (index) {
+                $(this).attr('disabled', true);
+            });
+        $('#add_scene_form_0').find('select').each(function (index) {
+            $(this).attr('disabled', true);
+        });
+        $('#add_scene_form_0').find('textarea').each(function (index) {
+            $(this).attr('disabled', true);
+        });
+        $('#add_scene_form_0').find('#save_scene_button').attr('disabled', true);
+        only_show_map();
+    });
+
+    $('#add_scene_form_0 .cancel').click(function () {
+        $('.new-scene-box').addClass('d-none');
+        $('.add-new-scene').removeClass('d-none');
+        $('#add_scene_form_0').find('input').each(function (index) {
+                $(this).attr('disabled', true);
+            });
+        $('#add_scene_form_0').find('select').each(function (index) {
+            $(this).attr('disabled', true);
+        });
+        $('#add_scene_form_0').find('textarea').each(function (index) {
+            $(this).attr('disabled', true);
+        });
+        $('#add_scene_form_0').find('#save_scene_button').attr('disabled', true);
+    });
+
     $('#publish_swithch_guidebook').click(function () {
         $.ajax({
             url: "{% url 'guidebook.check_publish' unique_id=guidebook.unique_id %}",
@@ -1210,7 +1290,9 @@
         $('.scene-box').off('click');
         $('.scene-box').click(function () {
             var image_key = $(this).data('image_key');
-            mapillaryViewer.moveToKey(image_key);
+            current_scene_id = $(this).attr('data-scene-id');
+            if (current_scene_id != '0' && current_scene_id != 0)
+                mapillaryViewer.moveToKey(image_key);
         });
 
         $('.list_item').off('mousedown');
@@ -1236,6 +1318,8 @@
                 $('.minimize-button').trigger('click');
             mapillaryViewer.resize();
             map.resize();
+            only_show_mapillary();
+            is_show_poi_list = true;
         });
     }
 
