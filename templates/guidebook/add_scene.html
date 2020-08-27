@@ -426,19 +426,22 @@
         }
     }
     mapboxgl.accessToken = mapboxToken;
+    var zoom = 1;
     if (scene_positions.length > 0)
     {
         var first_point = scene_positions[0];
         init_modal();
     }
     else
+    {
         var first_point = [-87.622088, 41.878781];
+    }
     console.log('first_point', first_point)
     var map = new mapboxgl.Map({
         container: 'map', // container id
         style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
         center: first_point, // starting position
-        zoom: 14, // starting zoom
+        zoom: zoom, // starting zoom
         attributionControl: true
     });
 
