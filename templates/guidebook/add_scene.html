@@ -774,6 +774,7 @@
     var tags = [];
     var is_existing_new_point = false;
     function add_new_poi() {
+        toastr.info("Now click a location on the image to highlight your POI")
         changeMode(Mapillary.TagComponent.TagMode.CreatePoint);
     }
     tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
