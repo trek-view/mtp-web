@@ -194,13 +194,18 @@
             </div>
         </div>
     </div>
-    <div class="left-side poi-box d-none">
-        <div class="hide-poi-box text-right p-2 mt-3">
+    <div class="left-side poi-box p-2 d-none">
+        <div class="hide-poi-box text-right mt-3">
             <button class="btn btn-info" onclick="hide_poi_box()">
                 Back To Scenes
             </button>
         </div>
-        <div class="poi-list p-2">
+        <div class="poi-header">
+            <h5 class="scene-title"></h5>
+            <span class="scene-description"></span>
+        </div>
+        <hr class="mt-2 mb-2" />
+        <div class="poi-list">
             <div class="">
                 <p>
                     Add point's of interest to this scene to give viewers more information.
@@ -1006,6 +1011,12 @@
     $('.point_list').click(function () {
         var scene_id = $(this).attr('data-scene-id');
         $('.left-side.poi-box').removeClass('d-none');
+        var title = $('#scene_' + current_scene_id).find('input[name="title"]').val();
+        var description = $('#scene_' + current_scene_id).find('textarea[name="description"]').val();
+        console.log('title', title);
+        $('.poi-header .scene-title').text(title);
+        $('.poi-header .scene-description').text(description);
+
         if ($('#mapillary_image_box').parent().hasClass('small-screen'))
             $('#mapillary_image_box').parent().find('.switch-full-screen').trigger('click');
         $('.full-screen').addClass('board-w-400');
@@ -1324,6 +1335,11 @@
             map.resize();
             only_show_mapillary();
             is_show_poi_list = true;
+            var title = $('#scene_' + current_scene_id).find('input[name="title"]').val();
+            var description = $('#scene_' + current_scene_id).find('textarea[name="description"]').val();
+            console.log('title', title);
+            $('.poi-header .scene-title').text(title);
+            $('.poi-header .scene-description').text(description);
         });
     }
 

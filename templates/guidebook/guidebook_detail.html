@@ -155,13 +155,17 @@
             {% endif %}
         </div>
     </div>
-    <div class="left-side poi-box d-none">
-        <div class="hide-poi-box text-right p-2 mt-3">
+    <div class="left-side poi-box d-none p-2">
+        <div class="hide-poi-box text-right mt-3">
             <button class="btn btn-info" onclick="hide_poi_box()">
                 Back to Scenes
             </button>
         </div>
-        <div class="poi-list p-2">
+        <div class="poi-header mt-3 mb-2 pl-3 pr-3">
+            <h5 class="scene-title"></h5>
+            <span class="scene-description"></span>
+        </div>
+        <div class="poi-list">
             <div class="accordion" id="poi_list">
             </div>
         </div>
@@ -375,10 +379,16 @@
         var image_key = $(this).data('image_key');
         var index = key_list.indexOf(image_key);
         var href = location.protocol + '//' + location.host + location.pathname ;
+        var title = $(this).find('.scene-title').find('h6').text();
+        var description = $(this).find('.scene-description').find('span').text();
         history.pushState({
             id: 'Guidebook Detail'
         }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
-        mapillaryViewer.moveToKey(image_key);
+        mapillaryViewer.moveToKey(image_key).then(function () {
+            $('.left-side.poi-box').removeClass('d-none');
+            $('.poi-header .scene-title').text(title);
+            $('.poi-header .scene-description').text(description);
+        });
     });
 
     mapboxgl.accessToken = mapboxToken;
@@ -573,7 +583,7 @@
                 }
                 refresh_poi_list();
                 refresh_mapillery_classes();
-                $('.left-side.poi-box').removeClass('d-none');
+
             }
         });
     });
