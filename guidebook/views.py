@@ -491,6 +491,7 @@ def ajax_save_poi(request, unique_id, pk):
             'status': 'success',
             'poi': json_poi,
             'poi_box_html': poi_box_html,
+            'poi_count': scene.getPOICount(),
             'message': message
         })
 
@@ -525,7 +526,8 @@ def ajax_delete_poi(request, unique_id, pk):
 
         return JsonResponse({
             'status': 'success',
-            'message': message
+            'message': message,
+            'poi_count': scene.getPOICount()
         })
 
     return JsonResponse({

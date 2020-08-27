@@ -103,32 +103,6 @@
             </div>
         </div>
 
-        <div class="card p-2 mt-2">
-            <div class="">
-                <form method="POST" id="delete_guidebook_form" class="d-flex align-items-center" action="{% url 'guidebook.guidebook_delete' unique_id=guidebook.unique_id %}">
-                    {% csrf_token %}
-                    <div class="col publish-guidebook text-center {% if guidebook.getSceneCount == 0 %}d-none{% endif %} ">
-                        {% if guidebook.is_approved and guidebook.is_published %}
-                            <button type="button" class="btn btn-success" id="publish_swithch_guidebook">Published</button>
-                        {% elif guidebook.is_approved and not guidebook.is_published %}
-                            <button type="button" class="btn btn-dark" id="publish_swithch_guidebook">Unpublished</button>
-                        {% endif %}
-                    </div>
-
-                    <div class="col preview-guidebook text-center">
-                        <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
-                            <button type="button" class="btn btn-info" id="publish_swithch_guidebook">Preview</button>
-                        </a>
-                    </div>
-
-                    <div class="col text-center delete-gudiebook">
-                        <button type="button" id="delete_guidebook" class="btn btn-danger">Delete</button>
-                    </div>
-
-                </form>
-            </div>
-        </div>
-
         <div class="mt-3">
             <h4>
                 Scene List:
@@ -148,10 +122,10 @@
                             <input type="text" name="lat" class="form-control d-none" value="{{ scene.lat }}" required="" id="id_lat">
                             <input type="text" name="lng" class="form-control d-none" value="{{ scene.lng }}" required="" id="id_lng">
                             <div class="text-right">
-                                <button type="button" class="btn btn-info point_list" data-scene-id="{{ scene.pk }}">Point List</button>
-                                <button type="button" class="btn btn-primary delete_scene_button" data-scene-id="{{ scene.pk }}" style="background: #993333 !important; border-color: #993333;">Delete</button>
-                                <button type="button" id="change_scene_button" class="save btn btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Change</button>
-                                <button type="button" id="save_scene_button" class="save btn btn-primary save-btn d-none" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', {{ scene.pk }})">Update</button>
+                                <button type="button" class="btn btn-sm btn-info point_list" data-scene-id="{{ scene.pk }}">Edit POI's ({{ scene.getPOICount }})</button>
+                                <button type="button" id="change_scene_button" class="save btn btn-sm btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Edit information</button>
+                                <button type="button" id="save_scene_button" class="save btn btn-sm btn-primary save-btn d-none" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', {{ scene.pk }})">Save</button>
+                                <button type="button" class="btn btn-sm btn-danger delete_scene_button" data-scene-id="{{ scene.pk }}">Delete</button>
                             </div>
                         </form>
                     </div>
@@ -178,6 +152,33 @@
                     <input type="text" name="lng" class="form-control d-none" disabled  required="" id="id_new_lng">
                     <div class="text-right">
                         <button type="button" id="save_scene_button" class="save btn btn-primary save-btn" disabled="" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', 0)">Add New Scene</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card p-2 mt-2">
+            <div class="">
+                <form method="POST" id="delete_guidebook_form" class="d-flex align-items-center" action="{% url 'guidebook.guidebook_delete' unique_id=guidebook.unique_id %}">
+                    {% csrf_token %}
+                    <div class="d-flex flex-row justify-content-between w-100">
+                        <div class="publish-guidebook text-center {% if guidebook.getSceneCount == 0 %}d-none{% endif %} ">
+                            {% if guidebook.is_approved and guidebook.is_published %}
+                                <button type="button" class="btn btn-secondary" id="publish_swithch_guidebook">Unpublish</button>
+                            {% elif guidebook.is_approved and not guidebook.is_published %}
+                                <button type="button" class="btn btn-success" id="publish_swithch_guidebook">Publish Now</button>
+                            {% endif %}
+                        </div>
+
+                        <div class="preview-guidebook text-center">
+                            <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
+                                <button type="button" class="btn btn-info">Preview</button>
+                            </a>
+                        </div>
+
+                        <div class="text-center delete-gudiebook">
+                            <button type="button" id="delete_guidebook" class="btn btn-danger">Delete</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -773,6 +774,7 @@
                 {
                     console.log(data);
                     add_tag(data, geometry);
+                    $('#scene_' + current_scene_id).find('button.point_list').text("Edit POI's (" + data.poi_count + ")");
                     refresh_poi_list(true);
                     refresh_mapillery_classes();
                     $('.left-side.poi-box').removeClass('d-none');
@@ -874,6 +876,7 @@
                                 $('#poi_' + selected_poi_id).remove();
                                 tagComponent.remove([selected_poi_id]);
                                 selected_poi_id = 0;
+                                $('#scene_' + current_scene_id).find('button.point_list').text("Edit POI's (" + data.poi_count + ")");
                                 $('.delete-icon').addClass('disabled');
                                 refresh_mapillery_classes();
                             }
@@ -1054,7 +1057,7 @@
                                 toastr.success(data.message);
                                 $('#scene_' + scene_id).parent().remove();
                                 if ($('.scene-list').html() == '') {
-                                    $('#publish_swithch_guidebook').removeClass('btn-success').addClass('btn-dark').text('Unpublished');
+                                    $('#publish_swithch_guidebook').removeClass('btn-secondary').addClass('btn-success').text('Publish Now');
                                 }
                                 key_list.splice(current_order_number, 1);
                                 sceneData.splice(current_order_number, 1);
@@ -1068,7 +1071,7 @@
                                 if (data.scene_count == 0)
                                 {
                                     $('.publish-guidebook').addClass('d-none');
-                                    $('.publish-guidebook').find('button').removeClass('btn-success').addClass('btn-dark').text('Unpublished');
+                                    $('.publish-guidebook').find('button').removeClass('btn-secondary').addClass('btn-success').text('Publish Now');
                                 }
                                 reorder_scene();
                                 set_select_scene();
@@ -1115,11 +1118,11 @@
                 else {
                     if (data.is_published)
                     {
-                        $('#publish_swithch_guidebook').removeClass('btn-dark').addClass('btn-success').text('Published');
+                        $('#publish_swithch_guidebook').removeClass('btn-success').addClass('btn-secondary').text('Unpublish');
                     }
                     else
                     {
-                        $('#publish_swithch_guidebook').removeClass('btn-success').addClass('btn-dark').text('Unpublished');
+                        $('#publish_swithch_guidebook').removeClass('btn-secondary').addClass('btn-success').text('Publish Now');
                     }
                 }
             }
@@ -1172,7 +1175,7 @@
     var classInfo = '';
     var item_count = 0;
 
-    var selectionHeight = 186;
+    var selectionHeight = 182;
     for (var i = 0; i < 200; i ++) {
         classInfo += '.' + 'item_' + i + ' {top: ' + (margin_top + i * selectionHeight) + 'px;}\n';
     }

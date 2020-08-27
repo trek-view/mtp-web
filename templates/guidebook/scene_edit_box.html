@@ -9,10 +9,10 @@
             <input type="text" name="lat" class="form-control d-none" value="{{ scene.lat }}" required="" id="id_lat">
             <input type="text" name="lng" class="form-control d-none" value="{{ scene.lng }}" required="" id="id_lng">
             <div class="text-right">
-                <button type="button" class="btn btn-info point_list" data-scene-id="{{ scene.pk }}">Point List</button>
-                <button type="button" class="btn btn-primary delete_scene_button" data-scene-id="{{ scene.pk }}" style="background: #993333 !important; border-color: #993333;">Delete</button>
-                <button type="button" id="change_scene_button" class="save btn btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Change</button>
-                <button type="button" id="save_scene_button" class="save btn btn-primary save-btn d-none" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', {{ scene.pk }})">Update</button>
+                <button type="button" class="btn btn-sm btn-info point_list" data-scene-id="{{ scene.pk }}">Edit POI's ({{ scene.getPOICount }})</button>
+                <button type="button" id="change_scene_button" class="save btn btn-sm btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Edit information</button>
+                <button type="button" id="save_scene_button" class="save btn btn-sm btn-primary save-btn d-none" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', {{ scene.pk }})">Save</button>
+                <button type="button" class="btn btn-sm btn-danger delete_scene_button" data-scene-id="{{ scene.pk }}">Delete</button>
             </div>
         </form>
     </div>
