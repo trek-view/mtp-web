@@ -94,7 +94,7 @@
                     <form method="POST" id="delete_guidebook_form" class="d-flex align-items-center" action="{% url 'guidebook.guidebook_delete' unique_id=guidebook.unique_id %}">
                         {% csrf_token %}
                         {% if guidebook.getSceneCount > 0 %}
-                            <div class="col text-center">
+                            <div class="col text-center d-none">
                                 {% if guidebook.is_approved and guidebook.is_published %}
                                     <button type="button" class="btn btn-success" id="publish_swithch_guidebook">Published</button>
                                 {% elif guidebook.is_approved and not guidebook.is_published %}
@@ -108,7 +108,7 @@
                             </a>
                         </div>
 
-                        <div class="col delete-gudiebook text-center">
+                        <div class="col delete-gudiebook text-center d-none">
                             <button type="button" id="delete_guidebook" class="btn btn-danger">Delete</button>
                         </div>
 
