@@ -348,10 +348,19 @@
         sceneData.push(item);
     });
 
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    var current_sort_number = urlParams.get('scene');
+
+    var current_sort = parseInt(current_sort_number) - 1;
+    var init_scene_key = key_list[0];
+    if (current_sort < key_list.length)
+        init_scene_key = key_list[current_sort];
+    console.log('sort', init_scene_key);
     var mapillaryViewer = new Mapillary.Viewer(
         'mapillary_image_box',
         mapillaryClientId,
-        "{{ guidebook.getFirstSceneKey }}",
+        init_scene_key,
         {
             component: {
                 cover: false,
@@ -364,6 +373,12 @@
 
     $('.scene-box').click(function () {
         var image_key = $(this).data('image_key');
+        var index = key_list.indexOf(image_key);
+        var href = location.protocol + '//' + location.host + location.pathname ;
+        history.pushState({
+            id: 'Guidebook Detail'
+        }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
+        //window.location.replace(href + '?scene=' + (index + 1));
         mapillaryViewer.moveToKey(image_key);
     });
 
@@ -663,9 +678,11 @@
     var createdIndex = 0;
     var tags = [];
     var is_existing_new_point = false;
+
     function add_new_poi() {
         changeMode(Mapillary.TagComponent.TagMode.CreatePoint);
     }
+
     function add_tag(data, geometry) {
         $('#poi_list').prepend(data.poi_box_html);
         var id = data.poi[0].pk;
