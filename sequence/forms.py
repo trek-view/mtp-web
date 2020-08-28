@@ -121,3 +121,32 @@ class SequenceSearchForm(forms.Form):
             choices=getAllTags()
         )
 
+class SequenceSearchForTourForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['name'] = forms.CharField(
+            label='Sequence Name',
+            widget=forms.TextInput(attrs={'class': 'form-control'}),
+            required=False
+        )
+
+        self.fields['camera_make'] = forms.CharField(
+            label='Camera Make/Model',
+            widget=forms.TextInput(attrs={'class': 'form-control'}),
+            required=False
+        )
+
+        self.fields['transport_type'] = forms.ModelChoiceField(
+            required=False,
+            widget=forms.Select(
+                attrs={'class': 'form-control'}),
+            queryset=TransportType.objects.filter(),
+            empty_label='All Types'
+        )
+        self.fields['tag'] = forms.MultipleChoiceField(
+            required=False,
+            widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+            choices=getAllTags()
+        )
+

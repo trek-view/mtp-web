@@ -33,7 +33,7 @@ from tour.models import Tour, TourSequence
 
 # That includes from .models import *
 from .forms import *
-from sequence.forms import SequenceSearchForm
+from sequence.forms import SequenceSearchForTourForm
 
 MAIN_PAGE_DESCRIPTION = "Tours are collections of sequences that have been curated by their owner. Browse others' tours or create one using your own sequences."
 
@@ -96,7 +96,7 @@ def tour_add_sequence(request, unique_id):
         if action is None:
             action = 'add'
 
-        form = SequenceSearchForm(request.GET)
+        form = SequenceSearchForTourForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
             camera_make = form.cleaned_data['camera_make']
@@ -104,7 +104,6 @@ def tour_add_sequence(request, unique_id):
             transport_type = form.cleaned_data['transport_type']
             # start_time = form.cleaned_data['start_time']
             # end_time = form.cleaned_data['end_time']
-            username = form.cleaned_data['username']
 
             sequences = Sequence.objects.all().filter(
                 user=request.user,
@@ -116,14 +115,12 @@ def tour_add_sequence(request, unique_id):
                 sequences = sequences.filter(camera_make__contains=camera_make)
             if transport_type and transport_type != 0 and transport_type != '':
                 sequences = sequences.filter(transport_type_id=transport_type)
-            if username and username != '':
-                sequences = sequences.filter(username__contains=username)
             if len(tags) > 0:
                 sequences = sequences.filter(tag__overlap=tags)
 
     if sequences == None:
         sequences = Sequence.objects.all().filter(is_published=True, is_approved=True)
-        form = SequenceSearchForm()
+        form = SequenceSearchForTourForm()
 
     sequences = sequences.order_by('-created_at')
 
