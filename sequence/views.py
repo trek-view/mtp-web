@@ -524,7 +524,7 @@ def ajax_import(request):
             sequence.is_transport = True
             print(sequence.name)
             sequence.save()
-
+            messages.success(request, "Sequences successfully imported.")
     return JsonResponse({
         'status': 'success',
     })
