@@ -14,6 +14,12 @@
             </em>
         </div>
 
+        <div class="pl-3 pr-3">
+            <p>
+                {{ pageDescription }}
+            </p>
+        </div>
+
         {% if messages %}
             {% for message in messages %}
             <div class="alert m-3 alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">

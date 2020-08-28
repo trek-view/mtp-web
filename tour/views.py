@@ -35,7 +35,7 @@ from tour.models import Tour, TourSequence
 from .forms import *
 from sequence.forms import SequenceSearchForm
 
-MAIN_PAGE_DESCIPTION = "Tours are collections of sequences that have been curated by their owner. Browse others' tours or create one using your own sequences."
+MAIN_PAGE_DESCRIPTION = "Tours are collections of sequences that have been curated by their owner. Browse others' tours or create one using your own sequences."
 
 # Tour
 def index(request):
@@ -78,7 +78,7 @@ def tour_create(request, unique_id=None):
         'form': form,
         'pageName': 'Create Tour',
         'pageTitle': 'Tour',
-        'pageDescription': MAIN_PAGE_DESCIPTION,
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
     }
     return render(request, 'tour/create.html', content)
 
@@ -173,7 +173,7 @@ def tour_add_sequence(request, unique_id):
             'form': form,
             'pageName': 'Import Sequence',
             'pageTitle': 'Sequence',
-            'pageDescription': MAIN_PAGE_DESCIPTION,
+            'pageDescription': MAIN_PAGE_DESCRIPTION,
             'page': page,
             'tour': tour,
             'action': action,
@@ -189,7 +189,7 @@ def tour_add_sequence(request, unique_id):
             'form': form,
             'pageName': 'Import Sequence',
             'pageTitle': 'Sequence',
-            'pageDescription': MAIN_PAGE_DESCIPTION,
+            'pageDescription': MAIN_PAGE_DESCRIPTION,
             'page': page,
             'tour': tour,
             'action': action,
@@ -255,7 +255,7 @@ def tour_list(request):
         'tours': pTours,
         'form': form,
         'pageName': 'Tours',
-        'pageDescription': MAIN_PAGE_DESCIPTION,
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
         'pageTitle': 'Tours',
         'page': page
     }
@@ -319,7 +319,7 @@ def my_tour_list(request):
         'form': form,
         'pageName': 'My Tours',
         'pageTitle': 'Tours',
-        'pageDescription': MAIN_PAGE_DESCIPTION,
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page
     }
     return render(request, 'tour/list.html', content)
@@ -342,7 +342,7 @@ def tour_detail(request, unique_id):
         'sequence_count': len(sequence_ary),
         'pageName': 'Tour Detail',
         'pageTitle': 'Tour',
-        'pageDescription': MAIN_PAGE_DESCIPTION,
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
         'tour': tour,
         'first_image_key': first_image_key,
         't_sequence_ary': t_sequence_ary

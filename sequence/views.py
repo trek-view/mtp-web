@@ -36,7 +36,8 @@ from .forms import *
 
 ############################################################################
 
-MAIN_PAGE_DESCIPTION = "Sequences are collections of images continuously captured by a user at a give time. Browse those created by others, or import your own from Mapillary."
+MAIN_PAGE_DESCRIPTION = "Sequences are collections of images continuously captured by a user at a give time. Browse those created by others, or import your own from Mapillary."
+IMPORT_PAGE_DESCRIPTION = "First start by choosing the month your sequences we're captured. If they were taken over multiple months, don't worry, once you've selected all the ones you want from the current month you can change this filter to add more."
 
 ############################################################################
 
@@ -118,7 +119,7 @@ def sequence_list(request):
         'form': form,
         'pageName': 'Sequences',
         'pageTitle': 'Sequences',
-        'pageDescription': MAIN_PAGE_DESCIPTION,
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page
     }
     return render(request, 'sequence/list.html', content)
@@ -190,7 +191,7 @@ def my_sequence_list(request):
         'form': form,
         'pageName': 'My Sequences',
         'pageTitle': 'Sequences',
-        'pageDescription': MAIN_PAGE_DESCIPTION,
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page
     }
     return render(request, 'sequence/list.html', content)
@@ -258,7 +259,7 @@ def sequence_detail(request, unique_id):
         'origin_images': origin_images,
         'pageName': 'Sequence Detail',
         'pageTitle': 'Sequence',
-        'pageDescription': MAIN_PAGE_DESCIPTION,
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page,
         'first_image': pImages[0],
         'addSequenceForm': addSequenceForm
@@ -495,7 +496,7 @@ def import_sequence_list(request):
         'sequences': sequences,
         'pageName': 'Sequences',
         'pageTitle': 'Sequences',
-        'pageDescription': MAIN_PAGE_DESCIPTION,
+        'pageDescription': IMPORT_PAGE_DESCRIPTION,
         'addSequenceForm': addSequenceForm,
         'all_tags': all_tags,
         'all_transport_types': all_transport_types,
