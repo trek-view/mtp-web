@@ -110,6 +110,8 @@ def change_password_success(request):
 def check_mapillary_oauth(request):
     if request.method == 'GET':
         mapillary_access_token = request.GET.get('access_token')
+        if mapillary_access_token is None or mapillary_access_token == '':
+            return redirect('sequence.index')
         user = request.user
         user.mapillary_access_token = mapillary_access_token
         user.save()
@@ -142,7 +144,7 @@ def check_mapillary_oauth(request):
 
         map_user.user = request.user
         map_user.save()
-        return redirect('sequence.index')
+        return redirect('sequence.import_sequence_list')
     else:
         messages.error(request, 'Error, mapillary invalid token!')
         return redirect('home')
