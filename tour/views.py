@@ -281,7 +281,8 @@ def my_tour_list(request):
             if name and name != '':
                 tours = tours.filter(name__contains=name)
             if username and username != '':
-                tours = tours.filter(username__contains=username)
+                users = CustomUser.objects.filter(username__contains=username)
+                tours = tours.filter(user__in=users)
             if len(tags) > 0:
                 tours = tours.filter(tag__overlap=tags)
 
