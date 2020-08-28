@@ -7,12 +7,8 @@
 <link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
 <div class="main-body">
     <div class="left-side p-3">
-        <div class="pl-3 pr-3 mt-4 mb-3 text-right">
-            <em>
-                <a href="{% url 'sequence.index' %}">
-                    Go to Sequence List
-                </a>
-            </em>
+        <div class="text-right mt-2 mb-2">
+            <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
         </div>
         {% if messages %}
             {% for message in messages %}
@@ -26,53 +22,22 @@
         {% endif %}
 
         <div class="p-2 item-detail card">
-            <div class="original-sequence-data mt-3">
-                <h5 class="text-center">Original Sequence Data on Mapillary</h5>
-
-                <div class="text-right mb-3">
-                    <a class="ml-auto" target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
-                        <img style="width: 170px" class="mt-2" src="{% static "images/icon/mapillary_icon.png" %}">
-                    </a>
-                </div>
-
-                <div class="mt-2" id="sequence_username">
-                    <label class="col-4">Username: </label>
-                    <a class="col-8" target="_blank" href="https://www.mapillary.com/profile/{{ sequence.username }}">
-                        {{ sequence.username }}
-                    </a>
-                </div>
-
-                <div class="mt-2" id="sequence_photo_count">
-                    <label class="col-4">Photos: </label>
-                    <span class="col-8">{{ sequence.getImageCount }} Photos</span>
-                </div>
-
-                <div class="mt-2" id="sequence_captured_at">
-                    <label class="col-4">Captured Time: </label>
-                    <span class="col-8">{{ sequence.captured_at }}</span>
-                </div>
-
-                <div class="mt-2" id="sequence_captured_at">
-                    <label class="col-4">Uploaded Time: </label>
-                    <span class="col-8">{{ sequence.created_at }}</span>
-                </div>
+            <div class="text-right mb-3">
+                <a class="ml-auto" target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
+                    <img style="width: 170px" class="mt-2" src="{% static "images/icon/mapillary_icon.png" %}">
+                </a>
             </div>
-            <div class="mtp-sequence-data border-top pt-4">
-                <h5 class="text-center mb-2">Sequence Data on MTP</h5>
+
+            <div class="mtp-sequence-data">
                 <div class="mt-2" id="sequence_name">
                     <label class="col-4">Title: </label>
                     <span class="col-8">{{ sequence.name }}</span>
                 </div>
 
-                <div class="mt-2" id="sequence_user">
-                    <label class="col-4">Username: </label>
-                    <span class="col-8">{{ sequence.user.username }}</span>
-                </div>
-
                 <div class="d-flex mt-2" id="sequence_description">
                     <label class="col-4">Description: </label>
                     <div class="col-8">
-                        <span class="">asdfasdfasd fasdfasdfffffff ffffffffffffffffffffffffffffffffff fffaaaaaaaaaa aaaaaaaaa aaaaaaaaa{{ sequence.description }}</span>
+                        <span class="">{{ sequence.description }}</span>
                     </div>
                 </div>
 
@@ -89,11 +54,26 @@
                         {% endfor %}
                     </div>
                 </div>
+
+                <div class="mt-2" id="sequence_user">
+                    <label class="col-4">Username: </label>
+                    <span class="col-8">{{ sequence.user.username }}</span>
+                </div>
+
+
+                <div class="mt-2" id="sequence_captured_at">
+                    <label class="col-4">Captured Time: </label>
+                    <span class="col-8">{{ sequence.captured_at }}</span>
+                </div>
+
+                <div class="mt-2" id="sequence_captured_at">
+                    <label class="col-4">Uploaded Time: </label>
+                    <span class="col-8">{{ sequence.created_at }}</span>
+                </div>
             </div>
 
             {% if user.is_authenticated and sequence.user == user %}
-                <div class="edit-form d-none border-top pt-4">
-                    <h5 class="text-center mb-2">Edit Sequence Data on MTP</h5>
+                <div class="edit-form d-none">
                     <form id="edit_form">
                         {% csrf_token %}
                         {{ addSequenceForm.as_p }}
