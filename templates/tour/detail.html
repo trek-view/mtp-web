@@ -8,7 +8,7 @@
     <div class="left-side p-3">
         <div class="pl-3 pr-3 mt-4 mb-3 text-right">
             <em>
-                <a href="{% url 'sequence.tour_list' %}">
+                <a href="{% url 'tour.tour_list' %}">
                     Go to Tour List
                 </a>
             </em>
@@ -60,7 +60,7 @@
         {% if request.user.is_authenticated and request.user == tour.user %}
             <div class="card p-2 mt-2">
                 <div class="">
-                    <form method="POST" id="delete_tour_form" class="d-flex align-items-center" action="{% url 'sequence.tour_delete' unique_id=tour.unique_id %}">
+                    <form method="POST" id="delete_tour_form" class="d-flex align-items-center" action="{% url 'tour.tour_delete' unique_id=tour.unique_id %}">
                         {% csrf_token %}
                         {% if tour.getSequenceCount > 0 %}
                             <div class="col text-center">
@@ -72,7 +72,7 @@
                             </div>
                         {% endif %}
                         <div class="col text-center">
-                            <a href="{% url 'sequence.tour_add_sequence' unique_id=tour.unique_id %}">
+                            <a href="{% url 'tour.tour_add_sequence' unique_id=tour.unique_id %}">
                                 <button type="button" class="btn btn-primary">Edit</button>
                             </a>
                         </div>
@@ -180,7 +180,7 @@
     $('.paginator-btn').click(function() {
         var pageNum = $(this).data('page');
         $('#search_form').find('input[name="page"]').val(pageNum);
-        location.assign("{% url 'sequence.tour_add_sequence' unique_id=tour.unique_id %}?" + $('#search_form').serialize());
+        location.assign("{% url 'tour.tour_add_sequence' unique_id=tour.unique_id %}?" + $('#search_form').serialize());
     });
 
     mapboxgl.accessToken = mapboxToken;
@@ -310,7 +310,7 @@
 
     $('#publish_swithch_tour').click(function () {
         $.ajax({
-            url: "{% url 'sequence.ajax_tour_check_publish' unique_id=tour.unique_id %}",
+            url: "{% url 'tour.ajax_tour_check_publish' unique_id=tour.unique_id %}",
             type: 'POST',
             data: {},
             dataType: 'json',
@@ -366,7 +366,7 @@
         $('.tour-others .like img').css('cursor', 'pointer');
         $('.tour-others .like img').click(function () {
             $.ajax({
-                url: "{% url 'sequence.ajax_tour_check_like' unique_id=tour.unique_id %}",
+                url: "{% url 'tour.ajax_tour_check_like' unique_id=tour.unique_id %}",
                 type: 'POST',
                 data: {},
                 dataType: 'json',

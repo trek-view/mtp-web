@@ -3,12 +3,13 @@
 {% block app_sequence %}active{% endblock %}
 {% block app_style %}<link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">{% endblock %}
 {% block content %}
+
 <div class="main-body">
     <div class="left-side">
         <div class="p-3">
             <div class="pt-3 mb-3">
                 <h3>
-                    Tours
+                    Sequences
                 </h3>
             </div>
 
@@ -18,8 +19,8 @@
         </div>
         <div class="pl-3 pr-3 mt-2 mb-3 text-right">
             <em>
-                <a href="{% url 'sequence.index' %}">
-                    Go to Sequence List
+                <a href="{% url 'tour.tour_list' %}">
+                    Go to Tour List
                 </a>
             </em>
         </div>
@@ -36,17 +37,17 @@
         {% if user.is_authenticated %}
             <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
                 <li class="nav-item" style="width: 30%;">
-                    <a class="nav-link {% if pageName == 'Tours' %}active{% endif %}" href="{% url 'sequence.tour_list' %}">All</a>
+                    <a class="nav-link {% if pageName == 'Sequences' %}active{% endif %}" href="{% url 'sequence.index' %}">All</a>
                 </li>
                 <li class="nav-item" style="width: 50%">
-                    <a class="nav-link {% if pageName == 'My Tours' %}active{% endif %}" href="{% url 'sequence.my_tour_list' %}">My Tours</a>
+                    <a class="nav-link {% if pageName == 'My Sequences' %}active{% endif %}" href="{% url 'sequence.my_sequence_list' %}">My Sequences</a>
                 </li>
             </ul>
         {% endif %}
         <div class="p-3" style="border-top: 1px solid #dee2e6;">
             <div class="mt-3 mb-3 text-right">
-                <a class="btn btn-outline-primary" href="{% url 'sequence.tour_create' %}">
-                    Create Tour
+                <a class="btn btn-outline-primary" href="{% url 'sequence.import_sequence' %}">
+                    Import from Mapillary
                 </a>
             </div>
             <div class="search-form">
@@ -63,9 +64,9 @@
     <div class="right-board bg-light">
         <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
             <div class="paginator">
-                {% if tours.has_other_pages %}
+                {% if sequences.has_other_pages %}
                     <ul class="pagination justify-content-center">
-                        {% if tours.number != 1 %}
+                        {% if sequences.number != 1 %}
                             <li class="page-item">
                                 <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
                             </li>
@@ -74,15 +75,15 @@
                                 <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
                             </li>
                         {% endif %}
-                        {% for i in tours.paginator.pages %}
-                            {% if tours.number == i %}
+                        {% for i in sequences.paginator.pages %}
+                            {% if sequences.number == i %}
                                 <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
                             {% else %}
                                 <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
                             {% endif %}
                         {% endfor %}
-                        {% if tours.number != tours.paginator.num_pages %}
-                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ tours.paginator.num_pages }}'>&raquo;</a></li>
+                        {% if sequences.number != sequences.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ sequences.paginator.num_pages }}'>&raquo;</a></li>
                         {% else %}
                             <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
                         {% endif %}
@@ -90,33 +91,36 @@
                 {% endif %}
             </div>
             <div class="item-list">
-                {% if tours.count > 0 %}
-                    {% for tour in tours %}
-                        <div class="card tour p-3 m-3 d-flex flex-row align-items-center" id="tour_{{ tour.unique_id }}" data-tour-id="{{ tour.unique_id }}">
-                            <div class="min-map-box" id="map-{{ tour.unique_id }}">
+                {% if sequences.count > 0 %}
+                    {% for sequence in sequences %}
+                        <div class="card sequence p-3 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}" onclick="getSequenceDetail('{{ sequence.unique_id }}')">
+                            <div class="min-map-box" id="map-{{ sequence.unique_id }}">
                             </div>
                             <div class="item-detail-box pl-3 pr-3">
                                 <div class="item-main w-100 float-left">
                                     <div class="item-title text-info d-flex flex-row justify-content-between">
-                                        <a target="_blank" href="{% url 'sequence.tour_detail' unique_id=tour.unique_id %}">
-                                            <h6>{{ tour.name }}</h6>
+                                        <a target="_blank" href="{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}">
+                                            <h6>{{ sequence.name }}</h6>
                                         </a>
                                     </div>
 
                                     <div class="item-description">
                                         <p class="mb-1">
-                                            {{ tour.getShortDescription }}
+                                            {{ sequence.getShortDescription }}
                                         </p>
                                     </div>
 
                                     <div class="w-100 d-flex flex-row">
+                                        <p class="mb-1 mr-3 item-transport-type">
+                                            {{ sequence.transport_type }}
+                                        </p>
                                         <p>
-                                            {{ tour.getImageCount }} Panos
+                                            {{ sequence.getImageCount }} Panos
                                         </p>
                                     </div>
 
                                     <div class="item-tag" style="min-height: 24px;">
-                                        {% for tag_name in tour.getTags %}
+                                        {% for tag_name in sequence.getTags %}
                                             <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                                                 {{ tag_name }}
                                             </span>
@@ -125,15 +129,20 @@
                                     </div>
 
                                     <div class="item-user">
-                                        <span class="user">{{ tour.user.username }}</span>
+                                        <span class="user">{{ sequence.user.username }}</span>
                                     </div>
 
                                 </div>
                             </div>
                             <div class="text-center" style="width: 150px; font-size: 13px;">
-                                <a target="_blank" href="https://www.mapillary.com/profile/{{ tour.username }}">
-                                    <h6>{{ tour.username }}</h6>
+                                <a target="_blank" href="https://www.mapillary.com/profile/{{ sequence.username }}">
+                                    <h6>{{ sequence.username }}</h6>
                                 </a>
+                                <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
+                                    <img class="w-100 mt-2" src="{% static "images/icon/mapillary_icon.png" %}">
+                                </a>
+                                <p class="mt-3">{{ sequence.captured_at }}</p>
+                                <p>{{ sequence.created_at }}</p>
                             </div>
                         </div>
                     {% endfor %}
@@ -144,9 +153,9 @@
                 {% endif %}
             </div>
             <div class="paginator">
-                {% if tours.has_other_pages %}
+                {% if sequences.has_other_pages %}
                     <ul class="pagination justify-content-center">
-                        {% if tours.number != 1 %}
+                        {% if sequences.number != 1 %}
                             <li class="page-item">
                                 <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
                             </li>
@@ -155,15 +164,15 @@
                                 <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
                             </li>
                         {% endif %}
-                        {% for i in tours.paginator.pages %}
-                            {% if tours.number == i %}
+                        {% for i in sequences.paginator.pages %}
+                            {% if sequences.number == i %}
                                 <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
                             {% else %}
                                 <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
                             {% endif %}
                         {% endfor %}
-                        {% if tours.number != tours.paginator.num_pages %}
-                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ tours.paginator.num_pages }}'>&raquo;</a></li>
+                        {% if sequences.number != sequences.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ sequences.paginator.num_pages }}'>&raquo;</a></li>
                         {% else %}
                             <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
                         {% endif %}
@@ -177,21 +186,22 @@
 {% endblock %}
 
 {% block scripts %}
+    {% if pageName == 'my-sequence-list' %}active{% endif %}
 <script>
     $('.paginator-btn').click(function() {
         var pageNum = $(this).data('page');
         $('#search_form').find('input[name="page"]').val(pageNum);
-        {% if pageName == 'tour-list' %}
-            var url = "{% url 'sequence.tour_list' %}?" + $('#search_form').serialize();
+        {% if pageName == 'sequence-list' %}
+            var url = "{% url 'sequence.sequence_list' %}?" + $('#search_form').serialize()
         {% else %}
-            var url = "{% url 'sequence.my_tour_list' %}?" + $('#search_form').serialize();
+            var url = "{% url 'sequence.my_sequence_list' %}?" + $('#search_form').serialize()
         {% endif %}
         location.assign(url);
     });
     mapboxgl.accessToken = mapboxToken;
     var positions = [];
-    {% for tour in tours %}
-        positions.push({{ tour.geometrySequence }});
+    {% for sequence in sequences %}
+        positions.push({{ sequence.geometry_coordinates_ary }});
     {% endfor %}
 
     console.log(positions);

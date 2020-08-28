@@ -76,6 +76,7 @@ urlpatterns = [
     path('marketplace/', include('marketplace.urls')),
     path('guidebook/', include('guidebook.urls')),
     path('sequence/', include('sequence.urls')),
+    path('tour/', include('tour.urls')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     # path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     re_path(r'', include(tf_urls)),

@@ -19,33 +19,17 @@ from .models import *
 ############################################################################
 
 
-class TransportTypeAdmin(admin.ModelAdmin):
-    list_display = (
-        'name',
-        'description'
-    )
-
-
-class TagAdmin(admin.ModelAdmin):
-    list_display = (
-        'name',
-        'description'
-    )
-
-class SequenceAdmin(admin.ModelAdmin):
+class TourAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'description',
-        'camera_make',
-        'seq_key',
-        'pano',
-        'user_key',
-        'username',
-        'name',
-        'description'
     )
 
+class TourTagAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'description',
+    )
 
-admin.site.register(TransportType, TransportTypeAdmin)
-admin.site.register(Tag, TagAdmin)
-admin.site.register(Sequence, SequenceAdmin)
+admin.site.register(TourTag, TourTagAdmin)
+admin.site.register(Tour, TourAdmin)

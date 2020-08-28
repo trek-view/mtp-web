@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'guidebook.apps.GuidebookConfig',
     'lib.apps.LibConfig',
     'sequence.apps.SequenceConfig',
+    'tour.apps.TourConfig',
     # ========================
     # 'oauth2_provider',
     # 'corsheaders',

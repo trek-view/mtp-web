@@ -2,33 +2,19 @@ from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
-    # Sequence
-
     path('', views.index, name='sequence.index'),
-    path('sequence/sequence-list', views.sequence_list, name='sequence.sequence_list'),
-    path('sequence/my-sequence-list', views.my_sequence_list, name='sequence.my_sequence_list'),
-    path('sequence/<str:unique_id>/detail', views.sequence_detail, name='sequence.sequence_detail'),
-    path('sequence/<str:unique_id>/delete', views.sequence_delete, name='sequence.sequence_delete'),
+    path('sequence-list', views.sequence_list, name='sequence.sequence_list'),
+    path('my-sequence-list', views.my_sequence_list, name='sequence.my_sequence_list'),
+    path('<str:unique_id>/detail', views.sequence_detail, name='sequence.sequence_detail'),
+    path('<str:unique_id>/delete', views.sequence_delete, name='sequence.sequence_delete'),
 
-    path('sequence/<str:unique_id>/ajax_save_sequence', views.ajax_save_sequence, name='sequence.ajax_save_sequence'),
-    path('sequence/<str:unique_id>/ajax_sequence_check_publish', views.ajax_sequence_check_publish, name='sequence.ajax_sequence_check_publish'),
-    path('sequence/<str:unique_id>/ajax_sequence_check_like', views.ajax_sequence_check_like, name='sequence.ajax_sequence_check_like'),
+    path('<str:unique_id>/ajax_save_sequence', views.ajax_save_sequence, name='sequence.ajax_save_sequence'),
+    path('<str:unique_id>/ajax_sequence_check_publish', views.ajax_sequence_check_publish, name='sequence.ajax_sequence_check_publish'),
+    path('<str:unique_id>/ajax_sequence_check_like', views.ajax_sequence_check_like, name='sequence.ajax_sequence_check_like'),
+    path('<str:unique_id>/ajax_get_image_detail/<str:image_key>/', views.ajax_get_image_detail, name='sequence.ajax_get_image_detail'),
 
-    path('sequence/import-sequence-list', views.import_sequence_list, name='sequence.import_sequence_list'),
-    path('sequence/import-sequence', views.import_sequence, name='sequence.import_sequence'),
-    path('sequence/import', views.ajax_import, name='sequence.ajax_import'),
+    path('import-sequence-list', views.import_sequence_list, name='sequence.import_sequence_list'),
+    path('import-sequence', views.import_sequence, name='sequence.import_sequence'),
+    path('import', views.ajax_import, name='sequence.ajax_import'),
 
-    # Tour
-
-    path('tour/create', views.tour_create, name='sequence.tour_create'),
-    path('tour/tour-list', views.tour_list, name='sequence.tour_list'),
-    path('tour/my-tour-list', views.my_tour_list, name='sequence.my_tour_list'),
-    path('tour/<str:unique_id>/detail', views.tour_detail, name='sequence.tour_detail'),
-    path('tour/<str:unique_id>/delete', views.tour_delete, name='sequence.tour_delete'),
-    path('tour/<str:unique_id>/add-seq', views.tour_add_sequence, name='sequence.tour_add_sequence'),
-    path('tour/<str:unique_id>/ajax_change_tour_seq', views.ajax_change_tour_seq, name='sequence.ajax_change_tour_seq'),
-    path('tour/<str:unique_id>/ajax_order_sequence', views.ajax_order_sequence, name='sequence.ajax_order_sequence'),
-    path('tour/<str:unique_id>/ajax_tour_check_publish', views.ajax_tour_check_publish, name='sequence.ajax_tour_check_publish'),
-    path('tour/<str:unique_id>/ajax_tour_check_like', views.ajax_tour_check_like, name='sequence.ajax_tour_check_like'),
-    path('tour/<str:unique_id>/ajax_tour_update', views.ajax_tour_update, name='sequence.ajax_tour_update'),
 ]
