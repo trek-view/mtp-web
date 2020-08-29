@@ -5,6 +5,7 @@ from django.http import (
 )
 import time
 import requests
+import math
 
 def send_mail_with_html(subject, html_message, to_email, from_email = None):
     if isinstance(to_email, str):
@@ -39,3 +40,17 @@ def get_mapillary_user(token):
         return None
     else:
         return data
+
+def distance(origin, destination):
+    lon1, lat1 = origin
+    lon2, lat2 = destination
+    radius = 6371 # km
+
+    dlat = math.radians(lat2-lat1)
+    dlon = math.radians(lon2-lon1)
+    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = radius * c
+
+    return d

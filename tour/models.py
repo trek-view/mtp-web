@@ -108,6 +108,14 @@ class Tour(models.Model):
         tour_sequences = TourSequence.objects.filter(tour=self)
         return tour_sequences.count()
 
+    def getDistance(self):
+        tour_sequences = TourSequence.objects.filter(tour=self)
+        distance = 0
+        if tour_sequences.count() > 0:
+            for t_s in tour_sequences:
+                distance += float(t_s.sequence.getDistance())
+
+        return "%.3f" % distance
 
 class TourSequence(models.Model):
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE)

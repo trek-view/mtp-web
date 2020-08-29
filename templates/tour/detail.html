@@ -87,21 +87,6 @@
     </div>
     <div class="right-board bg-light">
         <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
-            <div class="sequence-viewer" id="sequence_viewer">
-
-            </div>
-            {% if sequence_count > 0 %}
-                <div class="w-100 text-center">
-                    <div class="mt-3">
-                        <button class="btn btn-info btn-prev" disabled>
-                            Prev
-                        </button>
-                        <button class="btn btn-info btn-next">
-                            Next
-                        </button>
-                    </div>
-                </div>
-            {% endif %}
             <div class="item-list">
                 {% if sequence_count > 0 %}
                     {% for sequence in sequences %}
@@ -126,8 +111,14 @@
                                         <p class="mb-1 mr-3 item-transport-type">
                                             {{ sequence.transport_type }}
                                         </p>
-                                        <p>
+                                        <p class="mb-1 mr-3 item-image-count">
                                             {{ sequence.getImageCount }} Panos
+                                        </p>
+                                        <p class="mb-1 mr-3 item-distance">
+                                            {{ sequence.getDistance }} Km
+                                        </p>
+                                        <p class="mb-1 mr-3 item-tour-count">
+                                            {{ sequence.tour_count }} tours
                                         </p>
                                     </div>
 
@@ -147,9 +138,6 @@
                                 </div>
                             </div>
                             <div class="text-center" style="width: 150px; font-size: 13px;">
-                                <a target="_blank" href="https://www.mapillary.com/profile/{{ sequence.username }}">
-                                    <h6>{{ sequence.username }}</h6>
-                                </a>
                                 <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
                                     <img class="w-100 mt-1" src="{% static "images/icon/mapillary_icon.png" %}">
                                 </a>
@@ -271,42 +259,6 @@
     {% if first_image_key != '' %}
         currenct_sequence_id = 0;
     {% endif %}
-    var mapillaryViewer = new Mapillary.Viewer(
-        'sequence_viewer',
-        mapillaryClientId,
-        first_image_keys[0],
-        {
-            component: {
-                cover: false,
-                tag: true,
-            },
-        }
-    );
-    window.addEventListener('resize', function() { mapillaryViewer.resize(); });
-
-    $('.btn-prev').click(function () {
-        if (currenct_sequence_index == 0)
-            return;
-        currenct_sequence_index--;
-        mapillaryViewer.moveToKey(first_image_keys[currenct_sequence_index]);
-        if (currenct_sequence_index == 0)
-        {
-            $('.btn-prev').addClass('disabled').attr('disabled', true);
-        }
-        $('.btn-next').removeClass('disabled').attr('disabled', false);
-    });
-
-    $('.btn-next').click(function () {
-        if (currenct_sequence_index == first_image_keys.length - 1)
-            return;
-        currenct_sequence_index++;
-        mapillaryViewer.moveToKey(first_image_keys[currenct_sequence_index]);
-        if (currenct_sequence_index == first_image_keys.length - 1)
-        {
-            $('.btn-next').addClass('disabled').attr('disabled', true);
-        }
-        $('.btn-prev').removeClass('disabled').attr('disabled', false);
-    });
 
     $('#publish_swithch_tour').click(function () {
         $.ajax({
@@ -388,7 +340,5 @@
             });
         });
     {% endif %}
-
-
 </script>
 {% endblock %}

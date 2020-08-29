@@ -326,11 +326,16 @@ def tour_detail(request, unique_id):
     tour = get_object_or_404(Tour, unique_id=unique_id)
     sequence_ary = []
     tour_sequences = TourSequence.objects.filter(tour=tour).order_by('sort')
-    t_sequence_ary = []
+    t_count_ary = []
     if tour_sequences.count() > 0:
         for t_s in tour_sequences:
+            t_sequences = TourSequence.objects.filter(sequence=t_s.sequence)
+            if t_sequences is None or not t_sequences:
+                t_s.sequence.tour_count = 0
+            else:
+                t_s.sequence.tour_count = t_sequences.count()
+
             sequence_ary.append(t_s.sequence)
-            t_sequence_ary.append(t_s.sequence.unique_id)
 
     first_image_key = ''
     if len(sequence_ary) > 0:
@@ -343,7 +348,7 @@ def tour_detail(request, unique_id):
         'pageDescription': MAIN_PAGE_DESCRIPTION,
         'tour': tour,
         'first_image_key': first_image_key,
-        't_sequence_ary': t_sequence_ary
+        't_count_ary': t_count_ary
     }
     return render(request, 'tour/detail.html', content)
 
@@ -373,6 +378,7 @@ def ajax_tour_update(request, unique_id=None):
                     'tag': tour.getTags()
                 }
             })
+
 
     return JsonResponse({
         'status': 'failed',
@@ -419,6 +425,7 @@ def ajax_change_tour_seq(request, unique_id):
     tour = Tour.objects.get(unique_id=unique_id)
     if not tour or tour is None or tour.user != request.user:
         return JsonResponse({
+
             'status': 'failed',
             'message': 'The tour does not exist or has no access.'
         })

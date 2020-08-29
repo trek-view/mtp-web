@@ -114,8 +114,14 @@
                                         <p class="mb-1 mr-3 item-transport-type">
                                             {{ sequence.transport_type }}
                                         </p>
-                                        <p>
+                                        <p class="mb-1 mr-3 item-image-count">
                                             {{ sequence.getImageCount }} Panos
+                                        </p>
+                                        <p class="mb-1 mr-3 item-distance">
+                                            {{ sequence.getDistance }} Km
+                                        </p>
+                                        <p class="mb-1 mr-3 item-tour-count">
+                                            {{ sequence.tour_count }} tours
                                         </p>
                                     </div>
 
@@ -135,9 +141,6 @@
                                 </div>
                             </div>
                             <div class="text-center" style="width: 150px; font-size: 13px;">
-                                <a target="_blank" href="https://www.mapillary.com/profile/{{ sequence.username }}">
-                                    <h6>{{ sequence.username }}</h6>
-                                </a>
                                 <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
                                     <img class="w-100 mt-2" src="{% static "images/icon/mapillary_icon.png" %}">
                                 </a>

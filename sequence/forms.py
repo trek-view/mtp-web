@@ -67,7 +67,7 @@ class AddSequeceForm(forms.ModelForm):
             required=False,
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
-            queryset=TransportType.objects.filter(),
+            queryset=TransType.objects.all(),
             empty_label=None
         )
 
@@ -112,7 +112,7 @@ class SequenceSearchForm(forms.Form):
             required=False,
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
-            queryset=TransportType.objects.filter(),
+            queryset=TransType.objects.all(),
             empty_label='All Types'
         )
         self.fields['tag'] = forms.MultipleChoiceField(
@@ -141,7 +141,7 @@ class SequenceSearchForTourForm(forms.Form):
             required=False,
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
-            queryset=TransportType.objects.filter(),
+            queryset=TransType.objects.filter(),
             empty_label='All Types'
         )
         self.fields['tag'] = forms.MultipleChoiceField(

@@ -113,7 +113,15 @@ def sequence_list(request):
             last_num = pSequences.number + 3
     pSequences.paginator.pages = range(first_num, last_num + 1)
     pSequences.count = len(pSequences)
-    print(pSequences.count)
+
+    for i in range(len(pSequences)):
+        tour_sequences = TourSequence.objects.filter(sequence_id=pSequences[i].pk)
+        if tour_sequences is None or not tour_sequences:
+            pSequences[i].tour_count = 0
+        else:
+            pSequences[i].tour_count = tour_sequences.count()
+
+
     content = {
         'sequences': pSequences,
         'form': form,
@@ -159,7 +167,7 @@ def my_sequence_list(request):
 
     print(sequences)
     if sequences == None:
-        sequences = Sequence.objects.all().filter(is_published=True, is_approved=True)
+        sequences = Sequence.objects.all().filter(is_published=True)
         form = SequenceSearchForm()
 
     paginator = Paginator(sequences.order_by('-created_at'), 5)
@@ -186,6 +194,12 @@ def my_sequence_list(request):
     pSequences.paginator.pages = range(first_num, last_num + 1)
     pSequences.count = len(pSequences)
     print(pSequences.count)
+    for i in range(len(pSequences)):
+        tour_sequences = TourSequence.objects.filter(sequence_id=pSequences[i].pk)
+        if tour_sequences is None or not tour_sequences:
+            pSequences[i].tour_count = 0
+        else:
+            pSequences[i].tour_count = tour_sequences.count()
     content = {
         'sequences': pSequences,
         'form': form,
@@ -487,7 +501,7 @@ def import_sequence_list(request):
     tags = Tag.objects.filter(is_actived=True)
     for t in tags:
         all_tags.append({'id': t.pk, 'name': t.name})
-    transport_types = TransportType.objects.all()
+    transport_types = TransType.objects.all()
     for type in transport_types:
         all_transport_types.append({'id': type.pk, 'name': type.name})
     content = {
@@ -524,7 +538,7 @@ def ajax_import(request):
             sequence.is_transport = True
             print(sequence.name)
             sequence.save()
-            messages.success(request, "Sequences successfully imported.")
+        messages.success(request, "Sequences successfully imported.")
     return JsonResponse({
         'status': 'success',
     })

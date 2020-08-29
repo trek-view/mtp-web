@@ -10,7 +10,9 @@ from django.contrib.postgres.fields import ArrayField
 
 ## Python Packages
 import uuid
+from lib.functions import *
 from django.urls import reverse
+from mptt.models import MPTTModel, TreeForeignKey
 
 UserModel = get_user_model()
 
@@ -30,15 +32,28 @@ def getAllTags():
     print(itemsTuple)
     return itemsTuple
 
-class TransportType(models.Model):
-    name = models.CharField(max_length=50)
-    description = models.TextField(default='')
+class TransType(MPTTModel):
+    name = models.CharField(max_length=50, unique=True)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    icon = models.CharField(max_length=50, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        if self.parent is None:
+            return self.name
+        else:
+            return self.parent.name + ' - ' + self.name
+
+    class MPTTMeta:
+        level_attr = 'mptt_level'
+        order_insertion_by = ['name']
+
+    class Meta:
+        verbose_name_plural = 'Transport Type'
+
 
 def getAllCaptureType():
-    items = TransportType.objects.all()
+    items = TransType.objects.all()
     itemsTuple = ()
     for item in items:
         itemsTuple = itemsTuple + ((item.pk, item.name),)
@@ -64,7 +79,7 @@ class Sequence(models.Model):
 
     name = models.CharField(max_length=100, default='')
     description = models.TextField(default='')
-    transport_type = models.ForeignKey(TransportType, on_delete=models.CASCADE, null=True)
+    transport_type = models.ForeignKey(TransType, on_delete=models.CASCADE, null=True)
     tag = ArrayField(models.CharField(default='0', max_length=6), null=True)
 
     is_mapillary = models.BooleanField(default=True)
@@ -132,6 +147,24 @@ class Sequence(models.Model):
             return 0
         else:
             return liked_guidebook.count()
+
+    def getDistance(self):
+        all_distance = 0
+        if (len(self.geometry_coordinates_ary) > 0):
+            first_point = self.geometry_coordinates_ary[0]
+            for i in range(len(self.geometry_coordinates_ary) - 1):
+                if i == 0:
+                    continue
+                second_point = self.geometry_coordinates_ary[i]
+                d = distance(first_point, second_point)
+                first_point = second_point
+                all_distance += d
+            all_distance = "%.3f" % all_distance
+        return all_distance
+
+    # def getTourCount(self):
+    #     tour_sequences = TourSequence.objects.filter(sequence=self)
+    #     return tour_sequences.count()
 
 class Image(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)

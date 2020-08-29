@@ -95,7 +95,7 @@
                         <div class="card tour p-3 m-3 d-flex flex-row align-items-center" id="tour_{{ tour.unique_id }}" data-tour-id="{{ tour.unique_id }}">
                             <div class="min-map-box" id="map-{{ tour.unique_id }}">
                             </div>
-                            <div class="item-detail-box pl-3 pr-3">
+                            <div class="item-detail-box pl-3 pr-3 w-auto">
                                 <div class="item-main w-100 float-left">
                                     <div class="item-title text-info d-flex flex-row justify-content-between">
                                         <a target="_blank" href="{% url 'tour.tour_detail' unique_id=tour.unique_id %}">
@@ -110,7 +110,13 @@
                                     </div>
 
                                     <div class="w-100 d-flex flex-row">
-                                        <p>
+                                        <p class="mb-1 mr-3">
+                                            {{ tour.getSequenceCount }} Sequences
+                                        </p>
+                                        <p class="mb-1 mr-3">
+                                            {{ tour.getDistance }} Km
+                                        </p>
+                                        <p class="mb-1 mr-3">
                                             {{ tour.getImageCount }} Panos
                                         </p>
                                     </div>
@@ -129,11 +135,6 @@
                                     </div>
 
                                 </div>
-                            </div>
-                            <div class="text-center" style="width: 150px; font-size: 13px;">
-                                <a target="_blank" href="https://www.mapillary.com/profile/{{ tour.username }}">
-                                    <h6>{{ tour.username }}</h6>
-                                </a>
                             </div>
                         </div>
                     {% endfor %}

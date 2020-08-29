@@ -18,10 +18,10 @@ from .models import *
 
 ############################################################################
 
-
-class TransportTypeAdmin(admin.ModelAdmin):
+class TransTypeAdmin(admin.ModelAdmin):
     list_display = (
         'name',
+        'icon',
         'description'
     )
 
@@ -45,7 +45,6 @@ class SequenceAdmin(admin.ModelAdmin):
         'description'
     )
 
-
-admin.site.register(TransportType, TransportTypeAdmin)
+admin.site.register(TransType, TransTypeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Sequence, SequenceAdmin)

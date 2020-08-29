@@ -81,7 +81,6 @@ urlpatterns = [
     # path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     re_path(r'', include(tf_urls)),
     path('mission-control/', admin.site.urls, name='admin'),
-    path('my-admin/', admin_tmp.site.urls)
 ]
 
 # This part is for deploying this project as a production(DEBUG=True) on heroku.
