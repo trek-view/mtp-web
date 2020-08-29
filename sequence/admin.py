@@ -21,6 +21,7 @@ from .models import *
 class TransTypeAdmin(admin.ModelAdmin):
     list_display = (
         'name',
+        'parent',
         'icon',
         'description'
     )
