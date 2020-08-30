@@ -17,7 +17,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 UserModel = get_user_model()
 
 def icon_image_directory_path(instance, filename):
-    return 'sequence/transport_type/icons/{}'.format(str(instance.unique_id) + '-' + filename)
+    return 'media/sequence/transport_type/icons/{}'.format(str(instance.unique_id) + '-' + filename)
 class Icon(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=100)

@@ -106,9 +106,16 @@
                                         </p>
                                     </div>
 
-                                    <div class="w-100 d-flex flex-row">
-                                        <p class="mb-1 mr-3 item-transport-type">
-                                            {{ sequence.transport_type }}
+                                    <div class="w-100 d-flex flex-row align-items-end">
+                                        <p class="mb-1 mr-3 item-transport-type text-center">
+                                            <img src="{{ STATIC_URL }}{{ sequence.transport_type.parent.icon.filename }}">
+                                            <br>
+                                            {{ sequence.transport_type.parent }}
+                                        </p>
+                                        <p class="mb-1 mr-3 item-transport-type text-center">
+                                            <img src="{{ STATIC_URL }}{{ sequence.transport_type.icon.filename }}">
+                                            <br>
+                                            {{ sequence.transport_type.name }}
                                         </p>
                                         <p class="mb-1 mr-3 item-image-count">
                                             {{ sequence.getImageCount }} Panos
