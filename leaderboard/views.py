@@ -78,7 +78,6 @@ def index(request):
 
     user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
 
-    print(user_json)
     paginator = Paginator(user_json, 10)
 
     try:
@@ -103,7 +102,6 @@ def index(request):
     pItems.paginator.pages = range(first_num, last_num + 1)
     pItems.count = len(pItems)
     for i in range(len(pItems)):
-        print(pItems[i])
         user = CustomUser.objects.get(pk=pItems[i]['user'])
 
         if user is None or not user:
@@ -135,7 +133,6 @@ def index(request):
 
         used_trans = []
         u_trans_sequences = u_sequences.values('transport_type').annotate(camera_count=Count('transport_type'))
-        print(u_trans_sequences)
         if u_trans_sequences.count() > 0:
             for u_s in u_trans_sequences:
                 transport_type = TransType.objects.get(pk=u_s['transport_type'])
@@ -144,7 +141,6 @@ def index(request):
                 used_trans.append(transport_type.name)
         used_trans.sort()
         used_trans_str = ', '.join(used_trans)
-        print(used_trans_str)
         pItems[i]['transport_type'] = used_trans_str
 
         u_distance = 0

@@ -57,7 +57,6 @@ def tour_create(request, unique_id=None):
                 tour.username = mapillary_user.username
                 tour.is_published = False
                 tour.save()
-                print(tour.username)
                 messages.success(request, 'A tour was created successfully.')
             else:
                 tour = get_object_or_404(Tour, unique_id=unique_id)
@@ -163,7 +162,6 @@ def tour_add_sequence(request, unique_id):
                 last_num = pSequences.number + 3
         pSequences.paginator.pages = range(first_num, last_num + 1)
         pSequences.count = len(pSequences)
-        print(pSequences.count)
         content = {
             'sequences': pSequences,
             'sequence_count': len(pSequences),
@@ -219,7 +217,6 @@ def tour_list(request):
             if len(tags) > 0:
                 tours = tours.filter(tag__overlap=tags)
 
-    print(tours)
     if tours == None:
         tours = Tour.objects.all().filter(is_published=True)
         form = TourSearchForm()
@@ -247,7 +244,6 @@ def tour_list(request):
             last_num = pTours.number + 3
     pTours.paginator.pages = range(first_num, last_num + 1)
     pTours.count = len(pTours)
-    print(pTours.count)
     content = {
         'tours': pTours,
         'form': form,
@@ -270,20 +266,14 @@ def my_tour_list(request):
         if form.is_valid():
             name = form.cleaned_data['name']
             tags = form.cleaned_data['tag']
-            username = form.cleaned_data['username']
-
             tours = Tour.objects.all().filter(
                 user=request.user
             )
             if name and name != '':
                 tours = tours.filter(name__contains=name)
-            if username and username != '':
-                users = CustomUser.objects.filter(username__contains=username)
-                tours = tours.filter(user__in=users)
             if len(tags) > 0:
                 tours = tours.filter(tag__overlap=tags)
 
-    print(tours)
     if tours == None:
         tours = Tour.objects.all().filter(is_published=True)
         form = TourSearchForm()
@@ -311,7 +301,7 @@ def my_tour_list(request):
             last_num = pTours.number + 3
     pTours.paginator.pages = range(first_num, last_num + 1)
     pTours.count = len(pTours)
-    print(pTours.count)
+    form._my(request.user.username)
     content = {
         'tours': pTours,
         'form': form,
@@ -489,7 +479,6 @@ def ajax_order_sequence(request, unique_id):
         order_list = order_str.split(',')
         tour_seq_list = []
         for i in range(len(order_list)):
-            print(str(i) + ': ' + order_list[i])
             sequence = Sequence.objects.get(unique_id=order_list[i])
             if sequence is None or sequence.user != request.user:
                 return JsonResponse({

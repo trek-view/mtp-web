@@ -151,7 +151,7 @@ class GuidebookSearchForm(forms.Form):
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
             queryset=Category.objects.all(),
-            empty_label=None
+            empty_label="All Categories"
         )
         self.fields['tag'] = forms.MultipleChoiceField(
             required=False,
@@ -165,3 +165,9 @@ class GuidebookSearchForm(forms.Form):
             required=False
         )
 
+    def _my(self, username):
+        self.fields['username'] = forms.CharField(
+            label='',
+            widget=forms.TextInput(attrs={'class': 'form-control d-none', 'value': username}),
+            required=False
+        )

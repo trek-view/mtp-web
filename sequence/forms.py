@@ -121,6 +121,13 @@ class SequenceSearchForm(forms.Form):
             choices=getAllTags()
         )
 
+    def _my(self, username):
+        self.fields['username'] = forms.CharField(
+            label='',
+            widget=forms.TextInput(attrs={'class': 'form-control d-none', 'value': username}),
+            required=False
+        )
+
 class SequenceSearchForTourForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

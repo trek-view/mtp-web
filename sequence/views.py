@@ -66,8 +66,6 @@ def sequence_list(request):
             camera_make = form.cleaned_data['camera_make']
             tags = form.cleaned_data['tag']
             transport_type = form.cleaned_data['transport_type']
-            # start_time = form.cleaned_data['start_time']
-            # end_time = form.cleaned_data['end_time']
             username = form.cleaned_data['username']
 
             sequences = Sequence.objects.all().filter(
@@ -81,11 +79,11 @@ def sequence_list(request):
             if transport_type and transport_type != 0 and transport_type != '':
                 sequences = sequences.filter(transport_type_id=transport_type)
             if username and username != '':
-                sequences = sequences.filter(username__contains=username)
+                users = CustomUser.objects.filter(username__contains=username)
+                sequences = sequences.filter(user__in=users)
             if len(tags) > 0:
                 sequences = sequences.filter(tag__overlap=tags)
 
-    print(sequences)
     if sequences == None:
         sequences = Sequence.objects.all().filter(is_published=True)
         form = SequenceSearchForm()
@@ -146,9 +144,6 @@ def my_sequence_list(request):
             camera_make = form.cleaned_data['camera_make']
             tags = form.cleaned_data['tag']
             transport_type = form.cleaned_data['transport_type']
-            # start_time = form.cleaned_data['start_time']
-            # end_time = form.cleaned_data['end_time']
-            username = form.cleaned_data['username']
 
             sequences = Sequence.objects.all().filter(
                 user=request.user,
@@ -160,12 +155,9 @@ def my_sequence_list(request):
                 sequences = sequences.filter(camera_make__contains=camera_make)
             if transport_type and transport_type != 0 and transport_type != '':
                 sequences = sequences.filter(category_id=transport_type)
-            if username and username != '':
-                sequences = sequences.filter(username__contains=username)
             if len(tags) > 0:
                 sequences = sequences.filter(tag__overlap=tags)
 
-    print(sequences)
     if sequences == None:
         sequences = Sequence.objects.all().filter(is_published=True)
         form = SequenceSearchForm()
@@ -193,13 +185,14 @@ def my_sequence_list(request):
             last_num = pSequences.number + 3
     pSequences.paginator.pages = range(first_num, last_num + 1)
     pSequences.count = len(pSequences)
-    print(pSequences.count)
+
     for i in range(len(pSequences)):
         tour_sequences = TourSequence.objects.filter(sequence_id=pSequences[i].pk)
         if tour_sequences is None or not tour_sequences:
             pSequences[i].tour_count = 0
         else:
             pSequences[i].tour_count = tour_sequences.count()
+    form._my(request.user.username)
     content = {
         'sequences': pSequences,
         'form': form,
@@ -494,7 +487,6 @@ def import_sequence_list(request):
                         last_num = sequences.number + 3
                 sequences.paginator.pages = range(first_num, last_num + 1)
                 sequences.count = len(sequences)
-                print(sequences.count)
 
     addSequenceForm = AddSequeceForm()
     all_tags = []
@@ -537,7 +529,6 @@ def ajax_import(request):
             sequence.tag = sequence_json[unique_id]['tags']
             sequence.is_published = True
             sequence.is_transport = True
-            print(sequence.name)
             sequence.save()
         messages.success(request, "Sequences successfully imported.")
     return JsonResponse({

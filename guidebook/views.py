@@ -51,6 +51,8 @@ def guidebook_list(request, page):
             name = form.cleaned_data['name']
             category = form.cleaned_data['category']
             tags = form.cleaned_data['tag']
+            username = form.cleaned_data['username']
+
             guidebooks = Guidebook.objects.all().filter(
                 is_published=True,
                 is_approved=True
@@ -59,7 +61,9 @@ def guidebook_list(request, page):
                 guidebooks = guidebooks.filter(name__contains=name)
             if category:
                 guidebooks = guidebooks.filter(category_id=category)
-
+            if username and username != '':
+                users = CustomUser.objects.filter(username__contains=username)
+                guidebooks = guidebooks.filter(user__in=users)
             if len(tags) > 0:
                 guidebooks = guidebooks.filter(tag__overlap=tags)
 
@@ -148,7 +152,7 @@ def my_guidebook_list(request, page):
             last_num = pGuidebooks.number + 3
     pGuidebooks.paginator.pages = range(first_num, last_num + 1)
     pGuidebooks.count = len(pGuidebooks)
-
+    form._my(request.user.username)
     content = {
         'guidebooks': pGuidebooks,
         'form': form,
@@ -258,8 +262,6 @@ def ajax_guidebook_update(request, unique_id = None):
             guidebook.category = form.cleaned_data['category']
             guidebook.tag = form.cleaned_data['tag']
             guidebook.save()
-            print('========')
-            print(guidebook.getTagStr)
             return JsonResponse({
                 'status': 'success',
                 'message': 'Guidebook was uploaded successfully.',
@@ -401,7 +403,6 @@ def ajax_order_scene(request, unique_id):
         order_list = order_str.split(',')
         scene_list = []
         for i in range(len(order_list)):
-            print(str(i) + ': ' + order_list[i])
             scene = Scene.objects.get(pk=int(order_list[i]))
             if scene is None or scene.guidebook != guidebook:
                 return JsonResponse({

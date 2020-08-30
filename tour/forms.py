@@ -57,3 +57,9 @@ class TourSearchForm(forms.Form):
             choices=getAllTourTags()
         )
 
+    def _my(self, username):
+        self.fields['username'] = forms.CharField(
+            label='',
+            widget=forms.TextInput(attrs={'class': 'form-control d-none', 'value': username}),
+            required=False
+        )
