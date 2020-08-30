@@ -21,14 +21,16 @@ from django.template import RequestContext
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 from django.contrib.gis.geos import Point, LineString
-
+from django.db.models import Avg, Count, Min, Sum
+from django.db.models.expressions import F, Window
+from django.db.models.functions.window import RowNumber
 ## Custom Libs ##
 from lib.functions import *
 
 ## Project packages
 from accounts.models import CustomUser, MapillaryUser
 from tour.models import Tour, TourSequence
-
+from guidebook.models import Guidebook, Scene
 ## App packages
 
 # That includes from .models import *
@@ -322,8 +324,87 @@ def ajax_save_sequence(request, unique_id):
     })
 
 def ajax_get_image_detail(request, unique_id, image_key):
-    pass
-    return
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if not sequence:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Sequence does not exist.'
+        })
+
+    if not sequence.is_published:
+        if not request.user.is_authenticated or request.user != sequence.user:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "You can't access this sequence."
+            })
+    images = Image.objects.filter(seq_key=sequence.seq_key, image_key=image_key)
+    if images.count() > 0:
+        image = images[0]
+    else:
+        image = Image()
+
+        try:
+            url = 'https://a.mapillary.com/v3/images/{}?client_id={}'.format(image_key, settings.MAPILLARY_CLIENT_ID)
+            response = requests.get(url)
+            data = response.json()
+        except:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Image key error."
+            })
+        properties = data['properties']
+        keys = properties.keys()
+        if 'camera_make' in keys:
+            image.camera_make = properties['camera_make']
+        if 'camera_model' in keys:
+            image.camera_model = properties['camera_model']
+        if 'ca' in keys:
+            image.cas = properties['ca']
+        if 'captured_at' in keys:
+            image.captured_at = properties['captured_at']
+        if 'sequence_key' in keys:
+            image.seq_key = properties['sequence_key']
+        if 'user_key' in keys:
+            image.user_key = properties['user_key']
+        if 'key' in keys:
+            image.image_key = properties['key']
+        if 'pano' in keys:
+            image.pano = properties['pano']
+        if 'username' in keys:
+            image.username = properties['username']
+        if 'organization_key' in keys:
+            image.organization_key = properties['organization_key']
+        if 'private' in keys:
+            image.is_privated = properties['private']
+
+        image.lng = data['geometry']['coordinates'][0]
+        image.lat = data['geometry']['coordinates'][1]
+
+
+        image.is_uploaded = True
+        image.is_mapillary = True
+
+        image.user = sequence.user
+        print('test')
+        image.save()
+
+    view_points = ImageViewPoint.objects.filter(image=image)
+    scenes = Scene.objects.filter(image_key=image_key)
+    content = {
+        'image': image,
+        'view_points': view_points.count(),
+        'guidebook_count': scenes.count()
+    }
+    image_detail_box_html = render_to_string(
+        'sequence/image_detail_box.html',
+        content,
+        request
+    )
+    return JsonResponse({
+        'image_detail_box_html': image_detail_box_html,
+        'status': 'success',
+        'message': ""
+    })
 
 @my_login_required
 def import_sequence_list(request):
@@ -617,8 +698,8 @@ def ajax_get_image_list(request, unique_id):
     for i in range(len(coordinates_image)):
         images.append(
             {
-                'lat': geometry_coordinates_ary[i][0],
-                'lng': geometry_coordinates_ary[i][1],
+                'lat': geometry_coordinates_ary[i][1],
+                'lng': geometry_coordinates_ary[i][0],
                 'key': coordinates_image[i],
                 'cas': coordinates_cas[i]
             }
@@ -680,3 +761,73 @@ def ajax_get_image_list(request, unique_id):
         'status': 'success',
         'message': ''
     })
+
+def ajax_image_mark_view(request, unique_id, image_key):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You can't change the status."
+        })
+
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if not sequence:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Sequence does not exist.'
+        })
+
+    if sequence.user == request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The sequence and image are imported by you.'
+        })
+
+    if not sequence.is_published:
+        if not request.user.is_authenticated or request.user != sequence.user:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "You can't access this sequence."
+            })
+
+    images = Image.objects.filter(seq_key=sequence.seq_key, image_key=image_key)
+
+    if images.count() == 0:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "The Image does not exist."
+        })
+
+    image = images[0]
+
+    image_view_points = ImageViewPoint.objects.filter(image=image, user=request.user)
+    if image_view_points.count() > 0:
+        for v in image_view_points:
+            v.delete()
+        marked_images = ImageViewPoint.objects.filter(image=image)
+        if not marked_images:
+            view_points = 0
+        else:
+            view_points = marked_images.count()
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Unmarked',
+            'is_marked': False,
+            'view_points': view_points
+        })
+    else:
+        image_view_point = ImageViewPoint()
+        image_view_point.image = image
+        image_view_point.user = request.user
+        image_view_point.save()
+        marked_images = ImageViewPoint.objects.filter(image=image)
+        if not marked_images:
+            view_points = 0
+        else:
+            view_points = marked_images.count()
+        return JsonResponse({
+
+            'status': 'success',
+            'message': 'Marked',
+            'is_marked': True,
+            'view_points': view_points
+        })

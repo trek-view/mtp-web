@@ -1,0 +1,62 @@
+{% load static %}
+<div class="mt-3 p-2 item-detail card">
+    <div class="image-detail">
+        <div class="mt-2">
+            <label class="col-4">Key: </label>
+            <small class="col-8">{{ image.image_key }}</small>
+        </div>
+        <div class="mt-2">
+            <label class="col-4">Camera Make: </label>
+            <span class="col-8">{{ image.camera_make }}</span>
+        </div>
+        <div class="mt-2">
+            <label class="col-4">Camera Model: </label>
+            <span class="col-8">{{ image.camera_model }}</span>
+        </div>
+        <div class="mt-2">
+            <label class="col-4">Sequence Key: </label>
+            <small class="col-8">{{ image.seq_key }}</small>
+        </div>
+        <div class="mt-2">
+            <label class="col-4">Pano: </label>
+            <span class="col-8">{{ image.pano }}</span>
+        </div>
+        <div class="mt-2">
+            <label class="col-4">User Key: </label>
+            <small class="col-8">{{ image.user_key }}</small>
+        </div>
+        <div class="mt-2">
+            <label class="col-4">Username: </label>
+            <span class="col-8">{{ image.username }}</span>
+        </div>
+        <div class="mt-2">
+            <label class="col-4">Organization Key: </label>
+            <small class="col-8">{% if not image.oranization_key is None %}{{ image.organization_key }}{% endif %}</small>
+        </div>
+        <div class="mt-2">
+            <label class="col-4">Lat: </label>
+            <span class="col-8">{{ image.lat }}</span>
+        </div>
+        <div class="mt-2">
+            <label class="col-4">Lng: </label>
+            <span class="col-8">{{ image.lng }}</span>
+        </div>
+    </div>
+
+    <hr class="mt-3 mb-1">
+
+    <div class="image-others float-right d-flex flex-row justify-content-between mt-2">
+        <div class="guidebook text-center">
+            <img style="width: 40px" src="{% static 'images/icon/62-512.png' %}" />
+            <span class="text-center m-0">
+                {{ guidebook_count }} Guidebooks
+            </span>
+        </div>
+        <div class="view_point text-center">
+            <img style="width: 40px; cursor: pointer" src="{% static 'images/icon/images (1).jfif' %}" onclick="mark_view_point('{{ image.image_key }}')" />
+            <span class="text-center m-0">
+                {{ view_points }} View Points
+            </span>
+        </div>
+    </div>
+</div>

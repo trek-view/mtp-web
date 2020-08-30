@@ -19,7 +19,6 @@ nav.navbar {
     overflow-y: auto;
     height: calc(100vh - 100px);
     position: fixed;
-    height: calc(100% - 100px);
 }
 
 .right-fixed-board {

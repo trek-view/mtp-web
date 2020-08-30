@@ -199,3 +199,7 @@ class Image(models.Model):
 class SequenceLike(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE)
+
+class ImageViewPoint(models.Model):
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    image = models.ForeignKey(Image, on_delete=models.CASCADE)

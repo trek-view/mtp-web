@@ -27,34 +27,37 @@
         </ul>
     {% endif %}
 </div>
-<table class="w-100 mt-3 mb-3">
-    <thead class="text-left">
-        <tr>
-            <th>View Point</th>
-            <th>Image Key</th>
-            <th>Lat</th>
-            <th>Lng</th>
-            <th>Cas</th>
-            <th class="text-center">Links to destination</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for image in images %}
-            <tr>
-                <td>{{ image.view_point }}</td>
-                <td>{{ image.key }}</td>
-                <td>{{ image.lat }}</td>
-                <td>{{ image.lng }}</td>
-                <td>{{ image.cas }}</td>
-                <td class="text-center">
-                    <a target="_blank" href="https://www.mapillary.com/map/im/{{ image.key }}">
-                        <img style="width: 80px" src="{% static 'images/icon/mapillary_icon.png' %}" />
-                    </a>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+
+<div class="image-card-list">
+    {% for image in images %}
+        <div class="card p-2 mb-3" onclick="show_image_detail('{{ image.key }}')" style="cursor: pointer">
+            <div class="image-key text-primary">
+                <span><small>key: </small>{{ image.key }}</span>
+            </div>
+            <div class="image-position d-flex justify-content-between">
+                <span><small>Lat: </small>{{ image.lat }}</span>
+                <span><small>Lng: </small>{{ image.lng }}</span>
+            </div>
+            <div class="image-view-point d-flex justify-content-between">
+                <span><small>Guidebooks: </small>{% if not image.guidebook_count or image.guidebook_count is None %}0{% else %}{{ image.guidebook_count }}{% endif %}</span>
+                <span><small>View Points: </small>{% if not image.view_point or image.view_point is None %}0{% else %}{{ image.view_point }}{% endif %}</span>
+            </div>
+        </div>
+{#        <tr>#}
+{#            <td>{{ image.view_point }}</td>#}
+{#            <td>{{ image.key }}</td>#}
+{#            <td>{{ image.lat }}</td>#}
+{#            <td>{{ image.lng }}</td>#}
+{#            <td>{{ image.cas }}</td>#}
+{#            <td class="text-center">#}
+{#                <a target="_blank" href="https://www.mapillary.com/map/im/{{ image.key }}">#}
+{#                    <img style="width: 80px" src="{% static 'images/icon/mapillary_icon.png' %}" />#}
+{#                </a>#}
+{#            </td>#}
+{#        </tr>#}
+    {% endfor %}
+</div>
+
 <div class="paginator">
     {% if images.has_other_pages %}
         <ul class="pagination justify-content-center">

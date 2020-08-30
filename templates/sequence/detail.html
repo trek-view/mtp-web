@@ -142,6 +142,18 @@
         {% include 'components/copyrite.html' %}
     </div>
 
+    <div class="left-side d-none image-detail-box bg-white p-2">
+        <div class="hide-image-box text-right mt-3">
+            <button class="btn btn-info" onclick="hide_image_detail_box()">
+                Back to Sequence
+            </button>
+        </div>
+        <div class="image-detail">
+            <div class="" id="image_detail_box">
+            </div>
+        </div>
+    </div>
+
     <div class="right-board bg-light">
         <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
             <div class="sequence-viewer" id="sequence_viewer">
@@ -327,7 +339,7 @@
                 confirmButtonText: 'OK'
             })
         });
-    {% elif request.user != guidebook.user %}
+    {% elif request.user != sequence.user %}
         $('.sequence-others .like img').css('cursor', 'pointer');
         $('.sequence-others .like img').click(function () {
             $.ajax({
@@ -352,6 +364,67 @@
                 }
             });
         });
+    {% endif %}
+    function show_image_detail(image_key) {
+        var url = "{% url 'sequence.ajax_get_image_detail' unique_id=sequence.unique_id image_key='image_key' %}";
+        url = url.replace('image_key', image_key);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                {
+                    toastr.error(data.message)
+                }
+                else {
+                    $('.image-detail-box').removeClass('d-none');
+                    $('#image_detail_box').html(data.image_detail_box_html);
+                }
+            }
+        });
+        mapillaryViewer.moveToKey(image_key);
+    }
+
+    function hide_image_detail_box() {
+        $('.image-detail-box').addClass('d-none');
+    }
+
+    {% if not request.user.is_authenticated %}
+        function mark_view_point(image_key) {
+            Swal.fire({
+                title: 'Need to login!',
+                html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
+                        "If you don't have your account, please <a href=\"{% url 'signup' %}\">sign up</a>",
+                showCancelButton: false,
+                confirmButtonText: 'OK'
+            })
+        }
+    {% elif request.user != sequence.user %}
+        function mark_view_point(image_key) {
+            var url = "{% url 'sequence.ajax_image_mark_view' unique_id=sequence.unique_id image_key='image_key' %}";
+            url = url.replace('image_key', image_key)
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {},
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                    {
+                        toastr.error(data.message)
+                    }
+                    else {
+                        $('.image-others .view_point span').text(data.view_points + ' View Points');
+                    }
+                }
+            });
+        }
+    {% else %}
+        function mark_view_point(image_key) {
+            toastr.error('This sequense and image are imported by you.')
+        }
     {% endif %}
 </script>
 {% endblock %}
