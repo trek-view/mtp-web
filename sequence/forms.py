@@ -67,7 +67,7 @@ class AddSequeceForm(forms.ModelForm):
             required=False,
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
-            queryset=TransType.objects.all(),
+            queryset=TransType.objects.filter(parent__isnull=False),
             empty_label=None
         )
 
