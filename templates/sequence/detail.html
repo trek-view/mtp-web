@@ -142,90 +142,8 @@
             <div class="sequence-viewer" id="sequence_viewer">
 
             </div>
-            <div class="image-table mt-4">
-                <div class="paginator">
-                    {% if images.has_other_pages %}
-                        <ul class="pagination justify-content-center">
-                            {% if images.number != 1 %}
-                                <li class="page-item">
-                                    <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
-                                </li>
-                            {% else %}
-                                <li class="page-item disabled">
-                                    <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
-                                </li>
-                            {% endif %}
-                            {% for i in images.paginator.pages %}
-                                {% if images.number == i %}
-                                    <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
-                                {% else %}
-                                    <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
-                                {% endif %}
-                            {% endfor %}
-                            {% if images.number != images.paginator.num_pages %}
-                                <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ images.paginator.num_pages }}'>&raquo;</a></li>
-                            {% else %}
-                                <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
-                            {% endif %}
-                        </ul>
-                    {% endif %}
-                </div>
+            <div class="image-table mt-4" id="image_list">
 
-                <table class="w-100 mt-3 mb-3">
-                    <thead class="text-left">
-                        <tr>
-                            <th>View Point</th>
-                            <th>Image Key</th>
-                            <th>Lat</th>
-                            <th>Lng</th>
-                            <th>Cas</th>
-                            <th class="text-center">Links to destination</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for image in images %}
-                            <tr>
-                                <td>{{ image.view_point }}</td>
-                                <td>{{ image.key }}</td>
-                                <td>{{ image.lat }}</td>
-                                <td>{{ image.lng }}</td>
-                                <td>{{ image.cas }}</td>
-                                <td class="text-center">
-                                    <a target="_blank" href="https://www.mapillary.com/map/im/{{ image.key }}">
-                                        <img style="width: 80px" src="{% static 'images/icon/mapillary_icon.png' %}" />
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <div class="paginator">
-                    {% if images.has_other_pages %}
-                        <ul class="pagination justify-content-center">
-                            {% if images.number != 1 %}
-                                <li class="page-item">
-                                    <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
-                                </li>
-                            {% else %}
-                                <li class="page-item disabled">
-                                    <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
-                                </li>
-                            {% endif %}
-                            {% for i in images.paginator.pages %}
-                                {% if images.number == i %}
-                                    <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
-                                {% else %}
-                                    <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
-                                {% endif %}
-                            {% endfor %}
-                            {% if images.number != images.paginator.num_pages %}
-                                <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ images.paginator.num_pages }}'>&raquo;</a></li>
-                            {% else %}
-                                <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
-                            {% endif %}
-                        </ul>
-                    {% endif %}
-                </div>
             </div>
 
         </div>
@@ -273,10 +191,28 @@
         return false;
     };
 
-    $('.paginator-btn').click(function() {
-        var pageNum = $(this).data('page');
-        location.assign("{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}?" + 'page=' + pageNum);
-    });
+    function goto_page(pageNum) {
+        $.ajax({
+            url: '{% url "sequence.ajax_get_image_list" unique_id=sequence.unique_id %}',
+            type: 'GET',
+            data: {'page': pageNum},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else
+                {
+                    var href = location.protocol + '//' + location.host + location.pathname ;
+                    history.pushState({
+                        id: 'Sequence Detail'
+                    }, "{{ pageTitle }}", href + '?page=' + pageNum);
+                    $('#image_list').html(data.image_list_box_html);
+                }
+            }
+        });
+    }
+
+    goto_page("{{ page }}");
 
     var mapillaryViewer = new Mapillary.Viewer(
         'sequence_viewer',

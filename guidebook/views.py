@@ -227,8 +227,6 @@ def guidebook_create(request, unique_id=None):
                 guidebook.tag = form.cleaned_data['tag']
                 guidebook.save()
 
-
-
             messages.success(request, 'A guidebook was created successfully.')
             return redirect('guidebook.add_scene', unique_id=guidebook.unique_id)
     else:

@@ -227,48 +227,14 @@ def sequence_detail(request, unique_id):
             }
         )
 
-    paginator = Paginator(images, 20)
-
-    try:
-        pImages = paginator.page(page)
-    except PageNotAnInteger:
-        pImages = paginator.page(1)
-    except EmptyPage:
-        pImages = paginator.page(paginator.num_pages)
-
-
-    first_num = 1
-    last_num = paginator.num_pages
-    if paginator.num_pages > 7:
-        if pImages.number < 4:
-            first_num = 1
-            last_num = 7
-        elif pImages.number > paginator.num_pages - 3:
-            first_num = paginator.num_pages - 6
-            last_num = paginator.num_pages
-        else:
-            first_num = pImages.number - 3
-            last_num = pImages.number + 3
-    pImages.paginator.pages = range(first_num, last_num + 1)
-    pImages.count = len(pImages)
-    origin_images = []
-    for i in range(pImages.count):
-        image = Image.objects.filter(image_key=pImages[i]['key'])[:1]
-        if image.count() == 0:
-            origin_images.append(None)
-        else:
-            origin_images.append(image[0])
-
     addSequenceForm = AddSequeceForm(instance=sequence)
     content = {
         'sequence': sequence,
-        'images': pImages,
-        'origin_images': origin_images,
         'pageName': 'Sequence Detail',
         'pageTitle': 'Sequence',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'first_image': images[0],
         'page': page,
-        'first_image': pImages[0],
         'addSequenceForm': addSequenceForm
     }
     return render(request, 'sequence/detail.html', content)
@@ -620,3 +586,97 @@ def ajax_sequence_check_like(request, unique_id):
             'liked_count': liked_count
         })
 
+def ajax_get_image_list(request, unique_id):
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if not sequence:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Sequence does not exist.'
+        })
+
+    if not sequence.is_published:
+        if not request.user.is_authenticated or request.user != sequence.user:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "You can't access this sequence."
+            })
+
+    page = 1
+    if request.method == "GET":
+        page = request.GET.get('page')
+        print('page', page)
+        if page is None:
+            page = 1
+
+    geometry_coordinates_ary = sequence.geometry_coordinates_ary
+    coordinates_image = sequence.coordinates_image
+    coordinates_cas = sequence.coordinates_cas
+
+    images = []
+
+    for i in range(len(coordinates_image)):
+        images.append(
+            {
+                'lat': geometry_coordinates_ary[i][0],
+                'lng': geometry_coordinates_ary[i][1],
+                'key': coordinates_image[i],
+                'cas': coordinates_cas[i]
+            }
+        )
+
+    paginator = Paginator(images, 20)
+
+    try:
+        pImages = paginator.page(page)
+    except PageNotAnInteger:
+        pImages = paginator.page(1)
+    except EmptyPage:
+        pImages = paginator.page(paginator.num_pages)
+
+    first_num = 1
+    last_num = paginator.num_pages
+    if paginator.num_pages > 7:
+        if pImages.number < 4:
+            first_num = 1
+            last_num = 7
+        elif pImages.number > paginator.num_pages - 3:
+            first_num = paginator.num_pages - 6
+            last_num = paginator.num_pages
+        else:
+            first_num = pImages.number - 3
+            last_num = pImages.number + 3
+    pImages.paginator.pages = range(first_num, last_num + 1)
+    pImages.count = len(pImages)
+    origin_images = []
+    for i in range(pImages.count):
+        image = Image.objects.filter(image_key=pImages[i]['key'])[:1]
+        if image.count() == 0:
+            origin_images.append(None)
+        else:
+            origin_images.append(image[0])
+
+    addSequenceForm = AddSequeceForm(instance=sequence)
+    content = {
+        'sequence': sequence,
+        'images': pImages,
+        'origin_images': origin_images,
+        'pageName': 'Sequence Detail',
+        'pageTitle': 'Sequence',
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'page': page,
+        'first_image': pImages[0],
+        'addSequenceForm': addSequenceForm
+    }
+
+    image_list_box_html = render_to_string(
+        'sequence/image_list_box.html',
+        content,
+        request
+    )
+
+    return JsonResponse({
+        'image_list_box_html': image_list_box_html,
+        'page': page,
+        'status': 'success',
+        'message': ''
+    })
