@@ -5,62 +5,65 @@
 {% block content %}
 
 <div class="main-body">
-    <div class="left-side">
-        <div class="text-right mt-2 mb-2 pt-3 pr-3">
-            <a type="button" class="btn btn-info" href="{% url 'sequence.index' %}">Back</a>
-        </div>
-
-        <div class="pl-3 pr-3">
-            <div class="pt-3 mb-3">
-                <h3>
-                    Import Sequences
-                </h3>
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="text-right mt-2 mb-2 pt-3 pr-3">
+                <a type="button" class="btn btn-info" href="{% url 'sequence.index' %}">Back</a>
             </div>
-            <p>
-                {{ pageDescription }}
-            </p>
-        </div>
 
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert m-3 alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            {% endfor %}
-        {% endif %}
-
-        <div class="mt-4">
-
-        </div>
-
-        <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
-            <li class="nav-item" style="width: 50%;">
-                <a class="nav-link {% if action == 'filter' %}active{% endif %}" href="javascript:switch_action('filter');" id="switch_filter">
-                    Filter Mapillary
-                </a>
-            </li>
-            <li class="nav-item" style="width: 40%">
-                <a class="nav-link {% if action == 'restore' %}active{% endif %}" href="javascript:switch_action('restore');" id="switch_restore">
-                    Restore Trash
-                </a>
-            </li>
-        </ul>
-
-        <div class="p-3" style="border-top: 1px solid #dee2e6;">
-            <form id="search_form">
-                {% load bootstrap4 %}
-                {% bootstrap_css %}
-                {{ search_form.media }}
-                {{ search_form.as_p }}
-                <input type="text" class="d-none" name="action" value="{{ action }}">
-                <div class="form-group text-right mt-3">
-                    <button type="submit" class="save btn btn-primary">Search</button>
+            <div class="pl-3 pr-3">
+                <div class="pt-3 mb-3">
+                    <h3>
+                        Import Sequences
+                    </h3>
                 </div>
-            </form>
+                <p>
+                    {{ pageDescription }}
+                </p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert m-3 alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="mt-4">
+
+            </div>
+
+            <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
+                <li class="nav-item" style="width: 50%;">
+                    <a class="nav-link {% if action == 'filter' %}active{% endif %}" href="javascript:switch_action('filter');" id="switch_filter">
+                        Filter Mapillary
+                    </a>
+                </li>
+                <li class="nav-item" style="width: 40%">
+                    <a class="nav-link {% if action == 'restore' %}active{% endif %}" href="javascript:switch_action('restore');" id="switch_restore">
+                        Restore Trash
+                    </a>
+                </li>
+            </ul>
+
+            <div class="p-3" style="border-top: 1px solid #dee2e6;">
+                <form id="search_form">
+                    {% load bootstrap4 %}
+                    {% bootstrap_css %}
+                    {{ search_form.media }}
+                    {{ search_form.as_p }}
+                    <input type="text" class="d-none" name="action" value="{{ action }}">
+                    <div class="form-group text-right mt-3">
+                        <button type="submit" class="save btn btn-primary">Search</button>
+                    </div>
+                </form>
+            </div>
         </div>
+        {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board bg-light">
         <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">

@@ -5,145 +5,148 @@
 {% block content %}
 
 <div class="main-body">
-    <div class="left-side">
-    <div class="market p-3">
-        <div class="market-header pt-3 mb-3">
-            <h3>
-                Marketplace
-            </h3>
-        </div>
-        <div class="market-body">
-            <p>
-                {{ pageDescription }}
-            </p>
-            <p>
-                Created by the team at <a href="https://www.trekview.org/" target="_blank">Trek View</a>.
-            </p>
-        </div>
-    </div>
-    {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        {% endfor %}
-    {% endif %}
-    {% if user.is_authenticated %}
-        <ul class="nav nav-tabs text-center border-bottom-0 justify-content-center" id="myTab" role="tablist">
-            <li class="nav-item" style="width: 22%;">
-                <a class="nav-link {% if pageName == 'Photographers' %}active{% endif %}" href="{% url 'marketplace.photographer_list' page=1 %}">All</a>
-            </li>
-            <li class="nav-item" style="width: 32%;">
-                <a class="nav-link {% if pageName == 'My Jobs' %}active{% endif %}" href="{% url 'marketplace.my_job_list' page=1 %}">My Jobs</a>
-            </li>
-            <li class="nav-item" style="width: 46%;">
-                <a class="nav-link {% if pageName == 'My Photographers' %}active{% endif %}" href="{% url 'marketplace.my_photographer_list' page=1 %}">My Photographers</a>
-            </li>
-        </ul>
-    {% endif %}
-    <div class="photographers p-2">
-        <h4>Photographers for hire</h4>
-        <div class="mb-3 d-flex justify-content-between align-items-center">
-            <p class="mr-auto mb-0"><em><a href="{% url 'marketplace.job_list' page=1 %}">Looking for a job?</a></em></p>
-            <a href="{% url 'marketplace.photographer_create' %}" class="btn btn-outline-primary">Create Photographer</a>
-        </div>
-        
-        <div class="accordion" id="accordionExample">
-            <div class="card">
-                <button class="card-header d-flex flex-row justify-content-between align-items-center pr-2 btn collapsed" id="headingOne" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                    Search Photographer
-                    <i class="fa fa-chevron-down fa-1x"></i>
-                    <i class="fa fa-chevron-up d-none fa-1x"></i>
-                </button>
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="market p-3">
+                <div class="market-header pt-3 mb-3">
+                    <h3>
+                        Marketplace
+                    </h3>
+                </div>
+                <div class="market-body">
+                    <p>
+                        {{ pageDescription }}
+                    </p>
+                    <p>
+                        Created by the team at <a href="https://www.trekview.org/" target="_blank">Trek View</a>.
+                    </p>
+                </div>
+            </div>
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% if user.is_authenticated %}
+                <ul class="nav nav-tabs text-center border-bottom-0 justify-content-center" id="myTab" role="tablist">
+                    <li class="nav-item" style="width: 22%;">
+                        <a class="nav-link {% if pageName == 'Photographers' %}active{% endif %}" href="{% url 'marketplace.photographer_list' page=1 %}">All</a>
+                    </li>
+                    <li class="nav-item" style="width: 32%;">
+                        <a class="nav-link {% if pageName == 'My Jobs' %}active{% endif %}" href="{% url 'marketplace.my_job_list' page=1 %}">My Jobs</a>
+                    </li>
+                    <li class="nav-item" style="width: 46%;">
+                        <a class="nav-link {% if pageName == 'My Photographers' %}active{% endif %}" href="{% url 'marketplace.my_photographer_list' page=1 %}">My Photographers</a>
+                    </li>
+                </ul>
+            {% endif %}
+            <div class="photographers p-2">
+                <h4>Photographers for hire</h4>
+                <div class="mb-3 d-flex justify-content-between align-items-center">
+                    <p class="mr-auto mb-0"><em><a href="{% url 'marketplace.job_list' page=1 %}">Looking for a job?</a></em></p>
+                    <a href="{% url 'marketplace.photographer_create' %}" class="btn btn-outline-primary">Create Photographer</a>
+                </div>
 
-                <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-                    <div class="card-body">
-                        <div class="search-form">
-                            <form method="GET" class="post-form" id="search_form">
-                                {{ form.as_p }}
-                                <div class="form-group text-right mt-3">
-                                    <button type="submit" class="save btn btn-primary">Search</button>
+                <div class="accordion" id="accordionExample">
+                    <div class="card">
+                        <button class="card-header d-flex flex-row justify-content-between align-items-center pr-2 btn collapsed" id="headingOne" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            Search Photographer
+                            <i class="fa fa-chevron-down fa-1x"></i>
+                            <i class="fa fa-chevron-up d-none fa-1x"></i>
+                        </button>
+
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                            <div class="card-body">
+                                <div class="search-form">
+                                    <form method="GET" class="post-form" id="search_form">
+                                        {{ form.as_p }}
+                                        <div class="form-group text-right mt-3">
+                                            <button type="submit" class="save btn btn-primary">Search</button>
+                                        </div>
+                                    </form>
                                 </div>
-                            </form>
+                            </div>
                         </div>
+                    </div>
+                </div>
+                <div class="photographer-card mt-2 mb-2">
+                    <div class="photographer-list">
+                        {% if photographers.count > 0 %}
+                            {% for photographer in photographers %}
+                                <a style="text-decoration: inherit;" href="{% url 'marketplace.photographer_detail' unique_id=photographer.unique_id %}">
+                                    <div class="card photographer p-3 mt-3 mb-3" id="photographer_{{ photographer.unique_id }}" data-photographer-id="{{ photographer.unique_id }}">
+                                        <div class="photographer-title text-info">
+                                            <h5>
+                                                {{ photographer.name }}
+                                            </h5>
+                                        </div>
+
+                                        <div class="photographer-description">
+                                            <p>
+                                                {{ photographer.getShortDescription }}
+                                            </p>
+                                        </div>
+
+                                        <div class="photographer-options">
+                                            <p>
+                                                {{ photographer.getCaptureType }}, {{ photographer.getCaptureMethod }}
+                                            </p>
+                                        </div>
+
+                                        <div class="photographer-created-at text-secondary">
+                                            <h6>
+                                                {{ photographer.created_at }}
+                                            </h6>
+                                        </div>
+
+                                        <div class="photographer-geometry d-none">{{ photographer.geometry }}</div>
+                                    </div>
+                                </a>
+
+                            {% endfor %}
+                        {% else %}
+                            <div class="no-results d-flex justify-content-center align-items-center">
+                                <h5 class="text-info">No results match your criteria.</h5>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="potographer-paginator">
+                        {% if photographers.has_other_pages %}
+                            <ul class="pagination justify-content-center">
+                                {% if photographers.number != 1 %}
+                                    <li class="page-item">
+                                        <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                                    </li>
+                                {% endif %}
+                                {% for i in photographers.paginator.pages %}
+                                    {% if photographers.number == i %}
+                                        <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                                    {% else %}
+                                        <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if photographers.number != photographers.paginator.num_pages %}
+                                    <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ photographers.paginator.num_pages }}'>&raquo;</a></li>
+                                {% else %}
+                                    <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="photographer-card mt-2 mb-2">
-            <div class="photographer-list">
-                {% if photographers.count > 0 %}
-                    {% for photographer in photographers %}
-                        <a style="text-decoration: inherit;" href="{% url 'marketplace.photographer_detail' unique_id=photographer.unique_id %}">
-                            <div class="card photographer p-3 mt-3 mb-3" id="photographer_{{ photographer.unique_id }}" data-photographer-id="{{ photographer.unique_id }}">
-                                <div class="photographer-title text-info">
-                                    <h5>
-                                        {{ photographer.name }}
-                                    </h5>
-                                </div>
-
-                                <div class="photographer-description">
-                                    <p>
-                                        {{ photographer.getShortDescription }}
-                                    </p>
-                                </div>
-
-                                <div class="photographer-options">
-                                    <p>
-                                        {{ photographer.getCaptureType }}, {{ photographer.getCaptureMethod }}
-                                    </p>
-                                </div>
-
-                                <div class="photographer-created-at text-secondary">
-                                    <h6>
-                                        {{ photographer.created_at }}
-                                    </h6>
-                                </div>
-
-                                <div class="photographer-geometry d-none">{{ photographer.geometry }}</div>
-                            </div>
-                        </a>
-
-                    {% endfor %}
-                {% else %}
-                    <div class="no-results d-flex justify-content-center align-items-center">
-                        <h5 class="text-info">No results match your criteria.</h5>
-                    </div>
-                {% endif %}
-            </div>
-            <div class="potographer-paginator">
-                {% if photographers.has_other_pages %}
-                    <ul class="pagination justify-content-center">
-                        {% if photographers.number != 1 %}
-                            <li class="page-item">
-                                <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
-                            </li>
-                        {% else %}
-                            <li class="page-item disabled">
-                                <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
-                            </li>
-                        {% endif %}
-                        {% for i in photographers.paginator.pages %}
-                            {% if photographers.number == i %}
-                                <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
-                            {% else %}
-                                <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
-                            {% endif %}
-                        {% endfor %}
-                        {% if photographers.number != photographers.paginator.num_pages %}
-                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ photographers.paginator.num_pages }}'>&raquo;</a></li>
-                        {% else %}
-                            <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
-                        {% endif %}
-                    </ul>
-                {% endif %}
-            </div>
-        </div>
+        {% include 'components/copyrite.html' %}
     </div>
-</div>
     <div class="right-fixed-board bg-light">
         <div id="map"></div>
     </div>

@@ -5,143 +5,146 @@
 {% block content %}
 
 <div class="main-body">
-    <div class="left-side">
-        <div class="market p-3">
-            <div class="market-header pt-3 mb-3">
-                <h3>
-                    Marketplace
-                </h3>
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="market p-3">
+                <div class="market-header pt-3 mb-3">
+                    <h3>
+                        Marketplace
+                    </h3>
+                </div>
+                <div class="market-body">
+                    <p>
+                        {{ pageDescription }}
+                    </p>
+                    <p>
+                        Created by the team at <a href="https://www.trekview.org/" target="_blank">Trek View</a>.
+                    </p>
+                </div>
             </div>
-            <div class="market-body">
-                <p>
-                    {{ pageDescription }}
-                </p>
-                <p>
-                    Created by the team at <a href="https://www.trekview.org/" target="_blank">Trek View</a>.
-                </p>
-            </div>
-        </div>
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            {% endfor %}
-        {% endif %}
-        {% if user.is_authenticated %}
-            <ul class="nav nav-tabs text-center border-bottom-0 justify-content-center" id="myTab" role="tablist">
-                <li class="nav-item" style="width: 22%;">
-                    <a class="nav-link {% if pageName == 'Jobs' %}active{% endif %}" href="{% url 'marketplace.job_list' page=1 %}">All</a>
-                </li>
-                <li class="nav-item" style="width: 32%;">
-                    <a class="nav-link {% if pageName == 'My Jobs' %}active{% endif %}" href="{% url 'marketplace.my_job_list' page=1 %}">My Jobs</a>
-                </li>
-                <li class="nav-item" style="width: 46%;">
-                    <a class="nav-link {% if pageName == 'My Photographers' %}active{% endif %}" href="{% url 'marketplace.my_photographer_list' page=1 %}">My Photographers</a>
-                </li>
-            </ul>
-        {% endif %}
-        <div class="jobs p-2">
-            <h4>Open job listings</h4>
-            <div class="mb-3 d-flex justify-content-between align-items-center">
-                <p class="mr-auto mb-0"><em><a href="{% url 'marketplace.photographer_list' page=1 %}">Looking for a photographer?</a></em></p>
-                <a href="{% url 'marketplace.job_create' %}" class="btn btn-outline-primary">Create Job</a>
-            </div>
-            <div class="accordion" id="accordionExample">
-                <div class="card">
-                    <button class="card-header d-flex flex-row justify-content-between align-items-center pr-2 btn collapsed" id="headingOne" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                        Search Job
-                        <i class="fa fa-chevron-down fa-1x"></i>
-                        <i class="fa fa-chevron-up d-none fa-1x"></i>
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
-                    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-                        <div class="card-body">
-                            <div class="search-form">
-                                <form method="GET" class="post-form" id="search_form">
-                                    {{ form.as_p }}
-                                    <div class="form-group text-right mt-3">
-                                        <button type="submit" class="save btn btn-primary">Search</button>
-                                    </div>
-                                </form>
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% if user.is_authenticated %}
+                <ul class="nav nav-tabs text-center border-bottom-0 justify-content-center" id="myTab" role="tablist">
+                    <li class="nav-item" style="width: 22%;">
+                        <a class="nav-link {% if pageName == 'Jobs' %}active{% endif %}" href="{% url 'marketplace.job_list' page=1 %}">All</a>
+                    </li>
+                    <li class="nav-item" style="width: 32%;">
+                        <a class="nav-link {% if pageName == 'My Jobs' %}active{% endif %}" href="{% url 'marketplace.my_job_list' page=1 %}">My Jobs</a>
+                    </li>
+                    <li class="nav-item" style="width: 46%;">
+                        <a class="nav-link {% if pageName == 'My Photographers' %}active{% endif %}" href="{% url 'marketplace.my_photographer_list' page=1 %}">My Photographers</a>
+                    </li>
+                </ul>
+            {% endif %}
+            <div class="jobs p-2">
+                <h4>Open job listings</h4>
+                <div class="mb-3 d-flex justify-content-between align-items-center">
+                    <p class="mr-auto mb-0"><em><a href="{% url 'marketplace.photographer_list' page=1 %}">Looking for a photographer?</a></em></p>
+                    <a href="{% url 'marketplace.job_create' %}" class="btn btn-outline-primary">Create Job</a>
+                </div>
+                <div class="accordion" id="accordionExample">
+                    <div class="card">
+                        <button class="card-header d-flex flex-row justify-content-between align-items-center pr-2 btn collapsed" id="headingOne" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            Search Job
+                            <i class="fa fa-chevron-down fa-1x"></i>
+                            <i class="fa fa-chevron-up d-none fa-1x"></i>
+                        </button>
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                            <div class="card-body">
+                                <div class="search-form">
+                                    <form method="GET" class="post-form" id="search_form">
+                                        {{ form.as_p }}
+                                        <div class="form-group text-right mt-3">
+                                            <button type="submit" class="save btn btn-primary">Search</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="job-card mt-2 mb-2">
-                <div class="job-list">
-                    {% if jobs.count > 0 %}
-                        {% for job in jobs %}
-                            <a href="{% url 'marketplace.job_detail' unique_id=job.unique_id %}" style="text-decoration: initial;">
-                                <div class="card job p-3 mt-3 mb-3" id="job_{{ job.unique_id }}" data-job-id="{{ job.unique_id }}">
-                                    <div class="job-title text-info">
-                                        <h5>
-                                            {{ job.name }}
-                                        </h5>
+                <div class="job-card mt-2 mb-2">
+                    <div class="job-list">
+                        {% if jobs.count > 0 %}
+                            {% for job in jobs %}
+                                <a href="{% url 'marketplace.job_detail' unique_id=job.unique_id %}" style="text-decoration: initial;">
+                                    <div class="card job p-3 mt-3 mb-3" id="job_{{ job.unique_id }}" data-job-id="{{ job.unique_id }}">
+                                        <div class="job-title text-info">
+                                            <h5>
+                                                {{ job.name }}
+                                            </h5>
+                                        </div>
+
+                                        <div class="job-description">
+                                            <p>
+                                                {{ job.getShortDescription }}
+                                            </p>
+                                        </div>
+
+                                        <div class="job-options">
+                                            <p>
+                                                {{ job.getOrganisationCategory }}, {{ job.getCaptureType }}, {{ job.getCaptureMethod }}
+                                            </p>
+                                        </div>
+
+                                        <div class="job-created-at text-secondary">
+                                            <h6>
+                                                {{ job.created_at }}
+                                            </h6>
+                                        </div>
+
+                                        <div class="job-geometry d-none">{{ job.geometry }}</div>
                                     </div>
+                                </a>
 
-                                    <div class="job-description">
-                                        <p>
-                                            {{ job.getShortDescription }}
-                                        </p>
-                                    </div>
-
-                                    <div class="job-options">
-                                        <p>
-                                            {{ job.getOrganisationCategory }}, {{ job.getCaptureType }}, {{ job.getCaptureMethod }}
-                                        </p>
-                                    </div>
-
-                                    <div class="job-created-at text-secondary">
-                                        <h6>
-                                            {{ job.created_at }}
-                                        </h6>
-                                    </div>
-
-                                    <div class="job-geometry d-none">{{ job.geometry }}</div>
-                                </div>
-                            </a>
-
-                        {% endfor %}
-                    {% else %}
-                            <div class="no-results d-flex justify-content-center align-items-center">
-                                <h5 class="text-info">No results match your criteria.</h5>
-                            </div>
-                    {% endif %}
-                </div>
-                <div class="job-paginator">
-                    {% if jobs.has_other_pages %}
-                        <ul class="pagination justify-content-center">
-                            {% if jobs.number != 1 %}
-                                <li class="page-item">
-                                    <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
-                                </li>
-                            {% else %}
-                                <li class="page-item disabled">
-                                    <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
-                                </li>
-                            {% endif %}
-                            {% for i in jobs.paginator.pages %}
-                                {% if jobs.number == i %}
-                                    <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
-                                {% else %}
-                                    <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
-                                {% endif %}
                             {% endfor %}
-                            {% if jobs.number != jobs.paginator.num_pages %}
-                                <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ jobs.paginator.num_pages }}'>&raquo;</a></li>
-                            {% else %}
-                                <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
-                            {% endif %}
-                        </ul>
-                    {% endif %}
+                        {% else %}
+                                <div class="no-results d-flex justify-content-center align-items-center">
+                                    <h5 class="text-info">No results match your criteria.</h5>
+                                </div>
+                        {% endif %}
+                    </div>
+                    <div class="job-paginator">
+                        {% if jobs.has_other_pages %}
+                            <ul class="pagination justify-content-center">
+                                {% if jobs.number != 1 %}
+                                    <li class="page-item">
+                                        <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                                    </li>
+                                {% endif %}
+                                {% for i in jobs.paginator.pages %}
+                                    {% if jobs.number == i %}
+                                        <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                                    {% else %}
+                                        <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if jobs.number != jobs.paginator.num_pages %}
+                                    <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ jobs.paginator.num_pages }}'>&raquo;</a></li>
+                                {% else %}
+                                    <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
+        {% include 'components/copyrite.html' %}
     </div>
     <div class="right-fixed-board bg-light">
         <div id="map"></div>

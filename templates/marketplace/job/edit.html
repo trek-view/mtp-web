@@ -5,30 +5,33 @@
 {% block content %}
 
 <div class="main-body">
-    <div class="left-side">
-        <div class="p-4">
-            <h4 class="text-center text-primary">Edit Job</h4>
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="p-4">
+                <h4 class="text-center text-primary">Edit Job</h4>
 
-            <p>Draw the areas you need to capture street-level imagery of:</p>
+                <p>Draw the areas you need to capture street-level imagery of:</p>
 
-            <div class="mapbox-actions d-flex justify-content-between mb-3">
-                <div class="col-6 pl-0 pr-1">
-                    <button class="btn btn-primary w-100" id="draw_polygon">Draw Polygon</button>
+                <div class="mapbox-actions d-flex justify-content-between mb-3">
+                    <div class="col-6 pl-0 pr-1">
+                        <button class="btn btn-primary w-100" id="draw_polygon">Draw Polygon</button>
+                    </div>
+
+                    <div class="col-6 pr-0 pl-1">
+                        <button class="btn btn-danger w-100" id="delete_polygon">Delete Polygon</button>
+                    </div>
                 </div>
 
-                <div class="col-6 pr-0 pl-1">
-                    <button class="btn btn-danger w-100" id="delete_polygon">Delete Polygon</button>
-                </div>
+                <form method="POST" class="post-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="form-group text-right">
+                        <button type="submit" class="save btn btn-primary save-btn">Save</button>
+                    </div>
+                </form>
             </div>
-
-            <form method="POST" class="post-form">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <div class="form-group text-right">
-                    <button type="submit" class="save btn btn-primary save-btn">Save</button>
-                </div>
-            </form>
         </div>
+        {% include 'components/copyrite.html' %}
     </div>
     <div class="right-fixed-board bg-light">
         <div id="map"></div>

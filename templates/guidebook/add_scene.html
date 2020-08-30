@@ -5,194 +5,198 @@
 {% block content %}
     <link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
 <div class="main-body">
-    <div class="left-side p-3">
-        <div class="page-header">
-            <div class="pt-3 mb-3">
+    <div class="left-side p-3 d-flex flex-column justify-content-between">
+        <div>
+            <div class="page-header">
+                <div class="pt-3 mb-3">
+                    <h4>
+                        {{ pageName }}
+                    </h4>
+                </div>
+
+                <p>
+                    {{ pageDescription }}
+                </p>
+            </div>
+            <div class="guidebook-detail card p-2">
+                <div class="main-guidebook">
+                    <div class="guidebook-title text-center text-info mt-1">
+                        <h3>
+                            {{ guidebook.name }}
+                        </h3>
+                    </div>
+
+                    <div class="guidebook-description">
+                        <p class="mb-1">
+                            {{ guidebook.description }}
+                        </p>
+                    </div>
+
+                    <div class="guidebook-category mt-2" style="color: blueviolet;">
+                        <p class="mb-1">
+                            {{ guidebook.category }}
+                        </p>
+                    </div>
+
+                    <div class="guidebook-tag mt-2" style="min-height: 24px;">
+                        {% for tag_name in guidebook.getTags %}
+                            <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                                {{ tag_name }}
+                            </span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="guidebook-created-at text-secondary mt-2 d-flex justify-content-between align-items-center">
+                        <div class="created_at mr-auto">
+                            <span class="">
+                                {{ guidebook.created_at }}
+                            </span>
+                        </div>
+
+                        <div class="username ml-auto">
+                            <span class="" style="color: brown;">
+                                {{ guidebook.user }}
+                            </span>
+                        </div>
+
+
+                    </div>
+
+                    <div class="action text-right mt-2">
+                        <button type="button" class="btn btn-sm btn-primary" id="edit_button">Edit</button>
+                    </div>
+                </div>
+
+                <div class="main-guidebook-form d-none">
+                    <form method="POST" class="post-form" id="guidebook_edit_form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ g_form.as_p }}
+                        <div class="form-group d-flex justify-content-end">
+                            <button type="button" class="btn btn-sm btn-primary save-btn mr-2" id="guidebook_save_button">Save</button>
+                            <button type="button" class="btn btn-sm btn-dark" id="guidebook_cancel_button">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <hr class="mt-3 mb-1" />
+
+                <div class="guidebook-others float-right d-flex flex-row justify-content-between mt-2">
+                    <div class="scenes text-center">
+                        {% if guidebook.getSceneCount == 0 %}
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                        {% else %}
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                        {% endif %}
+                        <span class="text-center m-0">
+                            {{ guidebook.getSceneCount }} Photos
+                        </span>
+                    </div>
+                    <div class="like text-center">
+                        {% if guidebook.getLikeCount == 0 %}
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
+                        {% else %}
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
+                        {% endif %}
+                        <span class="text-center m-0">
+                            {{ guidebook.getLikeCount }} Likes
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
                 <h4>
-                    {{ pageName }}
+                    Scene List:
                 </h4>
             </div>
 
-            <p>
-                {{ pageDescription }}
-            </p>
-        </div>
-        <div class="guidebook-detail card p-2">
-            <div class="main-guidebook">
-                <div class="guidebook-title text-center text-info mt-1">
-                    <h3>
-                        {{ guidebook.name }}
-                    </h3>
+            <div class="mt-2 p-1 border scene-list list_container" id="scene_list">
+                {% for scene in guidebook.getScenes %}
+                    <div class="list_item">
+                        <div class="scene-box p-1 mt-2 mb-2" id="scene_{{ scene.pk }}" data-scene-id="{{ scene.pk }}" data-image_key="{{ scene.image_key }}" style="cursor: pointer">
+                            <form method="POST" class="post-form has-validation-callback" id="add_scene_form_{{ scene.pk }}">
+                                {% csrf_token %}
+                                <input type="number" name="scene_id" class="d-none" value="{{ scene.pk }}" id="id_scene_id">
+                                <input type="text" name="image_key" class="form-control d-none" value="{{ scene.image_key }}" required="" id="id_image_key">
+                                <input type="text" name="title" class="form-control mb-1" disabled="disabled" value="{{ scene.title }}" placeholder="Scene Title" required="" id="id_title">
+                                <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_description">{{ scene.description }}</textarea>
+                                <input type="text" name="lat" class="form-control d-none" value="{{ scene.lat }}" required="" id="id_lat">
+                                <input type="text" name="lng" class="form-control d-none" value="{{ scene.lng }}" required="" id="id_lng">
+                                <div class="text-right">
+                                    <button type="button" class="btn btn-sm btn-info point_list" data-scene-id="{{ scene.pk }}">Edit POI's ({{ scene.getPOICount }})</button>
+                                    <button type="button" id="change_scene_button" class="save btn btn-sm btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Edit information</button>
+                                    <button type="button" id="save_scene_button" class="save btn btn-sm btn-primary save-btn d-none" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', {{ scene.pk }})">Save</button>
+                                    <button type="button" class="btn btn-sm btn-danger delete_scene_button" data-scene-id="{{ scene.pk }}">Delete</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="add-new-scene mt-3 text-right">
+                <button type="button" class="btn btn-primary">Add Scene</button>
+            </div>
+
+            <div class="new-scene-box d-none">
+                <div class="mt-3">
+                    <h5>
+                        New Scene:
+                    </h5>
                 </div>
 
-                <div class="guidebook-description">
-                    <p class="mb-1">
-                        {{ guidebook.description }}
+                <div class="card mt-2 p-1 add-scene-form">
+                    <p class="mt-2 mb-2 text-center">
+                        Find an image on the map to use with this scene. When you're happy with the image, add a scene title and description and click save scene
                     </p>
-                </div>
-
-                <div class="guidebook-category mt-2" style="color: blueviolet;">
-                    <p class="mb-1">
-                        {{ guidebook.category }}
-                    </p>
-                </div>
-
-                <div class="guidebook-tag mt-2" style="min-height: 24px;">
-                    {% for tag_name in guidebook.getTags %}
-                        <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
-                            {{ tag_name }}
-                        </span>
-                    {% endfor %}
-                </div>
-
-                <div class="guidebook-created-at text-secondary mt-2 d-flex justify-content-between align-items-center">
-                    <div class="created_at mr-auto">
-                        <span class="">
-                            {{ guidebook.created_at }}
-                        </span>
-                    </div>
-
-                    <div class="username ml-auto">
-                        <span class="" style="color: brown;">
-                            {{ guidebook.user }}
-                        </span>
-                    </div>
-
-
-                </div>
-
-                <div class="action text-right mt-2">
-                    <button type="button" class="btn btn-sm btn-primary" id="edit_button">Edit</button>
-                </div>
-            </div>
-
-            <div class="main-guidebook-form d-none">
-                <form method="POST" class="post-form" id="guidebook_edit_form" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ g_form.as_p }}
-                    <div class="form-group d-flex justify-content-end">
-                        <button type="button" class="btn btn-sm btn-primary save-btn mr-2" id="guidebook_save_button">Save</button>
-                        <button type="button" class="btn btn-sm btn-dark" id="guidebook_cancel_button">Cancel</button>
-                    </div>
-                </form>
-            </div>
-
-            <hr class="mt-3 mb-1" />
-
-            <div class="guidebook-others float-right d-flex flex-row justify-content-between mt-2">
-                <div class="scenes text-center">
-                    {% if guidebook.getSceneCount == 0 %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
-                    {% else %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
-                    {% endif %}
-                    <span class="text-center m-0">
-                        {{ guidebook.getSceneCount }} Photos
-                    </span>
-                </div>
-                <div class="like text-center">
-                    {% if guidebook.getLikeCount == 0 %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
-                    {% else %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
-                    {% endif %}
-                    <span class="text-center m-0">
-                        {{ guidebook.getLikeCount }} Likes
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-3">
-            <h4>
-                Scene List:
-            </h4>
-        </div>
-
-        <div class="mt-2 p-1 border scene-list list_container" id="scene_list">
-            {% for scene in guidebook.getScenes %}
-                <div class="list_item">
-                    <div class="scene-box p-1 mt-2 mb-2" id="scene_{{ scene.pk }}" data-scene-id="{{ scene.pk }}" data-image_key="{{ scene.image_key }}" style="cursor: pointer">
-                        <form method="POST" class="post-form has-validation-callback" id="add_scene_form_{{ scene.pk }}">
+                    <p class="error text-danger text-center">This scene already exists in this guidebook.</p>
+                    <div class="scene-box p-1 mt-2 mb-2" id="scene_0" data-scene-id="0">
+                        <form method="POST" class="post-form has-validation-callback" id="add_scene_form_0">
                             {% csrf_token %}
-                            <input type="number" name="scene_id" class="d-none" value="{{ scene.pk }}" id="id_scene_id">
-                            <input type="text" name="image_key" class="form-control d-none" value="{{ scene.image_key }}" required="" id="id_image_key">
-                            <input type="text" name="title" class="form-control mb-1" disabled="disabled" value="{{ scene.title }}" placeholder="Scene Title" required="" id="id_title">
-                            <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_description">{{ scene.description }}</textarea>
-                            <input type="text" name="lat" class="form-control d-none" value="{{ scene.lat }}" required="" id="id_lat">
-                            <input type="text" name="lng" class="form-control d-none" value="{{ scene.lng }}" required="" id="id_lng">
+                            <input type="number" name="scene_id" class="d-none" id="id_new_scene_id" disabled value="0">
+                            <input type="text" name="image_key" class="form-control d-none" disabled required="" id="id_new_image_key">
+                            <input type="text" name="title" class="form-control mb-1" disabled placeholder="Scene Title" required="" id="id_new_title">
+                            <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_new_description">{{ scene.description }}</textarea>
+                            <input type="text" name="lat" class="form-control d-none " disabled  required="" id="id_new_lat">
+                            <input type="text" name="lng" class="form-control d-none" disabled  required="" id="id_new_lng">
                             <div class="text-right">
-                                <button type="button" class="btn btn-sm btn-info point_list" data-scene-id="{{ scene.pk }}">Edit POI's ({{ scene.getPOICount }})</button>
-                                <button type="button" id="change_scene_button" class="save btn btn-sm btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Edit information</button>
-                                <button type="button" id="save_scene_button" class="save btn btn-sm btn-primary save-btn d-none" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', {{ scene.pk }})">Save</button>
-                                <button type="button" class="btn btn-sm btn-danger delete_scene_button" data-scene-id="{{ scene.pk }}">Delete</button>
+                                <button type="button" id="save_scene_button" class="save btn btn-sm btn-primary save-btn" disabled="" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', 0)">Save New Scene</button>
+                                <button type="button" class="cancel btn btn-dark btn-sm">Abandon</button>
                             </div>
                         </form>
                     </div>
                 </div>
-            {% endfor %}
-        </div>
-
-        <div class="add-new-scene mt-3 text-right">
-            <button type="button" class="btn btn-primary">Add Scene</button>
-        </div>
-
-        <div class="new-scene-box d-none">
-            <div class="mt-3">
-                <h5>
-                    New Scene:
-                </h5>
             </div>
 
-            <div class="card mt-2 p-1 add-scene-form">
-                <p class="mt-2 mb-2 text-center">
-                    Find an image on the map to use with this scene. When you're happy with the image, add a scene title and description and click save scene
-                </p>
-                <p class="error text-danger text-center">This scene already exists in this guidebook.</p>
-                <div class="scene-box p-1 mt-2 mb-2" id="scene_0" data-scene-id="0">
-                    <form method="POST" class="post-form has-validation-callback" id="add_scene_form_0">
+            <div class="card p-2 mt-2">
+                <div class="">
+                    <form method="POST" id="delete_guidebook_form" class="d-flex align-items-center" action="{% url 'guidebook.guidebook_delete' unique_id=guidebook.unique_id %}">
                         {% csrf_token %}
-                        <input type="number" name="scene_id" class="d-none" id="id_new_scene_id" disabled value="0">
-                        <input type="text" name="image_key" class="form-control d-none" disabled required="" id="id_new_image_key">
-                        <input type="text" name="title" class="form-control mb-1" disabled placeholder="Scene Title" required="" id="id_new_title">
-                        <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_new_description">{{ scene.description }}</textarea>
-                        <input type="text" name="lat" class="form-control d-none " disabled  required="" id="id_new_lat">
-                        <input type="text" name="lng" class="form-control d-none" disabled  required="" id="id_new_lng">
-                        <div class="text-right">
-                            <button type="button" id="save_scene_button" class="save btn btn-sm btn-primary save-btn" disabled="" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', 0)">Save New Scene</button>
-                            <button type="button" class="cancel btn btn-dark btn-sm">Abandon</button>
+                        <div class="d-flex flex-row justify-content-between w-100">
+                            <div class="publish-guidebook text-center {% if guidebook.getSceneCount == 0 %}d-none{% endif %} ">
+                                {% if guidebook.is_approved and guidebook.is_published %}
+                                    <button type="button" class="btn btn-secondary" id="publish_swithch_guidebook">Unpublish</button>
+                                {% elif guidebook.is_approved and not guidebook.is_published %}
+                                    <button type="button" class="btn btn-success" id="publish_swithch_guidebook">Publish Now</button>
+                                {% endif %}
+                            </div>
+
+                            <div class="preview-guidebook text-center">
+                                <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
+                                    <button type="button" class="btn btn-info">Preview</button>
+                                </a>
+                            </div>
+
+                            <div class="text-center delete-gudiebook">
+                                <button type="button" id="delete_guidebook" class="btn btn-danger">Delete</button>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-
-        <div class="card p-2 mt-2">
-            <div class="">
-                <form method="POST" id="delete_guidebook_form" class="d-flex align-items-center" action="{% url 'guidebook.guidebook_delete' unique_id=guidebook.unique_id %}">
-                    {% csrf_token %}
-                    <div class="d-flex flex-row justify-content-between w-100">
-                        <div class="publish-guidebook text-center {% if guidebook.getSceneCount == 0 %}d-none{% endif %} ">
-                            {% if guidebook.is_approved and guidebook.is_published %}
-                                <button type="button" class="btn btn-secondary" id="publish_swithch_guidebook">Unpublish</button>
-                            {% elif guidebook.is_approved and not guidebook.is_published %}
-                                <button type="button" class="btn btn-success" id="publish_swithch_guidebook">Publish Now</button>
-                            {% endif %}
-                        </div>
-
-                        <div class="preview-guidebook text-center">
-                            <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
-                                <button type="button" class="btn btn-info">Preview</button>
-                            </a>
-                        </div>
-
-                        <div class="text-center delete-gudiebook">
-                            <button type="button" id="delete_guidebook" class="btn btn-danger">Delete</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+    
+        {% include 'components/copyrite.html' %}
     </div>
     <div class="left-side poi-box p-2 d-none">
         <div class="hide-poi-box text-right mt-3">

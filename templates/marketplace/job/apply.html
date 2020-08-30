@@ -5,51 +5,54 @@
 {% block content %}
 
 <div class="main-body">
-    <div class="left-side">
-        <div class="p-4 mt-3">
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="p-4 mt-3">
 
-            <div class="card p-3 mt-3 mb-3" id="job_{{ job.unique_id }}" data-job-id="{{ job.unique_id }}">
-                <div class="job-title text-info">
-                    <h5>
-                        {{ job.name }}
-                    </h5>
-                </div>
-                
-                <div class="job-description">
-                    <p>
-                        {{ job.getShortDescription }}
-                    </p>
+                <div class="card p-3 mt-3 mb-3" id="job_{{ job.unique_id }}" data-job-id="{{ job.unique_id }}">
+                    <div class="job-title text-info">
+                        <h5>
+                            {{ job.name }}
+                        </h5>
+                    </div>
+
+                    <div class="job-description">
+                        <p>
+                            {{ job.getShortDescription }}
+                        </p>
+                    </div>
+
+                    <div class="job-options">
+                        <p>
+                            {{ job.getOrganisationCategory }}, {{ job.getCaptureType }}, {{ job.getCaptureMethod }}{% if job.getIsPaid != '' %}, {{ job.getIsPaid }}{% endif %}
+                        </p>
+                    </div>
+
+                    <div class="job-created-at text-secondary">
+                        <h6>
+                            {{ job.created_at }}
+                        </h6>
+                    </div>
+
+                    <div class="job-geometry d-none">{{ job.geometry }}</div>
                 </div>
 
-                <div class="job-options">
-                    <p>
-                        {{ job.getOrganisationCategory }}, {{ job.getCaptureType }}, {{ job.getCaptureMethod }}{% if job.getIsPaid != '' %}, {{ job.getIsPaid }}{% endif %}
-                    </p>
-                </div>
+                <h4>Apply to this job</h4>
 
-                <div class="job-created-at text-secondary">
-                    <h6>
-                        {{ job.created_at }}
-                    </h6>
-                </div>
-                
+                <p>Send an email to this organisation to register your interest in this job by filling in the form below. Don't forget to include links to your portfolio of work.</p>
+
+                <form method="POST" class="post-form mt-3">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="form-group text-right">
+                        <button type="submit" class="save btn btn-primary">Send</button>
+                    </div>
+                </form>
+
                 <div class="job-geometry d-none">{{ job.geometry }}</div>
             </div>
-
-            <h4>Apply to this job</h4>
-
-            <p>Send an email to this organisation to register your interest in this job by filling in the form below. Don't forget to include links to your portfolio of work.</p>
-
-            <form method="POST" class="post-form mt-3">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <div class="form-group text-right">
-                    <button type="submit" class="save btn btn-primary">Send</button>
-                </div>
-            </form>
-
-            <div class="job-geometry d-none">{{ job.geometry }}</div>
         </div>
+        {% include 'components/copyrite.html' %}
     </div>
     <div class="right-fixed-board bg-light">
         <div id="map"></div>

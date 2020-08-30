@@ -5,66 +5,69 @@
 {% block content %}
 
 <div class="main-body">
-    <div class="left-side">
-        <div class="photographer-detail p-5">
-            <h4 class="text-center text-primary">Photographer Detail</h4>
-            <div>
-                <h6 class="">
-                    Name:
-                </h6>
-                <p class="">
-                    {{ photographer.name }}
-                </p>
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="photographer-detail p-5">
+                <h4 class="text-center text-primary">Photographer Detail</h4>
+                <div>
+                    <h6 class="">
+                        Name:
+                    </h6>
+                    <p class="">
+                        {{ photographer.name }}
+                    </p>
+                </div>
+
+                <div>
+                    <h6 class="">
+                        Business Name:
+                    </h6>
+                    <p class="">
+                        {{ photographer.business_name }}
+                    </p>
+                </div>
+
+                <div>
+                    <h6 class="">
+                        Business Website:
+                    </h6>
+                    <p class="">
+                        <a href="{{ photographer.business_website }}" target="_blank">{{ photographer.business_website }}</a>
+                    </p>
+                </div>
+
+                <div>
+                    <h6 class="">
+                        Business Email:
+                    </h6>
+                    <p class="">
+                        {{ photographer.business_email }}
+                    </p>
+                </div>
+
+                <div>
+                    <h6 class="">
+                        Description:
+                    </h6>
+                    <p class="">
+                        {{ photographer.description }}
+                    </p>
+                </div>
+
+                <p class="d-none" id="id_geometry">{{ photographer.geometry }}</p>
+
+                <div>
+                    <h6 class="">
+                        Date Time:
+                    </h6>
+                    <p class="">
+                        {{ photographer.updated_at }}
+                    </p>
+                </div>
+
             </div>
-
-            <div>
-                <h6 class="">
-                    Business Name:
-                </h6>
-                <p class="">
-                    {{ photographer.business_name }}
-                </p>
-            </div>
-
-            <div>
-                <h6 class="">
-                    Business Website:
-                </h6>
-                <p class="">
-                    <a href="{{ photographer.business_website }}" target="_blank">{{ photographer.business_website }}</a>
-                </p>
-            </div>
-
-            <div>
-                <h6 class="">
-                    Business Email:
-                </h6>
-                <p class="">
-                    {{ photographer.business_email }}
-                </p>
-            </div>
-
-            <div>
-                <h6 class="">
-                    Description:
-                </h6>
-                <p class="">
-                    {{ photographer.description }}
-                </p>
-            </div>
-
-            <p class="d-none" id="id_geometry">{{ photographer.geometry }}</p>
-
-            <div>
-                <h6 class="">
-                    Date Time:
-                </h6>
-                <p class="">
-                    {{ photographer.updated_at }}
-                </p>
-            </div>
-
         </div>
+        {% include 'components/copyrite.html' %}
     </div>
     <div class="right-fixed-board bg-light">
         <div id="map"></div>

@@ -6,135 +6,140 @@
 
 <link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
 <div class="main-body">
-    <div class="left-side p-3">
-        <div class="text-right mt-2 mb-2">
-            <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
-        </div>
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert m-3 alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    <div class="left-side p-3 d-flex flex-column justify-content-between">
+        <div>
+            <div class="text-right mt-2 mb-2">
+                <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
             </div>
-            {% endfor %}
-        {% endif %}
-
-        <div class="p-2 item-detail card">
-            <div class="text-right mb-3">
-                <a class="ml-auto" target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
-                    <img style="width: 170px" class="mt-2" src="{% static "images/icon/mapillary_icon.png" %}">
-                </a>
-            </div>
-
-            <div class="mtp-sequence-data">
-                <div class="mt-2" id="sequence_name">
-                    <label class="col-4">Title: </label>
-                    <span class="col-8">{{ sequence.name }}</span>
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert m-3 alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-
-                <div class="d-flex mt-2" id="sequence_description">
-                    <label class="col-4">Description: </label>
-                    <div class="col-8">
-                        <span class="">{{ sequence.description }}</span>
-                    </div>
-                </div>
-
-                <div class="mt-2" id="sequence_transport_type">
-                    <label class="col-4">Transport Type: </label>
-                    <span class="col-8">{{ sequence.transport_type }}</span>
-                </div>
-
-                <div class="mt-2 d-flex" id="sequence_tags">
-                    <label class="col-4">Tags: </label>
-                    <div class="col-8">
-                        {% for tag in sequence.getTags %}
-                            <span class="tag">{{ tag }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div class="mt-2" id="sequence_user">
-                    <label class="col-4">Username: </label>
-                    <span class="col-8">{{ sequence.user.username }}</span>
-                </div>
-
-
-                <div class="mt-2" id="sequence_captured_at">
-                    <label class="col-4">Captured Time: </label>
-                    <span class="col-8">{{ sequence.captured_at }}</span>
-                </div>
-
-                <div class="mt-2" id="sequence_captured_at">
-                    <label class="col-4">Uploaded Time: </label>
-                    <span class="col-8">{{ sequence.created_at }}</span>
-                </div>
-            </div>
-
-            {% if user.is_authenticated and sequence.user == user %}
-                <div class="edit-form d-none">
-                    <form id="edit_form">
-                        {% csrf_token %}
-                        {{ addSequenceForm.as_p }}
-                        <div class="text-right mt-3">
-                            <button type="button" class="btn btn-primary btn-save btn-sm">Save</button>
-                            <button type="button" class="btn btn-dark btn-cancel btn-sm">Cancel</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="mt-3 text-right actions">
-                    <button type="button" class="btn btn-primary btn-edit btn-sm">Edit</button>
-                </div>
+                {% endfor %}
             {% endif %}
 
-            <hr class="mt-3 mb-1">
+            <div class="p-2 item-detail card">
+                <div class="text-right mb-3">
+                    <a class="ml-auto" target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
+                        <img style="width: 170px" class="mt-2" src="{% static "images/icon/mapillary_icon.png" %}">
+                    </a>
+                </div>
 
-            <div class="sequence-others float-right d-flex flex-row justify-content-between mt-2">
-                <div class="scenes text-center">
-                    {% if sequence.getImageCount == 0 %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
-                    {% else %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
-                    {% endif %}
-                    <span class="text-center m-0">
-                        {{ sequence.getImageCount }} Photos
-                    </span>
+                <div class="mtp-sequence-data">
+                    <div class="mt-2" id="sequence_name">
+                        <label class="col-4">Title: </label>
+                        <span class="col-8">{{ sequence.name }}</span>
+                    </div>
+
+                    <div class="d-flex mt-2" id="sequence_description">
+                        <label class="col-4">Description: </label>
+                        <div class="col-8">
+                            <span class="">{{ sequence.description }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-2" id="sequence_transport_type">
+                        <label class="col-4">Transport Type: </label>
+                        <span class="col-8">{{ sequence.transport_type }}</span>
+                    </div>
+
+                    <div class="mt-2 d-flex" id="sequence_tags">
+                        <label class="col-4">Tags: </label>
+                        <div class="col-8">
+                            {% for tag in sequence.getTags %}
+                                <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-2" id="sequence_user">
+                        <label class="col-4">Username: </label>
+                        <span class="col-8">{{ sequence.user.username }}</span>
+                    </div>
+
+
+                    <div class="mt-2" id="sequence_captured_at">
+                        <label class="col-4">Captured Time: </label>
+                        <span class="col-8">{{ sequence.captured_at }}</span>
+                    </div>
+
+                    <div class="mt-2" id="sequence_captured_at">
+                        <label class="col-4">Uploaded Time: </label>
+                        <span class="col-8">{{ sequence.created_at }}</span>
+                    </div>
                 </div>
-                <div class="like text-center">
-                    {% if sequence.getLikeCount == 0 %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
-                    {% else %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
-                    {% endif %}
-                    <span class="text-center m-0">
-                        {{ sequence.getLikeCount }} Likes
-                    </span>
+
+                {% if user.is_authenticated and sequence.user == user %}
+                    <div class="edit-form d-none">
+                        <form id="edit_form">
+                            {% csrf_token %}
+                            {{ addSequenceForm.as_p }}
+                            <div class="text-right mt-3">
+                                <button type="button" class="btn btn-primary btn-save btn-sm">Save</button>
+                                <button type="button" class="btn btn-dark btn-cancel btn-sm">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="mt-3 text-right actions">
+                        <button type="button" class="btn btn-primary btn-edit btn-sm">Edit</button>
+                    </div>
+                {% endif %}
+
+                <hr class="mt-3 mb-1">
+
+                <div class="sequence-others float-right d-flex flex-row justify-content-between mt-2">
+                    <div class="scenes text-center">
+                        {% if sequence.getImageCount == 0 %}
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                        {% else %}
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                        {% endif %}
+                        <span class="text-center m-0">
+                            {{ sequence.getImageCount }} Photos
+                        </span>
+                    </div>
+                    <div class="like text-center">
+                        {% if sequence.getLikeCount == 0 %}
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
+                        {% else %}
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
+                        {% endif %}
+                        <span class="text-center m-0">
+                            {{ sequence.getLikeCount }} Likes
+                        </span>
+                    </div>
                 </div>
+            </div>
+            {% if request.user.is_authenticated and request.user == sequence.user %}
+                <div class="card mt-3 text-center">
+                    <div class="pt-2 pb-2">
+                        <form method="POST" id="delete_sequence_form" class="d-flex align-items-center" action="{% url 'sequence.sequence_delete' unique_id=sequence.unique_id %}">
+                            {% csrf_token %}
+                            <div class="col publish-sequence text-center">
+                                {% if sequence.is_published %}
+                                    <button type="button" class="btn btn-success" id="publish_swithch_sequence">Published</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-dark" id="publish_swithch_sequence">Unpublished</button>
+                                {% endif %}
+                            </div>
+
+                            <div class="col text-center delete-sequence">
+                                <button type="button" id="delete_sequence" class="btn btn-danger">Delete</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="image-table mt-4" id="image_list">
             </div>
         </div>
-        {% if request.user.is_authenticated and request.user == sequence.user %}
-            <div class="card mt-3 text-center">
-                <div class="pt-2 pb-2">
-                    <form method="POST" id="delete_sequence_form" class="d-flex align-items-center" action="{% url 'sequence.sequence_delete' unique_id=sequence.unique_id %}">
-                        {% csrf_token %}
-                        <div class="col publish-sequence text-center">
-                            {% if sequence.is_published %}
-                                <button type="button" class="btn btn-success" id="publish_swithch_sequence">Published</button>
-                            {% else %}
-                                <button type="button" class="btn btn-dark" id="publish_swithch_sequence">Unpublished</button>
-                            {% endif %}
-                        </div>
-
-                        <div class="col text-center delete-sequence">
-                            <button type="button" id="delete_sequence" class="btn btn-danger">Delete</button>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        {% endif %}
+        {% include 'components/copyrite.html' %}
     </div>
 
     <div class="right-board bg-light">
@@ -142,9 +147,7 @@
             <div class="sequence-viewer" id="sequence_viewer">
 
             </div>
-            <div class="image-table mt-4" id="image_list">
 
-            </div>
 
         </div>
     </div>

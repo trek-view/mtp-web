@@ -5,51 +5,54 @@
 {% block content %}
 
 <div class="main-body">
-    <div class="left-side">
-        <div class="p-4 mt-3">
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="p-4 mt-3">
 
-            <div class="card p-3 mt-3 mb-3" id="photographer_{{ photographer.unique_id }}" data-photographer-id="{{ photographer.unique_id }}">
-                <div class="photographer-title text-info">
-                    <h5>
-                        {{ photographer.name }}
-                    </h5>
-                </div>
-                
-                <div class="photographer-description">
-                    <p>
-                        {{ photographer.getShortDescription }}
-                    </p>
+                <div class="card p-3 mt-3 mb-3" id="photographer_{{ photographer.unique_id }}" data-photographer-id="{{ photographer.unique_id }}">
+                    <div class="photographer-title text-info">
+                        <h5>
+                            {{ photographer.name }}
+                        </h5>
+                    </div>
+
+                    <div class="photographer-description">
+                        <p>
+                            {{ photographer.getShortDescription }}
+                        </p>
+                    </div>
+
+                    <div class="photographer-options">
+                        <p>
+                            {{ photographer.getCaptureType }}, {{ photographer.getCaptureMethod }}
+                        </p>
+                    </div>
+
+                    <div class="photographer-created-at text-secondary">
+                        <h6>
+                            {{ photographer.created_at }}
+                        </h6>
+                    </div>
+
+                    <div class="photographer-geometry d-none">{{ photographer.geometry }}</div>
                 </div>
 
-                <div class="photographer-options">
-                    <p>
-                        {{ photographer.getCaptureType }}, {{ photographer.getCaptureMethod }}
-                    </p>
-                </div>
+                <h4>Contact this photographer</h4>
 
-                <div class="photographer-created-at text-secondary">
-                    <h6>
-                        {{ photographer.created_at }}
-                    </h6>
-                </div>
-                
+                <p>Send an email to this photographer to find out more about their services by filling in the form below. Don't forget to include links to further information about your job(s).</p>
+
+                <form method="POST" class="post-form mt-3">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="form-group text-right">
+                        <button type="submit" class="save btn btn-primary">Send</button>
+                    </div>
+                </form>
+
                 <div class="photographer-geometry d-none">{{ photographer.geometry }}</div>
             </div>
-
-            <h4>Contact this photographer</h4>
-
-            <p>Send an email to this photographer to find out more about their services by filling in the form below. Don't forget to include links to further information about your job(s).</p>
-
-            <form method="POST" class="post-form mt-3">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <div class="form-group text-right">
-                    <button type="submit" class="save btn btn-primary">Send</button>
-                </div>
-            </form>
-
-            <div class="photographer-geometry d-none">{{ photographer.geometry }}</div>
         </div>
+        {% include 'components/copyrite.html' %}
     </div>
     <div class="right-fixed-board bg-light">
         <div id="map"></div>

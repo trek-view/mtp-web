@@ -46,6 +46,12 @@ class SequenceAdmin(admin.ModelAdmin):
         'description'
     )
 
+    def queryset(self):
+        qs = super(SequenceAdmin, self).queryset()
+        if self.is_transport:  # however you get your condition
+           return qs.filter()  # whatever rows need to be included
+
+
 admin.site.register(TransType, TransTypeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Sequence, SequenceAdmin)

@@ -5,128 +5,132 @@
 {% block content %}
 
 <div class="main-body">
-    <div class="left-side">
-        <div class="pl-3 pr-3 mt-5 mb-3 text-right">
-            <em>
-                <a href="{% url 'tour.tour_list' %}">
-                    Go to Tour List
-                </a>
-            </em>
-        </div>
-        <div class="card m-3 p-2">
-            <div class="tour-detail ">
-                <div class="tour-name text-center text-info mt-1">
-                    <h3>
-                        {{ tour.name }}
-                    </h3>
-                </div>
-
-                <div class="tour-description">
-                    <p class="mb-1">
-                        {{ tour.description }}
-                    </p>
-                </div>
-                <div class="tour-tag">
-                    {% for tag_name in tour.getTags %}
-                        <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
-                            {{ tag_name }}
-                        </span>
-                    {% endfor %}
-                </div>
-
-                <div class="action text-right mt-2">
-                    <button type="button" class="btn btn-sm btn-primary" id="edit_button">Edit</button>
-                </div>
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="pl-3 pr-3 mt-5 mb-3 text-right">
+                <em>
+                    <a href="{% url 'tour.tour_list' %}">
+                        Go to Tour List
+                    </a>
+                </em>
             </div>
 
-            <div class="tour-detail-form d-none">
-                <form method="POST" class="post-form" id="tour_edit_form">
-                    {% csrf_token %}
-                    {{ t_form.as_p }}
-                    <div class="form-group d-flex justify-content-end">
-                        <button type="button" class="btn btn-sm btn-primary save-btn mr-2" id="tour_save_button">Save</button>
-                        <button type="button" class="btn btn-sm btn-dark" id="tour_cancel_button">Cancel</button>
+            <div class="card m-3 p-2">
+                <div class="tour-detail ">
+                    <div class="tour-name text-center text-info mt-1">
+                        <h3>
+                            {{ tour.name }}
+                        </h3>
                     </div>
-                </form>
-            </div>
 
-            <hr class="mt-3 mb-1">
+                    <div class="tour-description">
+                        <p class="mb-1">
+                            {{ tour.description }}
+                        </p>
+                    </div>
+                    <div class="tour-tag">
+                        {% for tag_name in tour.getTags %}
+                            <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                                {{ tag_name }}
+                            </span>
+                        {% endfor %}
+                    </div>
 
-            <div class="tour-others float-right d-flex flex-row justify-content-between mt-2">
-                <div class="scenes text-center">
-                    {% if tour.getImageCount == 0 %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
-                    {% else %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
-                    {% endif %}
-                    <span class="text-center m-0">
-                        {{ tour.getImageCount }} Photos
-                    </span>
+                    <div class="action text-right mt-2">
+                        <button type="button" class="btn btn-sm btn-primary" id="edit_button">Edit</button>
+                    </div>
                 </div>
-                <div class="like text-center">
-                    {% if tour.getLikeCount == 0 %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
-                    {% else %}
-                        <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
-                    {% endif %}
-                    <span class="text-center m-0">
-                        {{ tour.getLikeCount }} Likes
-                    </span>
-                </div>
-            </div>
-        </div>
 
-        <div class="card m-3 p-2 text-center">
-            <div class="">
-                <form method="POST" id="delete_tour_form" class="d-flex align-items-center" action="{% url 'tour.tour_delete' unique_id=tour.unique_id %}">
-                    {% csrf_token %}
-                    <div class="col publish-tour text-center {% if tour.getSequenceCount == 0 %}d-none{% endif %} ">
-                        {% if tour.is_published %}
-                            <button type="button" class="btn btn-success" id="publish_swithch_tour">Published</button>
+                <div class="tour-detail-form d-none">
+                    <form method="POST" class="post-form" id="tour_edit_form">
+                        {% csrf_token %}
+                        {{ t_form.as_p }}
+                        <div class="form-group d-flex justify-content-end">
+                            <button type="button" class="btn btn-sm btn-primary save-btn mr-2" id="tour_save_button">Save</button>
+                            <button type="button" class="btn btn-sm btn-dark" id="tour_cancel_button">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <hr class="mt-3 mb-1">
+
+                <div class="tour-others float-right d-flex flex-row justify-content-between mt-2">
+                    <div class="scenes text-center">
+                        {% if tour.getImageCount == 0 %}
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
                         {% else %}
-                            <button type="button" class="btn btn-dark" id="publish_swithch_tour">Unpublished</button>
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
                         {% endif %}
+                        <span class="text-center m-0">
+                            {{ tour.getImageCount }} Photos
+                        </span>
                     </div>
-
-                    <div class="col preview-tour text-center">
-                        <a href="{% url 'tour.tour_detail' unique_id=tour.unique_id %}">
-                            <button type="button" class="btn btn-info">Preview</button>
-                        </a>
+                    <div class="like text-center">
+                        {% if tour.getLikeCount == 0 %}
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
+                        {% else %}
+                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
+                        {% endif %}
+                        <span class="text-center m-0">
+                            {{ tour.getLikeCount }} Likes
+                        </span>
                     </div>
+                </div>
+            </div>
 
-                    <div class="col text-center delete-tour">
-                        <button type="button" id="delete_tour" class="btn btn-danger">Delete</button>
-                    </div>
+            <div class="card m-3 p-2 text-center">
+                <div class="">
+                    <form method="POST" id="delete_tour_form" class="d-flex align-items-center" action="{% url 'tour.tour_delete' unique_id=tour.unique_id %}">
+                        {% csrf_token %}
+                        <div class="col publish-tour text-center {% if tour.getSequenceCount == 0 %}d-none{% endif %} ">
+                            {% if tour.is_published %}
+                                <button type="button" class="btn btn-success" id="publish_swithch_tour">Published</button>
+                            {% else %}
+                                <button type="button" class="btn btn-dark" id="publish_swithch_tour">Unpublished</button>
+                            {% endif %}
+                        </div>
 
-                </form>
+                        <div class="col preview-tour text-center">
+                            <a href="{% url 'tour.tour_detail' unique_id=tour.unique_id %}">
+                                <button type="button" class="btn btn-info">Preview</button>
+                            </a>
+                        </div>
+
+                        <div class="col text-center delete-tour">
+                            <button type="button" id="delete_tour" class="btn btn-danger">Delete</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
+                <li class="nav-item" style="width: 40%;">
+                    <a class="nav-link {% if action == 'add' %}active{% endif %}" href="javascript:switch_action('add');" id="switch_add">
+                        Add Sequence
+                    </a>
+                </li>
+                <li class="nav-item" style="width: 40%">
+                    <a class="nav-link {% if action == 'list' %}active{% endif %}" href="javascript:switch_action('list');" id="switch_list">
+                        Sequence List
+                    </a>
+                </li>
+            </ul>
+
+            <div class="p-3" style="border-top: 1px solid #dee2e6;">
+                <div class="search-form">
+                    <form method="GET" class="post-form" id="search_form">
+                        <input type="number" class="d-none" name="page" value="{{ page }}">
+                        <input type="text" class="d-none" name="action" value="{{ action }}" />
+                        {{ form.as_p }}
+                        <div class="form-group text-right mt-3">
+                            <button type="submit" class="save btn btn-primary btn-search">Search</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-
-        <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
-            <li class="nav-item" style="width: 40%;">
-                <a class="nav-link {% if action == 'add' %}active{% endif %}" href="javascript:switch_action('add');" id="switch_add">
-                    Add Sequence
-                </a>
-            </li>
-            <li class="nav-item" style="width: 40%">
-                <a class="nav-link {% if action == 'list' %}active{% endif %}" href="javascript:switch_action('list');" id="switch_list">
-                    Sequence List
-                </a>
-            </li>
-        </ul>
-
-        <div class="p-3" style="border-top: 1px solid #dee2e6;">
-            <div class="search-form">
-                <form method="GET" class="post-form" id="search_form">
-                    <input type="number" class="d-none" name="page" value="{{ page }}">
-                    <input type="text" class="d-none" name="action" value="{{ action }}" />
-                    {{ form.as_p }}
-                    <div class="form-group text-right mt-3">
-                        <button type="submit" class="save btn btn-primary btn-search">Search</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board bg-light">
         <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">

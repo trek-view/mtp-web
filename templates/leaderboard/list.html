@@ -4,42 +4,46 @@
 {% block app_style %}<link rel="stylesheet" href="{% static 'css/leaderboard_style.css' %}">{% endblock %}
 {% block content %}
 <div class="main-body">
-    <div class="left-side">
-        <div class="p-3">
-            <div class="pt-3 mb-3">
-                <h3>
-                    Leaderboard
-                </h3>
-            </div>
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="p-3">
+                <div class="pt-3 mb-3">
+                    <h3>
+                        Leaderboard
+                    </h3>
+                </div>
 
-            <p>
-                {{ pageDescription }}
-            </p>
-        </div>
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert m-3 alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <p>
+                    {{ pageDescription }}
+                </p>
             </div>
-            {% endfor %}
-        {% endif %}
-        <div class="p-3" style="border-top: 1px solid #dee2e6;">
-            <div class="search-form">
-                <form method="GET" class="post-form" id="search_form">
-                    <input type="number" class="d-none" name="page" value="{{ page }}">
-                    {% load bootstrap4 %}
-                    {% bootstrap_css %}
-                    {{ form.media }}
-                    {{ form.as_p }}
-                    <div class="form-group text-right mt-3">
-                        <button type="submit" class="save btn btn-primary">Search</button>
-                    </div>
-                </form>
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert m-3 alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            <div class="p-3" style="border-top: 1px solid #dee2e6;">
+                <div class="search-form">
+                    <form method="GET" class="post-form" id="search_form">
+                        <input type="number" class="d-none" name="page" value="{{ page }}">
+                        {% load bootstrap4 %}
+                        {% bootstrap_css %}
+                        {{ form.media }}
+                        {{ form.as_p }}
+                        <div class="form-group text-right mt-3">
+                            <button type="submit" class="save btn btn-primary">Search</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
+
+        {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board bg-light">
         <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
