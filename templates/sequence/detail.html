@@ -155,16 +155,33 @@
     </div>
 
     <div class="right-board bg-light">
-        <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
-            <div class="sequence-viewer" id="sequence_viewer">
-
+        <div class="board">
+            <div class="small-screen small">
+                <div class="switch-full-screen switch_screen">
+                    <img class="w-100" src="{% static 'images/icon/flap.svg' %}">
+                </div>
+                <div class="switch-cover"></div>
+                <div class="map-board w-100 display" id="map">
+                </div>
             </div>
-
-
+            <div class="full-screen board-w-400">
+                <div class="switch-full-screen switch_screen d-none" >
+                    <img class="w-100" src="{% static 'images/icon/flap.svg' %}">
+                </div>
+                <div class="switch-cover"></div>
+                <div id='sequence_viewer' class="image-box display"></div>
+            </div>
+            <div class="show-or-hide">
+                <div class="minimize-button" onclick="showOrHide()">
+                    <img class="w-100" src="data:image/svg+xml;charset=utf-8,%3C?xml version='1.0' encoding='UTF-8' standalone='no'?%3E %3Csvg width='22px' height='18px' viewBox='0 0 22 18' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E %3C!-- Generator: sketchtool 3.7.2 (28276) - http://www.bohemiancoding.com/sketch --%3E %3Ctitle%3E390F95AB-67C8-42FF-B9FF-C317EDED2467%3C/title%3E %3Cdesc%3ECreated with sketchtool.%3C/desc%3E %3Cdefs%3E %3Crect id='path-1' x='0' y='0' width='22' height='17' rx='4'/%3E %3Cfilter x='-50%25' y='-50%25' width='200%25' height='200%25' filterUnits='objectBoundingBox' id='filter-2'%3E %3CfeOffset dx='0' dy='1' in='SourceAlpha' result='shadowOffsetOuter1'/%3E %3CfeColorMatrix values='0 0 0 0 0.278431373 0 0 0 0 0.290196078 0 0 0 0 0.305882353 0 0 0 0.4 0' type='matrix' in='shadowOffsetOuter1'/%3E %3C/filter%3E %3C/defs%3E %3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E %3Cg id='view_component_photo' transform='translate(-12.000000, -12.000000)'%3E %3Cg id='minimize' transform='translate(12.000000, 12.000000)'%3E %3Cg id='Rectangle-211'%3E %3Cuse fill='black' fill-opacity='1' filter='url(%23filter-2)' xlink:href='%23path-1'/%3E %3Cuse fill='%23FFFFFF' fill-rule='evenodd' xlink:href='%23path-1'/%3E %3C/g%3E %3Crect id='Rectangle-210' fill='%23474A4E' x='4' y='10' width='14' height='2' rx='100'/%3E %3C/g%3E %3C/g%3E %3C/g%3E %3C/svg%3E">
+                </div>
+                <div class="maximize-button d-none" onclick="showOrHide()">
+                    <img class="w-100" src="{% static 'images/icon/restore_map.svg' %}">
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
@@ -173,6 +190,9 @@
     $.ajaxSetup({
         data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
     });
+    var current_node_point = null;
+    var current_node_key = '';
+    var current_order_number = 0;
     toastr.options = {
       "closeButton": false,
       "debug": false,
@@ -229,6 +249,179 @@
 
     goto_page("{{ page }}");
 
+    mapboxgl.accessToken = mapboxToken;
+    // Create a popup, but don't add it to the map yet.
+    var popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
+    var positions = [];
+    var image_keys = [];
+    positions.push({{ sequence.geometry_coordinates_ary }});
+    {% for image in sequence.coordinates_image %}
+        image_keys.push("{{ image }}")
+    {% endfor %}
+
+    console.log(positions);
+
+    var sceneData = [];
+    var item = {};
+    var scene_positions = [];
+    for (var j = 0; j < positions[0].length; j++)
+    {
+        scene_positions.push([positions[0][j][0], positions[0][j][1]]);
+        item = {
+            "type": "Feature",
+            "properties": {'key': image_keys[j]},
+            "geometry": {
+                "coordinates": [positions[0][j][0], positions[0][j][1]],
+                "type": "Point"
+            }
+        };
+        sceneData.push(item);
+    }
+
+    if (scene_positions.length > 0)
+        var first_point = scene_positions[0];
+    else
+        var first_point = null;
+
+    if (first_point != null) {
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+            center: first_point, // starting position
+            zoom: 14, // starting zoom
+            attributionControl: false
+        });
+    }
+    else {
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+            center: [-87.622088, 41.878781], // starting position
+            zoom: 14, // starting zoom
+            attributionControl: false
+        });
+    }
+    map.on('load', function() {
+        map.addSource('points', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': sceneData
+            }
+        });
+        map.addLayer({
+            'id': 'mapillary-images',
+            'type': 'circle',
+            'source': 'points',
+            "paint": {
+                "circle-color": "#039825",
+                "circle-radius": 6
+            }
+        });
+        if (map.getLayer('markers')) map.removeLayer('markers');
+        if (map.getSource('markers')) map.removeSource('markers');
+        map.addSource('markers', {
+             type: 'geojson',
+             data: {
+                 type: 'Feature',
+                 geometry: {
+                     type: 'Point',
+                     coordinates: first_point
+                 },
+                 properties: {
+                     title: 'You are here!',
+                     'marker-symbol': 'marker'
+                 }
+             }
+        });
+        map.addLayer({
+             id: 'markers',
+             type: 'circle',
+             source: 'markers',
+             paint: {
+                 "circle-color": "#e0400e",
+                 "circle-radius": 9
+             }
+        });
+    });
+
+    map.on('mouseenter', 'mapillary-images', function(e) {
+      // Change the cursor style as a UI indicator.
+      map.getCanvas().style.cursor = 'pointer';
+
+      var coordinates = e.features[0].geometry.coordinates.slice();
+      var key = e.features[0].properties.key;
+      console.log(key)
+      var url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+
+      // Ensure that if the map is zoomed out such that multiple
+      // copies of the feature are visible, the popup appears
+      // over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+      // Populate the popup and set its coordinates
+      // based on the feature found.
+      popup.setLngLat(coordinates)
+      .setHTML("<img src='" + url + "' width='160'/>")
+      .addTo(map);
+    });
+
+    map.on('click', 'mapillary-images', function (e) {
+        var key = e.features[0].properties.key;
+        selected_poi_id = 0;
+        if ($('.minimize-button').hasClass('d-none') && $('.maximize-button').hasClass('d-none'))
+        {
+            $('.small').each(function (i) {
+                $(this).removeClass('d-none');
+            });
+            $('.minimize-button').removeClass('d-none');
+        }
+        mapillaryViewer.resize();
+        mapillaryViewer.moveToKey(key);
+    });
+
+    map.on('mouseleave', 'mapillary-images', function() {
+      map.getCanvas().style.cursor = '';
+      popup.remove();
+    });
+
+    $('.switch_screen').click(function () {
+         var full_screen = $('.full-screen');
+         var small_screen = $('.small-screen');
+         full_screen.removeClass('full-screen').removeClass('board-w-400').addClass('small-screen').addClass('small');
+         small_screen.removeClass('small-screen').removeClass('small').addClass('full-screen').addClass('board-w-400');
+         $('.switch_screen').each(function (i) {
+             $(this).removeClass('d-none');
+
+         });
+         $(this).addClass('d-none');
+
+         if (is_mapillary_viewer)
+         {
+             is_mapillary_viewer = false;
+             $('.maximize-button img').attr('src', "{% static 'images/icon/restore_viewer.svg' %}")
+         }
+         else
+         {
+             is_mapillary_viewer = true;
+             $('.maximize-button img').attr('src', "{% static 'images/icon/restore_map.svg' %}")
+         }
+
+         if (!$('.left-side.poi-box').hasClass('d-none')) {
+            $('.board-w-400').removeClass('board-w-400');
+            $('.full-screen').addClass('board-w-400');
+         }
+         mapillaryViewer.resize();
+         map.resize();
+    });
+
+    var is_mapillary_viewer = true;
+
     var mapillaryViewer = new Mapillary.Viewer(
         'sequence_viewer',
         mapillaryClientId,
@@ -240,6 +433,38 @@
             },
         }
     );
+    mapillaryViewer.on(Mapillary.Viewer.nodechanged, function (node) {
+        current_node_point = [node.latLon.lat, node.latLon.lon];
+        current_node_key = node.key;
+        current_order_number = image_keys.indexOf(current_node_key);
+        if (map.getLayer('markers')) map.removeLayer('markers');
+        if (map.getSource('markers')) map.removeSource('markers');
+        map.addSource('markers', {
+             type: 'geojson',
+             data: {
+                 type: 'Feature',
+                 geometry: {
+                     type: 'Point',
+                     coordinates: [current_node_point[1], current_node_point[0]]
+                 },
+                 properties: {
+                     title: 'You are here!',
+                     'marker-symbol': 'marker'
+                 }
+             }
+        });
+        map.addLayer({
+             id: 'markers',
+             type: 'circle',
+             source: 'markers',
+             paint: {
+                 "circle-color": "#e0400e",
+                 "circle-radius": 9
+             }
+        });
+        map.flyTo({center: [current_node_point[1], current_node_point[0]]});
+        show_image_detail(node.key)
+    });
     window.addEventListener('resize', function() { mapillaryViewer.resize(); });
 
     $('.btn-save').click(function () {
@@ -387,6 +612,10 @@
         mapillaryViewer.moveToKey(image_key);
     }
 
+    function move_image(image_key) {
+        mapillaryViewer.moveToKey(image_key);
+    }
+
     function hide_image_detail_box() {
         $('.image-detail-box').addClass('d-none');
     }
@@ -426,5 +655,36 @@
             toastr.error('This sequense and image are imported by you.')
         }
     {% endif %}
+
+    function showOrHide() {
+        if ($('.minimize-button').hasClass('d-none') && $('.maximize-button').hasClass('d-none'))
+        {
+            $('.small').each(function (i) {
+                $(this).removeClass('d-none');
+            });
+            $('.minimize-button').removeClass('d-none');
+        }
+        else {
+            if ($('.minimize-button').hasClass('d-none'))
+            {
+                $('.minimize-button').removeClass('d-none');
+                $('.maximize-button').addClass('d-none');
+                $('.small').each(function (i) {
+                    $(this).removeClass('d-none');
+                });
+                mapillaryViewer.resize();
+                map.resize();
+            }
+            else if ($('.maximize-button').hasClass('d-none'))
+            {
+                $('.maximize-button').removeClass('d-none');
+                $('.minimize-button').addClass('d-none');
+                $('.small').each(function (i) {
+                    $(this).addClass('d-none');
+                });
+            }
+        }
+
+    }
 </script>
 {% endblock %}

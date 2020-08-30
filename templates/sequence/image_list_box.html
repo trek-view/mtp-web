@@ -30,7 +30,7 @@
 
 <div class="image-card-list">
     {% for image in images %}
-        <div class="card p-2 mb-3" onclick="show_image_detail('{{ image.key }}')" style="cursor: pointer">
+        <div class="card p-2 mb-3" onclick="move_image('{{ image.key }}')" style="cursor: pointer">
             <div class="image-key text-primary">
                 <span><small>key: </small>{{ image.key }}</span>
             </div>

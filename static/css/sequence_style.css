@@ -84,3 +84,84 @@ body {
 .list_item:active, .list_item:hover {
     cursor: pointer;
 }
+
+.full-screen {
+    height: calc(100vh - 100px);
+    width: 100%;
+    position: fixed;
+    top: 100px;
+    z-index: 0;
+}
+
+.board-w-400 {
+    width: calc(100vw - 400px) !important;
+}
+
+.map-board {
+    height: 100%;
+    width: 100%;
+}
+.main-body .board {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
+.image-box {
+    width: 100%;
+    height: 100%;
+}
+
+.small-screen {
+    height: 300px;
+    margin-bottom: 55px;
+}
+
+.small-screen .display {
+    border-radius: 8px;
+    box-shadow: 3px 3px 0px 0px rgb(4 4 4 / 5%), 4px 7px 20px 0px rgb(0 0 0 / 86%);
+}
+
+.small {
+    width: 400px;
+    z-index: 200;
+    position: relative;
+    margin-left: 10px;
+}
+
+.minimize-button, .maximize-button {
+    width: 30px;
+    position: absolute;
+    cursor: pointer;
+    left: 10px;
+    bottom: 10px;
+    z-index: 300;
+}
+
+.maximize-button {
+    height: 40px;
+    width: 40px;
+    padding: 6px 8px 0px 8px;
+    border-radius: 50%;
+    background: #0000008c;
+}
+
+.switch-full-screen {
+    position: absolute;
+    right: 0px;
+    width: 47px;
+    height: 47px;
+    z-index: 300;
+    cursor: pointer;
+}
+
+.switch-cover {
+    position: absolute;
+    right: -23px;
+    top: -6px;
+    width: 70px;
+    height: 35px;
+    z-index: 200;
+    transform: rotate(45deg);
+}
+
