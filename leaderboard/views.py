@@ -34,7 +34,7 @@ from tour.models import Tour, TourSequence
 ## App packages
 
 from .forms import *
-from sequence.models import Sequence
+from sequence.models import Sequence, ImageViewPoint
 
 ############################################################################
 
@@ -76,8 +76,16 @@ def index(request):
             captured_at__year=y
         )
 
+
     user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
 
+    filter_type = request.GET.get('filter_type')
+    if not filter_type is None and filter_type == '1':
+        user_ary = []
+        for u in user_json:
+            user_ary.append(u['user'])
+        user_json = ImageViewPoint.objects.filter(user_id__in=user_ary).values('user').annotate(image_count=Count('image')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
+        form.set_filter_type(filter_type)
     paginator = Paginator(user_json, 10)
 
     try:
@@ -151,6 +159,10 @@ def index(request):
                 u_photo_count += u_s.getImageCount()
         pItems[i]['distance'] = "%.3f" % u_distance
         pItems[i]['photo_count'] = u_photo_count
+
+        u_viewpoints = ImageViewPoint.objects.filter(user=user)
+        u_view_point = u_viewpoints.count()
+        pItems[i]['view_points'] = u_view_point
 
     content = {
         'items': pItems,

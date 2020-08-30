@@ -43,6 +43,8 @@ class LeaderboardSearchForm(forms.Form):
             empty_label='All Types'
         )
 
+        self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'View Points')), initial=0)
+
     def set_month(self, month):
         self.fields['month'] = forms.DateField(
             widget=MonthPickerInput(
@@ -69,3 +71,6 @@ class LeaderboardSearchForm(forms.Form):
             empty_label='All Types',
             initial=transport_type
         )
+
+    def set_filter_type(self, filter_type):
+        self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'View Points')), initial=filter_type)
