@@ -6,15 +6,16 @@
 
 <div class="main-body">
     <div class="left-side">
-        <div class="pl-3 pr-3 mt-5 mb-3 text-right">
-            <em>
-                <a href="{% url 'sequence.index' %}">
-                    Go to Sequence List
-                </a>
-            </em>
+        <div class="text-right mt-2 mb-2 pt-3 pr-3">
+            <a type="button" class="btn btn-info" href="{% url 'sequence.index' %}">Back</a>
         </div>
 
         <div class="pl-3 pr-3">
+            <div class="pt-3 mb-3">
+                <h3>
+                    Import Sequences
+                </h3>
+            </div>
             <p>
                 {{ pageDescription }}
             </p>
