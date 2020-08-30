@@ -22,4 +22,7 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('username',)
     ordering = ('username',)
 
+class MapillaryUserAdmin(admin.ModelAdmin):
+    list_display = ('user', 'username', 'key', 'email', 'iamges_total_count', 'sequences_total_count', 'updated_at')
+
 admin.site.register(CustomUser, CustomUserAdmin)
