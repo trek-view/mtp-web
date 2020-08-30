@@ -51,7 +51,13 @@ class SequenceAdmin(admin.ModelAdmin):
         if self.is_transport:  # however you get your condition
            return qs.filter()  # whatever rows need to be included
 
+class IconAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'filename'
+    )
 
 admin.site.register(TransType, TransTypeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Sequence, SequenceAdmin)
+admin.site.register(Icon, IconAdmin)

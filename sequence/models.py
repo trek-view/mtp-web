@@ -16,6 +16,16 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 UserModel = get_user_model()
 
+def icon_image_directory_path(instance, filename):
+    return 'sequence/transport_type/icons/{}'.format(str(instance.unique_id) + '-' + filename)
+class Icon(models.Model):
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    name = models.CharField(max_length=100)
+    filename = models.ImageField(upload_to=icon_image_directory_path, null=True)
+
+    def __str__(self):
+        return self.name
+
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(default=None, blank=True, null=True)
@@ -35,7 +45,7 @@ def getAllTags():
 class TransType(MPTTModel):
     name = models.CharField(max_length=50, unique=True)
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
-    icon = models.CharField(max_length=50, blank=True, null=True)
+    icon = models.ForeignKey(Icon, on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -203,3 +213,4 @@ class SequenceLike(models.Model):
 class ImageViewPoint(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
+
