@@ -154,7 +154,7 @@ def check_mapillary_oauth(request):
 
 def profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
-    sequences = Sequence.objects.filter(user=user)
+    sequences = Sequence.objects.filter(user=user, is_transport=True)
     tours = Tour.objects.filter(user=user)
     guidebooks = Guidebook.objects.filter(user=user)
     content = {
