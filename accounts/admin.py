@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 ## App Packages
-from .models import CustomUser
+from .models import CustomUser, MapillaryUser
 
 
 class CustomUserAdmin(UserAdmin):
@@ -26,3 +26,4 @@ class MapillaryUserAdmin(admin.ModelAdmin):
     list_display = ('user', 'username', 'key', 'email', 'iamges_total_count', 'sequences_total_count', 'updated_at')
 
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(MapillaryUser, MapillaryUserAdmin)
