@@ -1,0 +1,47 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="main-body d-flex justify-content-center">
+    <div style="width: 350px;">
+        <h2 class="mt-5 text-center mb-4">{{ username }} Profile</h2>
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        <div class="">
+            <div class="guidebooks">
+                <a href="/guidebook/list?username={{ username }}">Go Guidebook({{ guidebooks_count }})</a>
+            </div>
+            <div class="sequences">
+                <a href="/sequence/list?username={{ username }}">Go Sequence({{ sequences_count }})</a>
+            </div>
+            <div class="tours">
+                <a href="/tour/list?username={{ username }}">Go Tour({{ tours_count }})</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function switch_maillist() {
+        if ($('#id_is_maillist').hasClass('d-none'))
+        {
+            $('#id_is_maillist').prev().addClass('d-none');
+        }
+        else {
+            $('#id_is_maillist').prev().addClass('d-none');
+        }
+    }
+    
+    switch_maillist()
+</script>
+{% endblock %}

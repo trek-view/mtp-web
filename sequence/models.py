@@ -82,6 +82,8 @@ class Sequence(models.Model):
     transport_type = models.ForeignKey(TransType, on_delete=models.CASCADE, null=True)
     tag = ArrayField(models.CharField(default='0', max_length=6), null=True)
 
+    image_count = models.IntegerField(default=0)
+
     is_mapillary = models.BooleanField(default=True)
     is_published = models.BooleanField(default=False)
     is_transport = models.BooleanField(default=False)
@@ -95,7 +97,7 @@ class Sequence(models.Model):
     def getTransportType(self):
         captureType = []
         for t in self.type:
-            cType = TransportType.objects.get(pk=t)
+            cType = TransType.objects.get(pk=t)
             if cType:
                 captureType.append(cType.name)
 

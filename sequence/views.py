@@ -87,7 +87,7 @@ def sequence_list(request):
 
     print(sequences)
     if sequences == None:
-        sequences = Sequence.objects.all().filter(is_published=True, is_approved=True)
+        sequences = Sequence.objects.all().filter(is_published=True)
         form = SequenceSearchForm()
 
     paginator = Paginator(sequences.order_by('-created_at'), 5)
@@ -452,6 +452,7 @@ def import_sequence_list(request):
                     if 'username' in properties:
                         sequence.username = properties['username']
                     sequence.geometry_coordinates_ary = geometry['coordinates']
+                    sequence.image_count = len(geometry['coordinates'])
                     # lineString = LineString(geometry['coordinates'][0], geometry['coordinates'][1])
                     # i = 0
                     # print(time.process_time() - start)

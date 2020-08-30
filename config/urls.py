@@ -18,6 +18,7 @@ from django.contrib.sitemaps import GenericSitemap
 from marketplace.models import Job, Photographer
 from guidebook.models import Guidebook
 from django.contrib import admin as admin_tmp
+from accounts import views as account_views
 
 sitemaps = {
     'static': StaticViewSitemap,
@@ -77,6 +78,8 @@ urlpatterns = [
     path('guidebook/', include('guidebook.urls')),
     path('sequence/', include('sequence.urls')),
     path('tour/', include('tour.urls')),
+    path('leaderboard/', include('leaderboard.urls')),
+    path('user/<str:username>/', account_views.profile, name="account.profile"),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     # path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     re_path(r'', include(tf_urls)),

@@ -1,18 +1,24 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% block app_sequence %}active{% endblock %}
+{% block app_tour %}active{% endblock %}
 {% block app_style %}<link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">{% endblock %}
 {% block content %}
 <link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
 <div class="main-body">
     <div class="left-side p-3">
-        <div class="pl-3 pr-3 mt-4 mb-3 text-right">
-            <em>
-                <a href="{% url 'tour.tour_list' %}">
-                    Go to Tour List
-                </a>
-            </em>
+        <div class="text-right mt-2 mb-2">
+            <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
         </div>
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert m-3 alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        {% endif %}
         <div class="tour-detail card p-2">
             <div class="tour-name text-center text-info mt-1">
                 <h3>
@@ -62,23 +68,10 @@
                 <div class="">
                     <form method="POST" id="delete_tour_form" class="d-flex align-items-center" action="{% url 'tour.tour_delete' unique_id=tour.unique_id %}">
                         {% csrf_token %}
-                        {% if tour.getSequenceCount > 0 %}
-                            <div class="col text-center">
-                                {% if tour.is_published %}
-                                    <button type="button" class="btn btn-success" id="publish_swithch_tour">Published</button>
-                                {% else %}
-                                    <button type="button" class="btn btn-dark" id="publish_swithch_tour">Unpublished</button>
-                                {% endif %}
-                            </div>
-                        {% endif %}
                         <div class="col text-center">
                             <a href="{% url 'tour.tour_add_sequence' unique_id=tour.unique_id %}">
                                 <button type="button" class="btn btn-primary">Edit</button>
                             </a>
-                        </div>
-
-                        <div class="col delete-tour text-center">
-                            <button type="button" id="delete_tour" class="btn btn-danger">Delete</button>
                         </div>
                     </form>
                 </div>

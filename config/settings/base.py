@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'lib.apps.LibConfig',
     'sequence.apps.SequenceConfig',
     'tour.apps.TourConfig',
+    'leaderboard.apps.LeaderboardConfig',
     # ========================
     # 'oauth2_provider',
     # 'corsheaders',

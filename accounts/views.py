@@ -16,6 +16,9 @@ from lib.functions import *
 
 from .models import CustomUser, MapillaryUser
 from .forms import UserSignUpForm, UserProfileForm
+from sequence.models import Sequence
+from tour.models import Tour
+from guidebook.models import Guidebook
 
 import requests
 
@@ -148,3 +151,19 @@ def check_mapillary_oauth(request):
     else:
         messages.error(request, 'Error, mapillary invalid token!')
         return redirect('home')
+
+def profile(request, username):
+    user = get_object_or_404(CustomUser, username=username)
+    sequences = Sequence.objects.filter(user=user)
+    tours = Tour.objects.filter(user=user)
+    guidebooks = Guidebook.objects.filter(user=user)
+    content = {
+        'username': username,
+        'sequences_count': sequences.count(),
+        'tours_count': tours.count(),
+        'guidebooks_count': guidebooks.count(),
+        'pageName': 'Profile',
+        'pageTitle': 'Profile'
+    }
+
+    return render(request, 'account/profile.html', content)

@@ -17,13 +17,6 @@
                 {{ pageDescription }}
             </p>
         </div>
-        <div class="pl-3 pr-3 mt-2 mb-3 text-right">
-            <em>
-                <a href="{% url 'tour.tour_list' %}">
-                    Go to Tour List
-                </a>
-            </em>
-        </div>
         {% if messages %}
             {% for message in messages %}
             <div class="alert m-3 alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">

@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='sequence.index'),
-    path('sequence-list', views.sequence_list, name='sequence.sequence_list'),
+    path('list', views.sequence_list, name='sequence.sequence_list'),
     path('my-sequence-list', views.my_sequence_list, name='sequence.my_sequence_list'),
     path('<str:unique_id>/detail', views.sequence_detail, name='sequence.sequence_detail'),
     path('<str:unique_id>/delete', views.sequence_delete, name='sequence.sequence_delete'),
