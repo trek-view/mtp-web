@@ -47,7 +47,7 @@ class CustomUser(AbstractUser):
     username = models.CharField(max_length=100, unique=True, validators=[alphanumeric])
     is_active = models.BooleanField(default=False)
     is_maillist = models.BooleanField(default=False)
-    mapillary_access_token = models.TextField(default='', null=True)
+    mapillary_access_token = models.TextField(default='', null=True, blank=True)
     verify_email_key = models.CharField(max_length=100, default='')
 
     USERNAME_FIELD = 'email'
