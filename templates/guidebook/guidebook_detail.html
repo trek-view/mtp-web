@@ -377,7 +377,13 @@
 
     $('.scene-box').click(function () {
         var image_key = $(this).data('image_key');
-
+        var index = key_list.indexOf(image_key);
+        var href = location.protocol + '//' + location.host + location.pathname ;
+        var title = $(this).find('.scene-title').find('h6').text();
+        var description = $(this).find('.scene-description').find('span').text();
+        history.pushState({
+            id: 'Guidebook Detail'
+        }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
         mapillaryViewer.moveToKey(image_key).then(function () {
             $('.left-side.poi-box').removeClass('d-none');
             $('.poi-header .scene-title').text(title);
