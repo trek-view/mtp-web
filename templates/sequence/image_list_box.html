@@ -30,7 +30,7 @@
 
 <div class="image-card-list">
     {% for image in images %}
-        <div class="card p-2 mb-3" onclick="move_image('{{ image.key }}')" style="cursor: pointer">
+        <div class="card p-2 mb-3" onclick="move_image('{{ image.key }}')" style="cursor: pointer" id="image_{{ image.key }}">
             <div class="image-key text-primary">
                 <span><small>key: </small>{{ image.key }}</span>
             </div>
@@ -39,8 +39,8 @@
                 <span><small>Lng: </small>{{ image.lng }}</span>
             </div>
             <div class="image-view-point d-flex justify-content-between">
-                <span><small>Guidebooks: </small>{% if not image.guidebook_count or image.guidebook_count is None %}0{% else %}{{ image.guidebook_count }}{% endif %}</span>
-                <span><small>View Points: </small>{% if not image.view_point or image.view_point is None %}0{% else %}{{ image.view_point }}{% endif %}</span>
+                <span><small>Guidebooks: </small>{% if not image.guidebooks or image.guidebooks is None %}0{% else %}{{ image.guidebooks }}{% endif %}</span>
+                <span><small>View Points: </small>{% if not image.view_points or image.view_points is None %}0{% else %}{{ image.view_points }}{% endif %}</span>
             </div>
         </div>
 {#        <tr>#}

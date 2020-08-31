@@ -331,89 +331,6 @@ def ajax_save_sequence(request, unique_id):
         'message': 'The sequence does not exist or has no access.'
     })
 
-def ajax_get_image_detail(request, unique_id, image_key):
-    sequence = Sequence.objects.get(unique_id=unique_id)
-    if not sequence:
-        return JsonResponse({
-            'status': 'failed',
-            'message': 'The Sequence does not exist.'
-        })
-
-    if not sequence.is_published:
-        if not request.user.is_authenticated or request.user != sequence.user:
-            return JsonResponse({
-                'status': 'failed',
-                'message': "You can't access this sequence."
-            })
-    images = Image.objects.filter(seq_key=sequence.seq_key, image_key=image_key)
-    if images.count() > 0:
-        image = images[0]
-    else:
-        image = Image()
-
-        try:
-            url = 'https://a.mapillary.com/v3/images/{}?client_id={}'.format(image_key, settings.MAPILLARY_CLIENT_ID)
-            response = requests.get(url)
-            data = response.json()
-        except:
-            return JsonResponse({
-                'status': 'failed',
-                'message': "Image key error."
-            })
-        properties = data['properties']
-        keys = properties.keys()
-        if 'camera_make' in keys:
-            image.camera_make = properties['camera_make']
-        if 'camera_model' in keys:
-            image.camera_model = properties['camera_model']
-        if 'ca' in keys:
-            image.cas = properties['ca']
-        if 'captured_at' in keys:
-            image.captured_at = properties['captured_at']
-        if 'sequence_key' in keys:
-            image.seq_key = properties['sequence_key']
-        if 'user_key' in keys:
-            image.user_key = properties['user_key']
-        if 'key' in keys:
-            image.image_key = properties['key']
-        if 'pano' in keys:
-            image.pano = properties['pano']
-        if 'username' in keys:
-            image.username = properties['username']
-        if 'organization_key' in keys:
-            image.organization_key = properties['organization_key']
-        if 'private' in keys:
-            image.is_privated = properties['private']
-
-        image.lng = data['geometry']['coordinates'][0]
-        image.lat = data['geometry']['coordinates'][1]
-
-
-        image.is_uploaded = True
-        image.is_mapillary = True
-
-        image.user = sequence.user
-        print('test')
-        image.save()
-
-    view_points = ImageViewPoint.objects.filter(image=image)
-    scenes = Scene.objects.filter(image_key=image_key)
-    content = {
-        'image': image,
-        'view_points': view_points.count(),
-        'guidebook_count': scenes.count()
-    }
-    image_detail_box_html = render_to_string(
-        'sequence/image_detail_box.html',
-        content,
-        request
-    )
-    return JsonResponse({
-        'image_detail_box_html': image_detail_box_html,
-        'status': 'success',
-        'message': ""
-    })
-
 @my_login_required
 def import_sequence_list(request):
     sequences = []
@@ -690,6 +607,89 @@ def ajax_sequence_check_like(request, unique_id):
             'liked_count': liked_count
         })
 
+def ajax_get_image_detail(request, unique_id, image_key):
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if not sequence:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Sequence does not exist.'
+        })
+
+    if not sequence.is_published:
+        if not request.user.is_authenticated or request.user != sequence.user:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "You can't access this sequence."
+            })
+    images = Image.objects.filter(seq_key=sequence.seq_key, image_key=image_key)
+    if images.count() > 0:
+        image = images[0]
+    else:
+        image = Image()
+
+        try:
+            url = 'https://a.mapillary.com/v3/images/{}?client_id={}'.format(image_key, settings.MAPILLARY_CLIENT_ID)
+            response = requests.get(url)
+            data = response.json()
+        except:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Image key error."
+            })
+        properties = data['properties']
+        keys = properties.keys()
+        if 'camera_make' in keys:
+            image.camera_make = properties['camera_make']
+        if 'camera_model' in keys:
+            image.camera_model = properties['camera_model']
+        if 'ca' in keys:
+            image.cas = properties['ca']
+        if 'captured_at' in keys:
+            image.captured_at = properties['captured_at']
+        if 'sequence_key' in keys:
+            image.seq_key = properties['sequence_key']
+        if 'user_key' in keys:
+            image.user_key = properties['user_key']
+        if 'key' in keys:
+            image.image_key = properties['key']
+        if 'pano' in keys:
+            image.pano = properties['pano']
+        if 'username' in keys:
+            image.username = properties['username']
+        if 'organization_key' in keys:
+            image.organization_key = properties['organization_key']
+        if 'private' in keys:
+            image.is_privated = properties['private']
+
+        image.lng = data['geometry']['coordinates'][0]
+        image.lat = data['geometry']['coordinates'][1]
+
+
+        image.is_uploaded = True
+        image.is_mapillary = True
+
+        image.user = sequence.user
+        print('test')
+        image.save()
+
+    view_points = ImageViewPoint.objects.filter(image=image)
+    scenes = Scene.objects.filter(image_key=image_key)
+    content = {
+        'image': image,
+        'view_points': view_points.count(),
+        'guidebook_count': scenes.count()
+    }
+    image_detail_box_html = render_to_string(
+        'sequence/image_detail_box.html',
+        content,
+        request
+    )
+    return JsonResponse({
+        'image_detail_box_html': image_detail_box_html,
+        'status': 'success',
+        'message': ""
+    })
+
 def ajax_get_image_list(request, unique_id):
     sequence = Sequence.objects.get(unique_id=unique_id)
     if not sequence:
@@ -759,7 +759,14 @@ def ajax_get_image_list(request, unique_id):
         else:
             origin_images.append(image[0])
 
+            view_points = ImageViewPoint.objects.filter(image=image[0])
+            scenes = Scene.objects.filter(image_key=image[0].image_key)
+            pImages[i]['view_points'] = view_points.count()
+            pImages[i]['guidebooks'] = scenes.count()
+
     addSequenceForm = AddSequeceForm(instance=sequence)
+
+
     content = {
         'sequence': sequence,
         'images': pImages,

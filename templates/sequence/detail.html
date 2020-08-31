@@ -228,7 +228,10 @@
         return false;
     };
 
+    var current_page = '0';
+
     function goto_page(pageNum) {
+        current_page = pageNum;
         $.ajax({
             url: '{% url "sequence.ajax_get_image_list" unique_id=sequence.unique_id %}',
             type: 'GET',
@@ -623,6 +626,7 @@
 
     function hide_image_detail_box() {
         $('.image-detail-box').addClass('d-none');
+        goto_page(current_page);
     }
 
     {% if not request.user.is_authenticated %}
