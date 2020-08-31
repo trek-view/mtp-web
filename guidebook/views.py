@@ -181,7 +181,8 @@ def guidebook_detail(request, unique_id):
         'is_liked': is_liked,
         'form': form,
         'poi_form': poi_form,
-        'pageTitle': 'Guidebook',
+        'pageTitle': guidebook.name,
+        'pageDescription': guidebook.description,
         'pageName': 'Guidebook Detail'
     }
     return render(request, 'guidebook/guidebook_detail.html', content)
@@ -252,7 +253,8 @@ def guidebook_create(request, unique_id=None):
     content = {
         'form': form,
         'pageName': 'Create Guidebook',
-        'pageTitle': 'Guidebook'
+        'pageTitle': 'Create Guidebook',
+        'pageDescription': MAIN_PAGE_DESCRIPTION
     }
     return render(request, 'guidebook/create_main.html', content)
 
@@ -310,7 +312,8 @@ def add_scene(request, unique_id):
         'form': form,
         'poi_form': poi_form,
         'pageName': 'Edit Guidebook',
-        'pageTitle': 'Guidebook'
+        'pageTitle': 'Edit Guidebook',
+        'pageDescription': MAIN_PAGE_DESCRIPTION
     }
     return render(request, 'guidebook/add_scene.html', content)
 

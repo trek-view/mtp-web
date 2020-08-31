@@ -235,8 +235,8 @@ def sequence_detail(request, unique_id):
     content = {
         'sequence': sequence,
         'pageName': 'Sequence Detail',
-        'pageTitle': 'Sequence',
-        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'pageTitle': sequence.name,
+        'pageDescription': sequence.description,
         'first_image': images[0],
         'page': page,
         'addSequenceForm': addSequenceForm
@@ -554,7 +554,7 @@ def import_sequence_list(request):
         'seq_count': len(sequences),
         'sequences': sequences,
         'pageName': 'Sequences',
-        'pageTitle': 'Sequences',
+        'pageTitle': 'Import Sequences',
         'pageDescription': IMPORT_PAGE_DESCRIPTION,
         'addSequenceForm': addSequenceForm,
         'all_transport_types': all_transport_types,
