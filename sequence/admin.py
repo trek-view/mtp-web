@@ -46,10 +46,10 @@ class SequenceAdmin(admin.ModelAdmin):
         'description'
     )
 
-    def queryset(self):
-        qs = super(SequenceAdmin, self).queryset()
-        if self.is_transport:  # however you get your condition
-           return qs.filter()  # whatever rows need to be included
+    def get_queryset(self, request):
+        query = super(SequenceAdmin, self).get_queryset(request)
+        filtered_query = query.filter(is_transport=True)
+        return filtered_query
 
 class IconAdmin(admin.ModelAdmin):
     list_display = (
