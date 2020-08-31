@@ -284,3 +284,17 @@ body {
 .left-side.poi-box {
     background: white;
 }
+
+.return-scene {
+    font-size: 16px;
+    top: 50px;
+    color: white;
+    width: 130px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    background: #7082dc;
+    z-index: 300;
+    position: absolute;
+    left: calc(50% - 65px);
+}
