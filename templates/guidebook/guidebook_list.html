@@ -28,12 +28,15 @@
                 </div>
                 {% endfor %}
             {% endif %}
-            <div class="w-100 d-flex p-3 justify-content-end mt-3 mb-3">
+            <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
                 <div class="">
                     <a class="btn btn-outline-primary" href="{% url 'guidebook.create' %}">
                         Create Guidebook
                     </a>
                 </div>
+            </div>
+            <div class="ml-3 mb-2 mr-3">
+                <h4>Filter Guidebook</h4>
             </div>
             {% if user.is_authenticated %}
                 <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
