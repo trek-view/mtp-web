@@ -188,6 +188,7 @@
 {% block scripts %}
 <script src="{% static 'js/mapillary.js' %}"></script>
 <script>
+    var first_point = true;
     $.ajaxSetup({
         data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
     });
@@ -464,7 +465,10 @@
              }
         });
         map.flyTo({center: [current_node_point[1], current_node_point[0]]});
-        show_image_detail(node.key)
+        if (first_point)
+            first_point = false;
+        else
+            show_image_detail(node.key)
     });
     window.addEventListener('resize', function() { mapillaryViewer.resize(); });
 
