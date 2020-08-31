@@ -46,34 +46,60 @@ def index(request):
     sequences = None
     page = 1
     form = LeaderboardSearchForm()
+    y = None
+    m = None
+    time_type = None
     if request.method == "GET":
         page = request.GET.get('page')
         if not page or page is None:
             page = 1
-        month = request.GET.get('month')
+        filter_time = request.GET.get('time')
         page = request.GET.get('page')
         transport_type = request.GET.get('transport_type')
-        if not month is None:
-            form.set_month(month)
-            y = month.split('-')[0]
-            m = month.split('-')[1]
+        time_type = request.GET.get('time_type')
+        if time_type is None or not time_type or time_type == 'all_time':
             sequences = Sequence.objects.filter(
-                is_transport=True,
-                captured_at__month=m,
-                captured_at__year=y
+                is_transport=True
             )
+        else:
+            if time_type == 'monthly':
+                if filter_time is None:
+                    now = datetime.now()
+                    y = now.year
+                    m = now.month
+                    form.set_timely('YYYY-MM', str(y) + '-' + str(m))
+                else:
+                    form.set_timely('YYYY-MM', filter_time)
+                    y = filter_time.split('-')[0]
+                    m = filter_time.split('-')[1]
+                sequences = Sequence.objects.filter(
+                    is_transport=True,
+                    captured_at__month=m,
+                    captured_at__year=y
+                )
+                time_type = 'monthly'
+            elif time_type == 'yearly':
+                if filter_time is None:
+                    now = datetime.now()
+                    y = now.year
+                    form.set_timely('YYYY', str(y))
+                else:
+                    form.set_timely('YYYY', filter_time)
+                    y = filter_time
+                sequences = Sequence.objects.filter(
+                    is_transport=True,
+                    captured_at__year=y
+                )
+                time_type = 'yearly'
+
         if transport_type and transport_type != 0 and transport_type != '':
             sequences = sequences.filter(transport_type_id=transport_type)
             form.set_transport_type(transport_type)
 
     if sequences == None:
-        now = datetime.now()
-        y = now.year
-        m = now.month
+
         sequences = Sequence.objects.filter(
             is_transport=True,
-            captured_at__month=m,
-            captured_at__year=y
         )
 
 
@@ -121,11 +147,10 @@ def index(request):
             is_transport=True,
         )
 
-        if not month is None:
-            u_sequences = u_sequences.filter(
-                captured_at__month=m,
-                captured_at__year=y
-            )
+        if not y is None:
+            u_sequences = u_sequences.filter(captured_at__year=y)
+        if not m is None:
+            u_sequences = u_sequences.filter(captured_at__month=m)
 
         if transport_type and transport_type != 0 and transport_type != '':
             u_sequences = u_sequences.filter(transport_type_id=transport_type)
@@ -164,12 +189,17 @@ def index(request):
         u_view_point = u_viewpoints.count()
         pItems[i]['view_points'] = u_view_point
 
+
+    if time_type is None:
+        time_type = 'all_time'
+    form.sef_time_type(time_type)
     content = {
         'items': pItems,
         'form': form,
         'pageName': 'Leaderboard',
         'pageTitle': 'Leaderboard',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
+        'page': page,
+        'time_type': time_type
     }
     return render(request, 'leaderboard/list.html', content)

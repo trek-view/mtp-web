@@ -19,21 +19,7 @@ class LeaderboardSearchForm(forms.Form):
         year = now.year
         month = now.month
 
-        self.fields['month'] = forms.DateField(
-            widget=MonthPickerInput(
-                format="YYYY-MM",
-                options={
-                    "format": "YYYY-MM",
-                    "showClose": False,
-                    "showClear": False,
-                    "showTodayButton": False,
-                },
-                attrs={
-                    'value': str(year) + '-' + str(month)
-                },
-            ),
-            required=True
-        )
+
 
         self.fields['transport_type'] = forms.ModelChoiceField(
             required=False,
@@ -43,20 +29,27 @@ class LeaderboardSearchForm(forms.Form):
             empty_label='All Types'
         )
 
+        self.fields['time_type'] = forms.CharField(
+            label='',
+            widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
+            required=False
+        )
+
         self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'View Points')), initial=0)
 
-    def set_month(self, month):
-        self.fields['month'] = forms.DateField(
+
+    def set_timely(self, type, value):
+        self.fields['time'] = forms.DateField(
             widget=MonthPickerInput(
-                format="YYYY-MM",
+                format=type,
                 options={
-                    "format": "YYYY-MM",
+                    "format": type,
                     "showClose": False,
                     "showClear": False,
                     "showTodayButton": False,
                 },
                 attrs={
-                    'value': month
+                    'value': value
                 },
             ),
             required=False
@@ -74,3 +67,10 @@ class LeaderboardSearchForm(forms.Form):
 
     def set_filter_type(self, filter_type):
         self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'View Points')), initial=filter_type)
+
+    def sef_time_type(self, time_type):
+        self.fields['time_type'] = forms.CharField(
+            label='',
+            widget=forms.TextInput(attrs={'class': 'form-control d-none', 'value': time_type}),
+            required=False
+        )
