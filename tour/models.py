@@ -36,7 +36,7 @@ def getAllTourTags():
 class Tour(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    tag = ArrayField(models.CharField(default='0', max_length=6), null=True)
+    tour_tag = models.ManyToManyField(TourTag)
     name = models.CharField(max_length=100, default='')
     username = models.CharField(max_length=100, null=True)
     description = models.TextField(default='')
@@ -46,10 +46,9 @@ class Tour(models.Model):
 
     def getTagStr(self):
         tags = []
-        if self.tag is None:
+        if self.tour_tag is None:
             return ''
-        for t in self.tag:
-            tag = TourTag.objects.get(pk=t)
+        for tag in self.tour_tag.all():
             if tag and tag.is_actived:
                 tags.append(tag.name)
 
@@ -60,10 +59,9 @@ class Tour(models.Model):
 
     def getTags(self):
         tags = []
-        if self.tag is None:
+        if self.tour_tag is None:
             return []
-        for t in self.tag:
-            tag = TourTag.objects.get(pk=t)
+        for tag in self.tour_tag.all():
             if tag and tag.is_actived:
                 tags.append(tag.name)
         return tags

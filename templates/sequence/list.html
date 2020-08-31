@@ -47,6 +47,7 @@
                 <div class="search-form">
                     <form method="GET" class="post-form" id="search_form">
                         <input type="number" class="d-none" name="page" value="{{ page }}">
+                        {{ form.media }}
                         {{ form.as_p }}
                         <div class="form-group text-right mt-3">
                             <button type="submit" class="save btn btn-primary">Search</button>

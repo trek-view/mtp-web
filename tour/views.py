@@ -57,12 +57,23 @@ def tour_create(request, unique_id=None):
                 tour.username = mapillary_user.username
                 tour.is_published = False
                 tour.save()
+                if form.cleaned_data['tour_tag'].count() > 0:
+                    for tour_tag in form.cleaned_data['tour_tag']:
+                        tour.tour_tag.add(tour_tag)
+                    for tour_tag in tour.tour_tag.all():
+                        if not tour_tag in form.cleaned_data['tour_tag']:
+                            tour.tour_tag.remove(tour_tag)
                 messages.success(request, 'A tour was created successfully.')
             else:
                 tour = get_object_or_404(Tour, unique_id=unique_id)
                 tour.name = form.cleaned_data['name']
                 tour.description = form.cleaned_data['description']
-                tour.tag = form.cleaned_data['tag']
+                if form.cleaned_data['tour_tag'].count() > 0:
+                    for tour_tag in form.cleaned_data['tour_tag']:
+                        tour.tour_tag.add(tour_tag)
+                    for tour_tag in tour.tour_tag.all():
+                        if not tour_tag in form.cleaned_data['tour_tag']:
+                            tour.tour_tag.remove(tour_tag)
                 tour.save()
                 messages.success(request, 'A tour was updated successfully.')
 
@@ -115,10 +126,11 @@ def tour_add_sequence(request, unique_id):
             if transport_type and transport_type != 0 and transport_type != '':
                 sequences = sequences.filter(transport_type_id=transport_type)
             if len(tags) > 0:
-                sequences = sequences.filter(tag__overlap=tags)
+                for tag in tags:
+                    sequences = sequences.filter(tag=tag)
 
     if sequences == None:
-        sequences = Sequence.objects.all().filter(is_published=True, is_approved=True)
+        sequences = Sequence.objects.all().filter(is_published=True)
         form = SequenceSearchForTourForm()
 
     sequences = sequences.order_by('-created_at')
@@ -201,21 +213,24 @@ def tour_list(request):
         if page is None:
             page = 1
         form = TourSearchForm(request.GET)
+        print(form.is_valid())
         if form.is_valid():
             name = form.cleaned_data['name']
-            tags = form.cleaned_data['tag']
+            tags = form.cleaned_data['tour_tag']
             username = form.cleaned_data['username']
 
             tours = Tour.objects.all().filter(
                 is_published=True
             )
+            print(tours.count())
             if name and name != '':
                 tours = tours.filter(name__contains=name)
             if username and username != '':
                 users = CustomUser.objects.filter(username__contains=username)
                 tours = tours.filter(user__in=users)
             if len(tags) > 0:
-                tours = tours.filter(tag__overlap=tags)
+                for tour_tag in tags:
+                    tours = tours.filter(tour_tag=tour_tag)
 
     if tours == None:
         tours = Tour.objects.all().filter(is_published=True)
@@ -265,14 +280,15 @@ def my_tour_list(request):
         form = TourSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
-            tags = form.cleaned_data['tag']
+            tags = form.cleaned_data['tour_tag']
             tours = Tour.objects.all().filter(
                 user=request.user
             )
             if name and name != '':
                 tours = tours.filter(name__contains=name)
             if len(tags) > 0:
-                tours = tours.filter(tag__overlap=tags)
+                for tour_tag in tags:
+                    tours = tours.filter(tour_tag=tour_tag)
 
     if tours == None:
         tours = Tour.objects.all().filter(is_published=True)
@@ -357,7 +373,12 @@ def ajax_tour_update(request, unique_id=None):
 
             tour.name = form.cleaned_data['name']
             tour.description = form.cleaned_data['description']
-            tour.tag = form.cleaned_data['tag']
+            if form.cleaned_data['tour_tag'].count() > 0:
+                for tour_tag in form.cleaned_data['tour_tag']:
+                    tour.tour_tag.add(tour_tag)
+                for tour_tag in tour.tour_tag.all():
+                    if not tour_tag in form.cleaned_data['tour_tag']:
+                        tour.tour_tag.remove(tour_tag)
             tour.save()
             return JsonResponse({
                 'status': 'success',

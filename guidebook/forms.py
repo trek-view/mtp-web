@@ -4,6 +4,7 @@ from django_select2 import forms as s2forms
 
 ## App packages
 from .models import *
+from tags_input import fields
 
 ############################################################################
 ############################################################################
@@ -26,11 +27,10 @@ class GuidebookForm(forms.ModelForm):
         empty_label=None
     )
 
-    tag = forms.ModelChoiceField(
-        required=False,
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
-        queryset=Tag.objects.all(),
-        to_field_name='pk'
+    tag = fields.TagsInputField(
+        Tag.objects.filter(is_actived=True),
+        create_missing=True,
+        required=True,
     )
 
     # cover_image = forms.FileField(
@@ -47,10 +47,10 @@ class GuidebookForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['tag'] = forms.MultipleChoiceField(
-            required=False,
-            widget=forms.SelectMultiple(attrs={'class': 'form-control', 'data-validation': 'required'}),
-            choices=getAllTags()
+        self.fields['tag'] = fields.TagsInputField(
+            Tag.objects.filter(is_actived=True),
+            create_missing=True,
+            required=True,
         )
 
     class Meta:
@@ -153,10 +153,10 @@ class GuidebookSearchForm(forms.Form):
             queryset=Category.objects.all(),
             empty_label="All Categories"
         )
-        self.fields['tag'] = forms.MultipleChoiceField(
+        self.fields['tag'] = fields.TagsInputField(
+            Tag.objects.filter(is_actived=True),
+            create_missing=True,
             required=False,
-            widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
-            choices=getAllTags()
         )
 
         self.fields['username'] = forms.CharField(

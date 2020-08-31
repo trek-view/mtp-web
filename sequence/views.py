@@ -84,7 +84,8 @@ def sequence_list(request):
                 users = CustomUser.objects.filter(username__contains=username)
                 sequences = sequences.filter(user__in=users)
             if len(tags) > 0:
-                sequences = sequences.filter(tag__overlap=tags)
+                for tag in tags:
+                    sequences = sequences.filter(tag=tag)
 
     if sequences == None:
         sequences = Sequence.objects.all().filter(is_published=True)
@@ -158,7 +159,8 @@ def my_sequence_list(request):
             if transport_type and transport_type != 0 and transport_type != '':
                 sequences = sequences.filter(category_id=transport_type)
             if len(tags) > 0:
-                sequences = sequences.filter(tag__overlap=tags)
+                for tag in tags:
+                    sequences = sequences.filter(tag=tag)
 
     if sequences == None:
         sequences = Sequence.objects.all().filter(is_published=True)
@@ -252,7 +254,9 @@ def sequence_delete(request, unique_id):
         sequence.name = ''
         sequence.description = ''
         sequence.transport_type = None
-        sequence.tag = None
+        tags = sequence.tag.all()
+        for tag in tags:
+            sequence.tag.remove(tag)
         sequence.is_published = False
         sequence.is_transport = False
         sequence.save()
@@ -296,13 +300,17 @@ def ajax_save_sequence(request, unique_id):
             sequence.name = form.cleaned_data['name']
             sequence.description = form.cleaned_data['description']
             sequence.transport_type = form.cleaned_data['transport_type']
-            sequence.tag = form.cleaned_data['tag']
+            if form.cleaned_data['tag'].count() > 0:
+                for tag in form.cleaned_data['tag']:
+                    sequence.tag.add(tag)
+                for tag in sequence.tag.all():
+                    if not tag in form.cleaned_data['tag']:
+                        sequence.tag.remove(tag)
             sequence.save()
 
             tags = []
-            if len(sequence.tag) > 0:
-                for t in sequence.tag:
-                    tag = Tag.objects.get(pk=t)
+            if sequence.tag.all().count() > 0:
+                for tag in sequence.tag.all():
                     if not tag or tag is None:
                         continue
                     tags.append(tag.name)
@@ -536,11 +544,8 @@ def import_sequence_list(request):
                 sequences.count = len(sequences)
 
     addSequenceForm = AddSequeceForm()
-    all_tags = []
+
     all_transport_types = []
-    tags = Tag.objects.filter(is_actived=True)
-    for t in tags:
-        all_tags.append({'id': t.pk, 'name': t.name})
     transport_types = TransType.objects.all()
     for type in transport_types:
         all_transport_types.append({'id': type.pk, 'name': type.name})
@@ -552,7 +557,6 @@ def import_sequence_list(request):
         'pageTitle': 'Sequences',
         'pageDescription': IMPORT_PAGE_DESCRIPTION,
         'addSequenceForm': addSequenceForm,
-        'all_tags': all_tags,
         'all_transport_types': all_transport_types,
         'action': action,
         'page': page
@@ -560,7 +564,7 @@ def import_sequence_list(request):
     return render(request, 'sequence/import_list.html', content)
 
 @my_login_required
-def ajax_import(request):
+def ajax_import(request, unique_id):
     if request.method == 'POST':
 
         # form = AddSequeceForm(request.POST)
@@ -571,18 +575,23 @@ def ajax_import(request):
         #         continue
         #     if sequence_json[unique_id]['name'] == '' or sequence_json[unique_id]['description'] == '' or sequence_json[unique_id]['transport_type'] == 0 or len(sequence_json[unique_id]['tags']) == 0:
         #         continue
-        if not request.POST.get('unique_id') is None or request.POST.get('unique_id'):
-            unique_id = request.POST.get('unique_id')
+        form = AddSequeceForm(request.POST)
+        if form.is_valid():
             sequence = Sequence.objects.get(unique_id=unique_id)
             if not sequence or sequence is None:
                 return JsonResponse({
                     'status': 'failed',
                     'message': 'This sequence was not imported.'
                 })
-            sequence.name = request.POST.get('name')
-            sequence.description = request.POST.get('description')
-            sequence.transport_type_id = request.POST.get('transport_type')
-            sequence.tag = request.POST.get('tags')
+            sequence.name = form.cleaned_data['name']
+            sequence.description = form.cleaned_data['description']
+            sequence.transport_type = form.cleaned_data['transport_type']
+            if form.cleaned_data['tag'].count() > 0:
+                for tag in form.cleaned_data['tag']:
+                    sequence.tag.add(tag)
+                for tag in sequence.tag.all():
+                    if not tag in form.cleaned_data['tag']:
+                        sequence.tag.remove(tag)
             sequence.is_published = True
             sequence.is_transport = True
             sequence.save()

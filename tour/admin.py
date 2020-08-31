@@ -14,12 +14,12 @@ from lib.functions import send_mail_with_html
 
 ## App packages
 from .models import *
-
+from tags_input import admin as tags_input_admin
 
 ############################################################################
 
 
-class TourAdmin(admin.ModelAdmin):
+class TourAdmin(tags_input_admin.TagsInputAdmin):
     list_display = (
         'name',
         'description',

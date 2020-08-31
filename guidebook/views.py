@@ -65,7 +65,8 @@ def guidebook_list(request, page):
                 users = CustomUser.objects.filter(username__contains=username)
                 guidebooks = guidebooks.filter(user__in=users)
             if len(tags) > 0:
-                guidebooks = guidebooks.filter(tag__overlap=tags)
+                for tag in tags:
+                    guidebooks = guidebooks.filter(tag=tag)
 
     if guidebooks == None:
         guidebooks = Guidebook.objects.all().filter(is_published=True, is_approved=True)
@@ -121,7 +122,8 @@ def my_guidebook_list(request, page):
                 guidebooks = guidebooks.filter(category_id=category)
 
             if len(tags) > 0:
-                guidebooks = guidebooks.filter(tag__overlap=tags)
+                for tag in tags:
+                    guidebooks = guidebooks.filter(tag=tag)
 
     if guidebooks == None:
         guidebooks = Guidebook.objects.all().filter(
@@ -194,6 +196,12 @@ def guidebook_create(request, unique_id=None):
                 guidebook = form.save(commit=False)
                 guidebook.user = request.user
                 guidebook.save()
+                if form.cleaned_data['tag'].count() > 0:
+                    for tag in form.cleaned_data['tag']:
+                        guidebook.tag.add(tag)
+                    for tag in guidebook.tag.all():
+                        if not tag in form.cleaned_data['tag']:
+                            guidebook.tag.remove(tag)
                 try:
                     # send email to creator
                     subject = 'Your guidebook post is under review'
@@ -224,7 +232,13 @@ def guidebook_create(request, unique_id=None):
                 guidebook.description = form.cleaned_data['description']
                 guidebook.cover_image = form.cleaned_data['cover_image']
                 guidebook.category = form.cleaned_data['category']
-                guidebook.tag = form.cleaned_data['tag']
+
+                if form.cleaned_data['tag'].count() > 0:
+                    for tag in form.cleaned_data['tag']:
+                        guidebook.tag.add(tag)
+                    for tag in guidebook.tag.all():
+                        if not tag in form.cleaned_data['tag']:
+                            guidebook.tag.remove(tag)
                 guidebook.save()
 
             messages.success(request, 'A guidebook was created successfully.')
@@ -258,7 +272,12 @@ def ajax_guidebook_update(request, unique_id = None):
             guidebook.name = form.cleaned_data['name']
             guidebook.description = form.cleaned_data['description']
             guidebook.category = form.cleaned_data['category']
-            guidebook.tag = form.cleaned_data['tag']
+            if form.cleaned_data['tag'].count() > 0:
+                for tag in form.cleaned_data['tag']:
+                    guidebook.tag.add(tag)
+                for tag in guidebook.tag.all():
+                    if not tag in form.cleaned_data['tag']:
+                        guidebook.tag.remove(tag)
             guidebook.save()
             return JsonResponse({
                 'status': 'success',

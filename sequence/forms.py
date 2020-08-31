@@ -6,6 +6,7 @@ from django_select2 import forms as s2forms
 from .models import *
 from datetime import datetime
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
+from tags_input import fields
 ############################################################################
 ############################################################################
 
@@ -71,10 +72,10 @@ class AddSequeceForm(forms.ModelForm):
             empty_label=None
         )
 
-        self.fields['tag'] = forms.MultipleChoiceField(
-            required=False,
-            widget=forms.SelectMultiple(attrs={'class': 'form-control', 'data-validation': 'required'}),
-            choices=getAllTags()
+        self.fields['tag'] = fields.TagsInputField(
+            Tag.objects.filter(is_actived=True),
+            create_missing=True,
+            required=True,
         )
 
     class Meta:
@@ -115,10 +116,10 @@ class SequenceSearchForm(forms.Form):
             queryset=TransType.objects.all(),
             empty_label='All Types'
         )
-        self.fields['tag'] = forms.MultipleChoiceField(
+        self.fields['tag'] = fields.TagsInputField(
+            Tag.objects.filter(is_actived=True),
+            create_missing=True,
             required=False,
-            widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
-            choices=getAllTags()
         )
 
     def _my(self, username):
@@ -151,9 +152,9 @@ class SequenceSearchForTourForm(forms.Form):
             queryset=TransType.objects.filter(),
             empty_label='All Types'
         )
-        self.fields['tag'] = forms.MultipleChoiceField(
+        self.fields['tag'] = fields.TagsInputField(
+            Tag.objects.filter(is_actived=True),
+            create_missing=True,
             required=False,
-            widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
-            choices=getAllTags()
         )
 

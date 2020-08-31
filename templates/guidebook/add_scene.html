@@ -70,6 +70,7 @@
                 <div class="main-guidebook-form d-none">
                     <form method="POST" class="post-form" id="guidebook_edit_form" enctype="multipart/form-data">
                         {% csrf_token %}
+                        {{ g_form.media }}
                         {{ g_form.as_p }}
                         <div class="form-group d-flex justify-content-end">
                             <button type="button" class="btn btn-sm btn-primary save-btn mr-2" id="guidebook_save_button">Save</button>

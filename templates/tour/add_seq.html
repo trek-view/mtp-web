@@ -44,6 +44,7 @@
                 <div class="tour-detail-form d-none">
                     <form method="POST" class="post-form" id="tour_edit_form">
                         {% csrf_token %}
+                        {{ t_form.media }}
                         {{ t_form.as_p }}
                         <div class="form-group d-flex justify-content-end">
                             <button type="button" class="btn btn-sm btn-primary save-btn mr-2" id="tour_save_button">Save</button>
@@ -122,6 +123,7 @@
                     <form method="GET" class="post-form" id="search_form">
                         <input type="number" class="d-none" name="page" value="{{ page }}">
                         <input type="text" class="d-none" name="action" value="{{ action }}" />
+                        {{ form.media }}
                         {{ form.as_p }}
                         <div class="form-group text-right mt-3">
                             <button type="submit" class="save btn btn-primary btn-search">Search</button>

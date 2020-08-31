@@ -53,7 +53,7 @@ class Guidebook(models.Model):
     description = models.TextField(null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     cover_image = models.ImageField(upload_to=image_directory_path, null=True)
-    tag = ArrayField(models.CharField(default='0', max_length=6), null=True)
+    tag = models.ManyToManyField(Tag)
     is_published = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=datetime.now, blank=True)
@@ -105,8 +105,7 @@ class Guidebook(models.Model):
         tags = []
         if self.tag is None:
             return ''
-        for t in self.tag:
-            tag = Tag.objects.get(pk=t)
+        for tag in self.tag.all():
             if tag and tag.is_actived:
                 tags.append(tag.name)
 
@@ -119,8 +118,7 @@ class Guidebook(models.Model):
         tags = []
         if self.tag is None:
             return []
-        for t in self.tag:
-            tag = Tag.objects.get(pk=t)
+        for tag in self.tag.all():
             if tag and tag.is_actived:
                 tags.append(tag.name)
         return tags

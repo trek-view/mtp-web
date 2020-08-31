@@ -77,6 +77,7 @@
                     <div class="edit-form d-none">
                         <form id="edit_form">
                             {% csrf_token %}
+                            {{ addSequenceForm.media }}
                             {{ addSequenceForm.as_p }}
                             <div class="text-right mt-3">
                                 <button type="button" class="btn btn-primary btn-save btn-sm">Save</button>

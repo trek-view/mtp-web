@@ -90,7 +90,7 @@ class Sequence(models.Model):
     name = models.CharField(max_length=100, default='')
     description = models.TextField(default='')
     transport_type = models.ForeignKey(TransType, on_delete=models.CASCADE, null=True)
-    tag = ArrayField(models.CharField(default='0', max_length=6), null=True)
+    tag = models.ManyToManyField(Tag)
 
     image_count = models.IntegerField(default=0)
 
@@ -118,10 +118,9 @@ class Sequence(models.Model):
 
     def getTagStr(self):
         tags = []
-        if self.tag is None:
+        if self.tag.all().count() == 0:
             return ''
-        for t in self.tag:
-            tag = Tag.objects.get(pk=t)
+        for tag in self.tag.all():
             if tag and tag.is_actived:
                 tags.append(tag.name)
 
@@ -132,10 +131,9 @@ class Sequence(models.Model):
 
     def getTags(self):
         tags = []
-        if self.tag is None:
-            return []
-        for t in self.tag:
-            tag = Tag.objects.get(pk=t)
+        if self.tag.all().count() == 0:
+            return ''
+        for tag in self.tag.all():
             if tag and tag.is_actived:
                 tags.append(tag.name)
         return tags

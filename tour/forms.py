@@ -6,7 +6,7 @@ from django_select2 import forms as s2forms
 from .models import *
 from datetime import datetime
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
-
+from tags_input import fields
 ############################################################################
 ############################################################################
 
@@ -21,10 +21,10 @@ class TourForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation': 'required'}),
         required=False)
 
-        self.fields['tag'] = forms.MultipleChoiceField(
-            required=False,
-            widget=forms.SelectMultiple(attrs={'class': 'form-control', 'data-validation': 'required'}),
-            choices=getAllTourTags()
+        self.fields['tour_tag'] = fields.TagsInputField(
+            TourTag.objects.filter(is_actived=True),
+            create_missing=True,
+            required=True,
         )
 
     class Meta:
@@ -32,7 +32,7 @@ class TourForm(forms.ModelForm):
         fields = (
             'name',
             'description',
-            'tag'
+            'tour_tag'
         )
 
 class TourSearchForm(forms.Form):
@@ -51,10 +51,10 @@ class TourSearchForm(forms.Form):
             required=False
         )
 
-        self.fields['tag'] = forms.MultipleChoiceField(
+        self.fields['tour_tag'] = fields.TagsInputField(
+            TourTag.objects.filter(is_actived=True),
+            create_missing=True,
             required=False,
-            widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
-            choices=getAllTourTags()
         )
 
     def _my(self, username):

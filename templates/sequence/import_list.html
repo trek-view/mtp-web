@@ -3,7 +3,7 @@
 {% block app_sequence %}active{% endblock %}
 {% block app_style %}<link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">{% endblock %}
 {% block content %}
-
+{{ addSequenceForm.media }}
 <div class="main-body">
     <div class="left-side d-flex flex-column justify-content-between">
         <div>
@@ -243,6 +243,8 @@
       </div>
       <div class="modal-body">
           <form id="add_form">
+              {% csrf_token %}
+
               {{ addSequenceForm.as_p }}
           </form>
       </div>
@@ -283,11 +285,8 @@
     mapboxgl.accessToken = mapboxToken;
     var positions = [];
     var sequences = {};
-    var all_tags = {};
+
     var all_transport_types = {};
-    {% for tag in all_tags %}
-        all_tags["{{ tag.id }}"] = "{{ tag.name }}";
-    {% endfor %}
     {% for type in all_transport_types %}
         all_transport_types["{{ type.id }}"] = "{{ type.name }}";
     {% endfor %}
@@ -380,16 +379,14 @@
 
     function show_add_modal(id) {
         selected_sequence_id = id;
-        var name = sequences[id]['name'];
-        var description = sequences[id]['description'];
-        console.log(description);
-        var transport_type = sequences[id]['transport_type'];
-        var tags = sequences[id]['tags'];
         var modal_form = $('#add_form_modal .modal-body');
-        modal_form.find('input[name="name"]').val(name);
-        modal_form.find('textarea[name="description"]').val(description);
-        modal_form.find('select[name="transport_type"]').val(transport_type);
-        modal_form.find('select[name="tag"]').val(tags);
+        $('.tagsinput .tag').each(function (index) {
+            $(this).remove();
+        });
+        modal_form.find('input[name="name"]').val('');
+        modal_form.find('textarea[name="description"]').val('');
+        modal_form.find('select[name="transport_type"]').val('');
+        modal_form.find('input[name="tag"]').val('');
         $('#add_form_modal').modal('show');
     }
 
@@ -416,25 +413,20 @@
         var name = modal_form.find('input[name="name"]').val();
         var description = modal_form.find('textarea[name="description"]').val();
         var transport_type = modal_form.find('select[name="transport_type"]').val();
-        var tags = modal_form.find('select[name="tag"]').val();
-
+        var tags = modal_form.find('input[name="tag"]').val();
+        console.log(tags)
         /*
         sequences[selected_sequence_id]['name'] = name;
         sequences[selected_sequence_id]['description'] = description;
         sequences[selected_sequence_id]['transport_type'] = transport_type;
         sequences[selected_sequence_id]['tags'] = tags;
         */
-
+        var url = "{% url 'sequence.ajax_import' unique_id='unique_id' %}";
+        url = url.replace('unique_id', selected_sequence_id)
         $.ajax({
-            url: "{% url 'sequence.ajax_import' %}",
+            url: url,
             type: 'POST',
-            data: {
-                'unique_id': selected_sequence_id,
-                'name': name,
-                'description': description,
-                'transport_type': transport_type,
-                'tags': tags
-            },
+            data: $('#add_form').serialize(),
             dataType: 'json',
             success: function (data) {
                 if (data.status == 'failed')
@@ -451,9 +443,9 @@
                     added_form.find('.sequence-description .contents').text(description);
                     added_form.find('.sequence-transport-type .contents').text(all_transport_types[transport_type]);
                     var tag_html = '';
-                    console.log(all_tags)
-                    for (var i = 0; i < tags.length; i++) {
-                        tag_html += '<span class="tag">' + all_tags[tags[i]] + '</span>';
+                    var tag_ary = tags.split(',');
+                    for (var i = 0; i < tag_ary.length; i++) {
+                        tag_html += '<span class="tag">' + tag_ary[i] + '</span>';
                     }
                     added_form.find('.sequence-tag .contents').html(tag_html);
 

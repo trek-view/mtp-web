@@ -37,7 +37,14 @@ INSTALLED_APPS = [
     'bootstrap4',
     'bootstrap_datepicker_plus',
     'mptt',
+    'tags_input',
 ]
+
+TAGS_INPUT_MAPPINGS = {
+    'guidebook.Tag': {'field': 'name'},
+    'sequence.Tag': {'field': 'name'},
+    'tour.TourTag': {'field': 'name'}
+}
 
 
 MIDDLEWARE = [
