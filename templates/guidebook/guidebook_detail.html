@@ -203,6 +203,10 @@
                     <img class="w-100" src="{% static 'images/icon/flap.svg' %}">
                 </div>
                 <div class="switch-cover"></div>
+                <div class="return-scene d-none" style="">
+                    Return to scene
+                </div>
+
                 <div id='mapillary_image_box' class="image-box display"></div>
             </div>
             <div class="show-or-hide">
@@ -373,7 +377,6 @@
             component: {
                 cover: false,
                 tag: true,
-                direction: false,
                 sequence: false,
             },
         }
@@ -518,28 +521,40 @@
 
     mapillaryViewer.on(Mapillary.Viewer.nodechanged, function (node) {
         current_node_point = [node.latLon.lat, node.latLon.lon];
-        current_node_key = node.key;
-        current_order_number = key_list.indexOf(current_node_key);
-
-        if (key_list.length > 1)
-        {
-            $('.PrevOrNext .SequencePlay').text('Scene ' + (current_order_number + 1))
-            $('.PrevOrNext').removeClass('d-none');
-            if (current_order_number == 0)
-            {
-                $('.PrevOrNext .SequenceStepPrev').addClass('disabled');
-            }
-            else
-                $('.PrevOrNext .SequenceStepPrev').removeClass('disabled');
-            if (current_order_number == key_list.length - 1)
-            {
-                $('.PrevOrNext .SequenceStepNext').addClass('disabled');
-            }
-            else
-                $('.PrevOrNext .SequenceStepNext').removeClass('disabled');
+        var node_key = node.key;
+        var order_number = key_list.indexOf(node_key);
+        if (order_number == -1) {
+            $('.PrevOrNext .SequencePlay').text('No scene');
+            $('.return-scene').removeClass('d-none');
         }
-        else
-            $('.PrevOrNext').addClass('d-none');
+        else {
+            current_order_number = order_number;
+            current_node_key = node_key;
+            $('.return-scene').addClass('d-none');
+            if (key_list.length > 1)
+            {
+                $('.PrevOrNext .SequencePlay').text('Scene ' + (current_order_number + 1))
+                $('.PrevOrNext').removeClass('d-none');
+                if (current_order_number == 0)
+                {
+                    $('.PrevOrNext .SequenceStepPrev').addClass('disabled');
+                }
+                else
+                    $('.PrevOrNext .SequenceStepPrev').removeClass('disabled');
+                if (current_order_number == key_list.length - 1)
+                {
+                    $('.PrevOrNext .SequenceStepNext').addClass('disabled');
+                }
+                else
+                    $('.PrevOrNext .SequenceStepNext').removeClass('disabled');
+            }
+            else
+            {
+                $('.PrevOrNext').addClass('d-none');
+            }
+        }
+
+
         $('#poi_list').html('');
         if (map.getLayer('markers')) map.removeLayer('markers');
         if (map.getSource('markers')) map.removeSource('markers');
@@ -590,6 +605,10 @@
 
             }
         });
+    });
+
+    $('.return-scene').click(function () {
+        mapillaryViewer.moveToKey(current_node_key);
     });
 
     $('.PrevOrNext .SequenceStepPrev').click(function () {
