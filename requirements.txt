@@ -34,6 +34,7 @@ django-robots==4.0
 django-s3-folder-storage==0.1
 django-select2==7.4.2
 django-storages==1.9.1
+django-tags-input==5.0.0
 django-two-factor-auth==1.12.1
 docutils==0.15.2
 filelock==3.0.12
