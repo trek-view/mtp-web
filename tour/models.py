@@ -115,6 +115,16 @@ class Tour(models.Model):
 
         return "%.3f" % distance
 
+    def getCoverImage(self):
+
+        tour_sequences = TourSequence.objects.filter(tour=self)
+        if tour_sequences.count() > 0:
+            sequence = tour_sequences[0].sequence
+            return sequence.getCoverImage()
+        else:
+            return None
+
+
 class TourSequence(models.Model):
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
     sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE)

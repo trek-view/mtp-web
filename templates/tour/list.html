@@ -97,6 +97,13 @@
                         <div class="card tour p-3 m-3 d-flex flex-row align-items-center" id="tour_{{ tour.unique_id }}" data-tour-id="{{ tour.unique_id }}">
                             <div class="min-map-box" id="map-{{ tour.unique_id }}">
                             </div>
+                            <div class="cover-image-box ml-3 mr-3" style="width: 180px;">
+                                {% if tour.getCoverImage is None %}
+                                    <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
+                                {% else %}
+                                    <img class="w-100" src="https://images.mapillary.com/{{ tour.getCoverImage }}/thumb-320.jpg">
+                                {% endif %}
+                            </div>
                             <div class="item-detail-box pl-3 pr-3 w-auto">
                                 <div class="item-main w-100 float-left">
                                     <div class="item-title text-info d-flex flex-row justify-content-between">

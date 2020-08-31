@@ -171,9 +171,12 @@ class Sequence(models.Model):
             all_distance = "%.3f" % all_distance
         return all_distance
 
-    # def getTourCount(self):
-    #     tour_sequences = TourSequence.objects.filter(sequence=self)
-    #     return tour_sequences.count()
+    def getCoverImage(self):
+        image_keys = self.coordinates_image
+        if len(image_keys) > 0:
+            return image_keys[0]
+        else:
+            return None
 
 class Image(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
