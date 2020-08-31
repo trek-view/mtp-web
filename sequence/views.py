@@ -71,8 +71,7 @@ def sequence_list(request):
             username = form.cleaned_data['username']
 
             sequences = Sequence.objects.all().filter(
-                is_published=True,
-                is_transport=True
+                is_published=True
             )
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)
@@ -149,8 +148,7 @@ def my_sequence_list(request):
             transport_type = form.cleaned_data['transport_type']
 
             sequences = Sequence.objects.all().filter(
-                user=request.user,
-                is_transport=True
+                user=request.user
             )
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)
@@ -258,7 +256,6 @@ def sequence_delete(request, unique_id):
         for tag in tags:
             sequence.tag.remove(tag)
         sequence.is_published = False
-        sequence.is_transport = False
         sequence.save()
 
         seq_likes = SequenceLike.objects.filter(sequence=sequence)
@@ -331,17 +328,17 @@ def ajax_save_sequence(request, unique_id):
         'message': 'The sequence does not exist or has no access.'
     })
 
+def sort_by_captured_at(item):
+    return str(item['properties']['captured_at'])
+
 @my_login_required
 def import_sequence_list(request):
     sequences = []
     search_form = TransportSearchForm()
-    page = 1
     action = 'filter'
     if request.method == "GET":
         month = request.GET.get('month')
         page = request.GET.get('page')
-        if page is None:
-            page = 1
         action = request.GET.get('action')
         if action is None:
             action = 'filter'
@@ -356,109 +353,91 @@ def import_sequence_list(request):
             if map_user is None:
                 return redirect('home')
 
-            if action == 'filter':
-                end_seq = Sequence.objects.filter(
-                    user=request.user,
-                    user_key=map_user.key,
-                    captured_at__year=y,
-                    captured_at__month=m,
-                ).order_by('captured_at')[:1]
-
+            if page is None:
                 start_time = month + '-01'
-                if end_seq.count() == 0 or action == 'restore':
-                    if m == '12':
-                        y = str(int(y) + 1)
-                        m = '01'
-                    else:
-                        if int(m) < 9:
-                            m = '0' + str(int(m) + 1)
-                        else:
-                            m = str(int(m) + 1)
-                    end_time = y + '-' + m + '-01'
-                    per_page = 5
+
+                if m == '12':
+                    y = str(int(y) + 1)
+                    m = '01'
                 else:
-                    end_time = str(end_seq[0].captured_at)[0:19]
-                    per_page = 6
+                    if int(m) < 9:
+                        m = '0' + str(int(m) + 1)
+                    else:
+                        m = str(int(m) + 1)
+                end_time = y + '-' + m + '-01'
+                per_page = 1000
 
-
-                # sequences = []
-                # seqs = Sequence.objects.filter()[:5]
-                #
-                # for s in seqs:
-                #     sequences.append(s)
-
-                url = 'https://a.mapillary.com/v3/sequences?page=1&per_page={}&client_id={}&userkeys={}&start_time={}&end_time={}'.format(per_page, settings.MAPILLARY_CLIENT_ID, map_user.key, start_time, end_time)
-                # url = 'https://a.mapillary.com/v3/sequences?per_page=1000&client_id={}&start_time={}&end_time={}'.format(settings.MAPILLARY_CLIENT_ID, start_time, end_time)
+                url = 'https://a.mapillary.com/v3/sequences?page=1&per_page={}&client_id={}&userkeys={}&start_time={}&end_time={}'.format(
+                    per_page,
+                    settings.MAPILLARY_CLIENT_ID,
+                    map_user.key,
+                    start_time,
+                    end_time
+                )
                 response = requests.get(url)
-                r = requests.head(url)
-
                 data = response.json()
+                features = data['features']
+                features.sort(key=sort_by_captured_at)
+                request.session['sequences'] = features
 
-                for feature in data['features']:
-                    properties = feature['properties']
-                    geometry = feature['geometry']
-                    sequence = Sequence.objects.filter(seq_key=properties['key'])[:1]
+                page = 1
+            if request.session['sequences'] is None or not request.session['sequences']:
+                request.session['sequences'] = []
 
-                    if sequence.count() > 0:
-                        continue
+            sequences_ary = []
+
+            for seq in request.session['sequences']:
+                seq_s = Sequence.objects.filter(seq_key=seq['properties']['key'])[:1]
+                if seq_s.count() == 0:
+                    sequences_ary.append(seq)
+
+            paginator = Paginator(sequences_ary, 5)
+            try:
+                sequences = paginator.page(page)
+            except PageNotAnInteger:
+                sequences = paginator.page(1)
+            except EmptyPage:
+                sequences = paginator.page(paginator.num_pages)
+
+            first_num = 1
+            last_num = paginator.num_pages
+            if paginator.num_pages > 7:
+                if sequences.number < 4:
+                    first_num = 1
+                    last_num = 7
+                elif sequences.number > paginator.num_pages - 3:
+                    first_num = paginator.num_pages - 6
+                    last_num = paginator.num_pages
+                else:
+                    first_num = sequences.number - 3
+                    last_num = sequences.number + 3
+            sequences.paginator.pages = range(first_num, last_num + 1)
+            sequences.count = len(sequences)
+
+            for i in range(len(sequences)):
+                seq = Sequence.objects.filter(seq_key=sequences[i]['properties']['key'])[:1]
+                if seq.count() > 0:
+                    sequences[i]['unique_id'] = str(seq[0].unique_id)
+                    sequences[i]['name'] = seq[0].name
+                    sequences[i]['description'] = seq[0].description
+                    if seq[0].transport_type is None:
+                        sequences[i]['transport_type'] = ''
                     else:
-                        sequence = Sequence()
-                    sequence.user = request.user
-                    if 'camera_make' in properties:
-                        sequence.camera_make = properties['camera_make']
-                    sequence.captured_at = properties['captured_at']
-                    if 'created_at' in properties:
-                        sequence.created_at = properties['created_at']
-                    sequence.seq_key = properties['key']
-                    if 'pano' in properties:
-                        sequence.pano = properties['pano']
-                    if 'user_key' in properties:
-                        sequence.user_key = properties['user_key']
-                    if 'username' in properties:
-                        sequence.username = properties['username']
-                    sequence.geometry_coordinates_ary = geometry['coordinates']
-                    sequence.image_count = len(geometry['coordinates'])
-                    # lineString = LineString(geometry['coordinates'][0], geometry['coordinates'][1])
-                    # i = 0
-                    # print(time.process_time() - start)
-                    # for point in geometry['coordinates']:
-                    #     i += 1
-                    #     if i < 3:
-                    #         continue
-                    #     lineString.append((point[0], point[1]))
-                    # print('len: ', len(lineString))
-                    # sequence.geometry_coordinates = lineString
-                    sequence.coordinates_cas = properties['coordinateProperties']['cas']
-                    sequence.coordinates_image = properties['coordinateProperties']['image_keys']
-                    if 'private' in properties:
-                        sequence.is_privated = properties['private']
-                    sequence.save()
-                    sequences.append(sequence)
-            else:
-                trash_sequences = Sequence.objects.filter(user_key=map_user.key, is_transport=False, captured_at__month=m, captured_at__year=y)
-                paginator = Paginator(trash_sequences.order_by('-created_at'), 5)
+                        sequences[i]['transport_type'] = seq[0].transport_type.parent.name + ' - ' +seq[0].transport_type.name
+                    sequences[i]['tags'] = seq[0].getTags()
+                else:
+                    sequences[i]['unique_id'] = None
 
-                try:
-                    sequences = paginator.page(page)
-                except PageNotAnInteger:
-                    sequences = paginator.page(1)
-                except EmptyPage:
-                    sequences = paginator.page(paginator.num_pages)
+                sequences[i]['image_count'] = len(sequences[i]['properties']['coordinateProperties']['image_keys'])
+                sequences[i]['captured_at'] = sequences[i]['properties']['captured_at']
+                sequences[i]['camera_make'] = sequences[i]['properties']['camera_make']
+                sequences[i]['created_at'] = sequences[i]['properties']['created_at']
+                sequences[i]['seq_key'] = sequences[i]['properties']['key']
+                sequences[i]['pano'] = sequences[i]['properties']['pano']
+                sequences[i]['user_key'] = sequences[i]['properties']['user_key']
+                sequences[i]['username'] = sequences[i]['properties']['username']
+                sequences[i]['geometry_coordinates_ary'] = sequences[i]['geometry']['coordinates']
 
-                first_num = 1
-                last_num = paginator.num_pages
-                if paginator.num_pages > 7:
-                    if sequences.number < 4:
-                        first_num = 1
-                        last_num = 7
-                    elif sequences.number > paginator.num_pages - 3:
-                        first_num = paginator.num_pages - 6
-                        last_num = paginator.num_pages
-                    else:
-                        first_num = sequences.number - 3
-                        last_num = sequences.number + 3
-                sequences.paginator.pages = range(first_num, last_num + 1)
-                sequences.count = len(sequences)
 
     addSequenceForm = AddSequeceForm()
 
@@ -481,7 +460,7 @@ def import_sequence_list(request):
     return render(request, 'sequence/import_list.html', content)
 
 @my_login_required
-def ajax_import(request, unique_id):
+def ajax_import(request, seq_key):
     if request.method == 'POST':
 
         # form = AddSequeceForm(request.POST)
@@ -494,29 +473,58 @@ def ajax_import(request, unique_id):
         #         continue
         form = AddSequeceForm(request.POST)
         if form.is_valid():
-            sequence = Sequence.objects.get(unique_id=unique_id)
-            if not sequence or sequence is None:
-                return JsonResponse({
-                    'status': 'failed',
-                    'message': 'This sequence was not imported.'
-                })
-            sequence.name = form.cleaned_data['name']
-            sequence.description = form.cleaned_data['description']
-            sequence.transport_type = form.cleaned_data['transport_type']
-            if form.cleaned_data['tag'].count() > 0:
-                for tag in form.cleaned_data['tag']:
-                    sequence.tag.add(tag)
-                for tag in sequence.tag.all():
-                    if not tag in form.cleaned_data['tag']:
-                        sequence.tag.remove(tag)
-            sequence.is_published = True
-            sequence.is_transport = True
-            sequence.save()
-            # messages.success(request, "Sequences successfully imported.")
-            return JsonResponse({
-                'status': 'success',
-                'message': 'Sequence successfully imported.'
-            })
+
+            # for i in range(len(request.session['sequences'])):
+            for feature in request.session['sequences']:
+                # feature = request.session['sequences'][i]
+                if feature['properties']['key'] == seq_key:
+                    properties = feature['properties']
+                    geometry = feature['geometry']
+                    sequence = Sequence.objects.filter(seq_key=seq_key)[:1]
+
+                    if sequence.count() > 0:
+                        continue
+                    else:
+                        sequence = Sequence()
+                    sequence.user = request.user
+                    if 'camera_make' in properties:
+                        sequence.camera_make = properties['camera_make']
+                    sequence.captured_at = properties['captured_at']
+                    if 'created_at' in properties:
+                        sequence.created_at = properties['created_at']
+                    sequence.seq_key = properties['key']
+                    if 'pano' in properties:
+                        sequence.pano = properties['pano']
+                    if 'user_key' in properties:
+                        sequence.user_key = properties['user_key']
+                    if 'username' in properties:
+                        sequence.username = properties['username']
+                    sequence.geometry_coordinates_ary = geometry['coordinates']
+                    sequence.image_count = len(geometry['coordinates'])
+                    sequence.coordinates_cas = properties['coordinateProperties']['cas']
+                    sequence.coordinates_image = properties['coordinateProperties']['image_keys']
+                    if 'private' in properties:
+                        sequence.is_privated = properties['private']
+
+                    sequence.name = form.cleaned_data['name']
+                    sequence.description = form.cleaned_data['description']
+                    sequence.transport_type = form.cleaned_data['transport_type']
+                    sequence.is_published = True
+                    sequence.save()
+
+                    if form.cleaned_data['tag'].count() > 0:
+                        for tag in form.cleaned_data['tag']:
+                            sequence.tag.add(tag)
+                        for tag in sequence.tag.all():
+                            if not tag in form.cleaned_data['tag']:
+                                sequence.tag.remove(tag)
+
+                    # messages.success(request, "Sequences successfully imported.")
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': 'Sequence successfully imported.',
+                        'unique_id': str(sequence.unique_id)
+                    })
     return JsonResponse({
         'status': 'failed',
         'message': 'Sequence was not imported.'

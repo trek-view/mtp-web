@@ -116,8 +116,7 @@ def tour_add_sequence(request, unique_id):
             # end_time = form.cleaned_data['end_time']
 
             sequences = Sequence.objects.all().filter(
-                user=request.user,
-                is_transport=True
+                user=request.user
             )
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)

@@ -46,10 +46,10 @@ class SequenceAdmin(tags_input_admin.TagsInputAdmin):
         'description'
     )
 
-    def get_queryset(self, request):
-        query = super(SequenceAdmin, self).get_queryset(request)
-        filtered_query = query.filter(is_transport=True)
-        return filtered_query
+    # def get_queryset(self, request):
+    #     query = super(SequenceAdmin, self).get_queryset(request)
+    #     filtered_query = query.filter(is_transport=True)
+    #     return filtered_query
 
 class IconAdmin(admin.ModelAdmin):
     list_display = (

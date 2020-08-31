@@ -37,26 +37,12 @@
 
             </div>
 
-            <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
-                <li class="nav-item" style="width: 50%;">
-                    <a class="nav-link {% if action == 'filter' %}active{% endif %}" href="javascript:switch_action('filter');" id="switch_filter">
-                        Filter Mapillary
-                    </a>
-                </li>
-                <li class="nav-item" style="width: 40%">
-                    <a class="nav-link {% if action == 'restore' %}active{% endif %}" href="javascript:switch_action('restore');" id="switch_restore">
-                        Restore Trash
-                    </a>
-                </li>
-            </ul>
-
             <div class="p-3" style="border-top: 1px solid #dee2e6;">
                 <form id="search_form">
                     {% load bootstrap4 %}
                     {% bootstrap_css %}
                     {{ search_form.media }}
                     {{ search_form.as_p }}
-                    <input type="text" class="d-none" name="action" value="{{ action }}">
                     <div class="form-group text-right mt-3">
                         <button type="submit" class="save btn btn-primary">Search</button>
                     </div>
@@ -67,52 +53,39 @@
     </div>
     <div class="right-board bg-light">
         <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
-            {% if seq_count > 0 %}
-                <div class="save-added-form m-3 text-right">
-                    <form method="post" id="added_form_data" class="d-none">
-                    </form>
-                    {% if action == 'filter' %}
-                        <button type="button" class="btn btn-primary" id="save_added_form_next" onclick="submit_form_data(true)">
-                            Next Page
-                        </button>
-                    {% endif %}
-                </div>
-            {% endif %}
-            {% if action == 'restore' %}
-                <div class="paginator">
-                    {% if sequences.has_other_pages %}
-                        <ul class="pagination justify-content-center">
-                            {% if sequences.number != 1 %}
-                                <li class="page-item">
-                                    <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
-                                </li>
+            <div class="paginator">
+                {% if sequences.has_other_pages %}
+                    <ul class="pagination justify-content-center">
+                        {% if sequences.number != 1 %}
+                            <li class="page-item">
+                                <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in sequences.paginator.pages %}
+                            {% if sequences.number == i %}
+                                <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
                             {% else %}
-                                <li class="page-item disabled">
-                                    <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
-                                </li>
+                                <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
                             {% endif %}
-                            {% for i in sequences.paginator.pages %}
-                                {% if sequences.number == i %}
-                                    <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
-                                {% else %}
-                                    <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
-                                {% endif %}
-                            {% endfor %}
-                            {% if sequences.number != sequences.paginator.num_pages %}
-                                <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ sequences.paginator.num_pages }}'>&raquo;</a></li>
-                            {% else %}
-                                <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
-                            {% endif %}
-                        </ul>
-                    {% endif %}
-                </div>
-            {% endif %}
+                        {% endfor %}
+                        {% if sequences.number != sequences.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ sequences.paginator.num_pages }}'>&raquo;</a></li>
+                        {% else %}
+                            <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
             <div class="sequence-list">
                 {% if seq_count > 0 %}
                     {% for sequence in sequences %}
-                        <div class="card sequence pt-3 pb-3 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}">
+                        <div class="card sequence pt-3 pb-3 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.seq_key }}" data-sequence-id="{{ sequence.seq_key }}">
                             <div class="col-md-6 d-flex flex-row border-right">
-                                <div class="min-map-box" style="height: 208px" id="map-{{ sequence.unique_id }}">
+                                <div class="min-map-box" style="height: 208px" id="map-{{ sequence.seq_key }}">
                                 </div>
                                 <div class="detail-box pl-3">
                                     <div class="sequence-main float-left">
@@ -140,7 +113,7 @@
                                         <div class="sequence-image-count" style="color: #a79f9f;">
                                             <span>Number of photos:</span>
                                             <p class="mb-1">
-                                                {{ sequence.getImageCount }}
+                                                {{ sequence.image_count }}
                                             </p>
                                         </div>
 
@@ -149,7 +122,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="transport-btn text-center">
-                                    <button type="button" class="btn btn-warning " onclick="show_add_modal('{{ sequence.unique_id }}')">
+                                    <button type="button" class="btn btn-warning " onclick="show_add_modal('{{ sequence.seq_key }}')">
                                         Import
                                     </button>
                                 </div>
@@ -173,7 +146,7 @@
                                         </p>
                                     </div>
                                     <div class="actions text-right">
-                                        <a type="button" target="_blank" href="{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}">
+                                        <a type="button" target="_blank" href="{% url 'sequence.sequence_detail' unique_id='unique_id' %}">
                                             Go to detail page.
                                         </a>
                                     </div>
@@ -187,46 +160,33 @@
                     </div>
                 {% endif %}
             </div>
-            {% if action == 'restore' %}
-                <div class="paginator">
-                    {% if sequences.has_other_pages %}
-                        <ul class="pagination justify-content-center">
-                            {% if sequences.number != 1 %}
-                                <li class="page-item">
-                                    <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
-                                </li>
+            <div class="paginator">
+                {% if sequences.has_other_pages %}
+                    <ul class="pagination justify-content-center">
+                        {% if sequences.number != 1 %}
+                            <li class="page-item">
+                                <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in sequences.paginator.pages %}
+                            {% if sequences.number == i %}
+                                <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
                             {% else %}
-                                <li class="page-item disabled">
-                                    <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
-                                </li>
+                                <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
                             {% endif %}
-                            {% for i in sequences.paginator.pages %}
-                                {% if sequences.number == i %}
-                                    <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
-                                {% else %}
-                                    <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
-                                {% endif %}
-                            {% endfor %}
-                            {% if sequences.number != sequences.paginator.num_pages %}
-                                <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ sequences.paginator.num_pages }}'>&raquo;</a></li>
-                            {% else %}
-                                <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
-                            {% endif %}
-                        </ul>
-                    {% endif %}
-                </div>
-            {% endif %}
-            {% if seq_count > 0 %}
-                <div class="save-added-form m-3 text-right">
-                    <form method="post" id="added_form_data" class="d-none">
-                    </form>
-                    {% if action == 'filter' %}
-                        <button type="button" class="btn btn-primary" id="save_added_form_next" onclick="submit_form_data(true)">
-                            Next Page
-                        </button>
-                    {% endif %}
-                </div>
-            {% endif %}
+                        {% endfor %}
+                        {% if sequences.number != sequences.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ sequences.paginator.num_pages }}'>&raquo;</a></li>
+                        {% else %}
+                            <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
@@ -291,7 +251,7 @@
         all_transport_types["{{ type.id }}"] = "{{ type.name }}";
     {% endfor %}
     {% for sequence in sequences %}
-        sequences['{{ sequence.unique_id }}'] = {
+        sequences['{{ sequence.seq_key }}'] = {
             'name': '',
             'description': '',
             'transport_type': 0,
@@ -304,8 +264,8 @@
         var url = "{% url 'sequence.import_sequence_list' %}?page="+ pageNum + "&" + $('#search_form').serialize();
         location.assign(url);
     });
-    function draw_map(data) {
-        var obj = $('.min-map-box').eq(i);
+    function draw_map(index, data) {
+        var obj = $('.min-map-box').eq(index);
         var obj_id = obj.attr('id');
         var sceneData = [];
         var item = {};
@@ -372,7 +332,7 @@
 
     for (i = 0; i < positions.length; i++)
     {
-        draw_map(positions[i])
+        draw_map(i, positions[i])
     }
 
     var selected_sequence_id = '';
@@ -421,8 +381,8 @@
         sequences[selected_sequence_id]['transport_type'] = transport_type;
         sequences[selected_sequence_id]['tags'] = tags;
         */
-        var url = "{% url 'sequence.ajax_import' unique_id='unique_id' %}";
-        url = url.replace('unique_id', selected_sequence_id)
+        var url = "{% url 'sequence.ajax_import' seq_key='seq_key' %}";
+        url = url.replace('seq_key', selected_sequence_id)
         $.ajax({
             url: url,
             type: 'POST',
@@ -435,6 +395,11 @@
                     toastr.success(data.message);
                     var added_form = $('#sequence_' + selected_sequence_id).find('.added-form');
                     var transport_btn = $('#sequence_' + selected_sequence_id).find('.transport-btn');
+                    var action = $('#sequence_' + selected_sequence_id).find('.actions').find('a');
+                    var url = action.attr('href');
+
+                    url = url.replace('unique_id', data.unique_id);
+                    action.attr('href', url)
 
                     added_form.removeClass('d-none');
                     transport_btn.addClass('d-none');
@@ -464,13 +429,6 @@
 
     var page = 1;
 
-    function switch_action(action) {
-        var month = $('input[name="month"]').val();
-        if (action == 'filter')
-            location.assign("{% url 'sequence.import_sequence_list' %}?action=filter");
-        else
-            location.assign("{% url 'sequence.import_sequence_list' %}?page=1&action=restore");
-    }
 
 </script>
 {% endblock %}

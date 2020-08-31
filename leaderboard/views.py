@@ -58,9 +58,7 @@ def index(request):
         transport_type = request.GET.get('transport_type')
         time_type = request.GET.get('time_type')
         if time_type is None or not time_type or time_type == 'all_time':
-            sequences = Sequence.objects.filter(
-                is_transport=True
-            )
+            sequences = Sequence.objects.all()
         else:
             if time_type == 'monthly':
                 if filter_time is None:
@@ -73,7 +71,6 @@ def index(request):
                     y = filter_time.split('-')[0]
                     m = filter_time.split('-')[1]
                 sequences = Sequence.objects.filter(
-                    is_transport=True,
                     captured_at__month=m,
                     captured_at__year=y
                 )
@@ -87,7 +84,6 @@ def index(request):
                     form.set_timely('YYYY', filter_time)
                     y = filter_time
                 sequences = Sequence.objects.filter(
-                    is_transport=True,
                     captured_at__year=y
                 )
                 time_type = 'yearly'
@@ -98,9 +94,7 @@ def index(request):
 
     if sequences == None:
 
-        sequences = Sequence.objects.filter(
-            is_transport=True,
-        )
+        sequences = Sequence.objects.all()
 
 
     user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
@@ -143,8 +137,7 @@ def index(request):
         pItems[i]['username'] = user.username
 
         u_sequences = Sequence.objects.filter(
-            user=user,
-            is_transport=True,
+            user=user
         )
 
         if not y is None:
