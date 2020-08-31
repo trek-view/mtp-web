@@ -7,14 +7,13 @@
 <div class="main-body">
     <div class="left-side d-flex flex-column justify-content-between">
         <div>
-            <div class="pl-3 pr-3 mt-5 mb-3 text-right">
-                <em>
-                    <a href="{% url 'tour.tour_list' %}">
-                        Go to Tour List
-                    </a>
-                </em>
+            <div class="page-header">
+                <div class="pt-3 pl-3 mt-3 pr-3 ">
+                    <h4>
+                        {{ pageName }}
+                    </h4>
+                </div>
             </div>
-
             <div class="card m-3 p-2">
                 <div class="tour-detail ">
                     <div class="tour-name text-center text-info mt-1">

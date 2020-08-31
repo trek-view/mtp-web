@@ -178,7 +178,7 @@ def tour_add_sequence(request, unique_id):
             'sequences': pSequences,
             'sequence_count': len(pSequences),
             'form': form,
-            'pageName': 'Import Sequence',
+            'pageName': 'Edit Tour',
             'pageTitle': 'Sequence',
             'pageDescription': MAIN_PAGE_DESCRIPTION,
             'page': page,
