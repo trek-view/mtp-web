@@ -461,7 +461,7 @@ def ajax_save_poi(request, unique_id, pk):
     if request.method == "POST":
         if request.POST.get('type') == 'new':
             poi = PointOfInterest()
-            poi.title = 'Undefined Title'
+            poi.title = ''
             poi.description = ''
             categories = POICategory.objects.all()
             poi.category_id = categories[0].pk
