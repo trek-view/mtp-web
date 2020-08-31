@@ -73,14 +73,7 @@
                     </form>
                     {% if action == 'filter' %}
                         <button type="button" class="btn btn-primary" id="save_added_form_next" onclick="submit_form_data(true)">
-                            Save and Next Page
-                        </button>
-                        <button type="button" class="btn btn-primary" id="save_added_form" onclick="submit_form_data(false);">
-                            Save
-                        </button>
-                    {% else %}
-                        <button type="button" class="btn btn-primary" id="save_added_form_next" onclick="submit_form_data(true)">
-                            Save
+                            Next Page
                         </button>
                     {% endif %}
                 </div>
@@ -157,7 +150,7 @@
                             <div class="col-md-6">
                                 <div class="transport-btn text-center">
                                     <button type="button" class="btn btn-warning " onclick="show_add_modal('{{ sequence.unique_id }}')">
-                                        Transport into Map the Paths
+                                        Import
                                     </button>
                                 </div>
 
@@ -168,7 +161,7 @@
                                     </div>
                                     <div class="sequence-description">
                                         <p class="w-25 mb-0" style="color: #9E9E9E;">Description: </p>
-                                        <p class="w-75 contents">This is my first test. so I want to transport </p>
+                                        <p class="w-75 contents">This is my first test. so I want to import </p>
                                     </div>
                                     <div class="sequence-transport-type" style="color: blueviolet;">
                                         <p class="w-25 mb-0">Transport Type: </p>
@@ -180,12 +173,9 @@
                                         </p>
                                     </div>
                                     <div class="actions text-right">
-                                        <button type="button" class="btn btn-sm btn-primary" onclick="show_add_modal('{{ sequence.unique_id }}')">
-                                            Edit
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger" onclick="reset_added_form('{{ sequence.unique_id }}')">
-                                            Cancel
-                                        </button>
+                                        <a type="button" target="_blank" href="{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}">
+                                            Go to detail page.
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -232,14 +222,7 @@
                     </form>
                     {% if action == 'filter' %}
                         <button type="button" class="btn btn-primary" id="save_added_form_next" onclick="submit_form_data(true)">
-                            Save and Next Page
-                        </button>
-                        <button type="button" class="btn btn-primary" id="save_added_form" onclick="submit_form_data(false);">
-                            Save
-                        </button>
-                    {% else %}
-                        <button type="button" class="btn btn-primary" id="save_added_form_next" onclick="submit_form_data(true)">
-                            Save
+                            Next Page
                         </button>
                     {% endif %}
                 </div>
@@ -265,7 +248,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary btn-save" onclick="save_add_form()">Save</button>
+        <button type="button" class="btn btn-primary btn-save" onclick="save_add_form()">Import Now</button>
       </div>
     </div>
   </div>
@@ -278,6 +261,24 @@
     $.ajaxSetup({
         data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
     });
+
+    toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    };
 
     mapboxgl.accessToken = mapboxToken;
     var positions = [];
@@ -300,17 +301,9 @@
         positions.push({{ sequence.geometry_coordinates_ary }});
     {% endfor %}
     $('.paginator-btn').click(function() {
-        if ($('.transport-btn.d-none').length > 0) {
-            Swal.fire({
-              icon: 'info',
-              text: 'You have not saved your changes.!',
-            })
-        }
-        else {
-            var pageNum = $(this).data('page');
-            var url = "{% url 'sequence.import_sequence_list' %}?page="+ pageNum + "&" + $('#search_form').serialize();
-            location.assign(url);
-        }
+        var pageNum = $(this).data('page');
+        var url = "{% url 'sequence.import_sequence_list' %}?page="+ pageNum + "&" + $('#search_form').serialize();
+        location.assign(url);
     });
     function draw_map(data) {
         var obj = $('.min-map-box').eq(i);
@@ -425,43 +418,56 @@
         var transport_type = modal_form.find('select[name="transport_type"]').val();
         var tags = modal_form.find('select[name="tag"]').val();
 
+        /*
         sequences[selected_sequence_id]['name'] = name;
         sequences[selected_sequence_id]['description'] = description;
         sequences[selected_sequence_id]['transport_type'] = transport_type;
         sequences[selected_sequence_id]['tags'] = tags;
+        */
 
-        var added_form = $('#sequence_' + selected_sequence_id).find('.added-form');
-        var transport_btn = $('#sequence_' + selected_sequence_id).find('.transport-btn');
-
-        added_form.removeClass('d-none');
-        transport_btn.addClass('d-none');
-
-        added_form.find('.sequence-name .contents').text(name);
-        added_form.find('.sequence-description .contents').text(description);
-        added_form.find('.sequence-transport-type .contents').text(all_transport_types[transport_type]);
-        var tag_html = '';
-        console.log(all_tags)
-        for (var i = 0; i < tags.length; i++) {
-            tag_html += '<span class="tag">' + all_tags[tags[i]] + '</span>';
-        }
-        added_form.find('.sequence-tag .contents').html(tag_html);
-
-        $('#add_form_modal').modal('hide');
-    }
-
-    function submit_form_data(next) {
         $.ajax({
             url: "{% url 'sequence.ajax_import' %}",
             type: 'POST',
-            data: {'sequence_json': JSON.stringify(sequences)},
+            data: {
+                'unique_id': selected_sequence_id,
+                'name': name,
+                'description': description,
+                'transport_type': transport_type,
+                'tags': tags
+            },
             dataType: 'json',
             success: function (data) {
-                if (next)
-                    location.reload();
-                else
-                    location.assign("{% url "sequence.my_sequence_list" %}")
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else {
+                    toastr.success(data.message);
+                    var added_form = $('#sequence_' + selected_sequence_id).find('.added-form');
+                    var transport_btn = $('#sequence_' + selected_sequence_id).find('.transport-btn');
+
+                    added_form.removeClass('d-none');
+                    transport_btn.addClass('d-none');
+
+                    added_form.find('.sequence-name .contents').text(name);
+                    added_form.find('.sequence-description .contents').text(description);
+                    added_form.find('.sequence-transport-type .contents').text(all_transport_types[transport_type]);
+                    var tag_html = '';
+                    console.log(all_tags)
+                    for (var i = 0; i < tags.length; i++) {
+                        tag_html += '<span class="tag">' + all_tags[tags[i]] + '</span>';
+                    }
+                    added_form.find('.sequence-tag .contents').html(tag_html);
+
+                    $('#add_form_modal').modal('hide');
+                }
             }
         });
+
+
+    }
+
+    function submit_form_data(next) {
+        if (next)
+            location.reload();
     }
 
     var page = 1;

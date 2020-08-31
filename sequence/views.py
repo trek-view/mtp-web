@@ -562,24 +562,38 @@ def import_sequence_list(request):
 @my_login_required
 def ajax_import(request):
     if request.method == 'POST':
-        sequence_str = request.POST.get('sequence_json')
-        sequence_json = json.loads(sequence_str)
-        for unique_id in sequence_json.keys():
+
+        # form = AddSequeceForm(request.POST)
+        # if form.is_valid():
+        # for unique_id in sequence_json.keys():
+        #     sequence = Sequence.objects.get(unique_id=unique_id)
+        #     if sequence is None:
+        #         continue
+        #     if sequence_json[unique_id]['name'] == '' or sequence_json[unique_id]['description'] == '' or sequence_json[unique_id]['transport_type'] == 0 or len(sequence_json[unique_id]['tags']) == 0:
+        #         continue
+        if not request.POST.get('unique_id') is None or request.POST.get('unique_id'):
+            unique_id = request.POST.get('unique_id')
             sequence = Sequence.objects.get(unique_id=unique_id)
-            if sequence is None:
-                continue
-            if sequence_json[unique_id]['name'] == '' or sequence_json[unique_id]['description'] == '' or sequence_json[unique_id]['transport_type'] == 0 or len(sequence_json[unique_id]['tags']) == 0:
-                continue
-            sequence.name = sequence_json[unique_id]['name']
-            sequence.description = sequence_json[unique_id]['description']
-            sequence.transport_type_id = sequence_json[unique_id]['transport_type']
-            sequence.tag = sequence_json[unique_id]['tags']
+            if not sequence or sequence is None:
+                return JsonResponse({
+                    'status': 'failed',
+                    'message': 'This sequence was not imported.'
+                })
+            sequence.name = request.POST.get('name')
+            sequence.description = request.POST.get('description')
+            sequence.transport_type_id = request.POST.get('transport_type')
+            sequence.tag = request.POST.get('tags')
             sequence.is_published = True
             sequence.is_transport = True
             sequence.save()
-        messages.success(request, "Sequences successfully imported.")
+            # messages.success(request, "Sequences successfully imported.")
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Sequence successfully imported.'
+            })
     return JsonResponse({
-        'status': 'success',
+        'status': 'failed',
+        'message': 'Sequence was not imported.'
     })
 
 def ajax_sequence_check_publish(request, unique_id):
