@@ -123,9 +123,9 @@
                             {% csrf_token %}
                             <div class="col publish-sequence text-center">
                                 {% if sequence.is_published %}
-                                    <button type="button" class="btn btn-success" id="publish_swithch_sequence">Published</button>
+                                    <button type="button" class="btn btn-secondary" id="publish_swithch_sequence">Unpublish</button>
                                 {% else %}
-                                    <button type="button" class="btn btn-dark" id="publish_swithch_sequence">Unpublished</button>
+                                    <button type="button" class="btn btn-success" id="publish_swithch_sequence">Publish Now</button>
                                 {% endif %}
                             </div>
 
@@ -532,11 +532,11 @@
                 else {
                     if (data.is_published)
                     {
-                        $('#publish_swithch_sequence').removeClass('btn-dark').addClass('btn-success').text('Published');
+                        $('#publish_swithch_sequence').removeClass('btn-success').addClass('btn-secondary').text('Unpublish');
                     }
                     else
                     {
-                        $('#publish_swithch_sequence').addClass('btn-dark').removeClass('btn-success').text('Unpublished');
+                        $('#publish_swithch_sequence').addClass('btn-success').removeClass('btn-secondary').text('Publish Now');
                     }
                 }
             }

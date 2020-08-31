@@ -78,28 +78,29 @@
                 </div>
             </div>
 
-            <div class="card m-3 p-2 text-center">
+            <div class="card m-3 p-2">
                 <div class="">
                     <form method="POST" id="delete_tour_form" class="d-flex align-items-center" action="{% url 'tour.tour_delete' unique_id=tour.unique_id %}">
                         {% csrf_token %}
-                        <div class="col publish-tour text-center {% if tour.getSequenceCount == 0 %}d-none{% endif %} ">
-                            {% if tour.is_published %}
-                                <button type="button" class="btn btn-success" id="publish_swithch_tour">Published</button>
-                            {% else %}
-                                <button type="button" class="btn btn-dark" id="publish_swithch_tour">Unpublished</button>
-                            {% endif %}
-                        </div>
+                        <div class="d-flex flex-row justify-content-between w-100">
+                            <div class="publish-guidebook text-center {% if tour.getSequenceCount == 0 %}d-none{% endif %} ">
+                                {% if tour.is_published %}
+                                    <button type="button" class="btn btn-secondary" id="publish_swithch_tour">Unpublish</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-success" id="publish_swithch_tour">Publish Nowf</button>
+                                {% endif %}
+                            </div>
 
-                        <div class="col preview-tour text-center">
-                            <a href="{% url 'tour.tour_detail' unique_id=tour.unique_id %}">
-                                <button type="button" class="btn btn-info">Preview</button>
-                            </a>
-                        </div>
+                            <div class="preview-tour text-center">
+                                <a href="{% url 'tour.tour_detail' unique_id=tour.unique_id %}">
+                                    <button type="button" class="btn btn-info">Preview</button>
+                                </a>
+                            </div>
 
-                        <div class="col text-center delete-tour">
-                            <button type="button" id="delete_tour" class="btn btn-danger">Delete</button>
+                            <div class="text-center delete-tour">
+                                <button type="button" id="delete_tour" class="btn btn-danger">Delete</button>
+                            </div>
                         </div>
-
                     </form>
                 </div>
             </div>
@@ -624,11 +625,11 @@
                 else {
                     if (data.is_published)
                     {
-                        $('#publish_swithch_tour').removeClass('btn-dark').addClass('btn-success').text('Published');
+                        $('#publish_swithch_tour').removeClass('btn-success').addClass('btn-secondary').text('Unpublish');
                     }
                     else
                     {
-                        $('#publish_swithch_tour').addClass('btn-dark').removeClass('btn-success').text('Unpublished');
+                        $('#publish_swithch_tour').addClass('btn-success').removeClass('btn-secondary').text('Publish Now');
                     }
                 }
             }
