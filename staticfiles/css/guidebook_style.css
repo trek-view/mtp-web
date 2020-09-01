@@ -160,14 +160,12 @@ body {
     width: 220px;
     height: 160px;
     background: #79aec8;
-    border-radius: 5px;
 }
 
 .guidebook-list .card.guidebook .cover-image-box  {
     width: 180px;
     height: 140px;
     background: #79aec8;
-    border-radius: 5px;
 }
 
 .guidebook-list .card.guidebook .cover-image-box > img {
@@ -176,15 +174,15 @@ body {
 }
 
 .detail-box .guidebook-main {
-    width: calc(100% - 80px);
+    width: calc(100% - 90px);
 }
 .detail-box .guidebook-others {
-    width: 70px;
+    width: 90px;
     height: 160px;
 }
 
 .detail-box {
-    max-width: 450px;
+    max-width: 550px;
 }
 
 .detail-box .guidebook-others img {
@@ -283,4 +281,18 @@ body {
 
 .left-side.poi-box {
     background: white;
+}
+
+.return-scene {
+    font-size: 16px;
+    top: 50px;
+    color: white;
+    width: 130px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    background: #7082dc;
+    z-index: 300;
+    position: absolute;
+    left: calc(50% - 65px);
 }

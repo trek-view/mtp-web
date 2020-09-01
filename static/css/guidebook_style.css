@@ -160,14 +160,12 @@ body {
     width: 220px;
     height: 160px;
     background: #79aec8;
-    border-radius: 5px;
 }
 
 .guidebook-list .card.guidebook .cover-image-box  {
     width: 180px;
     height: 140px;
     background: #79aec8;
-    border-radius: 5px;
 }
 
 .guidebook-list .card.guidebook .cover-image-box > img {
@@ -176,15 +174,15 @@ body {
 }
 
 .detail-box .guidebook-main {
-    width: calc(100% - 80px);
+    width: calc(100% - 90px);
 }
 .detail-box .guidebook-others {
-    width: 70px;
+    width: 90px;
     height: 160px;
 }
 
 .detail-box {
-    max-width: 450px;
+    max-width: 550px;
 }
 
 .detail-box .guidebook-others img {

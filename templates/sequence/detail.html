@@ -24,9 +24,14 @@
 
             <div class="p-2 item-detail card">
                 <div class="text-right mb-3">
-                    <a class="ml-auto" target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
-                        <img style="width: 170px" class="mt-2" src="{% static "images/icon/mapillary_icon.png" %}">
-                    </a>
+                    <div class="d-flex flex-row align-items-center">
+                        <a target="_blank" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
+                            <img class="w-100" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}">
+                        </a>
+                        <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
+                            <img class="w-100" src="{% static "images/icon/mapillary_icon.png" %}">
+                        </a>
+                    </div>
                 </div>
 
                 <div class="mtp-sequence-data">

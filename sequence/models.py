@@ -178,6 +178,14 @@ class Sequence(models.Model):
         else:
             return None
 
+    def getFirstPointLat(self):
+        lat = self.geometry_coordinates_ary[0][1]
+        return lat
+
+    def getFirstPointLng(self):
+        lng = self.geometry_coordinates_ary[0][0]
+        return lng
+
 class Image(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
