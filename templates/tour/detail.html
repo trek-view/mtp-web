@@ -89,6 +89,13 @@
                         <div class="card sequence p-3 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}" >
                             <div class="min-map-box" id="map-{{ sequence.unique_id }}">
                             </div>
+                            <div class="cover-image-box ml-3 mr-3" style="width: 180px;">
+                                {% if sequence.getCoverImage is None %}
+                                    <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
+                                {% else %}
+                                    <img class="w-100" src="https://images.mapillary.com/{{ sequence.getCoverImage }}/thumb-320.jpg">
+                                {% endif %}
+                            </div>
                             <div class="item-detail-box pl-3 pr-3">
                                 <div class="item-main w-100 float-left">
                                     <div class="item-title text-info d-flex flex-row justify-content-between">
@@ -103,9 +110,16 @@
                                         </p>
                                     </div>
 
-                                    <div class="w-100 d-flex flex-row">
-                                        <p class="mb-1 mr-3 item-transport-type">
-                                            {{ sequence.transport_type }}
+                                    <div class="w-100 d-flex flex-row align-items-end">
+                                        <p class="mb-1 mr-3 item-transport-type text-center">
+                                            <img class="transport-type-icon" src="{{ STATIC_URL }}{{ sequence.transport_type.parent.icon.filename }}">
+                                            <br>
+                                            {{ sequence.transport_type.parent }}
+                                        </p>
+                                        <p class="mb-1 mr-3 item-transport-type text-center">
+                                            <img class="transport-type-icon" src="{{ STATIC_URL }}{{ sequence.transport_type.icon.filename }}">
+                                            <br>
+                                            {{ sequence.transport_type.name }}
                                         </p>
                                         <p class="mb-1 mr-3 item-image-count">
                                             {{ sequence.getImageCount }} Panos
