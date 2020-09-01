@@ -705,6 +705,15 @@
             }
         })
     });
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+                toastr.error("{{ message }}")
+            {% elif message.tags == 'success' %}
+                toastr.success("{{ message }}")
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 
 </script>
 {% endblock %}
