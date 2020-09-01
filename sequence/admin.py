@@ -54,6 +54,7 @@ class SequenceAdmin(tags_input_admin.TagsInputAdmin):
 class IconAdmin(admin.ModelAdmin):
     list_display = (
         'name',
+        'font_awesome',
         'filename'
     )
 
