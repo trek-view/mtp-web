@@ -165,3 +165,24 @@ body {
     transform: rotate(45deg);
 }
 
+.right-board .image-view-point {
+    font-size: 14px;
+    top: 15px;
+    color: white;
+    border-radius: 4px;
+    text-align: center;
+    background: rgba(0,0,0,.5);
+    z-index: 300;
+    position: absolute;
+    left: 15px;
+    padding: 5px;
+}
+
+.right-board .image-view-point img {
+    border-radius: 18px;
+}
+
+.small-screen .image-view-point {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}

@@ -3,7 +3,7 @@
     <div class="image-detail">
         <div class="mt-2">
             <label class="col-4">Key: </label>
-            <small class="col-8">{{ image.image_key }}</small>
+            <span class="col-8">{{ image.image_key }}</span>
         </div>
         <div class="mt-2">
             <label class="col-4">Camera Make: </label>
@@ -15,7 +15,7 @@
         </div>
         <div class="mt-2">
             <label class="col-4">Sequence Key: </label>
-            <small class="col-8">{{ image.seq_key }}</small>
+            <span class="col-8">{{ image.seq_key }}</span>
         </div>
         <div class="mt-2">
             <label class="col-4">Pano: </label>
@@ -23,7 +23,7 @@
         </div>
         <div class="mt-2">
             <label class="col-4">User Key: </label>
-            <small class="col-8">{{ image.user_key }}</small>
+            <span class="col-8">{{ image.user_key }}</span>
         </div>
         <div class="mt-2">
             <label class="col-4">Username: </label>
@@ -63,7 +63,7 @@
             </a>
         </div>
         <div class="view_point text-center">
-            <img style="width: 40px; cursor: pointer" src="{% static 'images/icon/images (1).jfif' %}" onclick="mark_view_point('{{ image.image_key }}')" />
+            <img style="width: 40px; " src="{% static 'images/icon/images (1).jfif' %}" />
             <span class="text-center m-0">
                 {{ view_points }} View Points
             </span>

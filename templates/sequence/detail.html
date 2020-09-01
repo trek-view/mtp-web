@@ -202,6 +202,23 @@
                     <img class="w-100" src="{% static 'images/icon/flap.svg' %}">
                 </div>
                 <div class="switch-cover"></div>
+                {% if request.user.is_authenticated and request.user == sequence.user %}
+                    <div class="image-view-point" >
+                        <div class="view_point text-center">
+                            <span class="text-center m-0">
+                                {{ view_points }} View Points
+                            </span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="image-view-point" style="cursor: pointer;" onclick="mark_view_point()" style="">
+                        <div class="view_point text-center">
+                            <span class="text-center m-0 disabled">
+                                {{ view_points }} View Points
+                            </span>
+                        </div>
+                    </div>
+                {% endif %}
                 <div id='sequence_viewer' class="image-box display"></div>
             </div>
             <div class="show-or-hide">
@@ -220,7 +237,7 @@
 {% block scripts %}
 <script src="{% static 'js/mapillary.js' %}"></script>
 <script>
-    var first_point = true;
+    var first_move = true;
     $.ajaxSetup({
         data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
     });
@@ -500,8 +517,9 @@
              }
         });
         map.flyTo({center: [current_node_point[1], current_node_point[0]]});
-        if (first_point)
-            first_point = false;
+        if (first_move) {
+            first_move = false;
+        }
         else
             show_image_detail(node.key)
     });
@@ -646,6 +664,7 @@
                 else {
                     $('.image-detail-box').removeClass('d-none');
                     $('#image_detail_box').html(data.image_detail_box_html);
+                    $('.right-board .image-view-point span').text(data.view_points + ' View Points');
                 }
             }
         });
@@ -674,7 +693,8 @@
             })
         }
     {% elif request.user != sequence.user %}
-        function mark_view_point(image_key) {
+        function mark_view_point() {
+            image_key = current_node_key
             var url = "{% url 'sequence.ajax_image_mark_view' unique_id=sequence.unique_id image_key='image_key' %}";
             url = url.replace('image_key', image_key)
             $.ajax({
@@ -689,12 +709,13 @@
                     }
                     else {
                         $('.image-others .view_point span').text(data.view_points + ' View Points');
+                        $('.right-board .image-view-point span').text(data.view_points + ' View Points');
                     }
                 }
             });
         }
     {% else %}
-        function mark_view_point(image_key) {
+        function mark_view_point() {
             toastr.error('This sequense and image are imported by you.')
         }
     {% endif %}

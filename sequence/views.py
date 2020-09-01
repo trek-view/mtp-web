@@ -245,6 +245,12 @@ def sequence_detail(request, unique_id):
             }
         )
 
+    view_points = 0
+    imgs = Image.objects.filter(image_key=coordinates_image[0])
+    if imgs.count() > 0:
+        i_vs = ImageViewPoint.objects.filter(image=imgs[0])
+        view_points = i_vs.count()
+
     addSequenceForm = AddSequeceForm(instance=sequence)
     content = {
         'sequence': sequence,
@@ -253,6 +259,7 @@ def sequence_detail(request, unique_id):
         'pageDescription': sequence.description,
         'first_image': images[0],
         'page': page,
+        'view_points': view_points,
         'addSequenceForm': addSequenceForm
     }
     return render(request, 'sequence/detail.html', content)
@@ -711,7 +718,8 @@ def ajax_get_image_detail(request, unique_id, image_key):
     return JsonResponse({
         'image_detail_box_html': image_detail_box_html,
         'status': 'success',
-        'message': ""
+        'message': "",
+        'view_points': view_points.count()
     })
 
 def ajax_get_image_list(request, unique_id):
