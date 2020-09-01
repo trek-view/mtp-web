@@ -7,6 +7,7 @@ from .models import *
 from datetime import datetime
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
 from tags_input import fields
+from lib.classes import CustomTagsInputField
 ############################################################################
 ############################################################################
 
@@ -22,7 +23,7 @@ class TourForm(forms.ModelForm):
         required=False)
 
 
-        self.fields['tour_tag'] = fields.TagsInputField(
+        self.fields['tour_tag'] = CustomTagsInputField(
             TourTag.objects.filter(is_actived=True),
             create_missing=True,
             required=True,
@@ -54,7 +55,7 @@ class TourSearchForm(forms.Form):
             required=False
         )
 
-        self.fields['tour_tag'] = fields.TagsInputField(
+        self.fields['tour_tag'] = CustomTagsInputField(
             TourTag.objects.filter(is_actived=True),
             create_missing=False,
             required=False,

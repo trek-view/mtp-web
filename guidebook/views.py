@@ -263,6 +263,16 @@ def guidebook_create(request, unique_id=None):
 
             messages.success(request, 'A guidebook was created successfully.')
             return redirect('guidebook.add_scene', unique_id=guidebook.unique_id)
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
+
     else:
         if unique_id:
             guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
@@ -310,6 +320,15 @@ def ajax_guidebook_update(request, unique_id = None):
                     'tag': guidebook.getTags()
                 }
             })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
 
     return JsonResponse({
         'status': 'failed',
@@ -355,7 +374,20 @@ def ajax_upload_file(request, unique_id):
                 'status': 'success',
                 'message': 'A cover image is uploaded successfully.'
             })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
 
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'The Guidebook does not exist or has no access.'
+    })
 @my_login_required
 def ajax_add_scene(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
@@ -423,6 +455,15 @@ def ajax_add_scene(request, unique_id):
                     'status': 'success',
                     'message': 'A new Scene is added successfully.'
                 })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
     return JsonResponse({
         'status': 'failed',
         'message': 'It failed to save Scene!'

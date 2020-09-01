@@ -7,6 +7,7 @@ from .models import *
 from datetime import datetime
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
 from tags_input import fields
+from lib.classes import CustomTagsInputField
 ############################################################################
 ############################################################################
 
@@ -72,7 +73,7 @@ class AddSequeceForm(forms.ModelForm):
             empty_label=None
         )
 
-        self.fields['tag'] = fields.TagsInputField(
+        self.fields['tag'] = CustomTagsInputField(
             Tag.objects.filter(is_actived=True),
             create_missing=True,
             required=True,
@@ -116,7 +117,7 @@ class SequenceSearchForm(forms.Form):
             queryset=TransType.objects.all(),
             empty_label='All Types'
         )
-        self.fields['tag'] = fields.TagsInputField(
+        self.fields['tag'] = CustomTagsInputField(
             Tag.objects.filter(is_actived=True),
             create_missing=False,
             required=False,
@@ -152,7 +153,7 @@ class SequenceSearchForTourForm(forms.Form):
             queryset=TransType.objects.filter(),
             empty_label='All Types'
         )
-        self.fields['tag'] = fields.TagsInputField(
+        self.fields['tag'] = CustomTagsInputField(
             Tag.objects.filter(is_actived=True),
             create_missing=False,
             required=False,

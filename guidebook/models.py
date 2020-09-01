@@ -8,7 +8,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.urls import reverse
-
+from django.core.validators import RegexValidator
 ## Python Packages
 import uuid
 
@@ -19,7 +19,8 @@ def image_directory_path(instance, filename):
     return 'guidebook/{0}/cover_image/{1}'.format(instance.unique_id, filename)
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Only alphanumeric characters are allowed for Username.')
+    name = models.CharField(max_length=50, unique=True, null=True, validators=[alphanumeric])
     description = models.TextField(default=None, blank=True, null=True)
     is_actived = models.BooleanField(default=True)
 

@@ -5,7 +5,7 @@ from django_select2 import forms as s2forms
 ## App packages
 from .models import *
 from tags_input import fields
-
+from lib.classes import CustomTagsInputField
 ############################################################################
 ############################################################################
 
@@ -27,7 +27,7 @@ class GuidebookForm(forms.ModelForm):
         empty_label=None
     )
 
-    tag = fields.TagsInputField(
+    tag = CustomTagsInputField(
         Tag.objects.filter(is_actived=True),
         create_missing=True,
         required=True,
@@ -47,7 +47,7 @@ class GuidebookForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['tag'] = fields.TagsInputField(
+        self.fields['tag'] = CustomTagsInputField(
             Tag.objects.filter(is_actived=True),
             create_missing=True,
             required=True,
@@ -160,7 +160,7 @@ class GuidebookSearchForm(forms.Form):
             queryset=Category.objects.all(),
             empty_label="All Categories"
         )
-        self.fields['tag'] = fields.TagsInputField(
+        self.fields['tag'] = CustomTagsInputField(
             Tag.objects.filter(is_actived=True),
             create_missing=False,
             required=False,

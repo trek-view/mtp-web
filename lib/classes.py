@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-
+import re
 from tags_input import fields
 
 class CustomTagsInputField(fields.TagsInputField):
@@ -24,10 +24,9 @@ class CustomTagsInputField(fields.TagsInputField):
             if mapping['create_missing']:
                 for v in value:
                     if v in missing:
-                        vvv = v.replace('-', '')
-                        if not vvv.isalnum():
+                        if not re.match('^[a-zA-Z0-9-]+$', v):
                             raise ValidationError(
-                                'Only alphanumeric and "-" characters are allowed for Username.',
+                                'Only alphanumeric and "-" characters are allowed for tag.',
                                 code='invalid_alphanumeric',
                                 params={'value': v},
                             )

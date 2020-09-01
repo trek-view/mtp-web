@@ -571,6 +571,15 @@ def ajax_import(request, seq_key):
                         'message': 'Sequence successfully imported.',
                         'unique_id': str(sequence.unique_id)
                     })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
     return JsonResponse({
         'status': 'failed',
         'message': 'Sequence was not imported.'

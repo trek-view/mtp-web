@@ -10,13 +10,14 @@ from django.contrib.postgres.fields import ArrayField
 ## Python Packages
 import uuid
 from django.urls import reverse
-
+from django.core.validators import RegexValidator
 from sequence.models import Sequence
 
 UserModel = get_user_model()
 
 class TourTag(models.Model):
-    name = models.CharField(max_length=50, unique=True, null=True)
+    alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Only alphanumeric characters are allowed for Username.')
+    name = models.CharField(max_length=50, unique=True, null=True, validators=[alphanumeric])
     description = models.TextField(default=None, blank=True, null=True)
     is_actived = models.BooleanField(default=True)
 

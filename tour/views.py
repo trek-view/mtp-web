@@ -222,7 +222,6 @@ def tour_list(request):
         if page is None:
             page = 1
         form = TourSearchForm(request.GET)
-        print(form.is_valid())
         if form.is_valid():
             name = form.cleaned_data['name']
             tags = form.cleaned_data['tour_tag']
@@ -398,7 +397,15 @@ def ajax_tour_update(request, unique_id=None):
                     'tag': tour.getTags()
                 }
             })
-
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
 
     return JsonResponse({
         'status': 'failed',
