@@ -98,7 +98,7 @@ def job_create(request):
     content = {
         'form': form,
         'pageName': 'Create Job',
-        'pageTitle': 'Marketplace',
+        'pageTitle': 'Create Job - Marketplace',
         'pageDescription': MAIN_PAGE_DESCRIPTION
     }
     return render(request, 'marketplace/job/create.html', content)
@@ -145,7 +145,7 @@ def job_apply(request, unique_id):
         'form': form,
         'job': job,
         'pageName': 'Apply Job',
-        'pageTitle': 'Job'
+        'pageTitle': job.name + ' - ' + 'Apply Job'
     }
     return render(request, 'marketplace/job/apply.html', content)
 
@@ -178,7 +178,7 @@ def job_edit(request, unique_id):
     content = {
         'form': form,
         'pageName': 'Edit Job',
-        'pageTitle': 'Job'
+        'pageTitle': job.name + ' - Edit Job'
     }
     return render(request, 'marketplace/job/edit.html', content)
 
@@ -239,7 +239,7 @@ def job_list(request, page):
         'jobs': jobs,
         'form': form,
         'pageName': 'Jobs',
-        'pageTitle': 'Marketplace',
+        'pageTitle': 'Jobs - Marketplace',
         'pageDescription': MAIN_PAGE_DESCRIPTION
     }
     return render(request, 'marketplace/job/list.html', content)
@@ -273,7 +273,7 @@ def job_detail(request, unique_id):
         'geometry': geometry,
         'job_html_detail': job_html_detail,
         'pageName': 'Job Detail',
-        'pageTitle': 'Job'
+        'pageTitle': job.name + ' - Job'
     }
     return render(request, 'marketplace/job/job_detail.html', content)
 
@@ -330,7 +330,7 @@ def my_job_list(request, page):
         'jobs': pJobs,
         'form': form,
         'pageName': 'My Jobs',
-        'pageTitle': 'Marketplace',
+        'pageTitle': 'My Jobs - Marketplace',
         'pageDescription': MAIN_PAGE_DESCRIPTION
     }
     return render(request, 'marketplace/job/list.html', content)
@@ -405,7 +405,7 @@ def photographer_create(request):
     content = {
         'form': form,
         'pageName': 'Create Photographer',
-        'pageTitle': 'Photographer'
+        'pageTitle': 'Create Photographer - Marketplace'
     }
     return render(request, 'marketplace/photographer/create.html', content)
 
@@ -451,7 +451,7 @@ def photographer_hire(request, unique_id):
         'form': form,
         'photographer': photographer,
         'pageName': 'Hire Photographer',
-        'PageTitle': 'Photographer'
+        'PageTitle': photographer.name + ' - Hire Photographer'
     }
     return render(request, 'marketplace/photographer/hire.html', content)
 
@@ -483,7 +483,7 @@ def photographer_edit(request, unique_id):
     content = {
         'form': form,
         'pageName': 'Edit Photographer',
-        'pageTitle': 'Photographer'
+        'pageTitle': photographer.name + ' - Edit Photographer'
     }
     return render(request, 'marketplace/photographer/edit.html', content)
 
@@ -549,7 +549,7 @@ def photographer_list(request, page):
         'photographers': pPhotographers,
         'form': form,
         'pageName': 'Photographers',
-        'pageTitle': 'Marketplace',
+        'pageTitle': 'Photographers - Marketplace',
         'pageDescription': MAIN_PAGE_DESCRIPTION
     }
 
@@ -588,7 +588,7 @@ def photographer_detail(request, unique_id):
               'form': form,
               'geometry': geometry,
               'pageName': 'Photographer Detail',
-              'pageTitle': 'Photographer'
+              'pageTitle': photographer.name + ' - Photographer'
           })
 
 @my_login_required
@@ -637,7 +637,7 @@ def my_photographer_list(request, page):
         'photographers': pPhotographers,
         'form': form,
         'pageName': 'My Photographers',
-        'pageTitle': 'Marketplace',
+        'pageTitle': 'My Photographers - Marketplace',
         'pageDescription': MAIN_PAGE_DESCRIPTION
     }
     return render(request, 'marketplace/photographer/list.html', content)

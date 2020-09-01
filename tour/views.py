@@ -87,7 +87,7 @@ def tour_create(request, unique_id=None):
     content = {
         'form': form,
         'pageName': 'Create Tour',
-        'pageTitle': 'Tour',
+        'pageTitle': 'Create Tour',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
     }
     return render(request, 'tour/create.html', content)
@@ -188,7 +188,7 @@ def tour_add_sequence(request, unique_id):
             'sequence_count': len(pSequences),
             'form': form,
             'pageName': 'Edit Tour',
-            'pageTitle': 'Edit Tour',
+            'pageTitle': tour.name + ' - Edit Tour',
             'pageDescription': MAIN_PAGE_DESCRIPTION,
             'page': page,
             'tour': tour,
@@ -204,7 +204,7 @@ def tour_add_sequence(request, unique_id):
             'sequence_count': len(sequences),
             'form': form,
             'pageName': 'Edit Tour',
-            'pageTitle': 'Edit Tour',
+            'pageTitle': tour.name + ' - Edit Tour',
             'pageDescription': MAIN_PAGE_DESCRIPTION,
             'page': page,
             'tour': tour,
@@ -331,7 +331,7 @@ def my_tour_list(request):
         'tours': pTours,
         'form': form,
         'pageName': 'My Tours',
-        'pageTitle': 'Tours',
+        'pageTitle': 'My Tours',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page
     }
@@ -359,7 +359,7 @@ def tour_detail(request, unique_id):
         'sequences': sequence_ary,
         'sequence_count': len(sequence_ary),
         'pageName': 'Tour Detail',
-        'pageTitle': tour.name,
+        'pageTitle': tour.name + ' - Tour Detail',
         'pageDescription': tour.description,
         'tour': tour,
         'first_image_key': first_image_key,

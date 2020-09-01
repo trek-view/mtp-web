@@ -215,7 +215,7 @@ def my_sequence_list(request):
         'sequences': pSequences,
         'form': form,
         'pageName': 'My Sequences',
-        'pageTitle': 'Sequences',
+        'pageTitle': 'My Sequences',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page
     }
@@ -249,7 +249,7 @@ def sequence_detail(request, unique_id):
     content = {
         'sequence': sequence,
         'pageName': 'Sequence Detail',
-        'pageTitle': sequence.name,
+        'pageTitle': sequence.name + ' - Sequence',
         'pageDescription': sequence.description,
         'first_image': images[0],
         'page': page,
@@ -796,7 +796,7 @@ def ajax_get_image_list(request, unique_id):
         'images': pImages,
         'origin_images': origin_images,
         'pageName': 'Sequence Detail',
-        'pageTitle': 'Sequence',
+        'pageTitle': sequence.name + ' - Sequence',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page,
         'first_image': pImages[0],

@@ -159,7 +159,7 @@ def my_guidebook_list(request, page):
         'guidebooks': pGuidebooks,
         'form': form,
         'pageName': 'My Guidebooks',
-        'pageTitle': 'Guidebooks',
+        'pageTitle': 'My Guidebooks',
         'pageDescription': MAIN_PAGE_DESCRIPTION
     }
     return render(request, 'guidebook/guidebook_list.html', content)
@@ -181,7 +181,7 @@ def guidebook_detail(request, unique_id):
         'is_liked': is_liked,
         'form': form,
         'poi_form': poi_form,
-        'pageTitle': guidebook.name,
+        'pageTitle': guidebook.name + ' - ' + 'Guidebook',
         'pageDescription': guidebook.description,
         'pageName': 'Guidebook Detail'
     }
