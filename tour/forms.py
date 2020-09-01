@@ -21,11 +21,14 @@ class TourForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation': 'required'}),
         required=False)
 
+
         self.fields['tour_tag'] = fields.TagsInputField(
             TourTag.objects.filter(is_actived=True),
             create_missing=True,
             required=True,
         )
+    #
+
 
     class Meta:
         model = Tour
