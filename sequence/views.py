@@ -335,6 +335,19 @@ def ajax_save_sequence(request, unique_id):
                         continue
                     tags.append(tag.name)
 
+            transport_parent_html = render_to_string(
+                'sequence/transport_parent_box.html',
+                {'sequence': sequence},
+                request
+            )
+
+            transport_html = render_to_string(
+                'sequence/transport_box.html',
+                {'sequence': sequence},
+                request
+            )
+
+
             return JsonResponse({
                 'status': 'success',
                 'message': 'This sequence is updated successfully.',
@@ -342,10 +355,20 @@ def ajax_save_sequence(request, unique_id):
                     'name': sequence.name,
                     'description': sequence.description,
                     'transport_type': sequence.transport_type.name,
+                    'transport_parent_html': transport_parent_html,
+                    'transport_html': transport_html,
                     'tags': tags
                 }
             })
-
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
     return JsonResponse({
         'status': 'failed',
         'message': 'The sequence does not exist or has no access.'

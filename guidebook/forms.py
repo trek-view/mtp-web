@@ -162,7 +162,7 @@ class GuidebookSearchForm(forms.Form):
         )
         self.fields['tag'] = fields.TagsInputField(
             Tag.objects.filter(is_actived=True),
-            create_missing=True,
+            create_missing=False,
             required=False,
         )
 

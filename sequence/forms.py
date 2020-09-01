@@ -118,7 +118,7 @@ class SequenceSearchForm(forms.Form):
         )
         self.fields['tag'] = fields.TagsInputField(
             Tag.objects.filter(is_actived=True),
-            create_missing=True,
+            create_missing=False,
             required=False,
         )
 
@@ -154,7 +154,7 @@ class SequenceSearchForTourForm(forms.Form):
         )
         self.fields['tag'] = fields.TagsInputField(
             Tag.objects.filter(is_actived=True),
-            create_missing=True,
+            create_missing=False,
             required=False,
         )
 

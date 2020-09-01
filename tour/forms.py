@@ -56,7 +56,7 @@ class TourSearchForm(forms.Form):
 
         self.fields['tour_tag'] = fields.TagsInputField(
             TourTag.objects.filter(is_actived=True),
-            create_missing=True,
+            create_missing=False,
             required=False,
         )
 

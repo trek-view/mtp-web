@@ -51,7 +51,7 @@
                     </div>
 
                     <div class="sequence-transport-type mt-2 d-flex flex-row justify-content-start" id="sequence_transport_type" style="color: blueviolet;">
-                        <p class="mb-1 mr-3 item-transport-type text-center">
+                        <p class="mb-1 mr-3 item-transport-type parent-type text-center">
                             {% if sequence.transport_type.parent.icon.font_awesome is None or sequence.transport_type.parent.icon.font_awesome == '' %}
                                 <img class="transport-type-icon" src="{{ STATIC_URL }}{{ sequence.transport_type.parent.icon.filename }}">
                             {% else %}
@@ -60,7 +60,7 @@
                             <br>
                             {{ sequence.transport_type.parent }}
                         </p>
-                        <p class="mb-1 mr-3 item-transport-type text-center">
+                        <p class="mb-1 mr-3 item-transport-type sub-type text-center">
                             {% if sequence.transport_type.icon.font_awesome is None or sequence.transport_type.icon.font_awesome == '' %}
                                 <img class="transport-type-icon" src="{{ STATIC_URL }}{{ sequence.transport_type.icon.filename }}">
                             {% else %}
@@ -71,7 +71,7 @@
                         </p>
                     </div>
 
-                    <div class="sequence-tag mt-2">
+                    <div class="sequence-tag mt-2" id="sequence_tags">
                         {% for tag in sequence.getTags %}
                             <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                                 {{ tag }}
@@ -540,14 +540,15 @@
                 else {
                     toastr.success(data.message);
                     console.log(data);
-                    $('#sequence_name span').text(data.sequence['name']);
-                    $('#sequence_description span').text(data.sequence['description']);
-                    $('#sequence_transport_type span').text(data.sequence['transport_type']);
+                    $('#sequence_name h3').text(data.sequence['name']);
+                    $('#sequence_description p').text(data.sequence['description']);
+                    $('.item-transport-type .parent-type').html(data.sequence['transport_parent_html']);
+                    $('.item-transport-type .sub-type').html(data.sequence['transport_html']);
                     var tag_html = '';
                     for (var i = 0; i < data.sequence['tags'].length; i++) {
-                        tag_html += '<span class="tag">' + data.sequence['tags'][i] + '</span>';
+                        tag_html += '<span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">' + data.sequence['tags'][i] + '</span>';
                     }
-                    $('#sequence_tags div').html(tag_html);
+                    $('#sequence_tags').html(tag_html);
                 }
                 $('.mtp-sequence-data').removeClass('d-none');
                 $('.edit-form').addClass('d-none');
