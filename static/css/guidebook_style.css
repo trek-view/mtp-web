@@ -1,6 +1,6 @@
 .full-screen {
     height: calc(100vh - 100px);
-    width: 100%;
+    width: calc(100vw - 400px);
     position: fixed;
     top: 100px;
     z-index: 0;

@@ -14,7 +14,7 @@
 
 /* Mapbox board */
 .mapboxgl-map {
-    height: calc(100vh - 80px) !important;
+    height: calc(100vh - 100px) !important;
 }
 
 .mapbox-gl-draw_line {
