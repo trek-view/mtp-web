@@ -622,11 +622,13 @@
                 }
             }
         });
-        mapillaryViewer.moveToKey(image_key);
     }
 
     function move_image(image_key) {
-        mapillaryViewer.moveToKey(image_key);
+        if (image_key == current_node_key)
+            show_image_detail(image_key)
+        else
+            mapillaryViewer.moveToKey(image_key);
     }
 
     function hide_image_detail_box() {
