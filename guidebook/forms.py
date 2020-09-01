@@ -146,6 +146,13 @@ class GuidebookSearchForm(forms.Form):
             widget=forms.TextInput(attrs={'class': 'form-control'}),
             required=False
         )
+
+        self.fields['image_key'] = forms.CharField(
+            label='Image Key',
+            widget=forms.TextInput(attrs={'class': 'form-control'}),
+            required=False
+        )
+
         self.fields['category'] = forms.ModelChoiceField(
             required=False,
             widget=forms.Select(

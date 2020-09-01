@@ -48,9 +48,11 @@
     <div class="image-others float-right d-flex flex-row justify-content-between mt-2">
         <div class="guidebook text-center">
             <img style="width: 40px" src="{% static 'images/icon/62-512.png' %}" />
-            <span class="text-center m-0">
-                {{ guidebook_count }} Guidebooks
-            </span>
+            <a href="{% url 'guidebook.guidebook_list' %}?image_key={{ image.image_key }}">
+                <span class="text-center m-0">
+                    {{ guidebook_count }} Guidebooks
+                </span>
+            </a>
         </div>
         <div class="view_point text-center">
             <img style="width: 40px; cursor: pointer" src="{% static 'images/icon/images (1).jfif' %}" onclick="mark_view_point('{{ image.image_key }}')" />

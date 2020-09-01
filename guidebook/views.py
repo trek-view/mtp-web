@@ -52,6 +52,7 @@ def guidebook_list(request, page):
             category = form.cleaned_data['category']
             tags = form.cleaned_data['tag']
             username = form.cleaned_data['username']
+            image_key = form.cleaned_data['image_key']
 
             guidebooks = Guidebook.objects.all().filter(
                 is_published=True,
@@ -67,6 +68,14 @@ def guidebook_list(request, page):
             if len(tags) > 0:
                 for tag in tags:
                     guidebooks = guidebooks.filter(tag=tag)
+
+            if image_key:
+                scenes = Scene.objects.filter(image_key__contains=image_key)
+                guidebook_id_ary = []
+                if scenes.count() > 0:
+                    for s in scenes:
+                        guidebook_id_ary.append(s.guidebook_id)
+                guidebooks = guidebooks.filter(pk__in=guidebook_id_ary)
 
     if guidebooks == None:
         guidebooks = Guidebook.objects.all().filter(is_published=True, is_approved=True)
@@ -113,6 +122,8 @@ def my_guidebook_list(request, page):
             name = form.cleaned_data['name']
             category = form.cleaned_data['category']
             tags = form.cleaned_data['tag']
+            image_key = form.cleaned_data['image_key']
+
             guidebooks = Guidebook.objects.all().filter(
                 user=request.user
             )
@@ -124,6 +135,14 @@ def my_guidebook_list(request, page):
             if len(tags) > 0:
                 for tag in tags:
                     guidebooks = guidebooks.filter(tag=tag)
+
+            if image_key:
+                scenes = Scene.objects.filter(image_key__contains=image_key)
+                guidebook_id_ary = []
+                if scenes.count() > 0:
+                    for s in scenes:
+                        guidebook_id_ary.append(s.guidebook_id)
+                guidebooks = guidebooks.filter(pk__in=guidebook_id_ary)
 
     if guidebooks == None:
         guidebooks = Guidebook.objects.all().filter(

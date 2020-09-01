@@ -11,6 +11,13 @@
             <div class="text-right mt-2 mb-2">
                 <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
             </div>
+            <div class="page-header">
+                <div class="pt-3 mb-3">
+                    <h4>
+                        {{ pageName }}
+                    </h4>
+                </div>
+            </div>
             {% if messages %}
                 {% for message in messages %}
                 <div class="alert m-3 alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
@@ -25,56 +32,68 @@
             <div class="p-2 item-detail card">
                 <div class="text-right mb-3">
                     <div class="d-flex flex-row align-items-center">
-                        <a target="_blank" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
-                            <img class="w-100" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}">
-                        </a>
-                        <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
-                            <img class="w-100" src="{% static "images/icon/mapillary_icon.png" %}">
-                        </a>
+
+
                     </div>
                 </div>
 
                 <div class="mtp-sequence-data">
-                    <div class="mt-2" id="sequence_name">
-                        <label class="col-4">Title: </label>
-                        <span class="col-8">{{ sequence.name }}</span>
+                    <div class="sequence-title text-center text-info mt-1" id="sequence_name">
+                        <h3>
+                            {{ sequence.name }}
+                        </h3>
                     </div>
 
-                    <div class="d-flex mt-2" id="sequence_description">
-                        <label class="col-4">Description: </label>
-                        <div class="col-8">
-                            <span class="">{{ sequence.description }}</span>
+                    <div class="sequence-description" id="sequence_description">
+                        <p class="mb-1">
+                            {{ sequence.description }}
+                        </p>
+                    </div>
+
+                    <div class="sequence-transport-type mt-2 d-flex flex-row justify-content-start" id="sequence_transport_type" style="color: blueviolet;">
+                        <p class="mb-1 mr-3 item-transport-type text-center">
+                            <img class="transport-type-icon" src="{{ STATIC_URL }}{{ sequence.transport_type.parent.icon.filename }}">
+                            <br>
+                            {{ sequence.transport_type.parent }}
+                        </p>
+                        <p class="mb-1 mr-3 item-transport-type text-center">
+                            <img class="transport-type-icon" src="{{ STATIC_URL }}{{ sequence.transport_type.icon.filename }}">
+                            <br>
+                            {{ sequence.transport_type.name }}
+                        </p>
+                    </div>
+
+                    <div class="sequence-tag mt-2">
+                        {% for tag in sequence.getTags %}
+                            <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                                {{ tag }}
+                            </span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="guidebook-created-at d-flex flex-row align-items-center justify-content-between mt-2">
+                        <div class="text-secondary">
+                            <p >
+                            {{ sequence.captured_at }}
+                            </p>
+                            <p class="">
+                                {{ sequence.created_at }}
+                            </p>
                         </div>
+                        <span class="" style="color: brown;">{{ sequence.user.username }}</span>
                     </div>
 
-                    <div class="mt-2" id="sequence_transport_type">
-                        <label class="col-4">Transport Type: </label>
-                        <span class="col-8">{{ sequence.transport_type }}</span>
+                    <div class="mt-2 d-flex flex-row justify-content-between" id="mapillary-view">
+                         <a target="_blank" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
+                             <img style="width: 40px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}">
+                         </a>
+                         <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
+                             <img style="width: 170px" src="{% static "images/icon/mapillary_icon.png" %}">
+                         </a>
                     </div>
 
-                    <div class="mt-2 d-flex" id="sequence_tags">
-                        <label class="col-4">Tags: </label>
-                        <div class="col-8">
-                            {% for tag in sequence.getTags %}
-                                <span class="tag">{{ tag }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
+                    <div class="mt-2" id="mapillary-view">
 
-                    <div class="mt-2" id="sequence_user">
-                        <label class="col-4">Username: </label>
-                        <span class="col-8">{{ sequence.user.username }}</span>
-                    </div>
-
-
-                    <div class="mt-2" id="sequence_captured_at">
-                        <label class="col-4">Captured Time: </label>
-                        <span class="col-8">{{ sequence.captured_at }}</span>
-                    </div>
-
-                    <div class="mt-2" id="sequence_captured_at">
-                        <label class="col-4">Uploaded Time: </label>
-                        <span class="col-8">{{ sequence.created_at }}</span>
                     </div>
                 </div>
 
