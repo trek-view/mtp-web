@@ -89,7 +89,17 @@ def index(request):
                 time_type = 'yearly'
 
         if transport_type and transport_type != 0 and transport_type != '':
-            sequences = sequences.filter(transport_type_id=transport_type)
+            children_trans_type = TransType.objects.filter(parent_id=transport_type)
+            if children_trans_type.count() > 0:
+                types = []
+                types.append(transport_type)
+                for t in children_trans_type:
+                    types.append(t.pk)
+                sequences = sequences.filter(transport_type_id__in=types)
+            else:
+                sequences = sequences.filter(transport_type_id=transport_type)
+
+
             form.set_transport_type(transport_type)
 
     if sequences == None:
@@ -146,7 +156,15 @@ def index(request):
             u_sequences = u_sequences.filter(captured_at__month=m)
 
         if transport_type and transport_type != 0 and transport_type != '':
-            u_sequences = u_sequences.filter(transport_type_id=transport_type)
+            children_trans_type = TransType.objects.filter(parent_id=transport_type)
+            if children_trans_type.count() > 0:
+                types = []
+                types.append(transport_type)
+                for t in children_trans_type:
+                    types.append(t.pk)
+                u_sequences = u_sequences.filter(transport_type_id__in=types)
+            else:
+                u_sequences = u_sequences.filter(transport_type_id=transport_type)
 
         used_cameras = []
         u_camera_sequences = u_sequences.values('camera_make').annotate(camera_count=Count('camera_make'))

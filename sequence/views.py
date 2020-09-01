@@ -78,7 +78,15 @@ def sequence_list(request):
             if camera_make and camera_make != '':
                 sequences = sequences.filter(camera_make__contains=camera_make)
             if transport_type and transport_type != 0 and transport_type != '':
-                sequences = sequences.filter(transport_type_id=transport_type)
+                children_trans_type = TransType.objects.filter(parent_id=transport_type)
+                if children_trans_type.count() > 0:
+                    types = []
+                    types.append(transport_type)
+                    for t in children_trans_type:
+                        types.append(t.pk)
+                    sequences = sequences.filter(transport_type_id__in=types)
+                else:
+                    sequences = sequences.filter(transport_type_id=transport_type)
             if username and username != '':
                 users = CustomUser.objects.filter(username__contains=username)
                 sequences = sequences.filter(user__in=users)
@@ -155,7 +163,15 @@ def my_sequence_list(request):
             if camera_make and camera_make != '':
                 sequences = sequences.filter(camera_make__contains=camera_make)
             if transport_type and transport_type != 0 and transport_type != '':
-                sequences = sequences.filter(category_id=transport_type)
+                children_trans_type = TransType.objects.filter(parent_id=transport_type)
+                if children_trans_type.count() > 0:
+                    types = []
+                    types.append(transport_type)
+                    for t in children_trans_type:
+                        types.append(t.pk)
+                    sequences = sequences.filter(transport_type_id__in=types)
+                else:
+                    sequences = sequences.filter(transport_type_id=transport_type)
             if len(tags) > 0:
                 for tag in tags:
                     sequences = sequences.filter(tag=tag)
