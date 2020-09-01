@@ -161,10 +161,10 @@ def index(request):
         u_trans_sequences = u_sequences.values('transport_type').annotate(camera_count=Count('transport_type'))
         if u_trans_sequences.count() > 0:
             for u_s in u_trans_sequences:
-                transport_type = TransType.objects.get(pk=u_s['transport_type'])
-                if not transport_type or transport_type is None:
+                transport_type = TransType.objects.filter(pk=u_s['transport_type'])
+                if transport_type.count() == 0:
                     continue
-                used_trans.append(transport_type.name)
+                used_trans.append(transport_type[0].name)
         used_trans.sort()
         used_trans_str = ', '.join(used_trans)
         pItems[i]['transport_type'] = used_trans_str
