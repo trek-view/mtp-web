@@ -54,7 +54,7 @@ class Guidebook(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     cover_image = models.ImageField(upload_to=image_directory_path, null=True)
     tag = models.ManyToManyField(Tag)
-    is_published = models.BooleanField(default=False)
+    is_published = models.BooleanField(default=True)
     is_approved = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=datetime.now, blank=True)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)

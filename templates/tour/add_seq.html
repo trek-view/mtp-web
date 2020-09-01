@@ -83,11 +83,11 @@
                     <form method="POST" id="delete_tour_form" class="d-flex align-items-center" action="{% url 'tour.tour_delete' unique_id=tour.unique_id %}">
                         {% csrf_token %}
                         <div class="d-flex flex-row justify-content-between w-100">
-                            <div class="publish-guidebook text-center {% if tour.getSequenceCount == 0 %}d-none{% endif %} ">
+                            <div class="publish-guidebook text-center  ">
                                 {% if tour.is_published %}
                                     <button type="button" class="btn btn-secondary" id="publish_swithch_tour">Unpublish</button>
                                 {% else %}
-                                    <button type="button" class="btn btn-success" id="publish_swithch_tour">Publish Nowf</button>
+                                    <button type="button" class="btn btn-success" id="publish_swithch_tour">Publish Now</button>
                                 {% endif %}
                             </div>
 

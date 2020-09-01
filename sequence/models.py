@@ -95,7 +95,7 @@ class Sequence(models.Model):
     image_count = models.IntegerField(default=0)
 
     is_mapillary = models.BooleanField(default=True)
-    is_published = models.BooleanField(default=False)
+    is_published = models.BooleanField(default=True)
 
     def getImageCount(self):
         if not self.coordinates_image is None:

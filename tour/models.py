@@ -16,7 +16,7 @@ from sequence.models import Sequence
 UserModel = get_user_model()
 
 class TourTag(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=True, null=True)
     description = models.TextField(default=None, blank=True, null=True)
     is_actived = models.BooleanField(default=True)
 
@@ -42,7 +42,7 @@ class Tour(models.Model):
     description = models.TextField(default='')
     created_at = models.DateTimeField(default=datetime.now, blank=True)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)
-    is_published = models.BooleanField(default=False)
+    is_published = models.BooleanField(default=True)
 
     def getTagStr(self):
         tags = []
