@@ -28,7 +28,7 @@ from lib.functions import *
 ## Project packages
 from accounts.models import CustomUser, MapillaryUser
 from tour.models import Tour, TourSequence
-
+from sequence.models import TransType
 ## App packages
 
 # That includes from .models import *
@@ -97,14 +97,14 @@ def tour_add_sequence(request, unique_id):
     tour = get_object_or_404(Tour, unique_id=unique_id)
     sequences = None
     page = 1
-    action = 'add'
+    action = 'list'
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
             page = 1
         action = request.GET.get('action')
         if action is None:
-            action = 'add'
+            action = 'list'
 
         form = SequenceSearchForTourForm(request.GET)
         if form.is_valid():
@@ -114,7 +114,6 @@ def tour_add_sequence(request, unique_id):
             transport_type = form.cleaned_data['transport_type']
             # start_time = form.cleaned_data['start_time']
             # end_time = form.cleaned_data['end_time']
-
             sequences = Sequence.objects.all().filter(
                 user=request.user
             )
@@ -123,7 +122,15 @@ def tour_add_sequence(request, unique_id):
             if camera_make and camera_make != '':
                 sequences = sequences.filter(camera_make__contains=camera_make)
             if transport_type and transport_type != 0 and transport_type != '':
-                sequences = sequences.filter(transport_type_id=transport_type)
+                children_trans_type = TransType.objects.filter(parent_id=transport_type)
+                if children_trans_type.count() > 0:
+                    types = []
+                    types.append(transport_type)
+                    for t in children_trans_type:
+                        types.append(t.pk)
+                    sequences = sequences.filter(transport_type_id__in=types)
+                else:
+                    sequences = sequences.filter(transport_type_id=transport_type)
             if len(tags) > 0:
                 for tag in tags:
                     sequences = sequences.filter(tag=tag)
@@ -140,6 +147,9 @@ def tour_add_sequence(request, unique_id):
     if tour_sequences.count() > 0:
         for t_s in tour_sequences:
             t_sequence_ary.append(t_s.sequence.unique_id)
+    for sequence in sequences:
+        if not sequence.unique_id in t_sequence_ary:
+            sequence_ary.append(sequence)
 
     t_form = TourForm(instance=tour)
 
@@ -151,7 +161,7 @@ def tour_add_sequence(request, unique_id):
         #
         # paginator = Paginator(sequence_ary, 5)
 
-        paginator = Paginator(sequences, 5)
+        paginator = Paginator(sequence_ary, 5)
         try:
             pSequences = paginator.page(page)
         except PageNotAnInteger:

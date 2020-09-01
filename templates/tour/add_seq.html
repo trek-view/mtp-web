@@ -105,37 +105,51 @@
                 </div>
             </div>
 
-            <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
-                <li class="nav-item" style="width: 40%;">
-                    <a class="nav-link {% if action == 'add' %}active{% endif %}" href="javascript:switch_action('add');" id="switch_add">
-                        Add Sequence
-                    </a>
-                </li>
-                <li class="nav-item" style="width: 40%">
-                    <a class="nav-link {% if action == 'list' %}active{% endif %}" href="javascript:switch_action('list');" id="switch_list">
-                        Sequence List
-                    </a>
-                </li>
-            </ul>
-
-            <div class="p-3" style="border-top: 1px solid #dee2e6;">
-                <div class="search-form">
-                    <form method="GET" class="post-form" id="search_form">
-                        <input type="number" class="d-none" name="page" value="{{ page }}">
-                        <input type="text" class="d-none" name="action" value="{{ action }}" />
-                        {{ form.media }}
-                        {{ form.as_p }}
-                        <div class="form-group text-right mt-3">
-                            <button type="submit" class="save btn btn-primary btn-search">Search</button>
-                        </div>
-                    </form>
+            {% if action == 'list' %}
+                <div class="pr-3 text-right ">
+                    <button type="button" class="btn btn-primary " onclick="switch_action('add')" >Add Sequence</button>
                 </div>
-            </div>
+            {% else %}
+                <div class="pr-3 text-right ">
+                    <button type="button" class="btn btn-primary " onclick="switch_action('list')" >Exit Add Sequence</button>
+                </div>
+            {% endif %}
+
+            {% if action == 'add' %}
+                <div class="ml-3 mb-2 mr-3">
+                    <h4>Filter Tour</h4>
+                </div>
+                <div class="p-3 filter-box" style="border-top: 1px solid #dee2e6;">
+                    <div class="search-form">
+                        <form method="GET" class="post-form" id="search_form">
+                            <input type="number" class="d-none" name="page" value="{{ page }}">
+                            <input type="text" class="d-none" name="action" value="{{ action }}" />
+                            {{ form.media }}
+                            {{ form.as_p }}
+                            <div class="form-group text-right mt-3">
+                                <button type="submit" class="save btn btn-primary btn-search">Search</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
         </div>
         {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board bg-light">
         <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
+            {% if action == 'list' %}
+                <div class="text-center ">
+                    <h5>Tour Sequences</h5>
+                    You can reorder the sequences in tour.
+                </div>
+            {% else %}
+                <div class="text-center ">
+                    <h5>Add Sequences to tour</h5>
+                    Choose which sequence you want to add tour
+                </div>
+            {% endif %}
+
             <div class="paginator">
                 {% if sequences.has_other_pages %}
                     <ul class="pagination justify-content-center">
@@ -163,6 +177,7 @@
                     </ul>
                 {% endif %}
             </div>
+
             <div class="item-list {% if action == 'list' %}list_container{% endif %}">
                 {% if sequence_count > 0 %}
                     {% for sequence in sequences %}
@@ -293,9 +308,16 @@
         location.assign("{% url 'tour.tour_add_sequence' unique_id=tour.unique_id %}?" + $('#search_form').serialize());
     });
     function switch_action(action) {
-        $('#search_form input[name="action"]').val(action);
-        $('#search_form').find('input[name="page"]').val(1);
-        $('.btn-search').trigger('click');
+        if (action == 'list')
+        {
+            var url = "{% url 'tour.tour_add_sequence' unique_id=tour.unique_id %}?action=list"
+            window.location.assign(url);
+        }
+        else {
+            var url = "{% url 'tour.tour_add_sequence' unique_id=tour.unique_id %}?action=add"
+            window.location.assign(url);
+        }
+
     }
     function add_sequence_in_tour(unique_id) {
         $.ajax({
@@ -307,19 +329,19 @@
                 if (data.status == 'failed')
                     toastr.error(data.message);
                 else {
-
-                        {% if action == 'list' %}
-                            location.reload();
-                        {% else %}
-                            toastr.success(data.message);
-                            if (data.action == 'added')
-                            {
-                                $('#action_' + unique_id).removeClass('btn-warning').addClass('btn-danger').text('Remove from Tour');
-                            }
-                            else {
-                                $('#action_' + unique_id).addClass('btn-warning').removeClass('btn-danger').text('Add in Tour');
-                            }
-                        {% endif %}
+                        location.reload();
+{#                        {% if action == 'list' %}#}
+{#                            location.reload();#}
+{#                        {% else %}#}
+{#                            toastr.success(data.message);#}
+{#                            if (data.action == 'added')#}
+{#                            {#}
+{#                                $('#action_' + unique_id).removeClass('btn-warning').addClass('btn-danger').text('Remove from Tour');#}
+{#                            }#}
+{#                            else {#}
+{#                                $('#action_' + unique_id).addClass('btn-warning').removeClass('btn-danger').text('Add in Tour');#}
+{#                            }#}
+{#                        {% endif %}#}
                 }
             }
         });
