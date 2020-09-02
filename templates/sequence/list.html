@@ -122,20 +122,12 @@
 
                                     <div class="w-100 d-flex flex-row align-items-end">
                                         <p class="mb-1 mr-3 item-transport-type text-center">
-                                            {% if sequence.transport_type.parent.icon.font_awesome is None or sequence.transport_type.parent.icon.font_awesome == '' %}
-                                                <img class="transport-type-icon" src="{{ STATIC_URL }}{{ sequence.transport_type.parent.icon.filename }}">
-                                            {% else %}
-                                                <i class=transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
-                                            {% endif %}
+                                            <i class=transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
                                             <br>
                                             {{ sequence.transport_type.parent }}
                                         </p>
                                         <p class="mb-1 mr-3 item-transport-type text-center">
-                                            {% if sequence.transport_type.icon.font_awesome is None or sequence.transport_type.icon.font_awesome == '' %}
-                                                <img class="transport-type-icon" src="{{ STATIC_URL }}{{ sequence.transport_type.icon.filename }}">
-                                            {% else %}
-                                                <i class="transport-type-icon fas fa-{{ sequence.transport_type.icon.font_awesome }}"></i>
-                                            {% endif %}
+                                            <i class="transport-type-icon fas fa-{{ sequence.transport_type.icon.font_awesome }}"></i>
                                             <br>
                                             {{ sequence.transport_type.name }}
                                         </p>

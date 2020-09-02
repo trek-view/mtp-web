@@ -55,7 +55,6 @@ class IconAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'font_awesome',
-        'filename'
     )
 
 admin.site.register(TransType, TransTypeAdmin)
