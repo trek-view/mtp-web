@@ -132,7 +132,7 @@
 
                                     <div class="item-tag" style="min-height: 24px;">
                                         {% for tag_name in tour.getTags %}
-                                            <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                                            <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1" >
                                                 {{ tag_name }}
                                             </span>
                                         {% endfor %}
@@ -140,7 +140,9 @@
                                     </div>
 
                                     <div class="item-user">
-                                        <span class="user">{{ tour.user.username }}</span>
+                                        <a href="{% url 'account.profile' username=tour.user.username %}">
+                                            <span class="user" style="color: brown;">{{ tour.user.username }}</span>
+                                        </a>
                                     </div>
 
                                 </div>

@@ -35,7 +35,18 @@
                         {% endfor %}
                     </div>
 
-                    <div class="action text-right mt-2">
+                    <div class="tag-created-at text-secondary mt-2 d-flex justify-content-between">
+                        <span class="">
+                            {{ tour.created_at }}
+                        </span>
+                        <a href="{% url 'account.profile' username=tour.user.username %}">
+                            <span class="" style="color: brown;">
+                                {{ tour.user }}
+                            </span>
+                        </a>
+                    </div>
+
+                    <div class="action w-100 text-right mt-2">
                         <button type="button" class="btn btn-sm btn-primary" id="edit_button">Edit</button>
                     </div>
                 </div>
@@ -238,7 +249,9 @@
                                     </div>
 
                                     <div class="item-user">
-                                        <span class="user">{{ sequence.user.username }}</span>
+                                        <a href="{% url 'account.profile' username=sequence.user.username %}">
+                                            <span class="user" style="color: brown;">{{ sequence.user.username }}</span>
+                                        </a>
                                     </div>
 
                                 </div>

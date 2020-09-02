@@ -95,86 +95,90 @@
             <div class="guidebook-list">
                 {% if guidebooks.count > 0 %}
                     {% for guidebook in guidebooks %}
-                        <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
-                            <div class="card guidebook p-3 m-3 d-flex flex-row align-items-center" id="guidebook_{{ guidebook.unique_id }}" data-guidebook-id="{{ guidebook.unique_id }}" onclick="getGuidebookDetail('{{ guidebook.unique_id }}')">
-                                <div class="map-box" id="map-{{ guidebook.unique_id }}">
-                                </div>
-                                <div class="d-none">
 
-                                </div>
-                                <div class="cover-image-box ml-3 mr-3">
-                                    {% if guidebook.getCoverImage is None %}
-                                        <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
-                                    {% else %}
-                                        <img class="w-100" src="https://images.mapillary.com/{{ guidebook.getCoverImage }}/thumb-320.jpg">
-                                    {% endif %}
-                                </div>
-                                <div class="detail-box w-100">
-                                    <div class="guidebook-main float-left">
-                                        <div class="guidebook-title text-info">
+                        <div class="card guidebook p-3 m-3 d-flex flex-row align-items-center" id="guidebook_{{ guidebook.unique_id }}" data-guidebook-id="{{ guidebook.unique_id }}" onclick="getGuidebookDetail('{{ guidebook.unique_id }}')">
+                            <div class="map-box" id="map-{{ guidebook.unique_id }}">
+                            </div>
+                            <div class="d-none">
+
+                            </div>
+                            <div class="cover-image-box ml-3 mr-3">
+                                {% if guidebook.getCoverImage is None %}
+                                    <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
+                                {% else %}
+                                    <img class="w-100" src="https://images.mapillary.com/{{ guidebook.getCoverImage }}/thumb-320.jpg">
+                                {% endif %}
+                            </div>
+                            <div class="detail-box w-100">
+                                <div class="guidebook-main float-left">
+                                    <div class="guidebook-title text-info">
+                                        <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
                                             <h5>
                                                 {{ guidebook.name }}
                                             </h5>
-                                        </div>
+                                        </a>
+                                    </div>
 
-                                        <div class="guidebook-description">
-                                            <p class="mb-1">
-                                                {{ guidebook.getShortDescription }}
-                                            </p>
-                                        </div>
+                                    <div class="guidebook-description">
+                                        <p class="mb-1">
+                                            {{ guidebook.getShortDescription }}
+                                        </p>
+                                    </div>
 
-                                        <div class="guidebook-cetegory" style="color: blueviolet;">
-                                            <p class="mb-1">
-                                                {{ guidebook.category }}
-                                            </p>
-                                        </div>
+                                    <div class="guidebook-cetegory" style="color: blueviolet;">
+                                        <p class="mb-1">
+                                            {{ guidebook.category }}
+                                        </p>
+                                    </div>
 
-                                        <div class="guidebook-tag" style="min-height: 24px;">
-                                            {% for tag_name in guidebook.getTags %}
-                                                <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
-                                                    {{ tag_name }}
-                                                </span>
-                                            {% endfor %}
-                                        </div>
-
-                                        <div class="guidebook-created-at text-secondary">
-                                            <span class="float-left">
-                                                {{ guidebook.created_at }}
+                                    <div class="guidebook-tag" style="min-height: 24px;">
+                                        {% for tag_name in guidebook.getTags %}
+                                            <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                                                {{ tag_name }}
                                             </span>
-                                            <span class="float-right" style="color: brown;">
+                                        {% endfor %}
+                                    </div>
+
+                                    <div class="guidebook-created-at text-secondary d-flex flex-row justify-content-between">
+                                        <span class="">
+                                            {{ guidebook.created_at }}
+                                        </span>
+
+                                        <a href="{% url 'account.profile' username=guidebook.user.username %}">
+                                            <span class="" style="color: brown;">
                                                 {{ guidebook.user }}
                                             </span>
-                                        </div>
-
+                                        </a>
                                     </div>
-                                    <div class="guidebook-others float-right d-flex flex-column justify-content-between">
-                                        <div class="scenes text-center">
-                                            {% if guidebook.getSceneCount == 0 %}
-                                                <img src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
-                                            {% else %}
-                                                <img src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
-                                            {% endif %}
-                                            <p class="text-center m-0">
-                                                {{ guidebook.getSceneCount }}
-                                            </p>
-                                            <p class="text-center m-0">
-                                                Photos
-                                            </p>
-                                        </div>
-                                        <div class="like text-center">
-                                            {% if guidebook.getLikeCount == 0 %}
-                                                <img src="{% static 'images/icon/icons8-love-100.png' %}" />
-                                            {% else %}
-                                                <img src="{% static 'images/icon/icons8-love-48.png' %}" />
-                                            {% endif %}
-                                            <p class="text-center m-0">
-                                                {{ guidebook.getLikeCount }} Likes
-                                            </p>
-                                        </div>
+
+                                </div>
+                                <div class="guidebook-others float-right d-flex flex-column justify-content-between">
+                                    <div class="scenes text-center">
+                                        {% if guidebook.getSceneCount == 0 %}
+                                            <img src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                                        {% else %}
+                                            <img src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                                        {% endif %}
+                                        <p class="text-center m-0">
+                                            {{ guidebook.getSceneCount }}
+                                        </p>
+                                        <p class="text-center m-0">
+                                            Photos
+                                        </p>
+                                    </div>
+                                    <div class="like text-center">
+                                        {% if guidebook.getLikeCount == 0 %}
+                                            <img src="{% static 'images/icon/icons8-love-100.png' %}" />
+                                        {% else %}
+                                            <img src="{% static 'images/icon/icons8-love-48.png' %}" />
+                                        {% endif %}
+                                        <p class="text-center m-0">
+                                            {{ guidebook.getLikeCount }} Likes
+                                        </p>
                                     </div>
                                 </div>
                             </div>
-                        </a>
+                        </div>
                     {% endfor %}
                 {% else %}
                     <div class="no-results d-flex justify-content-center align-items-center">

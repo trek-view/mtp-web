@@ -54,9 +54,11 @@
                         </div>
 
                         <div class="username ml-auto">
-                            <span class="" style="color: brown;">
-                                {{ guidebook.user }}
-                            </span>
+                            <a href="{% url 'account.profile' username=guidebook.user.username %}">
+                                <span class="" style="color: brown;">
+                                    {{ guidebook.user }}
+                                </span>
+                            </a>
                         </div>
 
 

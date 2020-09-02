@@ -80,7 +80,9 @@
                                 {{ sequence.created_at }}
                             </p>
                         </div>
-                        <span class="" style="color: brown;">{{ sequence.user.username }}</span>
+                        <a href="{% url 'account.profile' username=sequence.user.username %}">
+                            <span class="" style="color: brown;">{{ sequence.user.username }}</span>
+                        </a>
                     </div>
 
                     <div class="mt-2 d-flex flex-row justify-content-between" id="mapillary-view">

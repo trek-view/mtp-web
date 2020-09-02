@@ -152,7 +152,9 @@
                                     </div>
 
                                     <div class="item-user">
-                                        <span class="user">{{ sequence.user.username }}</span>
+                                        <a href="{% url 'account.profile' username=sequence.user.username %}">
+                                            <span class="user">{{ sequence.user.username }}</span>
+                                        </a>
                                     </div>
 
                                 </div>

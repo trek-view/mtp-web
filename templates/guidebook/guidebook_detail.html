@@ -57,9 +57,11 @@
                     <span class="float-left">
                         {{ guidebook.created_at }}
                     </span>
-                    <span class="float-right" style="color: brown;">
-                        {{ guidebook.user }}
-                    </span>
+                    <a href="{% url 'account.profile' username=guidebook.user.username %}">
+                        <span class="float-right" style="color: brown;">
+                            {{ guidebook.user }}
+                        </span>
+                    </a>
                 </div>
                 <div class="guidebook-others float-right d-flex flex-row justify-content-between mt-2">
                     <div class="scenes text-center">

@@ -38,6 +38,17 @@
                     {% endfor %}
                 </div>
 
+                <div class="tag-created-at text-secondary mt-2">
+                    <span class="float-left">
+                        {{ tour.created_at }}
+                    </span>
+                    <a href="{% url 'account.profile' username=tour.user.username %}">
+                        <span class="float-right" style="color: brown;">
+                            {{ tour.user }}
+                        </span>
+                    </a>
+                </div>
+
                 <hr class="mt-3 mb-1">
 
                 <div class="tour-others float-right d-flex flex-row justify-content-between mt-2">
