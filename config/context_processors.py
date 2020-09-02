@@ -10,6 +10,7 @@ def get_settings(request):
         'MAPILLARY_CLIENT_ID': settings.MAPILLARY_CLIENT_ID,
         'MAPILLARY_CLIENT_SECRET': settings.MAPILLARY_CLIENT_SECRET,
         'MEDIA_URL': settings.MEDIA_URL,
+        'FONT_AWESOME_KIT': settings.FONT_AWESOME_KIT,
     }
 
 def baseurl(request):

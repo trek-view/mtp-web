@@ -110,3 +110,5 @@ MAPILLARY_CLIENT_SECRET = os.environ.get('MAPILLARY_CLIENT_SECRET')
 
 #sitemap
 SITE_ID = os.environ.get('SITE_ID')
+
+FONT_AWESOME_KIT = os.environ.get('FONT_AWESOME_KIT')
