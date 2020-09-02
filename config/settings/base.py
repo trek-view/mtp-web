@@ -1,5 +1,6 @@
 import os
-
+import datetime
+from datetime import timedelta
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -38,7 +39,17 @@ INSTALLED_APPS = [
     'bootstrap_datepicker_plus',
     'mptt',
     'tags_input',
+    'rest_framework',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 
 TAGS_INPUT_MAPPINGS = {
     'guidebook.Tag': {'field': 'name'},

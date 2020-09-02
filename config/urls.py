@@ -20,6 +20,7 @@ from guidebook.models import Guidebook
 from django.contrib import admin as admin_tmp
 from accounts import views as account_views
 
+
 sitemaps = {
     'static': StaticViewSitemap,
     'job': GenericSitemap({
@@ -85,6 +86,7 @@ urlpatterns = [
     # path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     re_path(r'', include(tf_urls)),
     path('mission-control/', admin.site.urls, name='admin'),
+    path('api/', include('api.urls')),
 ]
 
 # This part is for deploying this project as a production(DEBUG=True) on heroku.
