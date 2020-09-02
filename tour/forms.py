@@ -26,7 +26,7 @@ class TourForm(forms.ModelForm):
         self.fields['tour_tag'] = CustomTagsInputField(
             TourTag.objects.filter(is_actived=True),
             create_missing=True,
-            required=True,
+            required=False,
         )
     #
 

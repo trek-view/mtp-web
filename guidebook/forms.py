@@ -30,7 +30,7 @@ class GuidebookForm(forms.ModelForm):
     tag = CustomTagsInputField(
         Tag.objects.filter(is_actived=True),
         create_missing=True,
-        required=True,
+        required=False,
     )
 
     # cover_image = forms.FileField(
@@ -50,7 +50,7 @@ class GuidebookForm(forms.ModelForm):
         self.fields['tag'] = CustomTagsInputField(
             Tag.objects.filter(is_actived=True),
             create_missing=True,
-            required=True,
+            required=False,
         )
 
     class Meta:

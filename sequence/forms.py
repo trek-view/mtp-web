@@ -76,7 +76,7 @@ class AddSequeceForm(forms.ModelForm):
         self.fields['tag'] = CustomTagsInputField(
             Tag.objects.filter(is_actived=True),
             create_missing=True,
-            required=True,
+            required=False,
         )
 
     class Meta:
