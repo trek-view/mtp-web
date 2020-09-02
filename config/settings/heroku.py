@@ -114,8 +114,8 @@ SITE_ID = os.environ.get('SITE_ID')
 FONT_AWESOME_KIT = os.environ.get('FONT_AWESOME_KIT')
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=os.environ.get('ACCESS_TOKEN_LIFETIME')),
-    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=os.environ.get('REFRESH_TOKEN_LIFETIME')),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(os.environ.get('ACCESS_TOKEN_LIFETIME'))),
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=int(os.environ.get('REFRESH_TOKEN_LIFETIME'))),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'SIGNING_KEY': SECRET_KEY,
@@ -134,6 +134,6 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=os.environ.get('ACCESS_TOKEN_LIFETIME')),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(minutes=os.environ.get('REFRESH_TOKEN_LIFETIME')),
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=int(os.environ.get('ACCESS_TOKEN_LIFETIME'))),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(minutes=int(os.environ.get('REFRESH_TOKEN_LIFETIME'))),
 }
