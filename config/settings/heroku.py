@@ -64,11 +64,11 @@ AWS_DEFAULT_ACL = None
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_KEY")
 AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_S3_BUCKET")
+AWS_S3_BUCKET_CNAME = os.environ.get("AWS_S3_BUCKET_CNAME")
 AWS_QUERYSTRING_AUTH = False # This will make sure that the file URL does not have unnecessary parameters like your access key.
 AWS_S3_CUSTOM_DOMAIN = AWS_STORAGE_BUCKET_NAME + '.s3.amazonaws.com'
-
 # Static media settings
-STATIC_URL = 'https://' + AWS_STORAGE_BUCKET_NAME + '.s3.amazonaws.com/'
+STATIC_URL = 'https://' + AWS_S3_BUCKET_CNAME + '/'
 MEDIA_URL = STATIC_URL + 'media/'
 STATICFILES_DIRS = ( os.path.join(BASE_DIR, "static"), )
 STATIC_ROOT = 'staticfiles'
@@ -112,28 +112,3 @@ MAPILLARY_CLIENT_SECRET = os.environ.get('MAPILLARY_CLIENT_SECRET')
 SITE_ID = os.environ.get('SITE_ID')
 
 FONT_AWESOME_KIT = os.environ.get('FONT_AWESOME_KIT')
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(os.environ.get('ACCESS_TOKEN_LIFETIME'))),
-    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=int(os.environ.get('REFRESH_TOKEN_LIFETIME'))),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'SIGNING_KEY': SECRET_KEY,
-    'ALGORITHM': 'HS256',
-    'VERIFYING_KEY': None,
-    'AUDIENCE': None,
-    'ISSUER': None,
-
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    'TOKEN_TYPE_CLAIM': 'token_type',
-
-    'JTI_CLAIM': 'jti',
-
-    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=int(os.environ.get('ACCESS_TOKEN_LIFETIME'))),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(minutes=int(os.environ.get('REFRESH_TOKEN_LIFETIME'))),
-}
