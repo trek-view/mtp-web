@@ -47,12 +47,10 @@ def index(request):
     return redirect('sequence.sequence_list')
 
 def import_sequence(request):
-    if request.user.mapillary_access_token == '' or request.user.mapillary_access_token is None:
+    map_user_data = check_mapillary_token(request.user)
+    if not map_user_data:
         return redirect(settings.MAPILLARY_AUTHENTICATION_URL)
     else:
-        map_user = get_mapillary_user(request.user.mapillary_access_token)
-        if map_user is None:
-            return redirect(settings.MAPILLARY_AUTHENTICATION_URL)
         return redirect('sequence.import_sequence_list')
 
 def sequence_list(request):

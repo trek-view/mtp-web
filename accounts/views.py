@@ -119,10 +119,9 @@ def check_mapillary_oauth(request):
         user.mapillary_access_token = mapillary_access_token
         user.save()
 
-        token = user.mapillary_access_token
-        map_user_data = get_mapillary_user(token)
+        map_user_data = check_mapillary_token(request.user)
 
-        if map_user_data is None:
+        if not map_user_data:
             messages.error(request, "Unauthorized for Mapillary")
             return redirect('home')
 

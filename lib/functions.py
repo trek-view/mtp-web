@@ -36,10 +36,16 @@ def get_mapillary_user(token):
     headers = {"Authorization": "Bearer {}".format(token)}
     response = requests.get(url, headers=headers)
     data = response.json()
-    if 'message' in data and data['message'] == 'unauthorized':
-        return None
-    else:
-        return data
+    return data
+
+def get_sequence_by_key(token, seq_key):
+    if seq_key is None:
+        return False
+    url = 'https://a.mapillary.com/v3/sequences/{}?client_id={}'.format(seq_key, settings.MAPILLARY_CLIENT_ID)
+    headers = {"Authorization": "Bearer {}".format(token)}
+    response = requests.get(url, headers=headers)
+    data = response.json()
+    return data
 
 def distance(origin, destination):
     lon1, lat1 = origin
@@ -54,3 +60,14 @@ def distance(origin, destination):
     d = radius * c
 
     return d
+
+def check_mapillary_token(user):
+    if user.mapillary_access_token == '' or user.mapillary_access_token is None:
+        return False
+    map_user_data = get_mapillary_user(user.mapillary_access_token)
+
+    if map_user_data is None or 'message' in map_user_data.keys():
+        print(map_user_data['message'])
+        return False
+    else:
+        return map_user_data

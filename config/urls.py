@@ -83,7 +83,7 @@ urlpatterns = [
     path('user/<str:username>/', account_views.profile, name="account.profile"),
     path(r'^tags_input/', include('tags_input.urls', namespace='tags_input')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
-    # path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     re_path(r'', include(tf_urls)),
     path('mission-control/', admin.site.urls, name='admin'),
     path('api/', include('api.urls')),

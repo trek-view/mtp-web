@@ -26,6 +26,7 @@
                     <form method="post" class="mb-3">
                         {% csrf_token %}
                         {{ form.as_p }}
+                        <input type="hidden" name="next" value="{{ next }}" />
                         <div class="d-flex flex-row justify-content-between align-items-center">
                             <a href="{% url 'signup' %}">Sign Up</a>
                             <button type="submit" class="btn btn-primary">Login</button>

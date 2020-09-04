@@ -26,8 +26,8 @@ INSTALLED_APPS = [
     'tour.apps.TourConfig',
     'leaderboard.apps.LeaderboardConfig',
     # ========================
-    # 'oauth2_provider',
-    # 'corsheaders',
+    'oauth2_provider',
+    'corsheaders',
     'django_otp',
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',
@@ -43,12 +43,14 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication'
     ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning'
 }
 
 TAGS_INPUT_MAPPINGS = {
@@ -57,6 +59,17 @@ TAGS_INPUT_MAPPINGS = {
     'tour.TourTag': {'field': 'name'}
 }
 
+AUTHENTICATION_BACKENDS = (
+    'oauth2_provider.backends.OAuth2Backend',
+    # Uncomment following if you want to access the admin
+    'django.contrib.auth.backends.ModelBackend'
+)
+
+# OAUTH2_PROVIDER = {
+#     "AUTHORIZATION_CODE_EXPIRE_SECONDS": 60000000,
+#     "ACCESS_TOKEN_EXPIRE_SECONDS": 600000000,
+#     "RESOURCE_SERVER_TOKEN_CACHING_SECONDS": 600000000,
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -69,6 +82,8 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'accounts.AuthenticateMiddleware.AuthMd',
     'django_otp.middleware.OTPMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'oauth2_provider.middleware.OAuth2TokenMiddleware',
 ]
 
 TWO_FACTOR_PATCH_ADMIN = True
