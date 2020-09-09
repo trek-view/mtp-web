@@ -1,0 +1,229 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block app_challenge %}active{% endblock %}
+{% block app_style %}<link rel="stylesheet" href="{% static 'css/challenge_style.css' %}">{% endblock %}
+{% block content %}
+
+<div class="main-body">
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="market p-3">
+                <div class="market-header pt-3 mb-3">
+                    <h2>
+                        Challenge
+                    </h2>
+                </div>
+
+                <div class="market-body">
+                        <p>
+                            Find or offer help on image collection projects to create fresh street level map data in locations where it's needed for Google Street View, Mapillary, and more...
+                        </p>
+                </div>
+            </div>
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
+                <a href="{% url 'challenge.challenge_create' %}" class="btn btn-outline-primary">Create Challenge</a>
+            </div>
+            {% if user.is_authenticated %}
+                <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
+                    <li class="nav-item" style="width: 30%;">
+                        <a class="nav-link {% if pageName == 'phtographer-list' or pageName == 'challenge-detail' %}active{% endif %}" href="{% url 'challenge.challenge_list' page=1 %}">All</a>
+                    </li>
+                    <li class="nav-item" style="width: 50%;">
+                        <a class="nav-link {% if pageName == 'my-challenge-list' or pageName == 'my-challenge-detail' %}active{% endif %}" href="{% url 'challenge.my_challenge_list' page=1 %}">My Challenges</a>
+                    </li>
+                </ul>
+            {% endif %}
+            <div class="challenges p-2" style="border-top: 1px solid #dee2e6;">
+                <div class="accordion" id="accordionExample">
+                    <div class="card">
+                        <button class="card-header bg-white d-flex flex-row justify-content-between align-items-center pr-2 btn collapsed" id="headingOne" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            Search Challenge
+                            <i class="fa fa-chevron-down fa-1x"></i>
+                            <i class="fa fa-chevron-up d-none fa-1x"></i>
+                        </button>
+
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                            <div class="card-body">
+                                <div class="search-form">
+                                    <form method="GET" action="{% url 'challenge.challenge_list' page=1 %}" class="post-form" id="search_form">
+                                        {{ form.as_p }}
+                                        <div class="form-group text-right mt-3">
+                                            <button type="submit" class="save btn btn-primary">Search</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="challenge-card mt-2 mb-2">
+                    <div class="challenge-list">
+                        <div class="card challenge p-3 mt-3 mb-3" id="challenge_{{ challenge.unique_id }}" data-challenge-id="{{ challenge.unique_id }}" onclick="getChallengeDetail()">
+                            <div class="challenge-title text-info">
+                                <h5>
+                                    {{ challenge.name }}
+                                </h5>
+                            </div>
+
+                            <div class="challenge-description">
+                                <p>
+                                    {{ challenge.getShortDescription }}
+                                </p>
+                            </div>
+
+                            <div class="challenge-options">
+                                <p>
+                                    {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
+                                </p>
+                            </div>
+
+                            <div class="challenge-created-at text-secondary">
+                                <h6>
+                                    {{ challenge.created_at }}
+                                </h6>
+                            </div>
+
+                            <div class="challenge-geometry d-none">{{ challenge.geometry }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'components/copyrite.html' %}
+    </div>
+    <div class="right-board bg-light">
+        <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
+            <div class="paginator">
+                {% if items.has_other_pages %}
+                    <ul class="pagination justify-content-center">
+                        {% if items.number != 1 %}
+                            <li class="page-item">
+                                <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in items.paginator.pages %}
+                            {% if items.number == i %}
+                                <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% else %}
+                                <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if items.number != items.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ items.paginator.num_pages }}'>&raquo;</a></li>
+                        {% else %}
+                            <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="item-list">
+                {% if items.count > 0 %}
+                    <table class="w-100 table">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Username</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                                <tr class="border-top">
+                                    <td>{{ item.rank }}</td>
+                                    <td>
+                                        <a href="{% url 'account.profile' username=item.username %}">
+                                            <span class="user">{{ item.username }}</span>
+                                        </a>
+                                    </td>
+                                    <td>{{ item.image_count }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="no-results d-flex justify-content-center align-items-center">
+                        <h5 class="text-info">No results match your criteria.</h5>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="paginator">
+                {% if items.has_other_pages %}
+                    <ul class="pagination justify-content-center">
+                        {% if items.number != 1 %}
+                            <li class="page-item">
+                                <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in items.paginator.pages %}
+                            {% if items.number == i %}
+                                <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% else %}
+                                <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if items.number != items.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ items.paginator.num_pages }}'>&raquo;</a></li>
+                        {% else %}
+                            <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="challenge-detail modal fade" id="challengeDetailModal">
+        {{ challenge_html_detail }}
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    // Pagination
+    $('.paginator-btn').click(function() {
+        var pageNum = $(this).data('page');
+        location.assign("{% url 'challenge.challenge_list' %}" + pageNum + '?' + $('#search_form').serialize());
+    })
+
+    function goWithSearchParam(url) {
+        location.assign(url + '?' + $('#search_form').serialize());
+    }
+
+    $('#headingOne').click(function () {
+        if ($(this).hasClass('collapsed'))
+        {
+            $(this).find('.fa-chevron-down').addClass('d-none');
+            $(this).find('.fa-chevron-up').removeClass('d-none');
+        }
+        else
+        {
+            $(this).find('.fa-chevron-down').removeClass('d-none');
+            $(this).find('.fa-chevron-up').addClass('d-none');
+        }
+    });
+</script>
+{% endblock %}

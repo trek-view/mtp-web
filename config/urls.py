@@ -15,7 +15,7 @@ from django.contrib.auth.views import redirect_to_login
 from config.sitemaps import StaticViewSitemap
 from django.contrib.sitemaps.views import sitemap
 from django.contrib.sitemaps import GenericSitemap
-from marketplace.models import Job, Photographer
+from photographer.models import Photographer
 from guidebook.models import Guidebook
 from django.contrib import admin as admin_tmp
 from accounts import views as account_views
@@ -23,11 +23,8 @@ from accounts import views as account_views
 
 sitemaps = {
     'static': StaticViewSitemap,
-    'job': GenericSitemap({
-        'queryset': Job.objects.filter(is_published=True, is_approved=True),
-    }, priority=0.9),
     'photographer': GenericSitemap({
-        'queryset': Photographer.objects.filter(is_published=True, is_approved=True),
+        'queryset': Photographer.objects.filter(is_published=True),
     }, priority=0.9),
     'guidebook': GenericSitemap({
         'queryset': Guidebook.objects.filter(is_published=True, is_approved=True),
@@ -75,13 +72,14 @@ urlpatterns = [
 
     path('accounts/', include('accounts.urls')),
     path('email/', include(mail_urls)),
-    path('marketplace/', include('marketplace.urls')),
+    path('hire/', include('photographer.urls')),
+    path('challenge/', include('challenge.urls')),
     path('guidebook/', include('guidebook.urls')),
     path('sequence/', include('sequence.urls')),
     path('tour/', include('tour.urls')),
     path('leaderboard/', include('leaderboard.urls')),
     path('user/<str:username>/', account_views.profile, name="account.profile"),
-    path(r'^tags_input/', include('tags_input.urls', namespace='tags_input')),
+    path('tags_input/', include('tags_input.urls', namespace='tags_input')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     re_path(r'', include(tf_urls)),

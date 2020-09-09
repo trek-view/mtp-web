@@ -1,0 +1,61 @@
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="challengeDetailModalTitle">{{ challenge.name }}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="challenge-description">
+                <p>
+                    {{ challenge.description }}
+                </p>
+            </div>
+
+            <div class="challenge-options">
+                <p>
+                    {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
+                </p>
+            </div>
+
+            <div class="challenge-created-at text-secondary">
+                <h6>
+                    {{ challenge.created_at }}
+                </h6>
+            </div>
+        </div>
+        {% if is_mine %}
+            <div class="modal-footer d-flex flex-row justify-content-end">
+                <a type="button" href="javascript:goWithSearchParam('{% url 'challenge.challenge_leaderboard' unique_id=challenge.unique_id %}')" id="show_leaderboad" class="btn btn-success text-light" >Go to Leaderboard</a>
+                <a type="button" href="{% url 'challenge.my_challenge_edit' unique_id=challenge.unique_id %}" id="edit_button" class="btn btn-primary text-light" >Edit</a>
+                <button type="button" id="delete_button" class="btn btn-danger text-light" >Delete</button>
+                <form method="POST" action="{% url 'challenge.my_challenge_delete' unique_id=challenge.unique_id %}" id="delete_form">
+                    {% csrf_token %}
+                </form>
+            </div>
+        {% else %}
+            <div class="modal-footer d-flex flex-row justify-content-end">
+                <a type="button" href="javascript:goWithSearchParam('{% url 'challenge.challenge_leaderboard' unique_id=challenge.unique_id %}')" id="show_leaderboad" class="btn btn-success text-light" >Go to Leaderboard</a>
+            </div>
+        {% endif %}  
+    </div>
+</div>
+
+<script>
+    $('#delete_button').click(function() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                $('#delete_form').submit()
+            }
+        })
+    })
+</script>

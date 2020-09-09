@@ -218,13 +218,14 @@
     $('.paginator-btn').click(function() {
         var pageNum = $(this).data('page');
         $('#search_form').find('input[name="page"]').val(pageNum);
-        {% if pageName == 'sequence-list' %}
+        {% if pageName == 'Sequences' %}
             var url = "{% url 'sequence.sequence_list' %}?" + $('#search_form').serialize()
         {% else %}
             var url = "{% url 'sequence.my_sequence_list' %}?" + $('#search_form').serialize()
         {% endif %}
         location.assign(url);
     });
+
     mapboxgl.accessToken = mapboxToken;
     var positions = [];
     {% for sequence in sequences %}

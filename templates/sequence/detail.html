@@ -85,6 +85,8 @@
                         </a>
                     </div>
 
+                    <canvas id="myChart" width="350" height="150"></canvas>
+
                     <div class="mt-2 d-flex flex-row justify-content-between" id="mapillary-view">
                          <a target="_blank" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
                              <img style="width: 40px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}">
@@ -230,7 +232,12 @@
 
 {% block scripts %}
 <script src="{% static 'js/mapillary.js' %}"></script>
+<script src="{% static 'js/chart.min.js' %}"></script>
 <script>
+
+    var ctx = document.getElementById('myChart').getContext('2d');
+
+
     var first_move = true;
     $.ajaxSetup({
         data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
@@ -309,8 +316,6 @@
     {% for image in sequence.coordinates_image %}
         image_keys.push("{{ image }}")
     {% endfor %}
-
-    console.log(positions);
 
     var sceneData = [];
     var item = {};
@@ -437,6 +442,29 @@
       map.getCanvas().style.cursor = '';
       popup.remove();
     });
+
+    function getElevation(lng, lat) {
+        // make API request
+        var query = 'https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/' + lng + ',' + lat + '.json?layers=contour&limit=50&access_token=' + mapboxgl.accessToken;
+        $.ajax({
+            method: 'GET',
+            url: query,
+        }).done(function(data) {
+            // Get all the returned features
+            var allFeatures = data.features;
+            // Create an empty array to add elevation data to
+            var elevations = [];
+            // For each returned feature, add elevation data to the elevations array
+            for (i = 0; i < allFeatures.length; i++) {
+                elevations.push(allFeatures[i].properties.ele);
+            }
+            // In the elevations array, find the largest value
+            var highestElevation = Math.max(...elevations);
+            console.log(highestElevation)
+        });
+    }
+
+
 
     $('.switch_screen').click(function () {
          var full_screen = $('.full-screen');
@@ -643,6 +671,7 @@
             });
         });
     {% endif %}
+
     function show_image_detail(image_key) {
         var url = "{% url 'sequence.ajax_get_image_detail' unique_id=sequence.unique_id image_key='image_key' %}";
         url = url.replace('image_key', image_key);
@@ -745,5 +774,66 @@
         }
 
     }
+
+
+    var ele_ary = []
+    console.log(positions[0].length)
+    function getEleByAsyncFalse(lng, lat) {
+
+    }
+    var num_ary = []
+    for (j = 0; j < positions[0].length; j++) {
+        num_ary.push(j + 1);
+        ele_ary.push(0)
+    }
+    var jj = 0;
+    function getELE(j) {
+        var query = 'https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/' + positions[0][j][0] + ',' + positions[0][j][1] + '.json?layers=contour&limit=50&access_token=' + mapboxgl.accessToken;
+        $.ajax({
+            method: 'GET',
+            url: query,
+        }).done(function(data) {
+            console.log(data)
+            console.log(j)
+            // Get all the returned features
+            var allFeatures = data.features;
+            // Create an empty array to add elevation data to
+            var elevations = [];
+            // For each returned feature, add elevation data to the elevations array
+            for (i = 0; i < allFeatures.length; i++) {
+                elevations.push(allFeatures[i].properties.ele);
+            }
+            // In the elevations array, find the largest value
+            var highestElevation = Math.max(...elevations);
+            ele_ary[j] = highestElevation
+            jj++;
+            if (jj + 1 == positions[0].length) {
+                console.log(ele_ary)
+                var myLineChart = new Chart(document.getElementById("myChart"), {
+                    type: 'line',
+                    data: {
+                        labels: num_ary,
+                        datasets: [{
+                            data: ele_ary,
+                            borderWidth: 1,
+                            borderColor: "#3e95cd",
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        'borderColor': 'red',
+                        'borderWidth': 1,
+                        'legend': { 'display': false }
+                    }
+                });
+            }
+        });
+    }
+    for (j = 0; j < positions[0].length; j++) {
+
+        getELE(j)
+
+    }
+
 </script>
 {% endblock %}

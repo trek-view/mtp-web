@@ -84,8 +84,12 @@
                     <a class="nav-link" href="{% url 'guidebook.home' %}">Guidebooks</a>
                 </li>
 
-                <li class="nav-item {% block app_marketpalce %}{% endblock %}">
-                    <a class="nav-link" href="{% url 'marketplace.home' %}">Marketplace</a>
+                <li class="nav-item {% block app_challenge %}{% endblock %}">
+                    <a class="nav-link" href="{% url 'challenge.index' %}">Challenge</a>
+                </li>
+
+                <li class="nav-item {% block app_photographer %}{% endblock %}">
+                    <a class="nav-link" href="{% url 'photographer.index' %}">Photographer</a>
                 </li>
             </ul>
 

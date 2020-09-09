@@ -19,7 +19,8 @@ INSTALLED_APPS = [
     # ========================
     # custom apps
     'accounts.apps.AccountsConfig',
-    'marketplace.apps.MapPathsConfig',
+    'photographer.apps.PhotographerConfig',
+    'challenge.apps.ChallengeConfig',
     'guidebook.apps.GuidebookConfig',
     'lib.apps.LibConfig',
     'sequence.apps.SequenceConfig',

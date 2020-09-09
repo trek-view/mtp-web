@@ -20,10 +20,10 @@ from django.contrib import messages
 from django.template import RequestContext
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
-from django.contrib.gis.geos import Point, LineString
 from django.db.models import Avg, Count, Min, Sum
 from django.db.models.expressions import F, Window
 from django.db.models.functions.window import RowNumber
+from django.contrib.gis.geos import Point, Polygon, MultiPolygon, LinearRing, LineString
 ## Custom Libs ##
 from lib.functions import *
 
@@ -31,6 +31,7 @@ from lib.functions import *
 from accounts.models import CustomUser, MapillaryUser
 from tour.models import Tour, TourSequence
 from guidebook.models import Guidebook, Scene
+
 ## App packages
 
 # That includes from .models import *
@@ -545,6 +546,26 @@ def ajax_import(request, seq_key):
                         sequence.username = properties['username']
                     sequence.geometry_coordinates_ary = geometry['coordinates']
                     sequence.image_count = len(geometry['coordinates'])
+
+                    lineString = LineString()
+                    firstPoint = None
+                    if sequence.image_count == 0:
+                        firstPoint = Point(sequence.geometry_coordinates_ary[0][0], sequence.geometry_coordinates_ary[0][1])
+                        lineString = LineString(firstPoint.coords, firstPoint.coords)
+                    else:
+                        for i in range(len(sequence.geometry_coordinates_ary)):
+                            coor = sequence.geometry_coordinates_ary[i]
+                            if i == 0:
+                                firstPoint = Point(coor[0], coor[1])
+                                continue
+                            point = Point(coor[0], coor[1])
+                            if i == 1:
+                                lineString = LineString(firstPoint.coords, point.coords)
+                            else:
+                                lineString.append(point.coords)
+
+                    sequence.geometry_coordinates = lineString
+
                     sequence.coordinates_cas = properties['coordinateProperties']['cas']
                     sequence.coordinates_image = properties['coordinateProperties']['image_keys']
                     if 'private' in properties:
