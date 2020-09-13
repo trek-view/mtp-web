@@ -61,10 +61,13 @@ def distance(origin, destination):
 
     return d
 
-def check_mapillary_token(user):
-    if user.mapillary_access_token == '' or user.mapillary_access_token is None:
-        return False
-    map_user_data = get_mapillary_user(user.mapillary_access_token)
+def check_mapillary_token(user, token=None):
+    if token is None:
+        if user.mapillary_access_token == '' or user.mapillary_access_token is None:
+            return False
+        map_user_data = get_mapillary_user(user.mapillary_access_token)
+    else:
+        map_user_data = get_mapillary_user(token)
 
     if map_user_data is None or 'message' in map_user_data.keys():
         print(map_user_data['message'])
