@@ -64,7 +64,7 @@
         {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board bg-light">
-        <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
+        <div class="mt-4 mb-2 ml-auto mr-auto">
             <div class="guidebook-paginator">
                 {% if guidebooks.has_other_pages %}
                     <ul class="pagination justify-content-center">
@@ -96,88 +96,94 @@
                 {% if guidebooks.count > 0 %}
                     {% for guidebook in guidebooks %}
 
-                        <div class="card guidebook p-3 m-3 d-flex flex-row align-items-center" id="guidebook_{{ guidebook.unique_id }}" data-guidebook-id="{{ guidebook.unique_id }}" onclick="getGuidebookDetail('{{ guidebook.unique_id }}')">
-                            <div class="map-box" id="map-{{ guidebook.unique_id }}">
-                            </div>
-                            <div class="d-none">
+                        <div class="card guidebook p-3 m-3" id="guidebook_{{ guidebook.unique_id }}" data-guidebook-id="{{ guidebook.unique_id }}" onclick="getGuidebookDetail('{{ guidebook.unique_id }}')">
+                            <div class="row">
+                                <div class="col-md-5 col-lg-4">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6 pl-2 pr-2">
+                                            <div class="map-box" id="map-{{ guidebook.unique_id }}">
+                                            </div>
+                                        </div>
 
-                            </div>
-                            <div class="cover-image-box ml-3 mr-3">
-                                {% if guidebook.getCoverImage is None %}
-                                    <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
-                                {% else %}
-                                    <img class="w-100" src="https://images.mapillary.com/{{ guidebook.getCoverImage }}/thumb-320.jpg">
-                                {% endif %}
-                            </div>
-                            <div class="detail-box w-100">
-                                <div class="guidebook-main float-left">
-                                    <div class="guidebook-title text-info">
-                                        <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
-                                            <h5>
-                                                {{ guidebook.name }}
-                                            </h5>
-                                        </a>
-                                    </div>
-
-                                    <div class="guidebook-description">
-                                        <p class="mb-1">
-                                            {{ guidebook.getShortDescription }}
-                                        </p>
-                                    </div>
-
-                                    <div class="guidebook-cetegory" style="color: blueviolet;">
-                                        <p class="mb-1">
-                                            {{ guidebook.category }}
-                                        </p>
-                                    </div>
-
-                                    <div class="guidebook-tag" style="min-height: 24px;">
-                                        {% for tag_name in guidebook.getTags %}
-                                            <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
-                                                {{ tag_name }}
-                                            </span>
-                                        {% endfor %}
-                                    </div>
-
-                                    <div class="guidebook-created-at text-secondary d-flex flex-row justify-content-between">
-                                        <span class="">
-                                            {{ guidebook.created_at }}
-                                        </span>
-
-                                        <a href="{% url 'account.profile' username=guidebook.user.username %}">
-                                            <span class="" style="color: brown;">
-                                                {{ guidebook.user }}
-                                            </span>
-                                        </a>
-                                    </div>
-
-                                </div>
-                                <div class="guidebook-others float-right d-flex flex-column justify-content-between">
-                                    <div class="scenes text-center">
-                                        {% if guidebook.getSceneCount == 0 %}
-                                            <img src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
-                                        {% else %}
-                                            <img src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
-                                        {% endif %}
-                                        <p class="text-center m-0">
-                                            {{ guidebook.getSceneCount }}
-                                        </p>
-                                        <p class="text-center m-0">
-                                            Photos
-                                        </p>
-                                    </div>
-                                    <div class="like text-center">
-                                        {% if guidebook.getLikeCount == 0 %}
-                                            <img src="{% static 'images/icon/icons8-love-100.png' %}" />
-                                        {% else %}
-                                            <img src="{% static 'images/icon/icons8-love-48.png' %}" />
-                                        {% endif %}
-                                        <p class="text-center m-0">
-                                            {{ guidebook.getLikeCount }} Likes
-                                        </p>
+                                        <div class="cover-image-box col-md-6">
+                                            <div class="row">
+                                                {% if guidebook.getCoverImage is None %}
+                                                    <img class="w-100" style="height: 140px" src="{% static 'images/global/empty-1.png' %}">
+                                                {% else %}
+                                                    <img class="w-100" style="height: 140px" src="https://images.mapillary.com/{{ guidebook.getCoverImage }}/thumb-320.jpg">
+                                                {% endif %}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="detail-box col-md-7 col-lg-8">
+                                    <div class="guidebook-main ">
+                                        <div class="guidebook-title text-info">
+                                            <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
+                                                <h5>
+                                                    {{ guidebook.name }}
+                                                </h5>
+                                            </a>
+                                        </div>
+
+                                        <div class="guidebook-description">
+                                            <p class="mb-1">
+                                                {{ guidebook.getShortDescription }}
+                                            </p>
+                                        </div>
+
+                                        <div class="guidebook-cetegory" style="color: blueviolet;">
+                                            <p class="mb-1">
+                                                {{ guidebook.category }}
+                                            </p>
+                                        </div>
+
+                                        <div class="guidebook-tag" style="min-height: 24px;">
+                                            {% for tag_name in guidebook.getTags %}
+                                                <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                                                    {{ tag_name }}
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="guidebook-created-at text-secondary d-flex flex-row justify-content-between">
+                                            <span class="">
+                                                {{ guidebook.created_at }}
+                                            </span>
+
+                                            <a href="{% url 'account.profile' username=guidebook.user.username %}">
+                                                <span class="" style="color: brown;">
+                                                    {{ guidebook.user }}
+                                                </span>
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                    <div class="guidebook-others">
+                                            <div class="scenes text-center">
+                                                {% if guidebook.getSceneCount == 0 %}
+                                                    <img src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                                                {% else %}
+                                                    <img src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                                                {% endif %}
+                                                <p class="text-center m-0">
+                                                    {{ guidebook.getSceneCount }} Photos
+                                                </p>
+                                            </div>
+                                            <div class="like text-center">
+                                                {% if guidebook.getLikeCount == 0 %}
+                                                    <img src="{% static 'images/icon/icons8-love-100.png' %}" />
+                                                {% else %}
+                                                    <img src="{% static 'images/icon/icons8-love-48.png' %}" />
+                                                {% endif %}
+                                                <p class="text-center m-0">
+                                                    {{ guidebook.getLikeCount }} Likes
+                                                </p>
+                                            </div>
+                                        </div>
+                                </div>
                             </div>
+
                         </div>
                     {% endfor %}
                 {% else %}
@@ -233,6 +239,7 @@
     {% endfor %}
 
     console.log(positions)
+    var map_ary = [];
     function draw_map(data) {
         var obj = $('.map-box').eq(i);
         var obj_id = obj.attr('id');
@@ -295,12 +302,15 @@
                 }
             });
         });
+        map_ary.push(map)
+        window.addEventListener('resize', function() { map_ary[map_ary.length - 1].resize(); });
     }
 
     for (i = 0; i < positions.length; i++)
     {
         draw_map(positions[i])
     }
+
 
 
 

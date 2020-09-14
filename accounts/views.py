@@ -163,7 +163,7 @@ def profile(request, username):
 
     form = UserUpdateForm(instance=user)
 
-    sequences = Sequence.objects.filter(user=user, is_published=True)
+    sequences = Sequence.objects.filter(user=user, is_published=True).exclude(image_count=0)
     imageCount = 0
     imageViewPointCount = 0
     sequenceLikeCount = 0

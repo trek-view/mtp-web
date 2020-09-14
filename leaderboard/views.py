@@ -58,7 +58,7 @@ def index(request):
         transport_type = request.GET.get('transport_type')
         time_type = request.GET.get('time_type')
         if time_type is None or not time_type or time_type == 'all_time':
-            sequences = Sequence.objects.all()
+            sequences = Sequence.objects.all().exclude(image_count=0)
         else:
             if time_type == 'monthly':
                 if filter_time is None:
@@ -73,7 +73,7 @@ def index(request):
                 sequences = Sequence.objects.filter(
                     captured_at__month=m,
                     captured_at__year=y
-                )
+                ).exclude(image_count=0)
                 time_type = 'monthly'
             elif time_type == 'yearly':
                 if filter_time is None:
@@ -85,7 +85,7 @@ def index(request):
                     y = filter_time
                 sequences = Sequence.objects.filter(
                     captured_at__year=y
-                )
+                ).exclude(image_count=0)
                 time_type = 'yearly'
 
         if transport_type and transport_type != 0 and transport_type != '':
@@ -104,7 +104,7 @@ def index(request):
 
     if sequences == None:
 
-        sequences = Sequence.objects.all()
+        sequences = Sequence.objects.all().exclude(image_count=0)
 
 
     user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))

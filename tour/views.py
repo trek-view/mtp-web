@@ -116,7 +116,7 @@ def tour_add_sequence(request, unique_id):
             # end_time = form.cleaned_data['end_time']
             sequences = Sequence.objects.all().filter(
                 user=request.user
-            )
+            ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)
             if camera_make and camera_make != '':
@@ -136,7 +136,7 @@ def tour_add_sequence(request, unique_id):
                     sequences = sequences.filter(tag=tag)
 
     if sequences == None:
-        sequences = Sequence.objects.all().filter(is_published=True)
+        sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForTourForm()
 
     sequences = sequences.order_by('-created_at')

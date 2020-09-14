@@ -74,16 +74,16 @@ class Sequence(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     camera_make = models.CharField(max_length=50, default='')
-    captured_at = models.DateTimeField(null=True)
-    created_at = models.DateTimeField(null=True)
-    seq_key = models.CharField(max_length=100)
+    captured_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(null=True, blank=True)
+    seq_key = models.CharField(max_length=100, null=True, blank=True)
     pano = models.BooleanField(default=False)
-    user_key = models.CharField(max_length=100)
-    username = models.CharField(max_length=100)
-    geometry_coordinates = models.LineStringField(null=True)
-    geometry_coordinates_ary = ArrayField(ArrayField(models.FloatField(default=1)), null=True)
-    coordinates_cas = ArrayField(models.FloatField(default=0), null=True)
-    coordinates_image = ArrayField(models.CharField(default='', max_length=100), null=True)
+    user_key = models.CharField(max_length=100, null=True, blank=True)
+    username = models.CharField(max_length=100, null=True, blank=True)
+    geometry_coordinates = models.LineStringField(null=True, blank=True)
+    geometry_coordinates_ary = ArrayField(ArrayField(models.FloatField(default=1)), null=True, blank=True)
+    coordinates_cas = ArrayField(models.FloatField(default=0), null=True, blank=True)
+    coordinates_image = ArrayField(models.CharField(default='', max_length=100), null=True, blank=True)
     is_uploaded = models.BooleanField(default=False)
     is_privated = models.BooleanField(default=False)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)
@@ -178,16 +178,22 @@ class Sequence(models.Model):
 
     def getCoverImage(self):
         image_keys = self.coordinates_image
+        if image_keys is None:
+            return None
         if len(image_keys) > 0:
             return image_keys[0]
         else:
             return None
 
     def getFirstPointLat(self):
+        if self.geometry_coordinates_ary is None:
+            return None
         lat = self.geometry_coordinates_ary[0][1]
         return lat
 
     def getFirstPointLng(self):
+        if self.geometry_coordinates_ary is None:
+            return None
         lng = self.geometry_coordinates_ary[0][0]
         return lng
 
@@ -210,6 +216,7 @@ class Image(models.Model):
     is_mapillary = models.BooleanField(default=True)
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)
+    ele = models.FloatField(default=0)
     type = models.CharField(max_length=50, default='Point')
 
     def getSequence(self):

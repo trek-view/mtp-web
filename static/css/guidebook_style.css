@@ -157,15 +157,15 @@ body {
 }
 
 .guidebook-list .card.guidebook .map-box{
-    width: 220px;
+    /*width: 220px;*/
     height: 160px;
     background: #79aec8;
 }
 
 .guidebook-list .card.guidebook .cover-image-box  {
-    width: 180px;
+    /*width: 180px;*/
     height: 140px;
-    background: #79aec8;
+    /*background: #79aec8;*/
 }
 
 .guidebook-list .card.guidebook .cover-image-box > img {
@@ -174,15 +174,17 @@ body {
 }
 
 .detail-box .guidebook-main {
-    width: calc(100% - 90px);
+    width: 100%;
 }
 .detail-box .guidebook-others {
-    width: 90px;
+    width: 110px;
     height: 160px;
 }
 
 .detail-box {
-    max-width: 550px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .detail-box .guidebook-others img {
@@ -295,4 +297,21 @@ body {
     z-index: 300;
     position: absolute;
     left: calc(50% - 65px);
+}
+
+.guidebook-others {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+@media only screen and (max-width: 600px) {
+    .detail-box {
+        flex-direction: column;
+    }
+    .detail-box .guidebook-others {
+        flex-direction: row;
+        width: 100%;
+        height: auto;
+    }
 }

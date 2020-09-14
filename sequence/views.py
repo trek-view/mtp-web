@@ -71,7 +71,7 @@ def sequence_list(request):
 
             sequences = Sequence.objects.all().filter(
                 is_published=True
-            )
+            ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)
             if camera_make and camera_make != '':
@@ -94,7 +94,7 @@ def sequence_list(request):
                     sequences = sequences.filter(tag=tag)
 
     if sequences == None:
-        sequences = Sequence.objects.all().filter(is_published=True)
+        sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
     paginator = Paginator(sequences.order_by('-created_at'), 5)
@@ -156,7 +156,7 @@ def my_sequence_list(request):
 
             sequences = Sequence.objects.all().filter(
                 user=request.user
-            )
+            ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)
             if camera_make and camera_make != '':
@@ -176,7 +176,7 @@ def my_sequence_list(request):
                     sequences = sequences.filter(tag=tag)
 
     if sequences == None:
-        sequences = Sequence.objects.all().filter(is_published=True)
+        sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
     paginator = Paginator(sequences.order_by('-created_at'), 5)
@@ -751,6 +751,7 @@ def ajax_get_image_detail(request, unique_id, image_key):
         image.is_mapillary = True
 
         image.user = sequence.user
+        image.ele = 0
         print('test')
         image.save()
 

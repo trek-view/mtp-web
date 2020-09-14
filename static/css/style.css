@@ -10,7 +10,7 @@ nav.navbar {
     min-height: 80px !important;
     position: fixed;
     width: 100%;
-    z-index: 100;
+    z-index: 2100;
     box-shadow: 3px 3px 0px 0px rgb(4 4 4 / 5%), 1px 2px 20px 0px rgb(0 0 0 / 86%) !important;
 }
 
@@ -19,6 +19,9 @@ nav.navbar {
     overflow-y: auto;
     height: calc(100vh - 100px);
     position: fixed;
+    padding-top: 20px;
+    z-index: 400;
+    background: white;
 }
 
 .right-fixed-board {
@@ -113,7 +116,7 @@ form ul li .help-block.form-error {
         width: 220px;
     }
     .main-body {
-        padding-top: 75px;
+        padding-top: 80px;
     }
 }
 
@@ -134,7 +137,7 @@ form ul li .help-block.form-error {
 }
 
 .card .min-map-box {
-    width: 220px;
+    /*width: 220px;*/
     height: 160px;
 }
 
@@ -168,4 +171,75 @@ i.transport-type-icon {
 
 .ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front {
     z-index: 2000;
+}
+
+.close-sidebar, .open-sidebar {
+    font-size: 40px;
+    z-index: 1000;
+    position: fixed;
+    top: 110px;
+    left: 10px;
+    opacity: .4;
+}
+
+.close-sidebar:hover, .open-sidebar:hover {
+    opacity: 1;
+    cursor: pointer;
+}
+
+@media only screen and (max-width: 400px) {
+  .left-side {
+      width: 100vw;
+  }
+}
+
+.detail-box {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: center;
+}
+
+
+
+@media only screen and (max-width: 1200px) {
+    .opened-sidebar.full-screen {
+        width: 100% !important;
+    }
+
+    .right-fixed-board {
+        width: 100vw;
+        left: 0px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .left-side {
+        height: calc(100vh - 80px);
+    }
+
+    .close-sidebar, .open-sidebar {
+        top: 90px;
+    }
+
+    .full-screen {
+        top: 80px !important;
+        height: calc(100vh - 80px) !important;
+    }
+
+    .detail-box {
+        flex-direction: column;
+        align-content: start;
+    }
+    .detail-box .guidebook-others {
+        flex-direction: row;
+        width: 100%;
+        height: auto;
+    }
+
+    .right-fixed-board {
+        width: 100vw !important;
+        left: 0px !important;
+        top: 80px;
+    }
 }

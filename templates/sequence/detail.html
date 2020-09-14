@@ -686,7 +686,8 @@
                     toastr.error(data.message)
                 }
                 else {
-                    $('.image-detail-box').removeClass('d-none');
+                    if (is_opened_side_bar)
+                        $('.image-detail-box').removeClass('d-none');
                     $('#image_detail_box').html(data.image_detail_box_html);
                     $('.right-board .image-view-point span').text(data.view_points + ' View Points');
                 }
