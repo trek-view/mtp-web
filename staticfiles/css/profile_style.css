@@ -1,0 +1,35 @@
+.dz-image img {
+    width: 100% !important;
+    height: 100% !important;
+}
+.dz-image {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0px !important;
+}
+.dz-preview.dz-image-preview {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0px !important;
+    margin: 0px !important;
+}
+form.dropzone {
+    padding: 0px !important;
+    width: 200px !important;
+    height: 200px !important;
+}
+.dropzone .dz-preview .dz-error-message {
+    left: 103px;
+}
+
+.dropzone .dz-preview:hover .dz-image img {
+    -webkit-transform: unset;
+    transform: unset;
+    -webkit-filter: unset;
+    filter: unset;
+}
+.dz-image-cover img {
+    width: 120px !important;
+    height: 120px !important;
+    border-radius: 50% !important;
+}

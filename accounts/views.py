@@ -22,9 +22,9 @@ from lib.badge import get_finder_label, get_guidebook_label, get_mapper_label, g
 
 from .models import CustomUser, MapillaryUser
 from .forms import UserSignUpForm, UserProfileForm, UserAvatarForm, UserUpdateForm
-from sequence.models import Sequence, ImageViewPoint
-from tour.models import Tour
-from guidebook.models import Guidebook
+from sequence.models import Sequence, ImageViewPoint, SequenceLike
+from tour.models import Tour, TourLike
+from guidebook.models import Guidebook, GuidebookLike
 UserModel = get_user_model()
 import requests
 
@@ -159,26 +159,46 @@ def check_mapillary_oauth(request):
 
 def profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
-    sequences = Sequence.objects.filter(user=user)
-    tours = Tour.objects.filter(user=user)
-    guidebooks = Guidebook.objects.filter(user=user)
+
+
     form = UserUpdateForm(instance=user)
 
     sequences = Sequence.objects.filter(user=user, is_published=True)
     imageCount = 0
     imageViewPointCount = 0
-    if sequences.count() > 0:
+    sequenceLikeCount = 0
+    sequenceCount = sequences.count()
+    if sequenceCount > 0:
+
         image_key_ary = []
         for sequence in sequences:
+            sequenceLikes = SequenceLike.objects.filter(sequence=sequence)
+            sequenceLikeCount += sequenceLikes.count()
+
             imageCount += sequence.image_count
             image_key_ary += sequence.coordinates_image
 
         imageViewPoints = ImageViewPoint.objects.filter(image__image_key__in=image_key_ary)
         imageViewPointCount = imageViewPoints.count()
 
+    markedImageViewPoints = ImageViewPoint.objects.filter(user=user)
+    markedImageViewPointCount = markedImageViewPoints.count()
 
     guidebooks = Guidebook.objects.filter(user=user, is_published=True)
     guidebookCount = guidebooks.count()
+    guidebookLikeCount = 0
+    if guidebookCount > 0:
+        for guidebook in guidebooks:
+            guidebookLikes = GuidebookLike.objects.filter(guidebook=guidebook)
+            guidebookLikeCount += guidebookLikes.count()
+
+    tours = Tour.objects.filter(user=user, is_published=True)
+    tourCount = tours.count()
+    tourLikeCount = 0
+    if tourCount > 0:
+        for tour in tours:
+            tourLikes = TourLike.objects.filter(tour=tour)
+            tourLikeCount += tourLikes.count()
 
     mapper_label = get_mapper_label(imageCount)
     guidebook_label = get_guidebook_label(guidebookCount)
@@ -194,9 +214,14 @@ def profile(request, username):
         'guidebook_label': guidebook_label,
         'finder_label': finder_label,
         'spotter_label': spotter_label,
-        'sequences_count': sequences.count(),
-        'tours_count': tours.count(),
-        'guidebooks_count': guidebooks.count(),
+        'sequences_count': sequenceCount,
+        'seq_like_count': sequenceLikeCount,
+        'tours_count': tourCount,
+        'tour_like_count': tourLikeCount,
+        'guidebooks_count': guidebookCount,
+        'guide_like_count': guidebookLikeCount,
+        'view_point_count': imageViewPointCount,
+        'marked_point_count': markedImageViewPointCount,
         'pageName': 'Profile',
         'pageTitle': 'Profile'
     }

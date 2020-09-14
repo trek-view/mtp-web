@@ -3,43 +3,8 @@
 {% block content %}
 <link href="{% static 'css/dropzone.min.css' %}" type='text/css' rel='stylesheet' />
 <script src="{% static 'js/dropzone.min.js' %}" type='text/javascript'></script>
-<style>
-    .dz-image img {
-        width: 100% !important;
-        height: 100% !important;
-    }
-    .dz-image {
-        width: 100% !important;
-        height: 100% !important;
-        border-radius: 0px !important;
-    }
-    .dz-preview.dz-image-preview {
-        width: 100% !important;
-        height: 100% !important;
-        padding: 0px !important;
-        margin: 0px !important;
-    }
-    form.dropzone {
-        padding: 0px !important;
-        width: 200px !important;
-        height: 200px !important;
-    }
-    .dropzone .dz-preview .dz-error-message {
-        left: 103px;
-    }
-
-    .dropzone .dz-preview:hover .dz-image img {
-        -webkit-transform: unset;
-        transform: unset;
-        -webkit-filter: unset;
-        filter: unset;
-    }
-    .dz-image-cover img {
-        width: 120px !important;
-        height: 120px !important;
-        border-radius: 50% !important;
-    }
-</style>
+{% block app_profile %}active{% endblock %}
+{% block app_style %}<link rel="stylesheet" href="{% static 'css/profile_style.css' %}">{% endblock %}
 <div class="main-body">
     <div class="container">
         <div class="row mt-3">
@@ -108,7 +73,6 @@
                                         <a class="" href="{{ user.website_url }}">{{ user.website_url }}</a>
                                     </div>
                                 {% endif %}
-
                             </div>
                         </div>
                     </div>
@@ -153,29 +117,39 @@
 
         <hr class="mt-1 mb-1" />
 
-        <div style="width: 350px;">
-            <h2 class="mt-5 text-center mb-4">{{ username }} Profile</h2>
-            {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                {% endfor %}
-            {% endif %}
-            <div class="">
-                <div class="users">
-                    <a href="/user/list?username={{ username }}">Go Guidebook({{ users_count }})</a>
-                </div>
-                <div class="sequences">
-                    <a href="/sequence/list?username={{ username }}">Go Sequence({{ sequences_count }})</a>
-                </div>
-                <div class="tours">
-                    <a href="/tour/list?username={{ username }}">Go Tour({{ tours_count }})</a>
+        <div class="row">
+            <div class="col-md-6 mt-3">
+                <div class="card p-2 section w-100">
+                    <div class="users">
+                        <a href="/guidebook/list?username={{ username }}">Guidebooks created({{ guidebooks_count }})</a>
+                    </div>
                 </div>
             </div>
+
+            <div class="col-md-6 mt-3">
+                <div class="card p-2 section w-100">
+                    <div class="users">
+                        <a href="/tour/list?username={{ username }}">Tours created({{ tours_count }})</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mt-3">
+                <div class="card p-2 section w-100">
+                    <div class="users">
+                        <a href="/sequence/list?username={{ username }}">Go Guidebook({{ sequences_count }})</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mt-3">
+                <div class="card p-2 section w-100">
+                    <div class="users">
+                        <a href="/sequence/list?username={{ username }}">Go Guidebook({{ view_point_count }})</a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -266,7 +240,7 @@
                         $('.main-user .user-email h5').html(user.email);
                         $('.main-user .user-name p').html(user.first_name + ' ' + user.last_name);
                         $('.main-user .user-description p').html(user.description);
-                        $('.main-user .user-website').html(user.website_url);
+                        $('.main-user .user-website').html('<a class="" href="' + user.website_url + '">' + user.website_url + '</a>');
                     }
                     $('#userDetailModal').modal('hide');
                 }
@@ -285,7 +259,7 @@
         autoProcessQueue: false,
         uploadMultiple: false,
         parallelUploads: 1,
-        paramName: "cover_image", // The name that will be used to transfer the file
+        paramName: "avatar", // The name that will be used to transfer the file
         maxFilesize: 20,
         {#addRemoveLinks: true,#}
         maxFiles: 1,
@@ -300,7 +274,7 @@
                 this.addFile(file);
             });
             this.on("success", function(file, responseText) {
-                toastr.success('A cover image is updated successfully.');
+                toastr.success('A picture is updated successfully.');
             });
             this.on("thumbnail", function(file, dataUrl) {
                 $('.dz-image').css('border-radius', '0px');
