@@ -40,7 +40,7 @@ class CustomUserManager(BaseUserManager):
 
 def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'user/{}'.format(instance.username)
+    return 'user/{}.jpg'.format(instance.username)
 
 class CustomUser(AbstractUser):
     # username = None
