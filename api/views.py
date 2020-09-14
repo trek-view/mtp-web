@@ -43,6 +43,8 @@ from sequence.models import Sequence, TransType, Tag as SeqTag
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
+
 from accounts.models import MapillaryUser
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -50,8 +52,9 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
         return  # To not perform the csrf check previously happening
 
 class SequenceCreate(APIView):
-    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
+    authentication_classes = (CsrfExemptSessionAuthentication, )
     permission_classes = [IsAuthenticated]
+
     def post(self, request, version='v1'):
         sequence_name = request.POST.get('name')
         if not sequence_name or sequence_name is None:
@@ -103,7 +106,7 @@ class SequenceCreate(APIView):
         })
 
 class SequenceImport(APIView):
-    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
+    authentication_classes = (CsrfExemptSessionAuthentication, )
     permission_classes = [IsAuthenticated]
 
     def put(self, request, unique_id, version='v1'):
