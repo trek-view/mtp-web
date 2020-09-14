@@ -38,16 +38,26 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
 
+def image_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return 'user/{}'.format(instance.username)
 
 class CustomUser(AbstractUser):
     # username = None
     email = models.EmailField(_('email address'), unique=True)
     alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed for Username.')
+    alpha = RegexValidator(r'^[a-zA-Z]*$', 'Only alpha characters are allowed for Username.')
     username = models.CharField(max_length=100, unique=True, validators=[alphanumeric])
     is_active = models.BooleanField(default=False)
     is_maillist = models.BooleanField(default=False)
     mapillary_access_token = models.TextField(default='', null=True, blank=True)
     verify_email_key = models.CharField(max_length=100, default='')
+
+    avatar = models.ImageField(upload_to=image_directory_path, null=True, blank=True)
+    first_name = models.CharField(max_length=30, null=True, blank=True, validators=[alpha])
+    last_name = models.CharField(max_length=30, null=True, blank=True, validators=[alpha])
+    website_url = models.TextField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -59,10 +69,7 @@ class CustomUser(AbstractUser):
         # return self.email
 
     def save(self, *args, **kwargs):
-        
         super().save(*args, **kwargs)
-
-        
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None

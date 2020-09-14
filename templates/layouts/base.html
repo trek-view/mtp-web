@@ -95,7 +95,7 @@
 
             {% if user.is_authenticated %}
                 <div>
-                    <a href="{% url 'profile' %}" class="text-white">{{ request.user.username }}</a>
+                    <a href="{% url 'account.profile' username=request.user.username %}" class="text-white">{{ request.user.username }}</a>
                     <a href="{% url 'logout' %}" class="text-white">Logout</a>
                 </div>
             {% else %}

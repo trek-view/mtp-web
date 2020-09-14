@@ -78,7 +78,7 @@ urlpatterns = [
     path('sequence/', include('sequence.urls')),
     path('tour/', include('tour.urls')),
     path('leaderboard/', include('leaderboard.urls')),
-    path('user/<str:username>/', account_views.profile, name="account.profile"),
+    path('user/<str:username>/profile/', account_views.profile, name="account.profile"),
     path('tags_input/', include('tags_input.urls', namespace='tags_input')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),

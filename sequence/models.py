@@ -160,6 +160,10 @@ class Sequence(models.Model):
 
     def getDistance(self):
         all_distance = 0
+        if self.geometry_coordinates_ary is None:
+            return all_distance
+
+
         if (len(self.geometry_coordinates_ary) > 0):
             first_point = self.geometry_coordinates_ary[0]
             for i in range(len(self.geometry_coordinates_ary) - 1):
@@ -194,6 +198,7 @@ class Image(models.Model):
     camera_model = models.CharField(max_length=150, default='')
     cas = models.FloatField(default=0)
     captured_at = models.DateTimeField(null=True)
+    sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE, null=True, blank=True)
     seq_key = models.CharField(max_length=100, default='')
     image_key = models.CharField(max_length=100)
     pano = models.BooleanField(default=False)
@@ -222,4 +227,3 @@ class SequenceLike(models.Model):
 class ImageViewPoint(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
-

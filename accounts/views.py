@@ -7,19 +7,25 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Avg, Count, Min, Sum
+from django.db.models.expressions import F, Window
+from django.db.models.functions.window import RowNumber
 
 from datetime import datetime
 from mailerlite import MailerLiteApi
 import secrets
-
+from django.contrib.auth import (
+    authenticate, get_user_model, password_validation,
+)
 from lib.functions import *
+from lib.badge import get_finder_label, get_guidebook_label, get_mapper_label, get_spotter_label
 
 from .models import CustomUser, MapillaryUser
-from .forms import UserSignUpForm, UserProfileForm
-from sequence.models import Sequence
+from .forms import UserSignUpForm, UserProfileForm, UserAvatarForm, UserUpdateForm
+from sequence.models import Sequence, ImageViewPoint
 from tour.models import Tour
 from guidebook.models import Guidebook
-
+UserModel = get_user_model()
 import requests
 
 def signup(request):
@@ -156,8 +162,38 @@ def profile(request, username):
     sequences = Sequence.objects.filter(user=user)
     tours = Tour.objects.filter(user=user)
     guidebooks = Guidebook.objects.filter(user=user)
+    form = UserUpdateForm(instance=user)
+
+    sequences = Sequence.objects.filter(user=user, is_published=True)
+    imageCount = 0
+    imageViewPointCount = 0
+    if sequences.count() > 0:
+        image_key_ary = []
+        for sequence in sequences:
+            imageCount += sequence.image_count
+            image_key_ary += sequence.coordinates_image
+
+        imageViewPoints = ImageViewPoint.objects.filter(image__image_key__in=image_key_ary)
+        imageViewPointCount = imageViewPoints.count()
+
+
+    guidebooks = Guidebook.objects.filter(user=user, is_published=True)
+    guidebookCount = guidebooks.count()
+
+    mapper_label = get_mapper_label(imageCount)
+    guidebook_label = get_guidebook_label(guidebookCount)
+    finder_label = get_finder_label(imageViewPointCount)
+    spotter_label = get_spotter_label()
+
+
+
     content = {
         'username': username,
+        'form': form,
+        'mapper_label': mapper_label,
+        'guidebook_label': guidebook_label,
+        'finder_label': finder_label,
+        'spotter_label': spotter_label,
         'sequences_count': sequences.count(),
         'tours_count': tours.count(),
         'guidebooks_count': guidebooks.count(),
@@ -166,3 +202,95 @@ def profile(request, username):
     }
 
     return render(request, 'account/profile.html', content)
+
+@my_login_required
+def ajax_upload_file(request):
+    user = request.user
+
+    if request.method == "POST":
+        form = UserAvatarForm(request.POST, request.FILES)
+        if form.is_valid():
+            form_data = form.save(commit=False)
+            user.avatar = form_data.avatar
+            user.save()
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Picture is uploaded successfully.'
+            })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+@my_login_required
+def ajax_user_update(request):
+    user = request.user
+
+    if request.method == "POST":
+
+        email = request.POST.get('email')
+        if email is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Email is missing."
+            })
+        users = CustomUser.objects.filter(email=email).exclude(username=user.username)
+        if users.count() > 0:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "The email is already exist."
+            })
+        else:
+            user.email = email
+
+        first_name = request.POST.get('first_name')
+        print('first_name', first_name)
+        if first_name is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "First Name is required."
+            })
+        else:
+            user.first_name = first_name
+            last_name = request.POST.get('last_name')
+            if last_name is None:
+                return JsonResponse({
+                    'status': 'failed',
+                    'message': "Last Name is required."
+                })
+            else:
+                user.last_name = last_name
+        if not request.POST.get('description') is None:
+            user.description = request.POST.get('description')
+
+        if not request.POST.get('website_url') is None:
+            user.website_url = request.POST.get('website_url')
+        user.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'User detail data was uploaded successfully.',
+            'user': {
+                'email': user.email,
+                'description': user.description,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'website_url': user.website_url
+            }
+        })
+
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })

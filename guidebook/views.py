@@ -388,6 +388,7 @@ def ajax_upload_file(request, unique_id):
         'status': 'failed',
         'message': 'The Guidebook does not exist or has no access.'
     })
+
 @my_login_required
 def ajax_add_scene(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)

@@ -3,6 +3,17 @@ from django.contrib.auth import views as authViews
 from . import views
 from .forms import AuthenticationForm, UserPasswordChangeForm
 
+
+
+
+
+
+
+
+
+
+
+
 urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path(
@@ -34,6 +45,10 @@ urlpatterns = [
         name='change_password'
     ),
     path('change-password-success/', views.change_password_success, name='change_password_success'),
+
     path('profile/', views.profile_edit, name='profile'),
+    path('ajax_upload_file', views.ajax_upload_file, name='account.ajax_upload_file'),
+    path('ajax_user_update', views.ajax_user_update, name='account.ajax_user_update'),
+
     path('check-mapillary-oauth', views.check_mapillary_oauth, name='check_mapillary_oauth'),
 ]

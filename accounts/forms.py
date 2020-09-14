@@ -122,6 +122,38 @@ class UserSignUpForm(UserCreationForm):
         model = CustomUser
         fields = ("email", "username", "password1", "password2", "is_maillist")
 
+class UserUpdateForm(forms.ModelForm):
+    username = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': '', 'readonly': 'true'}))
+
+    email = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'data-validation': 'required'}),
+        required=False
+    )
+
+    first_name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
+        required=False
+    )
+
+    last_name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
+        required=False
+    )
+
+    description = forms.CharField(
+        widget=forms.Textarea(
+            attrs={'class': 'form-control', 'rows': 4, 'style': 'resize: none;'}),
+        required=False
+    )
+
+    website_url = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'style': 'resize: none;', 'data-validation': 'url'}), required=False)
+
+    class Meta:
+        model = CustomUser
+        fields = ("username", "email", "first_name", "last_name", "description", "website_url")
+
 class UserProfileForm(forms.ModelForm):
     username = forms.CharField(widget=forms.TextInput(
         attrs={'class': 'form-control disabled', 'readonly': 'readonly'}), required=False)
@@ -153,3 +185,16 @@ class UserPasswordChangeForm(PasswordChangeForm):
         strip=False,
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password'}),
     )
+
+class UserAvatarForm(forms.ModelForm):
+    avatar = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        required=False
+    )
+
+    class Meta:
+        model = CustomUser
+
+        fields = (
+            'avatar',
+        )
