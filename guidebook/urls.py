@@ -2,9 +2,7 @@ from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
-    path('home', views.home, name='home'),
     path('', views.home, name='guidebook.home'),
-
     path('create', views.guidebook_create, name='guidebook.create'),
     path('<str:unique_id>/edit/', views.guidebook_create, name='guidebook.guidebook_edit'),
     re_path(r'^list/(?P<page>\d*)?$', views.guidebook_list, name='guidebook.guidebook_list'),

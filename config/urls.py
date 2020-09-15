@@ -19,7 +19,7 @@ from photographer.models import Photographer
 from guidebook.models import Guidebook
 from django.contrib import admin as admin_tmp
 from accounts import views as account_views
-
+from . import views
 
 sitemaps = {
     'static': StaticViewSitemap,
@@ -67,7 +67,7 @@ class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
 
 urlpatterns = [
     # path('', views.index, name='home'),
-    path('', RedirectView.as_view(url='guidebook', permanent=False), name='home'),
+    path('', views.index, name='home'),
     # path('', RedirectView.as_view(url='marketplace', permanent=False), name='home'),
 
     path('accounts/', include('accounts.urls')),

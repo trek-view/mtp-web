@@ -3,17 +3,6 @@ from django.contrib.auth import views as authViews
 from . import views
 from .forms import AuthenticationForm, UserPasswordChangeForm
 
-
-
-
-
-
-
-
-
-
-
-
 urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path(
