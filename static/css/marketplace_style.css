@@ -1,0 +1,85 @@
+.jobs, .photographers {
+    background: rgba(214, 225, 234, 0.46);
+}
+
+.job-list .card, .photographer-list .card {
+    border-radius: .5rem;
+    /*box-shadow: 1px 1px 1px 0px;*/
+}
+
+.job-list .card:hover, .photographer-list .card:hover {
+    border: 1px #87e22e solid;
+    box-shadow: 2px 2px 10px 0px #cbf5a2;
+}
+
+/* Mapbox board */
+.mapboxgl-map {
+    height: calc(100vh - 100px) !important;
+}
+
+.mapbox-gl-draw_line {
+    display: none !important;
+}
+
+.mapbox-gl-draw_point {
+    display: none !important;
+}
+
+.mapbox-gl-draw_combine {
+    display: none !important;
+}
+
+.mapbox-gl-draw_uncombine {
+    display: none !important;
+}
+
+.mapbox-gl-draw_polygon {
+    display: none !important;
+}
+
+.mapbox-gl-draw_trash {
+    display: none !important;
+}
+
+.card.job, .card.photographer {
+    cursor: pointer;
+}
+
+@media (min-width: 576px) {
+    .modal-dialog {
+        margin: unset;
+    }
+}
+
+.modal-dialog {
+    margin-right: 5px !important;
+    margin-top: 5px !important;
+}
+
+
+.job-detail.modal, .photographer-detail.modal {
+    position: fixed;
+    top: unset;
+    left: unset;
+    /* bottom: 0 !important; */
+    right: 0 !important;
+    z-index: 1050;
+    display: none;
+    width: 400px;
+    /* height: 250px; */
+    overflow: hidden;
+    outline: 0;
+}
+
+#id_type, #id_capture_method, #id_is_paid {
+    position: relative;
+}
+
+.modal-body .photographer-description, .modal-body .job-description {
+    max-height: calc(100vh - 390px);
+    overflow-y: auto;
+}
+
+.photographer-detail.modal, .job-detail.modal {
+    max-height: calc(100vh - 110px);
+}

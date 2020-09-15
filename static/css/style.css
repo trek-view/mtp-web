@@ -1,0 +1,271 @@
+body {
+    overflow-y: hidden;
+}
+
+.card.login {
+    width: 400px;
+}
+
+nav.navbar {
+    min-height: 80px !important;
+    position: fixed;
+    width: 100%;
+    z-index: 2100;
+    box-shadow: 3px 3px 0px 0px rgb(4 4 4 / 5%), 1px 2px 20px 0px rgb(0 0 0 / 86%) !important;
+}
+
+.left-side {
+    width: 400px;
+    overflow-y: auto;
+    height: calc(100vh - 100px);
+    position: fixed;
+    padding-top: 20px;
+    z-index: 400;
+    background: white;
+}
+
+.right-fixed-board {
+    width: calc(100vw - 400px);
+    position: fixed;
+    left: 400px;
+    top: 100px;
+}
+
+.right-board {
+    width: calc(100vw - 400px);
+    min-height: calc(100vh - 100px);
+    margin-left: 400px;
+}
+
+.main-body {
+    display: flex;
+    flex-direction: row;
+    padding-top: 100px;
+}
+
+
+.errorlist {
+    color: red;
+}
+
+.navbar .logo {
+    width: 380px;
+}
+
+.navbar .logo img {
+    width: 100%;
+}
+
+.calculation-box {
+    height: 75px;
+    width: 150px;
+    position: absolute;
+    bottom: 40px;
+    left: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    text-align: center;
+}
+
+a, h1, h2, h3, h4, h5, h6, p, div, ul, li, button, input, optgroup, select, textarea {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+}
+
+form li {
+    list-style-type: none !important;
+    display: inline !important;
+}
+
+form ul {
+    padding-inline-start: 10px !important;
+    display: flex;
+    justify-content: space-between;
+}
+
+.close-left-icon {
+    position: absolute;
+    right: 0px;
+    top: 80px;
+    /* padding: 5px; */
+    background-color: teal;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
+
+.help-block.form-error {
+    color: #e01f1f;
+}
+
+form ul li .help-block.form-error {
+    position: absolute;
+    left: 0px;
+    top: -22px;
+}
+
+.no-results {
+    min-height: 100px;
+}
+
+@media only screen and (max-width: 600px) {
+    .navbar .logo {
+        width: 220px;
+    }
+    .main-body {
+        padding-top: 80px;
+    }
+}
+
+.error-404-box {
+    padding-top: 140px;
+}
+#toast-container>div {
+    box-shadow: 0 0 12px #000 !important;
+}
+
+#toast-container {
+    margin-top: 120px;
+}
+
+.alert-error {
+    background: #ff000099;
+    color: white;
+}
+
+.card .min-map-box {
+    /*width: 220px;*/
+    height: 160px;
+}
+
+.main-list-board {
+    max-width: 1050px;
+}
+
+.card .detail-box span {
+    font-size: 13px;
+}
+
+img.transport-type-icon {
+    width: 40px;
+    height: 30px;
+}
+
+i.transport-type-icon {
+    font-size: 27px;
+}
+
+.tagsinput {
+    width: 100% !important;
+    height: auto !important;
+}
+
+.tagsinput .tag {
+    background: #eff3f7 !important;
+    color: #151414 !important;
+    border-radius: 4px;
+}
+
+.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front {
+    z-index: 2000;
+}
+
+.close-sidebar, .open-sidebar {
+    font-size: 40px;
+    z-index: 1000;
+    position: fixed;
+    top: 110px;
+    left: 10px;
+    opacity: .4;
+}
+
+.close-sidebar:hover, .open-sidebar:hover {
+    opacity: 1;
+    cursor: pointer;
+}
+
+@media only screen and (max-width: 400px) {
+  .left-side {
+      width: 100vw;
+  }
+}
+
+.detail-box {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: center;
+}
+
+
+.switch-list-viewer {
+    position: absolute;
+    margin-top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+@media only screen and (max-width: 1200px) {
+    .opened-sidebar.full-screen {
+        width: 100% !important;
+    }
+
+    .right-fixed-board {
+        width: 100vw;
+        left: 0px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .left-side {
+        height: calc(100vh - 80px);
+    }
+
+    .close-sidebar, .open-sidebar {
+        top: 90px;
+    }
+
+    .full-screen {
+        top: 80px !important;
+        height: calc(100vh - 80px) !important;
+    }
+
+    .detail-box {
+        flex-direction: column;
+        align-content: start;
+    }
+    .detail-box .guidebook-others {
+        flex-direction: row;
+        width: 100%;
+        height: auto;
+    }
+
+    .right-fixed-board {
+        width: 100vw !important;
+        left: 0px !important;
+        top: 80px;
+    }
+}
+
+.right-board > #map.mapboxgl-map {
+    height: calc(100vh - 100px) !important;
+}
+
+.right-board .paginator:first-child {
+    min-height: 38px;
+}
+
+body {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+@media only screen and (max-width: 600px) {
+    #map.mapboxgl-map {
+        height: calc(100vh - 80px) !important;
+    }
+}
+
