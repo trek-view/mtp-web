@@ -13,7 +13,7 @@ Click [Map the Paths](https://map-the-paths.herokuapp.com/) to experience them.
 
 Set DJANGO_SETTINGS_MODULE to config.settings_local in manage.py.
 ``` python
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings_local')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
 ```
 
 Fill following values in config/setting_local.py
@@ -73,7 +73,7 @@ And connect your git repository to the created app.
 
 Set DJANGO_SETTINGS_MODULE to config.settings_heroku in manage.py and config/wsgi.py.
 ``` python
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings_heroku')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.heroku')
 ```
 
 And then push on git.
