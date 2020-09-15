@@ -77,7 +77,7 @@ class Guidebook(models.Model):
         return positions
 
     def getFirstSceneKey(self):
-        scenes = Scene.objects.filter(guidebook=self)
+        scenes = Scene.objects.filter(guidebook=self).order_by('sort')
         if scenes and scenes.count() > 0:
             firstScene = scenes[0]
             return firstScene.image_key
@@ -154,6 +154,8 @@ class Scene(models.Model):
     description = models.TextField(null=True)
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)
+    start_x = models.FloatField(default=0)
+    start_y = models.FloatField(default=0)
     sort = models.IntegerField(default=1, null=True)
     image_url = models.CharField(max_length=100, null=True)
 

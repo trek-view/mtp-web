@@ -8,6 +8,8 @@
             <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_description">{{ scene.description }}</textarea>
             <input type="text" name="lat" class="form-control d-none" value="{{ scene.lat }}" required="" id="id_lat">
             <input type="text" name="lng" class="form-control d-none" value="{{ scene.lng }}" required="" id="id_lng">
+            <input type="text" name="start_x" class="form-control d-none" value="{{ scene.start_x }}" required="" id="id_start_x">
+            <input type="text" name="start_y" class="form-control d-none" value="{{ scene.start_y }}" required="" id="id_start_y">
             <div class="text-right">
                 <button type="button" class="btn btn-sm btn-info point_list" data-scene-id="{{ scene.pk }}">Edit POI's ({{ scene.getPOICount }})</button>
                 <button type="button" id="change_scene_button" class="save btn btn-sm btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Edit information</button>

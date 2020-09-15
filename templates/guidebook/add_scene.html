@@ -125,6 +125,8 @@
                                 <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_description">{{ scene.description }}</textarea>
                                 <input type="text" name="lat" class="form-control d-none" value="{{ scene.lat }}" required="" id="id_lat">
                                 <input type="text" name="lng" class="form-control d-none" value="{{ scene.lng }}" required="" id="id_lng">
+                                <input type="text" name="start_x" class="form-control d-none" value="{{ scene.start_x }}" required="" id="id_start_x">
+                                <input type="text" name="start_y" class="form-control d-none" value="{{ scene.start_y }}" required="" id="id_start_y">
                                 <div class="text-right">
                                     <button type="button" class="btn btn-sm btn-info point_list" data-scene-id="{{ scene.pk }}">Edit POI's ({{ scene.getPOICount }})</button>
                                     <button type="button" id="change_scene_button" class="save btn btn-sm btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Edit information</button>
@@ -162,6 +164,8 @@
                             <textarea name="description" cols="40" rows="3" disabled class="form-control mb-1" placeholder="Scene Description" style="resize: none;" id="id_new_description">{{ scene.description }}</textarea>
                             <input type="text" name="lat" class="form-control d-none " disabled  required="" id="id_new_lat">
                             <input type="text" name="lng" class="form-control d-none" disabled  required="" id="id_new_lng">
+                            <input type="text" name="start_x" class="form-control d-none" disabled  required="" id="id_new_start_x">
+                            <input type="text" name="start_y" class="form-control d-none" disabled  required="" id="id_new_start_y">
                             <div class="text-right">
                                 <button type="button" id="save_scene_button" class="save btn btn-sm btn-primary save-btn" disabled="" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', 0)">Save New Scene</button>
                                 <button type="button" class="cancel btn btn-dark btn-sm">Abandon</button>
@@ -426,7 +430,12 @@
 
     $('.scene-box').click(function () {
         var image_key = $(this).data('image_key');
-        mapillaryViewer.moveToKey(image_key);
+        var $this = $(this);
+        mapillaryViewer.moveToKey(image_key).then((e) => {
+            var start_x = $this.find('input[name="start_x"]').val();
+            var start_y = $this.find('input[name="start_y"]').val();
+            mapillaryViewer.setCenter([start_x, start_y]);
+        });
     });
     function init_modal() {
         if ($('.minimize-button').hasClass('d-none') && $('.maximize-button').hasClass('d-none'))
@@ -742,7 +751,7 @@
     });
 
     function saveScene(url, id = 0) {
-        var $form = $('#add_scene_form_' + id);
+
         if ($('#add_scene_form_' + id + ' [name="image_key"]').val() == '')
         {
             toastr.error('Please select scene!.');
@@ -753,57 +762,64 @@
             toastr.error('Scene title is required!.');
             return;
         }
-
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: $form.serialize(),
-            dataType: 'json',
-            success: function (data) {
-                if (data.status == 'failed')
-                    toastr.error(data.message);
-                else
-                {
-                    toastr.success(data.message);
-                    console.log(data);
-                    current_scene_id = data.scene_id;
-                    old_scene();
-                    var scene_box_html = data.scene_box_html;
-                    var scene_count = data.scene_count;
-                    if (typeof scene_box_html != "undefined" && data.type == 'new')
+        mapillaryViewer.getCenter().then((c) => {
+            var start_x = c[0];
+            alert(start_x)
+            $('#add_scene_form_' + id + ' [name="start_x"]').val(c[0]);
+            $('#add_scene_form_' + id + ' [name="start_y"]').val(c[1]);
+            var $form = $('#add_scene_form_' + id);
+            console.log($form.serialize())
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: $form.serialize(),
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                        toastr.error(data.message);
+                    else
                     {
-                        $('#scene_list').append(scene_box_html);
-                        reorder_scene();
-                        $('.publish-guidebook').removeClass('d-none');
-                        $('.guidebook-others .scenes span').text(data.scene_count + " Photos");
-                        set_delete_scene();
-                        $('.publish-guidebook').removeClass('d-none');
-                        $('.add-new-scene').removeClass('d-none');
-                        $('.new-scene-box').addClass('d-none');
-                        $('#scene_' + current_scene_id).find('.point_list').trigger('click');
-                    }
-                    else if (data.type == 'update')
-                    {
-                        $('#scene_' + data.scene_id + ' .scene-title').html('<h6>' + data.title + '</h6>');
-                        $('#scene_' + data.scene_id + ' .scene-description').html('<span>' + data.description + '</span>');
-                        var $form = $('#add_scene_form_' + data.scene_id);
-                        $form.find('input').each(function (index) {
-                            $(this).attr('disabled', true)
-                        });
-                        $form.find('textarea').each(function (index) {
-                            $(this).attr('disabled', true)
-                        });
-                        $form.find('select').each(function (index) {
-                            $(this).attr('disabled', true)
-                        });
-                        $form.find('#save_scene_button').addClass('d-none');
-                        $form.find('#change_scene_button').removeClass('d-none');
-                    }
-                    console.log(scene_box_html);
-                    set_select_scene();
+                        toastr.success(data.message);
+                        console.log(data);
+                        current_scene_id = data.scene_id;
+                        old_scene();
+                        var scene_box_html = data.scene_box_html;
+                        var scene_count = data.scene_count;
+                        if (typeof scene_box_html != "undefined" && data.type == 'new')
+                        {
+                            $('#scene_list').append(scene_box_html);
+                            reorder_scene();
+                            $('.publish-guidebook').removeClass('d-none');
+                            $('.guidebook-others .scenes span').text(data.scene_count + " Photos");
+                            set_delete_scene();
+                            $('.publish-guidebook').removeClass('d-none');
+                            $('.add-new-scene').removeClass('d-none');
+                            $('.new-scene-box').addClass('d-none');
+                            $('#scene_' + current_scene_id).find('.point_list').trigger('click');
+                        }
+                        else if (data.type == 'update')
+                        {
+                            $('#scene_' + data.scene_id + ' .scene-title').html('<h6>' + data.title + '</h6>');
+                            $('#scene_' + data.scene_id + ' .scene-description').html('<span>' + data.description + '</span>');
+                            var $form = $('#add_scene_form_' + data.scene_id);
+                            $form.find('input').each(function (index) {
+                                $(this).attr('disabled', true)
+                            });
+                            $form.find('textarea').each(function (index) {
+                                $(this).attr('disabled', true)
+                            });
+                            $form.find('select').each(function (index) {
+                                $(this).attr('disabled', true)
+                            });
+                            $form.find('#save_scene_button').addClass('d-none');
+                            $form.find('#change_scene_button').removeClass('d-none');
+                        }
+                        console.log(scene_box_html);
+                        set_select_scene();
 
+                    }
                 }
-            }
+            });
         });
     }
 
@@ -1381,8 +1397,14 @@
         $('.scene-box').click(function () {
             var image_key = $(this).data('image_key');
             current_scene_id = $(this).attr('data-scene-id');
+            var $this = $(this);
             if (current_scene_id != '0' && current_scene_id != 0)
-                mapillaryViewer.moveToKey(image_key);
+                mapillaryViewer.moveToKey(image_key).then((e) => {
+                    var start_x = $this.find('input[name="start_x"]').val();
+                    var start_y = $this.find('input[name="start_y"]').val();
+                    mapillaryViewer.setCenter([start_x, start_y]);
+                });
+
         });
 
         $('.list_item').off('mousedown');

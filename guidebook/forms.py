@@ -100,13 +100,25 @@ class SceneForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
     )
 
+    start_x = forms.CharField(
+        label='',
+        widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
+    )
+
+    start_y = forms.CharField(
+        label='',
+        widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
+    )
+
     class Meta:
         fields = (
             'image_key',
             'title',
             'description',
             'lat',
-            'lng'
+            'lng',
+            'start_x',
+            'start_y'
         )
 
 class PointOfInterestForm(forms.ModelForm):
