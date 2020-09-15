@@ -67,13 +67,14 @@ AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_S3_BUCKET")
 AWS_S3_BUCKET_CNAME = os.environ.get("AWS_S3_BUCKET_CNAME")
 AWS_QUERYSTRING_AUTH = False # This will make sure that the file URL does not have unnecessary parameters like your access key.
 AWS_S3_CUSTOM_DOMAIN = AWS_STORAGE_BUCKET_NAME
+AWS_S3_MAPILLARY_BUCKET = os.environ.get("AWS_S3_MAPILLARY_BUCKET")
 # Static media settings
 STATIC_URL = 'https://' + AWS_S3_BUCKET_CNAME + '/'
-MEDIA_URL = STATIC_URL + 'media/'
+MEDIA_URL = 'https://' + AWS_S3_MAPILLARY_BUCKET + '/'
 STATICFILES_DIRS = ( os.path.join(BASE_DIR, "static"), )
 STATIC_ROOT = 'staticfiles'
 MEDIA_ROOT = 'media'
-ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+ADMIN_MEDIA_PREFIX = MEDIA_URL + 'admin/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
