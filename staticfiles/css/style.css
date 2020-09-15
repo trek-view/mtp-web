@@ -200,7 +200,12 @@ i.transport-type-icon {
     align-content: center;
 }
 
-
+.switch-list-viewer {
+    position: absolute;
+    margin-top: 20px;
+    right: 20px;
+    z-index: 100;
+}
 
 @media only screen and (max-width: 1200px) {
     .opened-sidebar.full-screen {
@@ -243,3 +248,23 @@ i.transport-type-icon {
         top: 80px;
     }
 }
+
+.right-board > #map.mapboxgl-map {
+    height: calc(100vh - 100px) !important;
+}
+
+.right-board .paginator:first-child {
+    min-height: 38px;
+}
+
+body {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+@media only screen and (max-width: 600px) {
+    #map.mapboxgl-map {
+        height: calc(100vh - 80px) !important;
+    }
+}
+
