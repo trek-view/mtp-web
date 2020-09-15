@@ -66,7 +66,10 @@
         {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board bg-light">
-        <div class="mt-4 mb-2 ml-auto mr-auto">
+        <div class="switch-list-viewer">
+            <input class="" type="checkbox" id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
+        </div>
+        <div id="list-view" class="mt-4 mb-2 ml-auto mr-auto">
             <div class="paginator">
                 {% if sequences.has_other_pages %}
                     <ul class="pagination justify-content-center">
@@ -223,6 +226,7 @@
                 {% endif %}
             </div>
         </div>
+        <div class="d-none" id="map"></div>
     </div>
 </div>
 
@@ -318,10 +322,101 @@
         map.resize();
     }
 
+    var centerPointerData = [];
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+        center: [-74.5, 40], // starting position
+        zoom: 1 // starting zoom
+    });
+
     for (i = 0; i < positions.length; i++)
     {
-        draw_map(positions[i])
+        draw_map(positions[i]);
+        drawMapView(i, positions[i])
     }
+
+    function drawMapView(l, data) {
+        if (data.length == 0)
+            return false;
+        var centerItem = {
+            "type": "Feature",
+            "properties": {"sequence_id": $('.sequence').eq(l).data('sequence-id')},
+            "geometry": {
+                "coordinates": [data[0][0], data[0][1]],
+                "type": "Point"
+            }
+        };
+        centerPointerData.push(centerItem);
+    }
+
+    map.on('load', function() {
+        map.loadImage(
+            'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
+            function(error, image) {
+                if (error) throw error;
+                map.addImage('custom-marker', image);
+                map.addSource('points', {
+                    'type': 'geojson',
+                    'data': {
+                        'type': 'FeatureCollection',
+                        'features': centerPointerData
+                    }
+                });
+                map.addLayer({
+                    'id': 'points',
+                    'type': 'symbol',
+                    'source': 'points',
+                    'layout': {
+                        'icon-image': 'custom-marker',
+                        // get the title name from the source's "title" property
+                        // 'text-field': ['get', 'title'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold'
+                        ],
+                        'text-offset': [0, 1.25],
+                        'text-anchor': 'top'
+                    }
+                });
+            }
+        )
+
+
+        map.on('click', 'points', function (e) {
+            gotoDetail(e.features[0].properties.sequence_id);
+
+        });
+
+        // Change the cursor to a pointer when the mouse is over the states layer.
+        map.on('mouseenter', 'points', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'points', function () {
+            map.getCanvas().style.cursor = '';
+        });
+    });
+
+
+    function gotoDetail(id) {
+        var url = "{% url 'sequence.sequence_detail' unique_id='unique_id' %}";
+        url = url.replace('unique_id', id);
+        location.assign(url);
+    }
+
+    $('#switch-list-viewer').change(function () {
+        if ($(this).prop('checked')) {
+            $('#list-view').addClass('d-none');
+            $('#map').removeClass('d-none');
+        }
+        else {
+            $('#list-view').removeClass('d-none');
+            $('#map').addClass('d-none');
+        }
+        map.resize();
+    })
 
 </script>
 {% endblock %}

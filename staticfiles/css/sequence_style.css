@@ -26,7 +26,7 @@ body {
 }
 
 .item-detail-box {
-    width: calc(100% - 480px);
+    /*width: calc(100% - 480px);*/
     height: 100%;
 }
 
@@ -87,7 +87,7 @@ body {
 
 .full-screen {
     height: calc(100vh - 100px);
-    width: 100%;
+    width: calc(100vw - 400px);
     position: fixed;
     top: 100px;
     z-index: 0;
@@ -165,3 +165,24 @@ body {
     transform: rotate(45deg);
 }
 
+.right-board .image-view-point {
+    font-size: 14px;
+    top: 15px;
+    color: white;
+    border-radius: 4px;
+    text-align: center;
+    background: rgba(0,0,0,.5);
+    z-index: 300;
+    position: absolute;
+    left: 15px;
+    padding: 5px;
+}
+
+.right-board .image-view-point img {
+    border-radius: 18px;
+}
+
+.small-screen .image-view-point {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}

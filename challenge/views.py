@@ -210,7 +210,7 @@ def challenge_list(request, page):
         challenges = Challenge.objects.all().filter(is_published=True)
         form = ChallengeSearchForm()
 
-    paginator = Paginator(challenges.order_by('-created_at'), 10)
+    paginator = Paginator(challenges.order_by('-created_at'), 5)
 
     try:
         pChallenges = paginator.page(page)

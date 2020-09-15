@@ -28,8 +28,17 @@ form.dropzone {
     -webkit-filter: unset;
     filter: unset;
 }
+
 .dz-image-cover img {
     width: 120px !important;
     height: 120px !important;
     border-radius: 50% !important;
+}
+
+.card.section {
+    height: 120px;
+}
+
+.modal-dialog {
+    margin-top: 130px;
 }

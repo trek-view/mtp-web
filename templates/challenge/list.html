@@ -46,76 +46,28 @@
                 </ul>
             {% endif %}
 
-            <div class="challenges p-2" style="border-top: 1px solid #dee2e6;">
-                <div class="accordion" id="accordionExample">
-                    <div class="card border">
-                        <button class="card-header bg-white d-flex flex-row justify-content-between align-items-center pr-2 btn collapsed" id="headingOne" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                            Search Challenge
-                            <i class="fa fa-chevron-down fa-1x"></i>
-                            <i class="fa fa-chevron-up d-none fa-1x"></i>
-                        </button>
-
-                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-                            <div class="card-body">
-                                <div class="search-form">
-                                    <form method="GET" class="post-form" id="search_form">
-                                        {% load bootstrap4 %}
-                                        {% bootstrap_css %}
-                                        {{ form.media }}
-                                        {{ form.as_p }}
-                                        <div class="form-group text-right mt-3">
-                                            <button type="submit" class="save btn btn-primary">Search</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
+            <div class="p-3" style="border-top: 1px solid #dee2e6;">
+                <div class="search-form">
+                    <form method="GET" class="post-form" id="search_form">
+                        {% load bootstrap4 %}
+                        {% bootstrap_css %}
+                        {{ form.media }}
+                        {{ form.as_p }}
+                        <div class="form-group text-right mt-3">
+                            <button type="submit" class="save btn btn-primary">Search</button>
                         </div>
-                    </div>
+                    </form>
                 </div>
-
-
-                <div class="challenge-card mt-2 mb-2">
-                    <div class="challenge-list">
-                        {% if challenges.count > 0 %}
-                            {% for challenge in challenges %}
-                                <a style="text-decoration: inherit;" href="javascript:goWithSearchParam('{% url 'challenge.challenge_detail' unique_id=challenge.unique_id %}');">
-                                    <div class="card challenge p-3 mt-3 mb-3" id="challenge_{{ challenge.unique_id }}" data-challenge-id="{{ challenge.unique_id }}">
-                                        <div class="challenge-title text-info">
-                                            <h5>
-                                                {{ challenge.name }}
-                                            </h5>
-                                        </div>
-
-                                        <div class="challenge-description">
-                                            <p>
-                                                {{ challenge.getShortDescription }}
-                                            </p>
-                                        </div>
-
-                                        <div class="challenge-options">
-                                            <p>
-                                                {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
-                                            </p>
-                                        </div>
-
-                                        <div class="challenge-created-at text-secondary">
-                                            <h6>
-                                                {{ challenge.created_at }}
-                                            </h6>
-                                        </div>
-
-                                        <div class="challenge-geometry d-none">{{ challenge.geometry }}</div>
-                                    </div>
-                                </a>
-
-                            {% endfor %}
-                        {% else %}
-                            <div class="no-results d-flex justify-content-center align-items-center">
-                                <h5 class="text-info">No results match your criteria.</h5>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="potographer-paginator">
+            </div>
+        </div>
+        {% include 'components/copyrite.html' %}
+    </div>
+    <div class="right-board bg-light">
+        <div class="switch-list-viewer">
+            <input class="" type="checkbox" id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
+        </div>
+        <div id="list-view" class="mt-4 mb-2 ml-auto mr-auto">
+            <div class="paginator">
                         {% if challenges.has_other_pages %}
                             <ul class="pagination justify-content-center">
                                 {% if challenges.number != 1 %}
@@ -142,20 +94,102 @@
                             </ul>
                         {% endif %}
                     </div>
-                </div>
-            </div>
+            <div class="item-list">
+                {% if challenges.count > 0 %}
+                    {% for challenge in challenges %}
+                        <div class="card row challenge p-3 m-3 d-flex flex-row align-items-center" id="challenge_{{ challenge.unique_id }}" data-challenge-id="{{ challenge.unique_id }}" onclick="getSequenceDetail('{{ challenge.unique_id }}')">
+                            <div class="col-sm-5 col-md-4 col-lg-3">
+                                <div class="row">
+                                    <div class="w-100 min-map-box" id="map-{{ challenge.unique_id }}">
+                                    </div>
+                                </div>
+                            </div>
 
-            <hr class="mt-1 mb-1 p-0">
+                            <div class="col-sm-7 col-md-8 detail-box col-lg-9">
+                                <div class="item-detail-box w-100 mt-3 pl-3 pr-3">
+                                    <div class="item-main w-100 float-left">
+                                        <div class="item-title text-info d-flex flex-row justify-content-between">
+                                            <a href="{% url 'challenge.challenge_detail' unique_id=challenge.unique_id %}">
+                                                <h6>{{ challenge.name }}</h6>
+                                            </a>
+                                        </div>
+
+                                        <div class="item-description">
+                                            <p class="mb-1">
+                                                {{ challenge.getShortDescription }}
+                                            </p>
+                                        </div>
+
+                                        <div class="item-description">
+                                            <p class="mb-1">
+                                                {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
+                                            </p>
+                                        </div>
+
+                                        <div class="item-description">
+                                            <p class="mb-1">
+                                                {{ challenge.created_at }}
+                                            </p>
+                                        </div>
+
+                                        <div class="challenge-geometry d-none">{{ challenge.geometry }}</div>
+
+                                        <div class="item-created-at text-secondary d-flex flex-row justify-content-between">
+                                            <span class="">
+                                                {{ challenge.created_at }}
+                                            </span>
+
+                                            <a href="{% url 'account.profile' username=challenge.user.username %}">
+                                                <span class="" style="color: brown;">
+                                                    {{ challenge.user }}
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-results d-flex justify-content-center align-items-center">
+                        <h5 class="text-info">No results match your criteria.</h5>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="paginator">
+                {% if challenges.has_other_pages %}
+                    <ul class="pagination justify-content-center">
+                        {% if challenges.number != 1 %}
+                            <li class="page-item">
+                                <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in challenges.paginator.pages %}
+                            {% if challenges.number == i %}
+                                <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% else %}
+                                <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if challenges.number != challenges.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ challenges.paginator.num_pages }}'>&raquo;</a></li>
+                        {% else %}
+                            <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
         </div>
-        {% include 'components/copyrite.html' %}
-    </div>
-    <div class="right-fixed-board bg-light">
-        <div id="map"></div>
+        <div class="d-none" id="map"></div>
     </div>
 
 
     <!-- Modal -->
-    <div class="challenge-detail modal fade" id="challengeDetailModal">
+    <div class="challenge-detail modal fade" style="padding-top: 80px !important;" id="challengeDetailModal">
     </div>
 </div>
 
@@ -202,6 +236,8 @@
     var challengeGeometryElements = $('.challenge-geometry');
     var polygonData = [];
     var centerPointerData = [];
+
+    var map_ary = [];
     for (i = 0; i < challengeGeometryElements.length; i++)
     {
         var item = challengeGeometryElements.eq(i);
@@ -243,6 +279,7 @@
             };
             centerPointerData.push(centerItem);
         });
+        draw_map(i, geometryDataJson)
     }
 
     map.on('load', function() {
@@ -328,7 +365,6 @@
         });
     });
 
-
     function getChallengeDetail(id) {
         $.ajax({
             url: '/challenge/ajax/get_challenge_detail/' + id,
@@ -402,5 +438,133 @@
             }
         });
     }
+
+    $('#switch-list-viewer').change(function () {
+        if ($(this).prop('checked')) {
+            $('#list-view').addClass('d-none');
+            $('#map').removeClass('d-none');
+        }
+        else {
+            $('#list-view').removeClass('d-none');
+            $('#map').addClass('d-none');
+        }
+        map.resize();
+    })
+
+
+
+    function draw_map(ii, geometryDataJson) {
+        var polygon_data = [];
+        var centerPointer_data = [];
+        var centerPoint = [0, 0];
+        geometryDataJson.forEach(function (item, index) {
+            polygon_data.push(item);
+            var minX = 0;
+            var maxX = 0;
+            var minY = 0;
+            var maxY = 0;
+            var coorXSum = 0;
+            var coorYSum = 0;
+            var countSum = 0;
+
+            var coordinates = item.geometry.coordinates;
+            for (j = 0; j < coordinates[0].length; j++)
+            {
+                coorXSum += coordinates[0][j][0];
+                coorYSum += coordinates[0][j][1];
+                countSum++;
+                if (coordinates[0][j][0] < minX)
+                    minX = coordinates[0][j][0];
+                if (coordinates[0][j][0] > maxX)
+                    maxX = coordinates[0][j][0];
+                if (coordinates[0][j][1] < minY)
+                    minY = coordinates[0][j][1];
+                if (coordinates[0][j][1] > maxY)
+                    maxY = coordinates[0][j][1];
+            }
+            var centerItem = {
+                "type": "Feature",
+                "properties": {"challenge_id": item.properties.challenge_id},
+                "geometry": {
+                    "coordinates": [coorXSum / countSum, coorYSum / countSum],
+                    "type": "Point"
+                }
+            };
+            centerPoint[0] += coorXSum / countSum;
+            centerPoint[1] += coorYSum / countSum;
+            centerPointer_data.push(centerItem);
+        });
+
+        var obj = $('.min-map-box').eq(ii);
+        var obj_id = obj.attr('id');
+
+        if (centerPointer_data.length > 0) {
+            centerPoint[0] = centerPoint[0] / centerPointer_data.length;
+            centerPoint[1] = centerPoint[1] / centerPointer_data.length;
+        }
+
+        var map = new mapboxgl.Map({
+            container: obj_id, // container id
+            style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+            center: centerPoint, // starting position
+            zoom: 3, // starting zoom
+            attributionControl: false
+        });
+
+        map.on('load', function() {
+            map.loadImage(
+                'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
+                function(error, image) {
+                    if (error) throw error;
+                    map.addImage('custom-marker', image);
+                    map.addSource('points', {
+                        'type': 'geojson',
+                        'data': {
+                            'type': 'FeatureCollection',
+                            'features': centerPointer_data
+                        }
+                    });
+                    map.addLayer({
+                        'id': 'points',
+                        'type': 'symbol',
+                        'source': 'points',
+                        'maxzoom': 6,
+                        'layout': {
+                            'icon-image': 'custom-marker',
+                            // get the title name from the source's "title" property
+                            // 'text-field': ['get', 'title'],
+                            'text-font': [
+                                'Open Sans Semibold',
+                                'Arial Unicode MS Bold'
+                            ],
+                            'text-offset': [0, 1.25],
+                            'text-anchor': 'top'
+                        }
+                    });
+                }
+            )
+            map.addSource('states', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'FeatureCollection',
+                    'features': polygon_data
+                }
+            });
+            map.addLayer({
+                'id': 'states-layer',
+                'type': 'fill',
+                'source': 'states',
+                'minzoom': 6,
+                'layout': {},
+                'paint': {
+                    'fill-color': 'rgba(200, 100, 240, 0.2)',
+                    'fill-outline-color': 'rgba(200, 100, 240, 0.8)'
+                }
+            });
+        });
+        map_ary.push(map);
+        window.addEventListener('resize', function() { map_ary[map_ary.length - 1].resize(); });
+    }
+
 </script>
 {% endblock %}
