@@ -69,7 +69,6 @@ urlpatterns = [
     # path('', views.index, name='home'),
     path('', views.index, name='home'),
     # path('', RedirectView.as_view(url='marketplace', permanent=False), name='home'),
-
     path('accounts/', include('accounts.urls')),
     path('email/', include(mail_urls)),
     path('hire/', include('photographer.urls')),
@@ -81,7 +80,6 @@ urlpatterns = [
     path('user/<str:username>/profile/', account_views.profile, name="account.profile"),
     path('tags_input/', include('tags_input.urls', namespace='tags_input')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
-    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     re_path(r'', include(tf_urls)),
     path('mission-control/', admin.site.urls, name='admin'),
     path('api/', include('api.urls')),

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from django.contrib.auth import views as authViews
 from . import views
 from .forms import AuthenticationForm, UserPasswordChangeForm
@@ -40,4 +40,5 @@ urlpatterns = [
     path('ajax_user_update', views.ajax_user_update, name='account.ajax_user_update'),
 
     path('check-mapillary-oauth', views.check_mapillary_oauth, name='check_mapillary_oauth'),
+    path('', include('oauth2_provider.urls', namespace='oauth2_provider')),
 ]
