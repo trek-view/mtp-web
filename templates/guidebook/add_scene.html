@@ -898,7 +898,12 @@
         $('.collapse-button').off('click');
         $('.collapse-button').click(function () {
             selected_poi_id = $(this).data('poi-id');
-            console.log(selected_poi_id);
+            if (!poi_clicking) {
+                var position_x = $('#poi_body_' + selected_poi_id).find('.position-x').text();
+                var position_y = $('#poi_body_' + selected_poi_id).find('.position-y').text();
+                mapillaryViewer.setCenter([position_x, position_y])
+            }
+
             $('.TagVertex.selected').each(function (i) {
                 $(this).removeClass('selected');
             });
@@ -999,13 +1004,14 @@
             var poi_id = id.replace('tagSpotInteractor_', '');
             selected_poi_id = poi_id;
             console.log('TagSpot', selected_poi_id);
-
+            poi_clicking = true;
             if (!$('#poi_body_' + poi_id).hasClass('show'))
                 $('#poi_' + poi_id).find('.card-header').find('button').trigger('click');
             $('.left-side.poi-box').removeClass('d-none');
         });
         $('.TagSpotInteractor').off('mouseup');
         $('.TagSpotInteractor').mouseup(function () {
+            poi_clicking = false;
             if (selected_poi_id == 0)
                 return;
             var poi_id = selected_poi_id;

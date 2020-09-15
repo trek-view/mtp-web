@@ -224,6 +224,7 @@
 {% block scripts %}
 <script>
     var point_moving = false;
+    var poi_clicking = false;
 
     var poi_mouseup = function (e) {
         var poi_id = e.target['data-poi-id'];
@@ -752,6 +753,9 @@
             {
                 $('#tagVertex_' + selected_poi_id).addClass('selected');
             }
+            var position_x = $('#poi_body_' + selected_poi_id).find('.position-x').text();
+            var position_y = $('#poi_body_' + selected_poi_id).find('.position-y').text();
+            mapillaryViewer.setCenter([position_x, position_y])
         });
         if (show)
             $('#poi_list').find('.card-header').eq(0).find('button').trigger('click');
@@ -774,6 +778,9 @@
             if (!$('#poi_body_' + poi_id).hasClass('show'))
                 $('#poi_' + poi_id).find('.card-header').find('button').trigger('click');
 
+        });
+        $('.TagSpotInteractor').off('mouseup');
+        $('.TagSpotInteractor').mouseup(function () {
         });
     }
 
