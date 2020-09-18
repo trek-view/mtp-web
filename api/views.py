@@ -199,7 +199,6 @@ class SequenceImport(APIView):
         p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
         p.start()
         print('2')
-        get_images_by_sequence(sequence, image_insert=True, detection_insert=True, mf_insert=True, image_download=True)
 
         return JsonResponse({
             'status': 'success',
