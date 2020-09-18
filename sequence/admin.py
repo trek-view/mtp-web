@@ -38,13 +38,26 @@ class SequenceAdmin(tags_input_admin.TagsInputAdmin):
         'name',
         'description',
         'camera_make',
-        'seq_key',
+        'mapillary_sequence_key',
+        'mapillary_user_key',
+        'mapillary_username',
         'pano',
-        'user_key',
-        'username',
         'name',
         'description'
     )
+
+    def mapillary_sequence_key(self, obj):
+        return obj.seq_key
+
+    def mapillary_user_key(self, obj):
+        return obj.user_key
+
+    def mapillary_username(self, obj):
+        return obj.username
+
+    mapillary_sequence_key.short_description = 'Mapillary Sequence Key'
+    mapillary_user_key.short_description = 'Mapillary User Key'
+    mapillary_username.short_description = 'Mapillary Username'
 
     # def get_queryset(self, request):
     #     query = super(SequenceAdmin, self).get_queryset(request)
