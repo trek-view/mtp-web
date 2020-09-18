@@ -223,11 +223,10 @@ def my_sequence_list(request):
     }
     return render(request, 'sequence/list.html', content)
 
-def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, mf_insert=False):
+def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, mf_insert=False, image_download=False):
     token = sequence.user.mapillary_access_token
     mapillary = Mapillary(token)
     image_json = mapillary.get_images_by_sequence_key([sequence.seq_key])
-    first_image = None
     if image_json and image_insert:
         image_features = image_json['features']
         print('Images insert!')
@@ -236,8 +235,6 @@ def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, 
         for image_feature in image_features:
             image = Image.objects.filter(image_key=image_feature['properties']['key'])
             if image.count() > 0:
-                if first_image is None:
-                    first_image = image[0]
                 continue
 
             image_keys.append(image_feature['properties']['key'])
@@ -402,23 +399,27 @@ def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, 
         if image_insert:
             sequence.is_published = True
             sequence.save()
-        if not first_image is None:
+        if len(image_keys) > 0 and image_download:
             # Create the model you want to save the image to
-            image = first_image
+            for image_key in image_keys:
+                images = Image.objects.filter(image_key=image_key)
+                if images.count() == 0:
+                    continue
+                if not images[0].mapillary_image is None:
+                    continue
+                image = images[0]
 
-            lf = mapillary.download_mapillary_image(image.image_key)
-            print('lf: ', lf)
-            # Save the temporary image to the model#
-            # This saves the model so be sure that is it valid
-            image.mapillary_image.save(image.image_key, files.File(lf))
-            image.save()
-            print(image.mapillary_image)
+                lf = mapillary.download_mapillary_image(image.image_key)
+                # Save the temporary image to the model#
+                # This saves the model so be sure that is it valid
+                if lf:
+                    image.mapillary_image.save(image.image_key, files.File(lf))
+                    image.save()
+                    print(image.mapillary_image)
     return image_json
 
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
-    image_json = get_images_by_sequence(sequence=sequence)
-    print(len(image_json['features']))
     page = 1
     if request.method == "GET":
         page = request.GET.get('page')
@@ -781,9 +782,7 @@ def ajax_import(request, seq_key):
                                 sequence.tag.remove(tag)
 
                     # get image data from mapillary with sequence_key
-                    image_json = get_images_by_sequence(sequence=sequence)
-                    print(len(image_json['features']))
-
+                    get_images_by_sequence(sequence, image_insert=True, detection_insert=True, mf_insert=True, image_download=True)
                     # messages.success(request, "Sequences successfully imported.")
                     return JsonResponse({
                         'status': 'success',

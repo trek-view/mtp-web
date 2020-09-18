@@ -46,6 +46,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
 from accounts.models import MapillaryUser
+from sequence.views import get_images_by_sequence
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
@@ -193,6 +194,8 @@ class SequenceImport(APIView):
 
         sequence.is_published = True
         sequence.save()
+
+        get_images_by_sequence(sequence, image_insert=True, detection_insert=True, mf_insert=True, image_download=True)
 
         return JsonResponse({
             'status': 'success',
