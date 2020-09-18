@@ -44,7 +44,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
-
+import threading
 from accounts.models import MapillaryUser
 from sequence.views import get_images_by_sequence
 
@@ -195,11 +195,15 @@ class SequenceImport(APIView):
         sequence.is_published = True
         sequence.save()
 
+        print('1')
+        p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
+        p.start()
+        print('2')
         get_images_by_sequence(sequence, image_insert=True, detection_insert=True, mf_insert=True, image_download=True)
 
         return JsonResponse({
             'status': 'success',
-            'message': 'Sequence successfully was imported.',
+            'message': 'Sequence successfully was imported. Sequence will be published in about 30 minutes.',
             'unique_id': str(sequence.unique_id)
         })
 

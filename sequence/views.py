@@ -29,7 +29,8 @@ from django.core import files
 ## Custom Libs ##
 from lib.functions import *
 from lib.mapillary import Mapillary
-
+import threading
+from asgiref.sync import sync_to_async
 ## Project packages
 from accounts.models import CustomUser, MapillaryUser
 from tour.models import Tour, TourSequence
@@ -223,7 +224,7 @@ def my_sequence_list(request):
     }
     return render(request, 'sequence/list.html', content)
 
-def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, mf_insert=False, image_download=False):
+def get_images_by_sequence(sequence, image_insert=True, detection_insert=True, mf_insert=True, image_download=True):
     token = sequence.user.mapillary_access_token
     mapillary = Mapillary(token)
     image_json = mapillary.get_images_by_sequence_key([sequence.seq_key])
@@ -274,6 +275,7 @@ def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, 
 
             image.point = Point(image.lat, image.lng)
             image.save()
+            print('image key: ', image.image_key)
 
         if len(image_keys) > 0 and detection_insert:
             detection_types = ['trafficsigns', 'segmentations', 'instances']
@@ -332,6 +334,7 @@ def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, 
                                 image_detection.geometry_point = Point(geometry['coordinates'])
                                 image_detection.type = detection_type
                                 image_detection.save()
+                                print('image detection: ', image_detection.det_key)
                         image_keys_t = []
                         continue
 
@@ -420,6 +423,7 @@ def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, 
 
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
+
     page = 1
     if request.method == "GET":
         page = request.GET.get('page')
@@ -782,11 +786,14 @@ def ajax_import(request, seq_key):
                                 sequence.tag.remove(tag)
 
                     # get image data from mapillary with sequence_key
-                    get_images_by_sequence(sequence, image_insert=True, detection_insert=True, mf_insert=True, image_download=True)
+                    print('1')
+                    p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
+                    p.start()
+                    print('2')
                     # messages.success(request, "Sequences successfully imported.")
                     return JsonResponse({
                         'status': 'success',
-                        'message': 'Sequence successfully imported.',
+                        'message': 'Sequence successfully imported. Sequence will be published in about 30 minutes.',
                         'unique_id': str(sequence.unique_id)
                     })
         else:
