@@ -89,6 +89,8 @@ class Mapillary():
             return data
 
     def download_mapillary_image(self, image_key):
+        if self.token is None:
+            return False
         url = '{}images/{}/download_original?client_id={}'.format(self.root_url, image_key, self.client_id)
         headers = {"Authorization": "Bearer {}".format(self.token)}
         request = requests.get(url, headers=headers, stream=True)
