@@ -52,7 +52,7 @@
         {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board bg-light">
-        <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
+        <div class="mt-4 mb-2 ml-auto mr-auto">
             <div class="paginator">
                 {% if sequences.has_other_pages %}
                     <ul class="pagination justify-content-center">
@@ -83,75 +83,84 @@
             <div class="sequence-list">
                 {% if seq_count > 0 %}
                     {% for sequence in sequences %}
-                        <div class="card sequence pt-3 pb-3 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.seq_key }}" data-sequence-id="{{ sequence.seq_key }}">
-                            <div class="col-md-6 d-flex flex-row border-right">
+                        <div class="card row sequence pt-3 pb-3 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.seq_key }}" data-sequence-id="{{ sequence.seq_key }}">
+                            <div class="col-md-4 ">
                                 <div class="min-map-box" style="height: 208px" id="map-{{ sequence.seq_key }}">
                                 </div>
-                                <div class="detail-box pl-3">
-                                    <div class="sequence-main float-left">
-                                        <div class="sequence-captured-at text-info">
-                                            <span>Captured:</span>
-                                            <h6>
-                                                {{ sequence.captured_at }}
-                                            </h6>
-                                        </div>
 
-                                        <div class="sequence-created-at">
-                                            <span>Uploaded:</span>
-                                            <p class="mb-1">
-                                                {{ sequence.created_at }}
-                                            </p>
-                                        </div>
-
-                                        <div class="sequence-camera-make" style="color: blueviolet;">
-                                            <span>Camera Make:</span>
-                                            <p class="mb-1">
-                                                {{ sequence.camera_make }}
-                                            </p>
-                                        </div>
-
-                                        <div class="sequence-image-count" style="color: #a79f9f;">
-                                            <span>Number of photos:</span>
-                                            <p class="mb-1">
-                                                {{ sequence.image_count }}
-                                            </p>
-                                        </div>
-
-                                    </div>
-                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="transport-btn text-center">
-                                    <button type="button" class="btn btn-warning " onclick="show_add_modal('{{ sequence.seq_key }}')">
-                                        Import
-                                    </button>
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col d-flex flex-row ">
+                                        <div class="detail-box">
+                                            <div class="sequence-main float-left">
+                                                <div class="sequence-captured-at text-info">
+                                                    <span>Captured:</span>
+                                                    <h6>
+                                                        {{ sequence.captured_at }}
+                                                    </h6>
+                                                </div>
+
+                                                <div class="sequence-created-at">
+                                                    <span>Uploaded:</span>
+                                                    <p class="mb-1">
+                                                        {{ sequence.created_at }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="sequence-camera-make" style="color: blueviolet;">
+                                                    <span>Camera Make:</span>
+                                                    <p class="mb-1">
+                                                        {{ sequence.camera_make }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="sequence-image-count" style="color: #a79f9f;">
+                                                    <span>Number of photos:</span>
+                                                    <p class="mb-1">
+                                                        {{ sequence.image_count }}
+                                                    </p>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col d-flex align-items-center">
+                                        <div class="transport-btn w-100 text-center">
+                                            <button type="button" class="btn btn-warning " onclick="show_add_modal('{{ sequence.seq_key }}')">
+                                                Import
+                                            </button>
+                                        </div>
+                                        <div class="added-form d-none">
+                                            <div class="sequence-name">
+                                                <p class="w-25 mb-0" style="color: #FF9800;">Name: </p>
+                                                <p class="w-75 contents">Test Name</p>
+                                            </div>
+                                            <div class="sequence-description">
+                                                <p class="w-25 mb-0" style="color: #9E9E9E;">Description: </p>
+                                                <p class="w-75 contents">This is my first test. so I want to import </p>
+                                            </div>
+                                            <div class="sequence-transport-type" style="color: blueviolet;">
+                                                <p class="w-25 mb-0">Transport Type: </p>
+                                                <p class="w-75 contents">Type 1</p>
+                                            </div>
+                                            <div class="sequence-tag">
+                                                <p class="w-25 mb-0">Tags: </p>
+                                                <p class="w-75 contents">
+                                                </p>
+                                            </div>
+                                            <div class="actions text-right">
+                                                <a type="button" target="_blank" href="{% url 'sequence.sequence_detail' unique_id='unique_id' %}">
+                                                    Go to detail page.
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="added-form d-none">
-                                    <div class="sequence-name">
-                                        <p class="w-25 mb-0" style="color: #FF9800;">Name: </p>
-                                        <p class="w-75 contents">Test Name</p>
-                                    </div>
-                                    <div class="sequence-description">
-                                        <p class="w-25 mb-0" style="color: #9E9E9E;">Description: </p>
-                                        <p class="w-75 contents">This is my first test. so I want to import </p>
-                                    </div>
-                                    <div class="sequence-transport-type" style="color: blueviolet;">
-                                        <p class="w-25 mb-0">Transport Type: </p>
-                                        <p class="w-75 contents">Type 1</p>
-                                    </div>
-                                    <div class="sequence-tag">
-                                        <p class="w-25 mb-0">Tags: </p>
-                                        <p class="w-75 contents">
-                                        </p>
-                                    </div>
-                                    <div class="actions text-right">
-                                        <a type="button" target="_blank" href="{% url 'sequence.sequence_detail' unique_id='unique_id' %}">
-                                            Go to detail page.
-                                        </a>
-                                    </div>
-                                </div>
                             </div>
+
+
                         </div>
                     {% endfor %}
                 {% else %}
@@ -192,7 +201,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="add_form_modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="add_form_modal" aria-hidden="true">
+<div class="modal fade mt-5 pt-5" id="add_form_modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="add_form_modal" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -264,6 +273,7 @@
         var url = "{% url 'sequence.import_sequence_list' %}?page="+ pageNum + "&" + $('#search_form').serialize();
         location.assign(url);
     });
+    var map_ary = [];
     function draw_map(index, data) {
         var obj = $('.min-map-box').eq(index);
         var obj_id = obj.attr('id');
@@ -328,6 +338,8 @@
                 }
             });
         });
+        map_ary.push(map);
+        map.resize();
     }
 
     for (i = 0; i < positions.length; i++)

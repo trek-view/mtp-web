@@ -24,8 +24,10 @@ from django.db.models import Avg, Count, Min, Sum
 from django.db.models.expressions import F, Window
 from django.db.models.functions.window import RowNumber
 from django.contrib.gis.geos import Point, Polygon, MultiPolygon, LinearRing, LineString
+from django.db import transaction
 ## Custom Libs ##
 from lib.functions import *
+from lib.mapillary import Mapillary
 
 ## Project packages
 from accounts.models import CustomUser, MapillaryUser
@@ -97,7 +99,7 @@ def sequence_list(request):
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
-    paginator = Paginator(sequences.order_by('-created_at'), 5)
+    paginator = Paginator(sequences.order_by('-created_at'), 2)
 
     try:
         pSequences = paginator.page(page)
@@ -220,8 +222,187 @@ def my_sequence_list(request):
     }
     return render(request, 'sequence/list.html', content)
 
+def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, mf_insert=False):
+    mapillary = Mapillary()
+    image_json = mapillary.get_images_by_sequence_key([sequence.seq_key])
+    if image_json and image_insert:
+        image_features = image_json['features']
+        print('Images insert!')
+        image_keys = []
+        image_position_ary = []
+        for image_feature in image_features:
+            image = Image.objects.filter(image_key=image_feature['properties']['key'])
+            if image.count() > 0:
+                continue
+
+            image_keys.append(image_feature['properties']['key'])
+            image_position_ary.append(image_feature['geometry']['coordinates'])
+
+            image = Image()
+            image.user = sequence.user
+            image.sequence = sequence
+
+            if 'ca' in image_feature['properties'].keys():
+                image.cas = image_feature['properties']['ca']
+            if 'altitude' in image_feature['properties'].keys():
+                image.ele = image_feature['properties']['altitude']
+            if 'camera_make' in image_feature['properties'].keys():
+                image.camera_make = image_feature['properties']['camera_make']
+            if 'camera_model' in image_feature['properties'].keys():
+                image.camera_model = image_feature['properties']['camera_model']
+            if 'key' in image_feature['properties'].keys():
+                image.image_key = image_feature['properties']['key']
+            if 'pano' in image_feature['properties'].keys():
+                image.pano = image_feature['properties']['pano']
+            if 'sequence_key' in image_feature['properties'].keys():
+                image.seq_key = image_feature['properties']['sequence_key']
+            if 'user_key' in image_feature['properties'].keys():
+                image.user_key = image_feature['properties']['user_key']
+            if 'username' in image_feature['properties'].keys():
+                image.username = image_feature['properties']['username']
+            if 'organization_key' in image_feature['properties'].keys():
+                image.organization_key = image_feature['properties']['organization_key']
+            if 'private' in image_feature['properties'].keys():
+                image.private = image_feature['properties']['private']
+            if 'captured_at' in image_feature['properties'].keys():
+                image.captured_at = image_feature['properties']['captured_at']
+
+            image.lat = image_feature['geometry']['coordinates'][0]
+            image.lng = image_feature['geometry']['coordinates'][1]
+
+            image.point = Point(image.lat, image.lng)
+            image.save()
+
+        if len(image_keys) > 0 and detection_insert:
+            detection_types = ['trafficsigns', 'segmentations', 'instances']
+            for detection_type in detection_types:
+                image_keys_t = []
+                image_num = 0
+                for image_k in image_keys:
+                    image_keys_t.append(image_k)
+                    image_num += 1
+                    if (len(image_keys_t) == 10 or image_num == len(image_keys)) and len(image_keys_t) > 0:
+                        print(image_keys_t)
+                        image_detection_json = mapillary.get_detection_by_image_key(image_keys_t, detection_type)
+                        if image_detection_json:
+                            image_detection_features = image_detection_json['features']
+                            for image_detection_feature in image_detection_features:
+                                properties = image_detection_feature['properties']
+                                geometry = image_detection_feature['geometry']
+                                image_detection = ImageDetection.objects.filter(image_key=properties['key'])
+                                if image_detection.count() > 0:
+                                    continue
+                                image_detection = ImageDetection()
+                                image_detection.user = sequence.user
+                                image_detection.sequence = sequence
+                                images = Image.objects.filter(image_key=properties['image_key'])[:1]
+                                if images.count() == 0:
+                                    continue
+                                image_detection.image = images[0]
+
+                                if 'area' in properties.keys():
+                                    image_detection.area = properties['area']
+                                if 'captured_at' in properties.keys():
+                                    image_detection.captured_at = properties['captured_at']
+                                if 'image_ca' in properties.keys():
+                                    image_detection.image_ca = properties['image_ca']
+                                if 'image_key' in properties.keys():
+                                    image_detection.image_key = properties['image_key']
+                                if 'image_pano' in properties.keys():
+                                    image_detection.image_pano = properties['image_pano']
+                                if 'key' in properties.keys():
+                                    image_detection.det_key = properties['key']
+                                if 'score' in properties.keys():
+                                    image_detection.score = properties['score']
+                                if 'shape' in properties.keys():
+                                    image_detection.shape_type = properties['shape']['type']
+                                if 'shape' in properties.keys():
+                                    coordinates = properties['shape']['coordinates']
+                                    multiPolygon = MultiPolygon()
+                                    for coordinate in coordinates:
+                                        polygon = Polygon(coordinate)
+                                        multiPolygon.append(polygon)
+                                    image_detection.shape_multipolygon = multiPolygon
+                                if 'value' in properties.keys():
+                                    image_detection.value = properties['value']
+
+                                image_detection.geometry_type = geometry['type']
+                                image_detection.geometry_point = Point(geometry['coordinates'])
+                                image_detection.type = detection_type
+                                image_detection.save()
+                        image_keys_t = []
+                        continue
+
+        if len(image_position_ary) > 0 and mf_insert:
+            print('Image len: ', len(image_position_ary))
+            mm = 0
+            for image_position in image_position_ary:
+                mm += 1
+                print('===== {} ====='.format(mm))
+                map_feature_json = mapillary.get_map_feature_by_close_to(image_position)
+                if map_feature_json:
+                    map_features = map_feature_json['features']
+                    print('map_features len: ', len(map_features))
+                    tt = 0
+                    for map_feature in map_features:
+                        tt += 1
+                        print('---- {} -----'.format(tt))
+                        mf_properties = map_feature['properties']
+                        mf_geometry = map_feature['geometry']
+                        mf_item = MapFeature.objects.filter(mf_key=mf_properties['key'])[:1]
+                        if mf_item.count() > 0:
+                            continue
+
+                        mf_item = MapFeature()
+                        if 'accuracy' in mf_properties.keys():
+                            mf_item.accuracy = mf_properties['accuracy']
+                        if 'altitude' in mf_properties.keys():
+                            mf_item.altitude = mf_properties['altitude']
+                        if 'direction' in mf_properties.keys():
+                            mf_item.direction = mf_properties['direction']
+                        if 'first_seen_at' in mf_properties.keys():
+                            mf_item.first_seen_at = mf_properties['first_seen_at']
+                        if 'key' in mf_properties.keys():
+                            mf_item.mf_key = mf_properties['key']
+                        if 'last_seen_at' in mf_properties.keys():
+                            mf_item.last_seen_at = mf_properties['last_seen_at']
+                        if 'layer' in mf_properties.keys():
+                            mf_item.layer = mf_properties['layer']
+                        if 'value' in mf_properties.keys():
+                            mf_item.value = mf_properties['value']
+
+                        mf_item.geometry_type = mf_geometry['type']
+                        mf_item.geometry_point = Point(mf_geometry['coordinates'])
+
+                        mf_item.save()
+
+                        if 'detections' in mf_properties.keys():
+                            for detection in mf_properties['detections']:
+                                detection_key = detection['detection_key']
+                                image_key = detection['image_key']
+                                user_key = detection['user_key']
+                                mf_key = mf_item.mf_key
+                                print(detection)
+                                mf_detection = MapFeatureDetection.objects.filter(mf_key=mf_key, detection_key=detection_key, image_key=image_key, user_key=user_key)
+                                if mf_detection.count() > 0:
+                                    continue
+                                else:
+                                    mf_detection = MapFeatureDetection()
+                                    mf_detection.mf_key = mf_key
+                                    mf_detection.detection_key = detection_key
+                                    mf_detection.image_key = image_key
+                                    mf_detection.user_key = user_key
+                                    mf_detection.save()
+
+        if image_insert:
+            sequence.is_published = True
+            sequence.save()
+    return image_json
+
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
+    image_json = get_images_by_sequence(sequence=sequence)
+    print(len(image_json['features']))
     page = 1
     if request.method == "GET":
         page = request.GET.get('page')
@@ -576,13 +757,16 @@ def ajax_import(request, seq_key):
                     sequence.transport_type = form.cleaned_data['transport_type']
                     sequence.is_published = True
                     sequence.save()
-
                     if form.cleaned_data['tag'].count() > 0:
                         for tag in form.cleaned_data['tag']:
                             sequence.tag.add(tag)
                         for tag in sequence.tag.all():
                             if not tag in form.cleaned_data['tag']:
                                 sequence.tag.remove(tag)
+
+                    # get image data from mapillary with sequence_key
+                    image_json = get_images_by_sequence(sequence=sequence)
+                    print(len(image_json['features']))
 
                     # messages.success(request, "Sequences successfully imported.")
                     return JsonResponse({
@@ -703,57 +887,19 @@ def ajax_get_image_detail(request, unique_id, image_key):
                 'status': 'failed',
                 'message': "You can't access this sequence."
             })
-    images = Image.objects.filter(seq_key=sequence.seq_key, image_key=image_key)
+    images = Image.objects.filter(image_key=image_key)[:1]
     if images.count() > 0:
         image = images[0]
     else:
-        image = Image()
+        return JsonResponse({
+            'status': 'failed',
+            'message': "The image doesn't exist.",
+        })
 
-        try:
-            url = 'https://a.mapillary.com/v3/images/{}?client_id={}'.format(image_key, settings.MAPILLARY_CLIENT_ID)
-            response = requests.get(url)
-            data = response.json()
-        except:
-            return JsonResponse({
-                'status': 'failed',
-                'message': "Image key error."
-            })
-        properties = data['properties']
-        keys = properties.keys()
-        if 'camera_make' in keys:
-            image.camera_make = properties['camera_make']
-        if 'camera_model' in keys:
-            image.camera_model = properties['camera_model']
-        if 'ca' in keys:
-            image.cas = properties['ca']
-        if 'captured_at' in keys:
-            image.captured_at = properties['captured_at']
-        if 'sequence_key' in keys:
-            image.seq_key = properties['sequence_key']
-        if 'user_key' in keys:
-            image.user_key = properties['user_key']
-        if 'key' in keys:
-            image.image_key = properties['key']
-        if 'pano' in keys:
-            image.pano = properties['pano']
-        if 'username' in keys:
-            image.username = properties['username']
-        if 'organization_key' in keys:
-            image.organization_key = properties['organization_key']
-        if 'private' in keys:
-            image.is_privated = properties['private']
+    mapillary = Mapillary()
+    image_detection_json = mapillary.get_detection_by_image_key(['CzA0rSBNLp08OVZJtVIRpU'])
 
-        image.lng = data['geometry']['coordinates'][0]
-        image.lat = data['geometry']['coordinates'][1]
-
-
-        image.is_uploaded = True
-        image.is_mapillary = True
-
-        image.user = sequence.user
-        image.ele = 0
-        print('test')
-        image.save()
+    print(image_detection_json)
 
     view_points = ImageViewPoint.objects.filter(image=image)
     scenes = Scene.objects.filter(image_key=image_key)

@@ -18,7 +18,7 @@ from .models import *
 
 ############################################################################
 class PhotographerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'business_name', 'business_website', 'business_email', 'type', 'user', 'created_at')
+    list_display = ('name', 'business_name', 'business_website', 'business_email', 'user', 'created_at')
 
 class PhotographerEnquireAdmin(admin.ModelAdmin):
     list_display = ('subject', 'created_at')

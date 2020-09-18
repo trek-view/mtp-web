@@ -203,7 +203,7 @@ i.transport-type-icon {
 
 .switch-list-viewer {
     position: absolute;
-    margin-top: 20px;
+    margin-top: 24px;
     right: 20px;
     z-index: 100;
 }
@@ -247,6 +247,11 @@ i.transport-type-icon {
         width: 100vw !important;
         left: 0px !important;
         top: 80px;
+    }
+
+    .right-board .paginator:first-child {
+        min-height: 38px;
+        margin-top: 70px;
     }
 }
 

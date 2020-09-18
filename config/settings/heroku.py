@@ -71,7 +71,7 @@ AWS_S3_MAPILLARY_BUCKET = os.environ.get("AWS_S3_MAPILLARY_BUCKET")
 # Static media settings
 STATIC_URL = 'https://' + AWS_S3_BUCKET_CNAME + '/'
 MEDIA_URL = 'https://' + AWS_S3_MAPILLARY_BUCKET + '/'
-STATICFILES_DIRS = ( os.path.join(BASE_DIR, "static"), )
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), )
 STATIC_ROOT = 'staticfiles'
 MEDIA_ROOT = 'media'
 ADMIN_MEDIA_PREFIX = MEDIA_URL + 'admin/'
@@ -113,3 +113,4 @@ MAPILLARY_CLIENT_SECRET = os.environ.get('MAPILLARY_CLIENT_SECRET')
 SITE_ID = os.environ.get('SITE_ID')
 
 FONT_AWESOME_KIT = os.environ.get('FONT_AWESOME_KIT')
+

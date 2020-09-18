@@ -19,17 +19,20 @@ UserModel = get_user_model()
 class CaptureType(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(default=None, blank=True, null=True)
-
+    def __str__(self):
+        return self.name
 
 class CaptureMethod(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(default=None, blank=True, null=True)
-
+    def __str__(self):
+        return self.name
 
 class ImageQuality(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(default=None, blank=True, null=True)
-
+    def __str__(self):
+        return self.name
     class Meta:
         verbose_name_plural = 'Image Quality'
 
@@ -67,9 +70,9 @@ class Photographer(models.Model):
     business_website = models.TextField()
     business_email = models.CharField(max_length=200)
     description = models.TextField()
-    type = ArrayField(models.CharField(default='1', max_length=3), null=True)
-    capture_method = ArrayField(models.CharField(default='1', max_length=3), null=True)
-    image_quality = models.CharField(default='0', max_length=3)
+    capture_type = models.ManyToManyField(CaptureType)
+    capture_method = models.ManyToManyField(CaptureMethod)
+    image_quality = models.ForeignKey(ImageQuality, on_delete=models.CASCADE, null=True, blank=True)
     geometry = models.TextField(default='')
     multipolygon = models.MultiPolygonField(null=True, blank=True)
     is_published = models.BooleanField(default=True)

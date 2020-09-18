@@ -14,7 +14,7 @@ class PhotographerForm(forms.ModelForm):
     description = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation': 'required'}),
         required=False)
-    type = None
+    capture_type = None
     capture_method = None
     image_quality = None
     geometry = forms.CharField(widget=forms.Textarea(attrs={'class': 'd-none'}), label='', required=False)
@@ -28,24 +28,25 @@ class PhotographerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['type'] = forms.MultipleChoiceField(
+        self.fields['capture_type'] = forms.ModelMultipleChoiceField(
             required=False,
             widget=forms.CheckboxSelectMultiple(
                 attrs={'data-validation': 'checkbox_group', 'data-validation-qty': 'min1'}),
-            choices=getAllCaptureType()
+            queryset=CaptureType.objects.all(),
         )
 
-        self.fields['capture_method'] = forms.MultipleChoiceField(
+        self.fields['capture_method'] = forms.ModelMultipleChoiceField(
             required=False,
             widget=forms.CheckboxSelectMultiple(
                 attrs={'data-validation': 'checkbox_group', 'data-validation-qty': 'min1'}),
-            choices=getAllCaptureMethod()
+            queryset=CaptureMethod.objects.all(),
         )
 
-        self.fields['image_quality'] = forms.ChoiceField(
+        self.fields['image_quality'] = forms.ModelChoiceField(
             widget=forms.RadioSelect(attrs={'class': '', 'data-validation': 'required'}),
-            choices=getAllImageQuality(),
-            required=False
+            queryset=ImageQuality.objects.all(),
+            required=False,
+            empty_label=None
         )
 
     class Meta:
@@ -58,7 +59,7 @@ class PhotographerForm(forms.ModelForm):
             'business_email',
             'geometry',
             'description',
-            'type',
+            'capture_type',
             'capture_method',
             'image_quality',
             'zoom',
@@ -69,19 +70,19 @@ class PhotographerSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['type'] = forms.MultipleChoiceField(
+        self.fields['capture_type'] = forms.ModelMultipleChoiceField(
             required=False,
             widget=forms.CheckboxSelectMultiple(),
-            choices=getAllCaptureType()
+            queryset=CaptureType.objects.all(),
         )
-        self.fields['capture_method'] = forms.MultipleChoiceField(
+        self.fields['capture_method'] = forms.ModelMultipleChoiceField(
             required=False,
             widget=forms.CheckboxSelectMultiple(),
-            choices=getAllCaptureMethod()
+            queryset=CaptureMethod.objects.all(),
         )
-        self.fields['image_quality'] = forms.ChoiceField(
+        self.fields['image_quality'] = forms.ModelChoiceField(
             widget=forms.RadioSelect(attrs={'class': '', 'data-validation': 'required'}),
-            choices=getAllImageQuality(),
+            queryset=ImageQuality.objects.all(),
             required=False
         )
 
