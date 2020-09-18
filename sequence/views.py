@@ -410,6 +410,7 @@ def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, 
             # Save the temporary image to the model#
             # This saves the model so be sure that is it valid
             image.mapillary_image.save(image.image_key, files.File(lf))
+            image.save()
 
     return image_json
 
