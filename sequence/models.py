@@ -13,11 +13,16 @@ import uuid
 from lib.functions import *
 from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
+from django.core.files import File
+from urllib.request import urlretrieve
 
 UserModel = get_user_model()
 
-def icon_image_directory_path(instance, filename):
-    return 'media/sequence/transport_type/icons/{}'.format(str(instance.unique_id) + '-' + filename)
+def image_directory_path(instance, filename):
+    path = 'sequence/{}/{}/{}.jpg'.format(instance.username, instance.seq_key, filename)
+    print("image path: ", path)
+    return path
+
 class Icon(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=100)
@@ -222,6 +227,8 @@ class Image(models.Model):
 
     point = models.PointField(null=True, blank=True)
 
+    mapillary_image = models.ImageField(upload_to=image_directory_path, null=True, blank=True)
+
     def getSequence(self):
         if self.seq_key != '':
             sequence = Sequence.objects.get(seq_key=self.seq_key)
@@ -229,6 +236,8 @@ class Image(models.Model):
                 return None
             return sequence
         return None
+
+
 
 class ImageDetection(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)

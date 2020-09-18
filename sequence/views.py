@@ -25,6 +25,7 @@ from django.db.models.expressions import F, Window
 from django.db.models.functions.window import RowNumber
 from django.contrib.gis.geos import Point, Polygon, MultiPolygon, LinearRing, LineString
 from django.db import transaction
+from django.core import files
 ## Custom Libs ##
 from lib.functions import *
 from lib.mapillary import Mapillary
@@ -225,6 +226,7 @@ def my_sequence_list(request):
 def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, mf_insert=False):
     mapillary = Mapillary()
     image_json = mapillary.get_images_by_sequence_key([sequence.seq_key])
+    first_image = None
     if image_json and image_insert:
         image_features = image_json['features']
         print('Images insert!')
@@ -233,6 +235,8 @@ def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, 
         for image_feature in image_features:
             image = Image.objects.filter(image_key=image_feature['properties']['key'])
             if image.count() > 0:
+                if first_image is None:
+                    first_image = image[0]
                 continue
 
             image_keys.append(image_feature['properties']['key'])
@@ -397,6 +401,15 @@ def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, 
         if image_insert:
             sequence.is_published = True
             sequence.save()
+        if not first_image is None:
+            # Create the model you want to save the image to
+            image = first_image
+
+            lf = mapillary.download_mapillary_image(image.image_key)
+            # Save the temporary image to the model#
+            # This saves the model so be sure that is it valid
+            image.mapillary_image.save(image.image_key, files.File(lf))
+
     return image_json
 
 def sequence_detail(request, unique_id):

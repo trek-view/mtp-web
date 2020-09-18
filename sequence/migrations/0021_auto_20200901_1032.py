@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='icon',
             name='filename',
-            field=models.ImageField(blank=True, null=True, upload_to=sequence.models.icon_image_directory_path),
+            field=models.ImageField(blank=True, null=True, upload_to=''),
         ),
     ]

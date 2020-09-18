@@ -6,12 +6,17 @@ from django.http import (
 import time
 import requests
 import math
+import tempfile
+
 
 class Mapillary():
     client_id = settings.MAPILLARY_CLIENT_ID
     client_secret = settings.MAPILLARY_CLIENT_SECRET
     root_url = 'https://a.mapillary.com/v3/'
+    token = None
 
+    def __init__(self, token=None):
+        self.token = token
 
     def get_images_by_sequence_key(self, seq_keys):
         sequence_str = ','.join(seq_keys)
@@ -82,3 +87,32 @@ class Mapillary():
             return False
         else:
             return data
+
+    def download_mapillary_image(self, image_key):
+        url = '{}images/{}/download_original?client_id={}'.format(self.root_url, image_key, self.client_id)
+        headers = {"Authorization": "Bearer {}".format(self.token)}
+        request = requests.get(url, headers=headers, stream=True)
+
+        # Was the request OK?
+        if request.status_code != requests.codes.ok:
+            # Nope, error handling, skip file etc etc etc
+            return False
+
+        # # Get the filename from the url, used for saving later
+        # file_name = image_url.split('/')[-1]
+
+        # Create a temporary file
+        lf = tempfile.NamedTemporaryFile()
+
+        # Read the streamed image in sections
+        for block in request.iter_content(1024 * 8):
+
+            # If no more file then stop
+            if not block:
+                break
+
+            # Write image block to temporary file
+            lf.write(block)
+
+        return lf
+
