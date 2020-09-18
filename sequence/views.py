@@ -407,11 +407,12 @@ def get_images_by_sequence(sequence, image_insert=True, detection_insert=False, 
             image = first_image
 
             lf = mapillary.download_mapillary_image(image.image_key)
+            print('lf: ', lf)
             # Save the temporary image to the model#
             # This saves the model so be sure that is it valid
             image.mapillary_image.save(image.image_key, files.File(lf))
             image.save()
-
+            print(image.mapillary_image)
     return image_json
 
 def sequence_detail(request, unique_id):
