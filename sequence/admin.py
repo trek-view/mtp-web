@@ -35,6 +35,7 @@ class TagAdmin(admin.ModelAdmin):
 
 class SequenceAdmin(tags_input_admin.TagsInputAdmin):
     list_display = (
+        'unique_id',
         'name',
         'description',
         'camera_make',
