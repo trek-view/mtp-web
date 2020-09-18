@@ -111,7 +111,7 @@ class SequenceImport(APIView):
 
     def put(self, request, unique_id, version='v1'):
         data = request.data
-        token = data['token']
+        token = data['mapillary_user_token']
 
         if token is None:
             return Response({'error': 'Mapillary token is missing', 'status': False})
@@ -124,7 +124,7 @@ class SequenceImport(APIView):
         if not sequence or sequence is None:
             return Response({'error': 'Sequence id is invalid', 'status': False})
 
-        seq_key = data['seq_key']
+        seq_key = data['mapillary_sequence_key']
         if not seq_key or seq_key is None:
             return Response({'error': 'Sequence key is missing', 'status': False})
 
