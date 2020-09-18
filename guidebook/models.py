@@ -9,6 +9,8 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.urls import reverse
 from django.core.validators import RegexValidator
+from storages.backends.s3boto3 import S3Boto3Storage
+from django.conf import settings
 ## Python Packages
 import uuid
 
@@ -54,6 +56,7 @@ class Guidebook(models.Model):
     description = models.TextField(null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     cover_image = models.ImageField(upload_to=image_directory_path, null=True)
+    cover_test_image = models.ImageField(upload_to=image_directory_path, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME), null=True)
     tag = models.ManyToManyField(Tag)
     is_published = models.BooleanField(default=True)
     is_approved = models.BooleanField(default=True)
