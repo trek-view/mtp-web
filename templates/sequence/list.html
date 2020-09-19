@@ -120,74 +120,79 @@
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
 
                             <div class="detail-box col-lg-8">
-                                <div class="item-detail-box mt-3 pl-3 pr-3">
-                                    <div class="item-main w-100 float-left">
-                                        <div class="item-title text-info d-flex flex-row justify-content-between">
-                                            <a href="{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}">
-                                                <h6>{{ sequence.name }}</h6>
-                                            </a>
-                                        </div>
+                                <div class="row w-100">
+                                    <div class="col-md-6 item-detail-box p-2">
+                                        <div class="item-main w-100 float-left">
+                                            <div class="item-title text-info d-flex flex-row justify-content-between">
+                                                <a href="{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}">
+                                                    <h6>{{ sequence.name }}</h6>
+                                                </a>
+                                            </div>
 
-                                        <div class="item-description">
-                                            <p class="mb-1">
-                                                {{ sequence.getShortDescription }}
-                                            </p>
-                                        </div>
+                                            <div class="item-description">
+                                                <p class="mb-1">
+                                                    {{ sequence.getShortDescription }}
+                                                </p>
+                                            </div>
 
-                                        <div class="w-100 d-flex flex-row align-items-end">
-                                            <p class="mb-1 mr-3 item-transport-type text-center">
-                                                <i class=transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
-                                                <br>
-                                                {{ sequence.transport_type.parent }}
-                                            </p>
-                                            <p class="mb-1 mr-3 item-transport-type text-center">
-                                                <i class="transport-type-icon fas fa-{{ sequence.transport_type.icon.font_awesome }}"></i>
-                                                <br>
-                                                {{ sequence.transport_type.name }}
-                                            </p>
-                                            <p class="mb-1 mr-3 item-image-count">
-                                                {{ sequence.getImageCount }} Panos
-                                            </p>
-                                            <p class="mb-1 mr-3 item-distance">
-                                                {{ sequence.getDistance }} Km
-                                            </p>
-                                            <p class="mb-1 mr-3 item-tour-count">
-                                                {{ sequence.tour_count }} tours
-                                            </p>
-                                        </div>
+                                            <div class="w-100 d-flex flex-row align-items-end">
+                                                <p class="mb-1 mr-3 item-transport-type text-center">
+                                                    <i class=transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
+                                                    <br>
+                                                    {{ sequence.transport_type.parent }}
+                                                </p>
+                                                <p class="mb-1 mr-3 item-transport-type text-center">
+                                                    <i class="transport-type-icon fas fa-{{ sequence.transport_type.icon.font_awesome }}"></i>
+                                                    <br>
+                                                    {{ sequence.transport_type.name }}
+                                                </p>
+                                                <p class="mb-1 mr-3 item-image-count">
+                                                    {{ sequence.getImageCount }} Panos
+                                                </p>
+                                                <p class="mb-1 mr-3 item-distance">
+                                                    {{ sequence.getDistance }} Km
+                                                </p>
+                                                <p class="mb-1 mr-3 item-tour-count">
+                                                    {{ sequence.tour_count }} tours
+                                                </p>
+                                            </div>
 
-                                        <div class="item-tag" style="min-height: 24px;">
-                                            {% for tag_name in sequence.getTags %}
-                                                <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
-                                                    {{ tag_name }}
-                                                </span>
-                                            {% endfor %}
-                                        </div>
+                                            <div class="item-tag" style="min-height: 24px;">
+                                                {% for tag_name in sequence.getTags %}
+                                                    <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                                                        {{ tag_name }}
+                                                    </span>
+                                                {% endfor %}
+                                            </div>
 
-                                        <div class="item-user">
-                                            <a href="{% url 'account.profile' username=sequence.user.username %}">
-                                                <span class="user">{{ sequence.user.username }}</span>
-                                            </a>
+                                            <div class="item-user">
+                                                <a href="{% url 'account.profile' username=sequence.user.username %}">
+                                                    <span class="user">{{ sequence.user.username }}</span>
+                                                </a>
+                                            </div>
+
                                         </div>
 
                                     </div>
-                                </div>
-                                <div class="pl-3 pr-3 mt-3 " style="font-size: 13px;">
-                                    <div class="d-flex flex-row align-items-center">
-                                        <a target="_blank" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
-                                            <img style="width: 40px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}">
-                                        </a>
-                                        <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
-                                            <img style="width: 120px" src="{% static "images/icon/mapillary_icon.png" %}">
-                                        </a>
+                                    <div class="col-md-3">
+                                        <canvas id="chart_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}" class="ele-chart" width="250" height="190"></canvas>
                                     </div>
+                                    <div class="col-md-3 p-2 " style="font-size: 13px;">
+                                        <div class="d-flex flex-row align-items-center">
+                                            <a target="_blank" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
+                                                <img style="width: 40px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}">
+                                            </a>
+                                            <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
+                                                <img style="width: 120px" src="{% static "images/icon/mapillary_icon.png" %}">
+                                            </a>
+                                        </div>
 
-                                    <p class="mt-3">{{ sequence.captured_at }}</p>
-                                    <p>{{ sequence.created_at }}</p>
+                                        <p class="mt-3">{{ sequence.captured_at }}</p>
+                                        <p>{{ sequence.created_at }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -233,6 +238,7 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="{% static 'js/chart.min.js' %}"></script>
     {% if pageName == 'my-sequence-list' %}active{% endif %}
 <script>
     $('.paginator-btn').click(function() {
@@ -253,6 +259,7 @@
     {% endfor %}
 
     var map_ary = [];
+    var chart_ary = [];
     console.log(positions);
     function draw_map(data) {
         var obj = $('.min-map-box').eq(i);
@@ -416,6 +423,59 @@
             $('#map').addClass('d-none');
         }
         map.resize();
+    })
+
+    function drawChart(sequence_id) {
+        var url = "{% url 'sequence.ajax_get_image_ele' unique_id='unique_id' %}";
+        url = url.replace('unique_id', sequence_id)
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                {
+                    toastr.error(data.message)
+                }
+                else {
+                    var num_ary = []
+                    for (var i=0; i<data.eles.length;i++) {
+                        num_ary.push(i+1)
+                    }
+                    var myLineChart = new Chart(document.getElementById("chart_" + sequence_id), {
+                        type: 'line',
+                        data: {
+                            labels: num_ary,
+                            datasets: [{
+                                data: data.eles,
+                                borderWidth: 1,
+                                borderColor: "#3e95cd",
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero:true
+                                    }
+                                }]
+                            },
+                            'legend': { 'display': false }
+                        }
+                    });
+                }
+            }
+        });
+
+    }
+
+    $('.ele-chart').each(function (index) {
+        var sequence_id = $(this).attr('data-sequence-id');
+        drawChart(sequence_id)
     })
 
 </script>

@@ -67,7 +67,6 @@ class TransType(MPTTModel):
     class Meta:
         verbose_name_plural = 'Transport Type'
 
-
 def getAllCaptureType():
     items = TransType.objects.all()
     itemsTuple = ()
@@ -237,16 +236,11 @@ class Image(models.Model):
             return sequence
         return None
 
-
-
 class ImageDetection(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, blank=True)
     area = models.FloatField(default=0)
     captured_at = models.DateTimeField(null=True, blank=True)
     image_ca = models.FloatField(default=0)
-    sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE, null=True, blank=True)
-    image = models.ForeignKey(Image, on_delete=models.CASCADE, null=True, blank=True)
     image_key = models.CharField(max_length=100)
     image_pano = models.BooleanField(default=False)
     det_key = models.CharField(max_length=100, null=True, blank=True)

@@ -23,7 +23,11 @@ class Mapillary():
         per_page = 1000
         url = '{}images?client_id={}&sequence_keys={}&per_page={}'.format(self.root_url, self.client_id, sequence_str, per_page)
         response = requests.get(url)
-        data = response.json()
+        try:
+            data = response.json()
+        except:
+            print('Response error')
+            return False
         if data is None or 'message' in data.keys():
             print(data['message'])
             return False
@@ -36,7 +40,11 @@ class Mapillary():
         url = '{}images_computed?client_id={}&sequence_keys={}&per_page={}'.format(self.root_url, self.client_id, sequence_str,
                                                                           per_page)
         response = requests.get(url)
-        data = response.json()
+        try:
+            data = response.json()
+        except:
+            print('Response error')
+            return False
         if data is None or 'message' in data.keys():
             print(data['message'])
             return False
@@ -48,7 +56,11 @@ class Mapillary():
         per_page = 1000
         url = '{}images?client_id={}&image_keys={}&per_page={}'.format(self.root_url, self.client_id, image_str, per_page)
         response = requests.get(url)
-        data = response.json()
+        try:
+            data = response.json()
+        except:
+            print('Response error')
+            return False
         if data is None or 'message' in data.keys():
             print(data['message'])
             return False
@@ -62,7 +74,11 @@ class Mapillary():
         url = '{}object_detections/{}?client_id={}&image_keys={}&per_page={}'.format(self.root_url, type, self.client_id, image_str, per_page)
         response = requests.get(url)
         print(response)
-        data = response.json()
+        try:
+            data = response.json()
+        except:
+            print('Response error')
+            return False
 
         if data is None or 'message' in data.keys():
             print(data['message'])
@@ -81,7 +97,11 @@ class Mapillary():
         per_page = 1000
         url = '{}map_features?client_id={}&closeto={}&layers={}&per_page={}'.format(self.root_url, self.client_id, close_to_str, layers_str, per_page)
         response = requests.get(url)
-        data = response.json()
+        try:
+            data = response.json()
+        except:
+            print('Response error')
+            return False
         if data is None or 'message' in data.keys():
             print(data['message'])
             return False
