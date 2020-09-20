@@ -196,7 +196,7 @@ class SequenceImport(APIView):
         sequence.save()
 
         print('1')
-        p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
+        p = threading.Thread(target=get_images_by_sequence, args=(sequence, 'mtpdu',))
         p.start()
         print('2')
 

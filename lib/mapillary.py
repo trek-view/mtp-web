@@ -14,9 +14,14 @@ class Mapillary():
     client_secret = settings.MAPILLARY_CLIENT_SECRET
     root_url = 'https://a.mapillary.com/v3/'
     token = None
+    source = None
 
-    def __init__(self, token=None):
+    def __init__(self, token=None, source=None):
         self.token = token
+        self.source = source
+        if self.source == 'mtpdu':
+            self.client_id = settings.MTP_DESKTOP_UPLOADER_CLIENT_ID
+            self.client_secret = settings.MTP_DESKTOP_UPLOADER_CLIENT_SECRET
 
     def get_images_by_sequence_key(self, seq_keys):
         sequence_str = ','.join(seq_keys)
