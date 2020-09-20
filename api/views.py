@@ -47,6 +47,7 @@ from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, Token
 import threading
 from accounts.models import MapillaryUser
 from sequence.views import get_images_by_sequence
+from lib.mapillary import Mapillary
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
@@ -116,8 +117,8 @@ class SequenceImport(APIView):
 
         if token is None:
             return Response({'error': 'Mapillary token is missing', 'status': False})
-
-        map_user_data = self.update_mapillary_user(request, token)
+        mapillary = Mapillary(token, source='mtpdu')
+        map_user_data = mapillary.get_mapillary_user()
         if not map_user_data:
             return Response({'error': 'Mapillary token is invalid', 'status': False})
 
@@ -129,7 +130,7 @@ class SequenceImport(APIView):
         if not seq_key or seq_key is None:
             return Response({'error': 'Sequence key is missing', 'status': False})
 
-        sequence_json = get_sequence_by_key(request.user.mapillary_access_token, seq_key)
+        sequence_json = mapillary.get_sequence_by_key(seq_key)
         print('sequence_json')
         if not sequence_json:
             return Response({'error': 'Sequence is empty', 'status': False})
@@ -206,39 +207,6 @@ class SequenceImport(APIView):
             'unique_id': str(sequence.unique_id)
         })
 
-    def update_mapillary_user(self, request, token):
-        mapillary_access_token = token
-        map_user_data = check_mapillary_token(request.user, token=mapillary_access_token)
-        if not map_user_data:
-            return False
-
-        user = request.user
-        user.mapillary_access_token = mapillary_access_token
-        user.save()
-
-        data = MapillaryUser.objects.filter(key=map_user_data['key'], user=request.user)
-        if data.count() == 0:
-            map_user = MapillaryUser()
-        else:
-            map_user = data[0]
-
-        if 'about' in map_user_data:
-            map_user.about = map_user_data['about']
-        if 'avatar' in map_user_data:
-            map_user.avatar = map_user_data['avatar']
-        if 'created_at' in map_user_data:
-            map_user.created_at = map_user_data['created_at']
-        if 'email' in map_user_data:
-            map_user.email = map_user_data['email']
-        if 'key' in map_user_data:
-            map_user.key = map_user_data['key']
-        if 'username' in map_user_data:
-            map_user.username = map_user_data['username']
-
-        map_user.user = request.user
-        map_user.save()
-
-        return map_user_data
 
 class MapillaryTokenVerify(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)

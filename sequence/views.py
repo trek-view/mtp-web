@@ -224,8 +224,9 @@ def my_sequence_list(request):
     }
     return render(request, 'sequence/list.html', content)
 
-def get_images_by_sequence(sequence, source=None, image_insert=True, detection_insert=False, mf_insert=True, image_download=True):
-    token = sequence.user.mapillary_access_token
+def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, detection_insert=False, mf_insert=True, image_download=True):
+    if token is None:
+        token = sequence.user.mapillary_access_token
     mapillary = Mapillary(token, source=source)
     image_json = mapillary.get_images_with_ele_by_seq_key([sequence.seq_key])
     if image_json and image_insert:

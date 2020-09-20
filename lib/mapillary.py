@@ -15,6 +15,7 @@ class Mapillary():
     root_url = 'https://a.mapillary.com/v3/'
     token = None
     source = None
+    mapillary_user_data = None
 
     def __init__(self, token=None, source=None):
         self.token = token
@@ -144,3 +145,37 @@ class Mapillary():
         print(lf)
         return lf
 
+    def get_mapillary_user(self):
+        if self.token is None:
+            return False
+        url = '{}me?client_id={}'.format(self.root_url, self.client_id)
+        headers = {"Authorization": "Bearer {}".format(self.token)}
+        response = requests.get(url, headers=headers)
+        try:
+            data = response.json()
+        except:
+            print('Response error')
+            return False
+        if data is None or 'message' in data.keys():
+            print(data['message'])
+            return False
+        else:
+            return data
+
+    def get_sequence_by_key(self, seq_key):
+        if self.token is None:
+            return False
+        url = '{}sequences/{}?client_id={}'.format(self.root_url, seq_key, self.client_id)
+        headers = {"Authorization": "Bearer {}".format(self.token)}
+        response = requests.get(url, headers=headers)
+        try:
+            data = response.json()
+        except:
+            print('Response error')
+            return False
+        if data is None or 'message' in data.keys():
+            print(data['message'])
+            return False
+        else:
+            self.mapillary_user_data = data
+            return data
