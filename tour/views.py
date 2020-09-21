@@ -43,11 +43,11 @@ def index(request):
 
 @my_login_required
 def tour_create(request, unique_id=None):
-    mapillary_user = MapillaryUser.objects.get(user=request.user)
-    if not mapillary_user:
+    mapillary_users = MapillaryUser.objects.filter(user=request.user)
+    if mapillary_users.count() == 0:
         messages.error(request, "You don't have any sequences. Please upload sequence or import from Mapillary.")
         return redirect('sequence.index')
-
+    mapillary_user = mapillary_users[0]
     if request.method == "POST":
         form = TourForm(request.POST)
         if form.is_valid():

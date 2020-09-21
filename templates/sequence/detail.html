@@ -792,7 +792,21 @@
                         options: {
                             'borderColor': 'red',
                             'borderWidth': 1,
-                            'legend': { 'display': false }
+                            'legend': { 'display': false },
+                            scales: {
+                                yAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'mtrs abv sea lvl'
+                                    }
+                                }],
+                                xAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'photo num'
+                                    }
+                                }]
+                            }
                         }
                     });
                 }
