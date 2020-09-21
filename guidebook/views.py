@@ -407,8 +407,6 @@ def ajax_add_scene(request, unique_id):
             scene = Scene.objects.filter(image_key=image_key, guidebook=guidebook)
             lat = float(form.cleaned_data['lat'])
             lng = float(form.cleaned_data['lng'])
-            start_x = float(form.cleaned_data['start_x'])
-            start_y = float(form.cleaned_data['start_y'])
 
             if scene:
                 old_scene = scene[0]
@@ -416,8 +414,6 @@ def ajax_add_scene(request, unique_id):
                 old_scene.description = description
                 old_scene.lat = lat
                 old_scene.lng = lng
-                old_scene.start_x = start_x
-                old_scene.start_y = start_y
                 old_scene.save()
                 return JsonResponse({
                     'type': 'update',
@@ -435,8 +431,6 @@ def ajax_add_scene(request, unique_id):
                 new_scene.description = description
                 new_scene.lat = lat
                 new_scene.lng = lng
-                new_scene.start_x = start_x
-                new_scene.start_y = start_y
                 scenes = guidebook.getScenes()
                 max_sort = 0
                 for s in scenes:
@@ -670,7 +664,7 @@ def ajax_get_scene(request, unique_id):
 def ajax_get_edit_scene(request, unique_id):
     image_key = request.GET['image_key']
     guidebook = Guidebook.objects.get(unique_id=unique_id)
-    if not guidebook:
+    if not guidebook and guidebook.user != request.user:
         return JsonResponse({
             'status': 'failed',
             'message': 'The Guidebook does not exist or has no access.'
@@ -711,6 +705,53 @@ def ajax_get_edit_scene(request, unique_id):
             'poi_list': poi_list
         })
 
+@my_login_required
+def ajax_set_start_view(request, unique_id):
+    guidebook = Guidebook.objects.get(unique_id=unique_id)
+    if not guidebook and guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Guidebook does not exist or has no access.'
+        })
+
+    if request.method == 'POST':
+        image_key = request.POST['image_key']
+        scenes = Scene.objects.filter(guidebook=guidebook, image_key=image_key)
+        if not scenes or scenes.count() == 0:
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'The scene does not exist or has no access.'
+            })
+        else:
+            scene = scenes[0]
+            start_x = request.POST['start_x']
+            if start_x is None:
+                return JsonResponse({
+                    'status': 'failed',
+                    'message': 'The derection information is empty.'
+                })
+            else:
+                scene.start_x = start_x
+
+            start_y = request.POST['start_y']
+            if start_y is None:
+                return JsonResponse({
+                    'status': 'failed',
+                    'message': 'The derection information is empty.'
+                })
+            else:
+                scene.start_y = start_y
+
+            scene.save()
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Starting view is successfully set.'
+            })
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'Bad request'
+    })
 @my_login_required
 def ajax_get_scene_list(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)

@@ -79,11 +79,11 @@ class Guidebook(models.Model):
                 positions.append(position)
         return positions
 
-    def getFirstSceneKey(self):
+    def getFirstScene(self):
         scenes = Scene.objects.filter(guidebook=self).order_by('sort')
         if scenes and scenes.count() > 0:
             firstScene = scenes[0]
-            return firstScene.image_key
+            return firstScene
         else:
             return ''
 
@@ -157,8 +157,8 @@ class Scene(models.Model):
     description = models.TextField(null=True)
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)
-    start_x = models.FloatField(default=0)
-    start_y = models.FloatField(default=0)
+    start_x = models.FloatField(default=0.5)
+    start_y = models.FloatField(default=0.5)
     sort = models.IntegerField(default=1, null=True)
     image_url = models.CharField(max_length=100, null=True)
 
@@ -177,7 +177,6 @@ class Scene(models.Model):
             return ', '.join(categories)
         else:
             return ''
-
 
 class PointOfInterest(models.Model):
     scene = models.ForeignKey(Scene, on_delete=models.CASCADE)

@@ -344,12 +344,17 @@
     var key_list = [];
     var sceneData = [];
     var item = {};
+    var position_ary = [];
+
     $('.scene-position').each(function (index) {
         var lat = $(this).find('.lat').text();
         var lng = $(this).find('.lng').text();
+        var start_x = $(this).find('.start_x').text();
+        var start_y = $(this).find('.start_y').text();
         var key = $(this).find('.image_key').text();
         scene_positions.push([lng, lat]);
         key_list.push(key);
+        position_ary.push([start_x, start_y])
         item = {
             "type": "Feature",
             "properties": {"key": key},
@@ -382,6 +387,10 @@
             },
         }
     );
+
+    if (position_ary.length > 0) {
+        mapillaryViewer.setCenter(position_ary[0])
+    }
 
     $('.scene-box').click(function () {
         var image_key = $(this).data('image_key');

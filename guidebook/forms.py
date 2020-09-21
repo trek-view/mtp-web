@@ -103,11 +103,13 @@ class SceneForm(forms.Form):
     start_x = forms.CharField(
         label='',
         widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
+        required=False
     )
 
     start_y = forms.CharField(
         label='',
         widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
+        required=False
     )
 
     class Meta:
