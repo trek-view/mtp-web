@@ -58,7 +58,7 @@ class Guidebook(models.Model):
     cover_image = models.ImageField(upload_to=image_directory_path, null=True)
     cover_test_image = models.ImageField(upload_to=image_directory_path, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME), null=True)
     tag = models.ManyToManyField(Tag)
-    is_published = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=datetime.now, blank=True)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)

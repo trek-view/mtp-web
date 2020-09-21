@@ -184,7 +184,12 @@
                                 {% if guidebook.is_approved and guidebook.is_published %}
                                     <button type="button" class="btn btn-secondary" id="publish_swithch_guidebook">Unpublish</button>
                                 {% elif guidebook.is_approved and not guidebook.is_published %}
-                                    <button type="button" class="btn btn-success" id="publish_swithch_guidebook">Publish Now</button>
+                                    {% if guidebook.getSceneCount == 0 %}
+                                        <button type="button" class="btn btn-secondary" id="publish_swithch_guidebook">Unpublish</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-success" id="publish_swithch_guidebook">Publish Now</button>
+                                    {% endif %}
+
                                 {% endif %}
                             </div>
 
@@ -420,8 +425,10 @@
     var init_start_y = 0.5;
     if (key_list.length > 0) {
         init_node = "{{ guidebook.getFirstScene.image_key }}";
-        init_start_x = {{ guidebook.getFirstScene.start_x }};
-        init_start_y = {{ guidebook.getFirstScene.start_y }};
+        {% if not guidebook.getFirstScene.start_x is None %}
+            init_start_x = {{ guidebook.getFirstScene.start_x }};
+            init_start_y = {{ guidebook.getFirstScene.start_y }};
+        {% endif %}
         $('.small').each(function (i) {
             $(this).removeClass('d-none');
         });

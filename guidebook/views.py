@@ -446,6 +446,9 @@ def ajax_add_scene(request, unique_id):
                 scenes = Scene.objects.filter(guidebook=guidebook)
                 if scenes and scenes.count() > 0:
                     scene_count = scenes.count()
+                    if scene_count == 1:
+                        guidebook.is_published = True
+                        guidebook.save()
                 else:
                     scene_count = 0
                 return JsonResponse({
