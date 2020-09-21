@@ -73,6 +73,10 @@
                                         <a class="" href="{{ user.website_url }}">{{ user.website_url }}</a>
                                     </div>
                                 {% endif %}
+
+                                <div class="link-developer mt-2 text-right">
+                                    <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:list' %}">Developer</a>
+                                </div>
                             </div>
                         </div>
                     </div>
