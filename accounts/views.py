@@ -159,8 +159,6 @@ def check_mapillary_oauth(request):
 
 def profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
-
-
     form = UserUpdateForm(instance=user)
 
     sequences = Sequence.objects.filter(user=user, is_published=True).exclude(image_count=0)
@@ -208,6 +206,7 @@ def profile(request, username):
 
 
     content = {
+        'current_user': user,
         'username': username,
         'form': form,
         'mapper_label': mapper_label,

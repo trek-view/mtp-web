@@ -13,34 +13,38 @@
                     <div class="d-flex flex-row">
                         <div class="d-flex flex-column align-items-center mr-3" style="width: 120px" id="user_avatar">
                             <div class="dz-image-cover">
-                                {% if user.avatar != '' and user.avatar != None %}
-                                    <img style="width: 120px; height: 120px; border-radius: 50%;"  src="{{ MEDIA_URL }}{{ request.user.avatar }}">
+                                {% if current_user.avatar != '' and current_user.avatar != None %}
+                                    <img style="width: 120px; height: 120px; border-radius: 50%;"  src="{{ MEDIA_URL }}{{ current_user.avatar }}">
                                 {% else %}
                                     <img style="width: 120px; height: 120px; border-radius: 50%;" src="{% static 'images/icon/avatar1.png' %}">
                                 {% endif %}
                             </div>
-                            <div class="text-right mt-3 ml-2">
-                                <button type="button" data-toggle="modal" data-target="#uploadPictureModal" class="btn btn-sm btn-warning" id="change_file">Change Picture</button>
-                            </div>
+                            {% if request.user.is_authenticated and current_user == request.user %}
+                                <div class="text-right mt-3 ml-2">
+                                    <button type="button" data-toggle="modal" data-target="#uploadPictureModal" class="btn btn-sm btn-warning" id="change_file">Change Picture</button>
+                                </div>
+                            {% endif %}
                         </div>
                         <div style="width: calc(100% - 140px)">
                             <div class="main-user">
                                 <div class="d-flex flex-row justify-content-between w-100 user-username text-center text-info mt-1">
                                     <h3>
-                                        {{ user.username }}
+                                        {{ current_user.username }}
                                     </h3>
-                                    <div class="action text-right mt-2">
-                                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#userDetailModal" id="edit_button">Edit</button>
-                                    </div>
+                                    {% if request.user.is_authenticated  and current_user == request.user %}
+                                        <div class="action text-right mt-2">
+                                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#userDetailModal" id="edit_button">Edit</button>
+                                        </div>
+                                    {% endif %}
                                 </div>
 
-                                {% if request.user.is_authenticated and request.user == user %}
+                                {% if request.user.is_authenticated and request.user == current_user %}
                                     <div class="user-email">
-                                        <h5 class="mb-1">{{ user.email }}</h5>
+                                        <h5 class="mb-1">{{ current_user.email }}</h5>
                                     </div>
                                 {% endif %}
 
-                                {% if user.first_name == '' or user.last_name == '' %}
+                                {% if current_user.first_name == '' or current_user.last_name == '' %}
                                     <div class="user-name">
                                         <p class="mb-1">
                                             Name field is empty.
@@ -48,11 +52,11 @@
                                     </div>
                                 {% else %}
                                     <div class="user-name">
-                                        <p class="mb-1">{{ user.first_name }} {{ user.last_name }}</p>
+                                        <p class="mb-1">{{ current_user.first_name }} {{ current_user.last_name }}</p>
                                     </div>
                                 {% endif %}
 
-                                {% if user.description is None or user.description == '' %}
+                                {% if current_user.description is None or current_user.description == '' %}
                                     <div class="user-description mt-2" >
                                         <p class="mb-1">
                                             Description field is empty.
@@ -60,23 +64,25 @@
                                     </div>
                                 {% else %}
                                     <div class="user-description mt-2" >
-                                        <p class="mb-1">{{ user.description }}</p>
+                                        <p class="mb-1">{{ current_user.description }}</p>
                                     </div>
                                 {% endif %}
 
-                                {% if user.website_url == '' or user.website_url is None %}
+                                {% if current_user.website_url == '' or current_user.website_url is None %}
                                     <div class="user-website mt-2">
                                        Website Url field is empty.
                                     </div>
                                 {% else %}
                                     <div class="user-website mt-2">
-                                        <a class="" href="{{ user.website_url }}">{{ user.website_url }}</a>
+                                        <a class="" href="{{ current_user.website_url }}">{{ current_user.website_url }}</a>
                                     </div>
                                 {% endif %}
 
-                                <div class="link-developer mt-2 text-right">
-                                    <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:list' %}">Developer</a>
-                                </div>
+                                {% if request.user.is_authenticated and current_user == request.user %}
+                                    <div class="link-developer mt-2 text-right">
+                                        <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:list' %}">Developer</a>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -125,7 +131,7 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users">
-                        <a href="/guidebook/list?username={{ username }}">Guidebooks created({{ guidebooks_count }})</a>
+                        <a href="/guidebook/list?username={{ current_user.username }}">Guidebooks created({{ guidebooks_count }})</a>
                     </div>
                 </div>
             </div>
@@ -133,7 +139,7 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users">
-                        <a href="/tour/list?username={{ username }}">Tours created({{ tours_count }})</a>
+                        <a href="/tour/list?username={{ current_user.username }}">Tours created({{ tours_count }})</a>
                     </div>
                 </div>
             </div>
@@ -141,7 +147,7 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users">
-                        <a href="/sequence/list?username={{ username }}">Go Guidebook({{ sequences_count }})</a>
+                        <a href="/sequence/list?username={{ current_user.username }}">Go Guidebook({{ sequences_count }})</a>
                     </div>
                 </div>
             </div>
@@ -149,7 +155,7 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users">
-                        <a href="/sequence/list?username={{ username }}">Go Guidebook({{ view_point_count }})</a>
+                        <a href="/sequence/list?username={{ current_user.username }}">Go Guidebook({{ view_point_count }})</a>
                     </div>
                 </div>
             </div>
@@ -253,7 +259,7 @@
     });
 
     Dropzone.autoDiscover = false;
-    {% if user.cover_image == '' or user.cover_image is None %}
+    {% if current_user.avatar == '' or current_user.avatar is None %}
         var server_image = false;
     {% else %}
         var server_image = true;
