@@ -278,13 +278,10 @@ def challenge_leaderboard(request, unique_id):
     if (not request.user.is_authenticated or request.user != challenge.user) and not challenge.is_published:
         messages.success(request, "You can't access this challenge.")
         return redirect('challenge.challenge_list')
-    print(challenge.multipolygon.coords)
-    sequences = Sequence.objects.filter(is_published=True, geometry_coordinates__contains=challenge.multipolygon)
-    print(sequences)
+    sequences = Sequence.objects.filter(is_published=True, geometry_coordinates__intersects=challenge.multipolygon)
 
     user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
 
-    print(user_json)
     paginator = Paginator(user_json, 10)
     page = request.GET.get('page')
     if not page or page is None:
