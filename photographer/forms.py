@@ -83,7 +83,8 @@ class PhotographerSearchForm(forms.Form):
         self.fields['image_quality'] = forms.ModelChoiceField(
             widget=forms.RadioSelect(attrs={'class': '', 'data-validation': 'required'}),
             queryset=ImageQuality.objects.all(),
-            required=False
+            required=False,
+            empty_label='All'
         )
 
 class PhotographerEnquireForm(forms.ModelForm):

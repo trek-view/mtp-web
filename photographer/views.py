@@ -215,14 +215,14 @@ def photographer_list(request, page):
         if form.is_valid():
 
             capture_type = form.cleaned_data['capture_type']
-            captureMethod = form.cleaned_data['capture_method']
+            capture_method = form.cleaned_data['capture_method']
             image_quality = form.cleaned_data['image_quality']
 
             photographers = Photographer.objects.all().filter(is_published=True)
             if len(capture_type) > 0:
-                photographers = photographers.filter(capture_type__overlap=capture_type)
-            if len(captureMethod) > 0:
-                photographers = photographers.filter(capture_method__overlap=captureMethod)
+                photographers = photographers.filter(capture_type__in=capture_type)
+            if len(capture_method) > 0:
+                photographers = photographers.filter(capture_method__in=capture_method)
             if (image_quality != ''):
                 photographers = photographers.filter(image_quality=image_quality)
 
@@ -306,12 +306,12 @@ def my_photographer_list(request, page):
 
         if form.is_valid():
             capture_type = form.cleaned_data['capture_type']
-            captureMethod = form.cleaned_data['capture_method']
+            capture_method = form.cleaned_data['capture_method']
             photographers = Photographer.objects.all().filter(user=request.user)
             if len(capture_type) > 0:
-                photographers = photographers.filter(capture_type__overlap=capture_type)
-            if len(captureMethod) > 0:
-                photographers = photographers.filter(capture_method__overlap=captureMethod)
+                photographers = photographers.filter(capture_type__in=capture_type)
+            if len(capture_method) > 0:
+                photographers = photographers.filter(capture_method__in=capture_method)
 
     if photographers == None:
         photographers = Photographer.objects.all().filter(user=request.user)
