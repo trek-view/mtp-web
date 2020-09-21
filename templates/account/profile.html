@@ -40,7 +40,7 @@
 
                                 {% if request.user.is_authenticated and request.user == current_user %}
                                     <div class="user-email">
-                                        <h5 class="mb-1">{{ current_user.email }}</h5>
+                                        <h5 class="mb-1">{{ current_user.email }} (only visible to you)</h5>
                                     </div>
                                 {% endif %}
 
