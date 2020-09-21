@@ -635,7 +635,19 @@
         history.pushState({
             id: 'Guidebook Detail'
         }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
-        mapillaryViewer.moveToKey(key_list[current_order_number - 1])
+
+        var image_key = key_list[index];
+        var title = $('.scene-box').eq(index).find('.scene-title').find('h6').text();
+        var description = $('.scene-box').eq(index).find('.scene-description').find('span').text();
+        mapillaryViewer.moveToKey(image_key).then(function () {
+            if (is_opened_side_bar)
+                $('.left-side.poi-box').removeClass('d-none');
+            $('.poi-header .scene-title').text(title);
+            $('.poi-header .scene-description').text(description);
+            var start_x = $('.scene-box').eq(index).find('.start_x').text();
+            var start_y = $('.scene-box').eq(index).find('.start_y').text();
+            mapillaryViewer.setCenter([start_x, start_y]);
+        });
     });
 
     $('.PrevOrNext .SequenceStepNext').click(function () {
@@ -648,7 +660,18 @@
         history.pushState({
             id: 'Guidebook Detail'
         }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
-        mapillaryViewer.moveToKey(key_list[current_order_number + 1])
+        var image_key = key_list[index];
+        var title = $('.scene-box').eq(index).find('.scene-title').find('h6').text();
+        var description = $('.scene-box').eq(index).find('.scene-description').find('span').text();
+        mapillaryViewer.moveToKey(image_key).then(function () {
+            if (is_opened_side_bar)
+                $('.left-side.poi-box').removeClass('d-none');
+            $('.poi-header .scene-title').text(title);
+            $('.poi-header .scene-description').text(description);
+            var start_x = $('.scene-box').eq(index).find('.start_x').text();
+            var start_y = $('.scene-box').eq(index).find('.start_y').text();
+            mapillaryViewer.setCenter([start_x, start_y]);
+        });
     });
 
     var is_mapillary_viewer = true;
@@ -805,24 +828,15 @@
     });
 
     $('#point_list').click(function () {
-        if ($('.left-side.poi-box').hasClass('d-none')) {
-            $(this).text('Hide POI List');
-            $('.left-side.poi-box').removeClass('d-none');
+        $(this).text('Hide POI List');
+        $('.left-side.poi-box').removeClass('d-none');
 
-            if ($('#mapillary_image_box').parent().hasClass('small-screen'))
-                $('#mapillary_image_box').parent().find('.switch-full-screen').trigger('click');
-            $('.full-screen').addClass('board-w-400');
-            $('.minimize-button').trigger('click');
-            mapillaryViewer.resize();
-            map.resize();
-        }
-        else {
-            $(this).text('Show POI List');
-            $('.left-side.poi-box').addClass('d-none');
-            $('.board-w-400').removeClass('board-w-400');
-            mapillaryViewer.resize();
-            map.resize();
-        }
+        if ($('#mapillary_image_box').parent().hasClass('small-screen'))
+            $('#mapillary_image_box').parent().find('.switch-full-screen').trigger('click');
+        $('.full-screen').addClass('board-w-400');
+        $('.minimize-button').trigger('click');
+        mapillaryViewer.resize();
+        map.resize();
     });
 
     window.addEventListener('resize', function() { mapillaryViewer.resize(); map.resize(); });

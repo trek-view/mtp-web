@@ -279,7 +279,7 @@ def challenge_leaderboard(request, unique_id):
         messages.success(request, "You can't access this challenge.")
         return redirect('challenge.challenge_list')
     print(challenge.multipolygon.coords)
-    sequences = Sequence.objects.filter(is_published=True, geometry_coordinates__crosses=challenge.multipolygon)
+    sequences = Sequence.objects.filter(is_published=True, geometry_coordinates__contains=challenge.multipolygon)
     print(sequences)
 
     user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
