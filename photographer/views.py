@@ -51,7 +51,7 @@ PHOTOGRAPHER_PAGE_DESCRIPTION = ""
 ############################################################################
 
 def index(request):
-    return redirect('photographer.photographer_list', page=1)
+    return redirect('photographer.photographer_list')
 
 @my_login_required
 def photographer_create(request):
@@ -207,30 +207,34 @@ def my_photographer_delete(request, unique_id):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
-def photographer_list(request, page):
+def photographer_list(request):
     photographers = None
+    page = 1
     if request.method == "GET":
         form = PhotographerSearchForm(request.GET)
-
+        page = request.GET.get('page')
+        if page is None:
+            page = 1
         if form.is_valid():
 
             capture_type = form.cleaned_data['capture_type']
             capture_method = form.cleaned_data['capture_method']
             image_quality = form.cleaned_data['image_quality']
+            print(image_quality)
 
             photographers = Photographer.objects.all().filter(is_published=True)
             if len(capture_type) > 0:
                 photographers = photographers.filter(capture_type__in=capture_type)
             if len(capture_method) > 0:
                 photographers = photographers.filter(capture_method__in=capture_method)
-            if (image_quality != ''):
+            if not image_quality is None:
                 photographers = photographers.filter(image_quality=image_quality)
 
     if photographers == None:
         photographers = Photographer.objects.all().filter(is_published=True)
         form = PhotographerSearchForm()
 
-    paginator = Paginator(photographers.order_by('-created_at'), 10)
+    paginator = Paginator(photographers.order_by('-created_at'), 5)
 
     try:
         pPhotographers = paginator.page(page)
@@ -259,11 +263,11 @@ def photographer_list(request, page):
         'form': form,
         'pageName': 'Photographers',
         'pageTitle': 'Photographers',
-        'pageDescription': MAIN_PAGE_DESCRIPTION
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'page': page
     }
 
     return render(request, 'photographer/list.html', content)
-
 
 def photographer_detail(request, unique_id):
     photographer = get_object_or_404(Photographer, unique_id=unique_id)
@@ -288,22 +292,25 @@ def photographer_detail(request, unique_id):
                                                  'is_mine': is_mine})
 
     return render(request, 'photographer/photographer_detail.html',
-                  {
-                      'photographer': photographer,
-                      'photographer_html_detail': photographer_html_detail,
-                      'form': form,
-                      'geometry': geometry,
-                      'pageName': 'Photographer Detail',
-                      'pageTitle': photographer.name + ' - Photographer'
-                  })
-
+      {
+          'photographer': photographer,
+          'photographer_html_detail': photographer_html_detail,
+          'form': form,
+          'geometry': geometry,
+          'pageName': 'Photographer Detail',
+          'pageTitle': photographer.name + ' - Photographer',
+          'page': 1
+      })
 
 @my_login_required
-def my_photographer_list(request, page):
+def my_photographer_list(request):
     photographers = None
+    page = 1
     if request.method == "GET":
+        page = request.GET.get('page')
+        if page is None:
+            page = 1
         form = PhotographerSearchForm(request.GET)
-
         if form.is_valid():
             capture_type = form.cleaned_data['capture_type']
             capture_method = form.cleaned_data['capture_method']
@@ -317,7 +324,7 @@ def my_photographer_list(request, page):
         photographers = Photographer.objects.all().filter(user=request.user)
         form = PhotographerSearchForm()
 
-    paginator = Paginator(photographers.order_by('-created_at'), 10)
+    paginator = Paginator(photographers.order_by('-created_at'), 5)
 
     try:
         pPhotographers = paginator.page(page)
@@ -345,10 +352,10 @@ def my_photographer_list(request, page):
         'form': form,
         'pageName': 'My Photographers',
         'pageTitle': 'My Photographers',
-        'pageDescription': MAIN_PAGE_DESCRIPTION
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'page': page
     }
     return render(request, 'photographer/list.html', content)
-
 
 def ajax_photographer_detail(request, unique_id):
     photographer = Photographer.objects.get(unique_id=unique_id)

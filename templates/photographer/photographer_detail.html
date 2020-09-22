@@ -36,10 +36,10 @@
             {% if user.is_authenticated %}
                 <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
                     <li class="nav-item" style="width: 30%;">
-                        <a class="nav-link {% if pageName == 'phtographer-list' or pageName == 'photographer-detail' %}active{% endif %}" href="{% url 'photographer.photographer_list' page=1 %}">All</a>
+                        <a class="nav-link {% if pageName == 'phtographer-list' or pageName == 'photographer-detail' %}active{% endif %}" href="{% url 'photographer.photographer_list' %}">All</a>
                     </li>
                     <li class="nav-item" style="width: 50%;">
-                        <a class="nav-link {% if pageName == 'my-photographer-list' or pageName == 'my-photographer-detail' %}active{% endif %}" href="{% url 'photographer.my_photographer_list' page=1 %}">My Photographers</a>
+                        <a class="nav-link {% if pageName == 'my-photographer-list' or pageName == 'my-photographer-detail' %}active{% endif %}" href="{% url 'photographer.my_photographer_list' %}">My Photographers</a>
                     </li>
                 </ul>
             {% endif %}
@@ -55,7 +55,8 @@
                         <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
                             <div class="card-body">
                                 <div class="search-form">
-                                    <form method="GET" action="{% url 'photographer.photographer_list' page=1 %}" class="post-form" id="search_form">
+                                    <form method="GET" action="{% url 'photographer.photographer_list' %}" class="post-form" id="search_form">
+                                        <input type="number" class="d-none" name="page" value="{{ page }}">
                                         {{ form.as_p }}
                                         <div class="form-group text-right mt-3">
                                             <button type="submit" class="save btn btn-primary">Search</button>
@@ -121,11 +122,12 @@
 {% block scripts %}
 <script>
 
-    // Pagination
     $('.paginator-btn').click(function() {
         var pageNum = $(this).data('page');
-        location.assign("{% url 'photographer.photographer_list' %}" + pageNum + '?' + $('#search_form').serialize());
-    })
+        $('#search_form').find('input[name="page"]').val(pageNum);
+        var url = "{% url 'photographer.photographer_list' %}?" + $('#search_form').serialize()
+        location.assign(url);
+    });
 
     $('#headingOne').click(function () {
         if ($(this).hasClass('collapsed'))

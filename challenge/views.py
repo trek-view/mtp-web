@@ -54,7 +54,7 @@ JOB_PAGE_DESCRIPTION = ""
 ############################################################################
 
 def index(request):
-    return redirect('challenge.challenge_list', page=1)
+    return redirect('challenge.challenge_list')
 
 @my_login_required
 def challenge_create(request):
@@ -183,11 +183,14 @@ def my_challenge_delete(request, unique_id):
 
     return redirect('challenge.index')
 
-def challenge_list(request, page):
+def challenge_list(request):
     challenges = None
+    page = 1
     if request.method == "GET":
         form = ChallengeSearchForm(request.GET)
-
+        page = request.GET.get('page')
+        if page is None:
+            page = 1
         if form.is_valid():
             challenges = Challenge.objects.all().filter(is_published=True)
 
@@ -256,7 +259,8 @@ def challenge_list(request, page):
         'form': form,
         'pageName': 'Challenges',
         'pageTitle': 'Challenges',
-        'pageDescription': MAIN_PAGE_DESCRIPTION
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'page': page
     }
 
     return render(request, 'challenge/list.html', content)
@@ -272,6 +276,8 @@ def challenge_detail(request, unique_id):
 
     geometry = json.dumps(challenge.geometry)
 
+    page = 1
+
     if challenge.user == request.user:
         is_mine = True
     else:
@@ -286,7 +292,8 @@ def challenge_detail(request, unique_id):
               'form': form,
               'geometry': geometry,
               'pageName': 'Challenge Detail',
-              'pageTitle': challenge.name + ' - Challenge'
+              'pageTitle': challenge.name + ' - Challenge',
+              'page': page
           })
 
 def challenge_leaderboard(request, unique_id):
@@ -309,6 +316,7 @@ def challenge_leaderboard(request, unique_id):
     user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
 
     paginator = Paginator(user_json, 10)
+    page = 1
     page = request.GET.get('page')
     if not page or page is None:
         page = 1
@@ -349,15 +357,19 @@ def challenge_leaderboard(request, unique_id):
               'challenge': challenge,
               'form': form,
               'pageName': 'Challenge Leaderboard',
-              'pageTitle': challenge.name + ' - Challenge Leaderboard'
+              'pageTitle': challenge.name + ' - Challenge Leaderboard',
+              'page': page
           })
 
 @my_login_required
-def my_challenge_list(request, page):
+def my_challenge_list(request):
     challenges = None
+    page = 1
     if request.method == "GET":
         form = ChallengeSearchForm(request.GET)
-
+        page = request.GET.get('page')
+        if page is None:
+            page = 1
         if form.is_valid():
             challenges = Challenge.objects.all().filter(user=request.user)
 
@@ -425,7 +437,8 @@ def my_challenge_list(request, page):
         'form': form,
         'pageName': 'My Challenges',
         'pageTitle': 'My Challenges',
-        'pageDescription': MAIN_PAGE_DESCRIPTION
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'page': page
     }
     return render(request, 'challenge/list.html', content)
 

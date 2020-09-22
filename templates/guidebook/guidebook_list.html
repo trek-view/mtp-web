@@ -41,16 +41,17 @@
             {% if user.is_authenticated %}
                 <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
                     <li class="nav-item" style="width: 30%;">
-                        <a class="nav-link {% if pageName == 'Guidebooks' %}active{% endif %}" href="{% url 'guidebook.guidebook_list' page=1 %}">All</a>
+                        <a class="nav-link {% if pageName == 'Guidebooks' %}active{% endif %}" href="{% url 'guidebook.guidebook_list' %}">All</a>
                     </li>
                     <li class="nav-item" style="width: 50%">
-                        <a class="nav-link {% if pageName == 'My Guidebooks' %}active{% endif %}" href="{% url 'guidebook.my_guidebook_list' page=1 %}">My Guidebooks</a>
+                        <a class="nav-link {% if pageName == 'My Guidebooks' %}active{% endif %}" href="{% url 'guidebook.my_guidebook_list' %}">My Guidebooks</a>
                     </li>
                 </ul>
             {% endif %}
             <div class="p-3" style="border-top: 1px solid #dee2e6;">
                 <div class="search-form">
                     <form method="GET" class="post-form" id="search_form">
+                        <input type="number" class="d-none" name="page" value="{{ page }}">
                         {{ form.media }}
                         {{ form.as_p }}
                         <div class="form-group text-right mt-3">
@@ -233,8 +234,15 @@
 <script>
     $('.paginator-btn').click(function() {
         var pageNum = $(this).data('page');
-        location.assign("{% url 'guidebook.guidebook_list' %}" + pageNum + '?' + $('#search_form').serialize());
+        $('#search_form').find('input[name="page"]').val(pageNum);
+        {% if pageName == 'Guidebooks' %}
+            var url = "{% url 'guidebook.guidebook_list' %}?" + $('#search_form').serialize()
+        {% else %}
+            var url = "{% url 'guidebook.my_guidebook_list' %}?" + $('#search_form').serialize()
+        {% endif %}
+        location.assign(url);
     });
+
     mapboxgl.accessToken = mapboxToken;
     var positions = [];
     {% for guidebook in guidebooks %}

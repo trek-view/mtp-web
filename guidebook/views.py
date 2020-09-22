@@ -41,11 +41,15 @@ MAIN_PAGE_DESCRIPTION = 'Create a guidebook of street-level photos to show peopl
 ############################################################################
 
 def home(request):
-    return redirect('guidebook.guidebook_list', page=1)
+    return redirect('guidebook.guidebook_list')
 
-def guidebook_list(request, page):
+def guidebook_list(request):
     guidebooks = None
+    page = 1
     if request.method == "GET":
+        page = request.GET.get('page')
+        if page is None:
+            page = 1
         form = GuidebookSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -109,14 +113,19 @@ def guidebook_list(request, page):
         'form': form,
         'pageName': 'Guidebooks',
         'pageTitle': 'Guidebooks',
-        'pageDescription': MAIN_PAGE_DESCRIPTION
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'page': page
     }
     return render(request, 'guidebook/guidebook_list.html', content)
 
 @my_login_required
-def my_guidebook_list(request, page):
+def my_guidebook_list(request):
     guidebooks = None
+    page = 1
     if request.method == "GET":
+        page = request.GET.get('page')
+        if page is None:
+            page = 1
         form = GuidebookSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -179,7 +188,8 @@ def my_guidebook_list(request, page):
         'form': form,
         'pageName': 'My Guidebooks',
         'pageTitle': 'My Guidebooks',
-        'pageDescription': MAIN_PAGE_DESCRIPTION
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'page': page
     }
     return render(request, 'guidebook/guidebook_list.html', content)
 
