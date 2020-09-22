@@ -8,7 +8,7 @@ from django.db.models import Manager as GeoManager
 from datetime import datetime
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
-from sequence.models import TransType
+from sequence.models import TransType, CameraMake
 
 ## Python Packages
 import uuid
@@ -22,6 +22,7 @@ class Challenge(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     transport_type = models.ManyToManyField(TransType)
+    camera_make = models.ManyToManyField(CameraMake)
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
     expected_count = models.IntegerField(null=True, blank=True)

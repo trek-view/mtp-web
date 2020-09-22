@@ -90,6 +90,11 @@ def challenge_create(request):
             challenge.geometry = json.dumps(geometry)
 
             challenge.save()
+            camera_make = form.cleaned_data['camera_make']
+            print(camera_make)
+            if not camera_make is None and len(camera_make) > 0:
+                for cm in camera_make:
+                    challenge.camera_make.add(cm)
 
             transport_type = form.cleaned_data['transport_type']
             if not transport_type is None:
@@ -117,6 +122,13 @@ def challenge_edit(request, unique_id):
             challenge.user = request.user
             challenge.updated_at = datetime.now()
             challenge.save()
+
+            camera_make = form.cleaned_data['camera_make']
+            print(camera_make)
+            if not camera_make is None and len(camera_make) > 0:
+                for cm in camera_make:
+                    challenge.camera_make.add(cm)
+
             geometry = json.loads(challenge.geometry)
 
             multipoly = MultiPolygon()
@@ -161,6 +173,9 @@ def challenge_edit(request, unique_id):
 def my_challenge_delete(request, unique_id):
     challenge = get_object_or_404(Challenge, unique_id=unique_id)
     if challenge.user == request.user:
+        if challenge.camera_make.all().count() > 0:
+            for cm in challenge.camera_make.all():
+                cm.delete()
         challenge.delete()
         messages.success(request, 'Challenge "%s" is deleted successfully.' % challenge.name)
     else:
@@ -182,10 +197,10 @@ def challenge_list(request, page):
             expected_count_max = form.cleaned_data['expected_count_max']
             start_time = form.cleaned_data['start_time']
             end_time = form.cleaned_data['end_time']
+            camera_makes = form.cleaned_data['camera_make']
 
             if not name is None:
                 challenges = challenges.filter(name__contains=name)
-            print(transport_type)
             if not transport_type is None and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
@@ -205,6 +220,8 @@ def challenge_list(request, page):
                 challenges = challenges.filter(end_time__gte=start_time)
             if not end_time is None:
                 challenges = challenges.filter(start_time__lte=end_time)
+            if not camera_makes is None and len(camera_makes) > 0:
+                challenges = challenges.filter(camera_make__in=camera_makes)
 
     if challenges == None:
         challenges = Challenge.objects.all().filter(is_published=True)
@@ -278,7 +295,16 @@ def challenge_leaderboard(request, unique_id):
     if (not request.user.is_authenticated or request.user != challenge.user) and not challenge.is_published:
         messages.success(request, "You can't access this challenge.")
         return redirect('challenge.challenge_list')
+
     sequences = Sequence.objects.filter(is_published=True, geometry_coordinates__intersects=challenge.multipolygon)
+
+    cm = challenge.camera_make.all()
+    cm_names = []
+    if cm.count() > 0:
+        for _cm in cm:
+            cm_names.append(_cm.name)
+        sequences = sequences.filter(camera_make__in=cm_names)
+    print(sequences.count())
 
     user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
 
@@ -335,11 +361,43 @@ def my_challenge_list(request, page):
         if form.is_valid():
             challenges = Challenge.objects.all().filter(user=request.user)
 
+            name = form.cleaned_data['name']
+            transport_type = form.cleaned_data['transport_type']
+            expected_count_min = form.cleaned_data['expected_count_min']
+            expected_count_max = form.cleaned_data['expected_count_max']
+            start_time = form.cleaned_data['start_time']
+            end_time = form.cleaned_data['end_time']
+            camera_makes = form.cleaned_data['camera_make']
+
+            if not name is None:
+                challenges = challenges.filter(name__contains=name)
+            if not transport_type is None and transport_type != 0 and transport_type != '':
+                children_trans_type = TransType.objects.filter(parent_id=transport_type)
+                if children_trans_type.count() > 0:
+                    types = []
+                    types.append(transport_type)
+                    for t in children_trans_type:
+                        types.append(t)
+                    challenges = challenges.filter(transport_type__in=types)
+                else:
+                    challenges = challenges.filter(transport_type=transport_type)
+
+            if not expected_count_min is None:
+                challenges = challenges.filter(expected_count__gte=expected_count_min)
+            if not expected_count_max is None:
+                challenges = challenges.filter(expected_count__lte=expected_count_max)
+            if not start_time is None:
+                challenges = challenges.filter(end_time__gte=start_time)
+            if not end_time is None:
+                challenges = challenges.filter(start_time__lte=end_time)
+            if not camera_makes is None and len(camera_makes) > 0:
+                challenges = challenges.filter(camera_make__in=camera_makes)
+
     if challenges == None:
         challenges = Challenge.objects.all().filter(user=request.user)
         form = ChallengeSearchForm()
 
-    paginator = Paginator(challenges.order_by('-created_at'), 10)
+    paginator = Paginator(challenges.order_by('-created_at'), 5)
 
     try:
         pChallenges = paginator.page(page)
@@ -375,7 +433,6 @@ def ajax_challenge_detail(request, unique_id):
     challenge = Challenge.objects.get(unique_id=unique_id)
     if challenge.user == request.user:
         is_mine = True
-
     else:
         is_mine = False
     serialized_obj = serializers.serialize('json', [challenge, ])

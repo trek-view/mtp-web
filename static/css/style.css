@@ -272,5 +272,9 @@ body {
     #map.mapboxgl-map {
         height: calc(100vh - 80px) !important;
     }
+
+    #map.mapboxgl-map {
+        height: calc(100vh - 80px) !important;
+    }
 }
 

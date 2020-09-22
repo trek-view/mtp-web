@@ -74,6 +74,12 @@ def getAllCaptureType():
         itemsTuple = itemsTuple + ((item.pk, item.name),)
     return itemsTuple
 
+class CameraMake(models.Model):
+    name = models.CharField(max_length=50, default='')
+
+    def __str__(self):
+        return self.name
+
 class Sequence(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)

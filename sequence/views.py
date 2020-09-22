@@ -425,8 +425,22 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
 
     return image_json
 
+def set_camera_make(sequence):
+    if sequence.camera_make is None or sequence.camera_make == '':
+        return False
+    camera_makes = CameraMake.objects.filter(name=sequence.camera_make)
+    if camera_makes.count() == 0:
+        camera_make = CameraMake()
+        camera_make.name = sequence.camera_make
+        camera_make.save()
+        return True
+    else:
+        return False
+
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
+
+    set_camera_make(sequence)
     page = 1
     if request.method == "GET":
         page = request.GET.get('page')
@@ -781,6 +795,9 @@ def ajax_import(request, seq_key):
                     sequence.transport_type = form.cleaned_data['transport_type']
                     sequence.is_published = True
                     sequence.save()
+
+                    set_camera_make(sequence)
+
                     if form.cleaned_data['tag'].count() > 0:
                         for tag in form.cleaned_data['tag']:
                             sequence.tag.add(tag)
