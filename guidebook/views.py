@@ -21,7 +21,9 @@ from django.template import RequestContext
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 from django.contrib.gis.geos import Point
-
+from django.db.models import Avg, Count, Min, Sum
+from django.db.models.expressions import F, Window
+from django.db.models.functions.window import RowNumber
 ## Custom Libs ##
 from lib.functions import *
 
@@ -57,6 +59,7 @@ def guidebook_list(request):
             tags = form.cleaned_data['tag']
             username = form.cleaned_data['username']
             image_key = form.cleaned_data['image_key']
+            like = form.cleaned_data['like']
 
             guidebooks = Guidebook.objects.all().filter(
                 is_published=True,
@@ -72,6 +75,17 @@ def guidebook_list(request):
             if len(tags) > 0:
                 for tag in tags:
                     guidebooks = guidebooks.filter(tag=tag)
+            if like and like != 'all':
+                guidebook_likes = GuidebookLike.objects.all().values('guidebook').annotate()
+                print(guidebook_likes)
+                guidebook_ary = []
+                if guidebook_likes.count() > 0:
+                    for guidebook_like in guidebook_likes:
+                        guidebook_ary.append(guidebook_like['guidebook'])
+                if like == 'true':
+                    guidebooks = guidebooks.filter(pk__in=guidebook_ary)
+                elif like == 'false':
+                    guidebooks = guidebooks.exclude(pk__in=guidebook_ary)
 
             if image_key:
                 scenes = Scene.objects.filter(image_key__contains=image_key)
@@ -132,6 +146,7 @@ def my_guidebook_list(request):
             category = form.cleaned_data['category']
             tags = form.cleaned_data['tag']
             image_key = form.cleaned_data['image_key']
+            like = form.cleaned_data['like']
 
             guidebooks = Guidebook.objects.all().filter(
                 user=request.user
@@ -145,6 +160,18 @@ def my_guidebook_list(request):
                 for tag in tags:
                     guidebooks = guidebooks.filter(tag=tag)
 
+            if like and like != 'all':
+                guidebook_likes = GuidebookLike.objects.all().values('guidebook').annotate()
+                print(guidebook_likes)
+                guidebook_ary = []
+                if guidebook_likes.count() > 0:
+                    for guidebook_like in guidebook_likes:
+                        guidebook_ary.append(guidebook_like['guidebook'])
+                if like == 'true':
+                    guidebooks = guidebooks.filter(pk__in=guidebook_ary)
+                elif like == 'false':
+                    guidebooks = guidebooks.exclude(pk__in=guidebook_ary)
+
             if image_key:
                 scenes = Scene.objects.filter(image_key__contains=image_key)
                 guidebook_id_ary = []
@@ -152,6 +179,7 @@ def my_guidebook_list(request):
                     for s in scenes:
                         guidebook_id_ary.append(s.guidebook_id)
                 guidebooks = guidebooks.filter(pk__in=guidebook_id_ary)
+
 
     if guidebooks == None:
         guidebooks = Guidebook.objects.all().filter(
@@ -765,6 +793,7 @@ def ajax_set_start_view(request, unique_id):
         'status': 'failed',
         'message': 'Bad request'
     })
+
 @my_login_required
 def ajax_get_scene_list(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
@@ -933,4 +962,4 @@ def guidebook_delete(request, unique_id):
         messages.success(request, 'Photographer "%s" is deleted successfully.' % guidebook.name)
     else:
         messages.error(request, "This user hasn't permission")
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect('guidebook.guidebook_list')

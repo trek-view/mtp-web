@@ -28,7 +28,7 @@ from lib.functions import *
 ## Project packages
 from accounts.models import CustomUser, MapillaryUser
 from tour.models import Tour, TourSequence
-from sequence.models import TransType
+from sequence.models import TransType, SequenceLike
 ## App packages
 
 # That includes from .models import *
@@ -112,6 +112,8 @@ def tour_add_sequence(request, unique_id):
             camera_make = form.cleaned_data['camera_make']
             tags = form.cleaned_data['tag']
             transport_type = form.cleaned_data['transport_type']
+            like = form.cleaned_data['like']
+
             # start_time = form.cleaned_data['start_time']
             # end_time = form.cleaned_data['end_time']
             sequences = Sequence.objects.all().filter(
@@ -134,6 +136,17 @@ def tour_add_sequence(request, unique_id):
             if len(tags) > 0:
                 for tag in tags:
                     sequences = sequences.filter(tag=tag)
+            if like and like != 'all':
+                sequence_likes = SequenceLike.objects.all().values('sequence').annotate()
+                print(sequence_likes)
+                sequence_ary = []
+                if sequence_likes.count() > 0:
+                    for sequence_like in sequence_likes:
+                        sequence_ary.append(sequence_like['sequence'])
+                if like == 'true':
+                    sequences = sequences.filter(pk__in=sequence_ary)
+                elif like == 'false':
+                    sequences = sequences.exclude(pk__in=sequence_ary)
 
     if sequences == None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
@@ -226,6 +239,7 @@ def tour_list(request):
             name = form.cleaned_data['name']
             tags = form.cleaned_data['tour_tag']
             username = form.cleaned_data['username']
+            like = form.cleaned_data['like']
 
             tours = Tour.objects.all().filter(
                 is_published=True
@@ -239,6 +253,17 @@ def tour_list(request):
             if len(tags) > 0:
                 for tour_tag in tags:
                     tours = tours.filter(tour_tag=tour_tag)
+            if like and like != 'all':
+                tour_likes = TourLike.objects.all().values('tour').annotate()
+                print(tour_likes)
+                tour_ary = []
+                if tour_likes.count() > 0:
+                    for tour_like in tour_likes:
+                        tour_ary.append(tour_like['tour'])
+                if like == 'true':
+                    tours = tours.filter(pk__in=tour_ary)
+                elif like == 'false':
+                    tours = tours.exclude(pk__in=tour_ary)
 
     if tours == None:
         tours = Tour.objects.all().filter(is_published=True)
@@ -289,6 +314,7 @@ def my_tour_list(request):
         if form.is_valid():
             name = form.cleaned_data['name']
             tags = form.cleaned_data['tour_tag']
+            like = form.cleaned_data['like']
             tours = Tour.objects.all().filter(
                 user=request.user
             )
@@ -297,6 +323,17 @@ def my_tour_list(request):
             if len(tags) > 0:
                 for tour_tag in tags:
                     tours = tours.filter(tour_tag=tour_tag)
+            if like and like != 'all':
+                tour_likes = TourLike.objects.all().values('tour').annotate()
+                print(tour_likes)
+                tour_ary = []
+                if tour_likes.count() > 0:
+                    for tour_like in tour_likes:
+                        tour_ary.append(tour_like['tour'])
+                if like == 'true':
+                    tours = tours.filter(pk__in=tour_ary)
+                elif like == 'false':
+                    tours = tours.exclude(pk__in=tour_ary)
 
     if tours == None:
         tours = Tour.objects.all().filter(is_published=True)

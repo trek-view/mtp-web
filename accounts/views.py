@@ -11,6 +11,7 @@ from django.db.models import Avg, Count, Min, Sum
 from django.db.models.expressions import F, Window
 from django.db.models.functions.window import RowNumber
 
+
 from datetime import datetime
 from mailerlite import MailerLiteApi
 import secrets

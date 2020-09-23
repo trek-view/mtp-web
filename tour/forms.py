@@ -61,6 +61,13 @@ class TourSearchForm(forms.Form):
             required=False,
         )
 
+        self.fields['like'] = forms.ChoiceField(
+            label='Like',
+            widget=forms.RadioSelect(),
+            required=False,
+            choices=(('all', 'All'), ('true', 'Liked'), ('false', 'Unliked')),
+        )
+
     def _my(self, username):
         self.fields['username'] = forms.CharField(
             label='',

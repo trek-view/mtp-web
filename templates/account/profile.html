@@ -130,32 +130,36 @@
         <div class="row">
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
-                    <div class="users">
-                        <a href="/guidebook/list?username={{ current_user.username }}">Guidebooks created({{ guidebooks_count }})</a>
+                    <div class="users h-100 d-flex flex-column justify-content-between">
+                        <a class="btn btn-outline-info" href="/guidebook/list?username={{ current_user.username }}">Guidebooks created({{ guidebooks_count }})</a>
+                        <a class="btn btn-outline-info" href="/guidebook/list?username={{ current_user.username }}&like=true">Guidebooks liked({{ guide_like_count }})</a>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
-                    <div class="users">
-                        <a href="/tour/list?username={{ current_user.username }}">Tours created({{ tours_count }})</a>
+                    <div class="users h-100 d-flex flex-column justify-content-between">
+                        <a class="btn btn-outline-info" href="/tour/list?username={{ current_user.username }}">Tours created({{ tours_count }})</a>
+                        <a class="btn btn-outline-info" href="/tour/list?username={{ current_user.username }}&like=true">Tours liked({{ tour_like_count }})</a>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
-                    <div class="users">
-                        <a href="/sequence/list?username={{ current_user.username }}">Sequences Created({{ sequences_count }})</a>
+                    <div class="users h-100 d-flex flex-column justify-content-between">
+                        <a class="btn btn-outline-info" href="/sequence/list?username={{ current_user.username }}">Sequences Created({{ sequences_count }})</a>
+                        <a class="btn btn-outline-info" href="/sequence/list?username={{ current_user.username }}&like=true">Sequences liked({{ seq_like_count }})</a>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
-                    <div class="users">
-                        <a href="/sequence/list?username={{ current_user.username }}">Viewpoints received({{ view_point_count }})</a>
+                    <div class="users h-100 d-flex flex-column justify-content-between">
+                        <a class="btn btn-outline-info" href="/sequence/list?username={{ current_user.username }}">Viewpoints received({{ view_point_count }})</a>
+                        <a class="btn btn-outline-info" href="/sequence/list?username={{ current_user.username }}&like=true">Viewpoints marked({{ marked_point_count }})</a>
                     </div>
                 </div>
             </div>

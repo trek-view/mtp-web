@@ -72,6 +72,7 @@ def sequence_list(request):
             tags = form.cleaned_data['tag']
             transport_type = form.cleaned_data['transport_type']
             username = form.cleaned_data['username']
+            like = form.cleaned_data['like']
 
             sequences = Sequence.objects.all().filter(
                 is_published=True
@@ -96,6 +97,17 @@ def sequence_list(request):
             if len(tags) > 0:
                 for tag in tags:
                     sequences = sequences.filter(tag=tag)
+            if like and like != 'all':
+                sequence_likes = SequenceLike.objects.all().values('sequence').annotate()
+                print(sequence_likes)
+                sequence_ary = []
+                if sequence_likes.count() > 0:
+                    for sequence_like in sequence_likes:
+                        sequence_ary.append(sequence_like['sequence'])
+                if like == 'true':
+                    sequences = sequences.filter(pk__in=sequence_ary)
+                elif like == 'false':
+                    sequences = sequences.exclude(pk__in=sequence_ary)
 
     if sequences == None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
@@ -157,6 +169,7 @@ def my_sequence_list(request):
             camera_make = form.cleaned_data['camera_make']
             tags = form.cleaned_data['tag']
             transport_type = form.cleaned_data['transport_type']
+            like = form.cleaned_data['like']
 
             sequences = Sequence.objects.all().filter(
                 user=request.user
@@ -178,6 +191,17 @@ def my_sequence_list(request):
             if len(tags) > 0:
                 for tag in tags:
                     sequences = sequences.filter(tag=tag)
+            if like and like != 'all':
+                sequence_likes = SequenceLike.objects.all().values('sequence').annotate()
+                print(sequence_likes)
+                sequence_ary = []
+                if sequence_likes.count() > 0:
+                    for sequence_like in sequence_likes:
+                        sequence_ary.append(sequence_like['sequence'])
+                if like == 'true':
+                    sequences = sequences.filter(pk__in=sequence_ary)
+                elif like == 'false':
+                    sequences = sequences.exclude(pk__in=sequence_ary)
 
     if sequences == None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)

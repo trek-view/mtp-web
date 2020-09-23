@@ -414,17 +414,27 @@
 
     mapboxgl.accessToken = mapboxToken;
     if (scene_positions.length > 0)
+    {
         var first_point = scene_positions[0];
-    else
-        var first_point = [-87.622088, 41.878781];
-    console.log(first_point);
-    var map = new mapboxgl.Map({
-        container: 'map', // container id
-        style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
-        center: first_point, // starting position
-        zoom: 14, // starting zoom
-        attributionControl: false
-    });
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+            center: first_point, // starting position
+            zoom: 14, // starting zoom
+            attributionControl: false
+        });
+    }
+
+    else {
+        var first_point = null;
+
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+            zoom: -2, // starting zoom
+            attributionControl: false
+        });
+    }
 
     map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
     map.on('load', function() {
@@ -447,30 +457,31 @@
         });
         if (map.getLayer('markers')) map.removeLayer('markers');
         if (map.getSource('markers')) map.removeSource('markers');
-        map.addSource('markers', {
-             type: 'geojson',
-             data: {
-                 type: 'Feature',
-                 geometry: {
-                     type: 'Point',
-                     coordinates: first_point
-                 },
-                 properties: {
-                     title: 'You are here!',
-                     'marker-symbol': 'marker'
+        if (first_point != null) {
+            map.addSource('markers', {
+                 type: 'geojson',
+                 data: {
+                     type: 'Feature',
+                     geometry: {
+                         type: 'Point',
+                         coordinates: first_point
+                     },
+                     properties: {
+                         title: 'You are here!',
+                         'marker-symbol': 'marker'
+                     }
                  }
-             }
-        });
-        map.addLayer({
-             id: 'markers',
-             type: 'circle',
-             source: 'markers',
-             paint: {
-                 "circle-color": "#e0400e",
-                 "circle-radius": 9
-             }
-        });
-
+            });
+            map.addLayer({
+                 id: 'markers',
+                 type: 'circle',
+                 source: 'markers',
+                 paint: {
+                     "circle-color": "#e0400e",
+                     "circle-radius": 9
+                 }
+            });
+        }
     });
 
     // Create a popup, but don't add it to the map yet.

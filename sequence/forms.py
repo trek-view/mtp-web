@@ -122,6 +122,12 @@ class SequenceSearchForm(forms.Form):
             create_missing=False,
             required=False,
         )
+        self.fields['like'] = forms.ChoiceField(
+            label='Like',
+            widget=forms.RadioSelect(),
+            required=False,
+            choices=(('all', 'All'), ('true', 'Liked'), ('false', 'Unliked')),
+        )
 
     def _my(self, username):
         self.fields['username'] = forms.CharField(
@@ -158,4 +164,9 @@ class SequenceSearchForTourForm(forms.Form):
             create_missing=False,
             required=False,
         )
-
+        self.fields['like'] = forms.ChoiceField(
+            label='Like',
+            widget=forms.RadioSelect(),
+            required=False,
+            choices=(('all', 'All'), ('true', 'Liked'), ('false', 'Unliked')),
+        )
