@@ -278,3 +278,16 @@ body {
     }
 }
 
+.detail-modal {
+    position: fixed;
+    left: unset;
+    /* bottom: 0 !important; */
+    right: 0 !important;
+    z-index: 1050;
+    display: none;
+    width: 400px;
+    /* height: 250px; */
+    overflow: hidden;
+    outline: 0;
+    max-height: calc(100vh - 110px);
+}

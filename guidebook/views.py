@@ -963,3 +963,21 @@ def guidebook_delete(request, unique_id):
     else:
         messages.error(request, "This user hasn't permission")
     return redirect('guidebook.guidebook_list')
+
+def ajax_get_detail(request, unique_id):
+    guidebook = Guidebook.objects.get(unique_id=unique_id)
+    if guidebook.user == request.user:
+        is_mine = True
+    else:
+        is_mine = False
+    serialized_obj = serializers.serialize('json', [guidebook, ])
+    data = {
+        'guidebook': json.loads(serialized_obj)
+    }
+
+    if not data['guidebook']:
+        data['message'] = "The guidebook id doesn't exist."
+    else:
+        data['guidebook_html_detail'] = render_to_string('guidebook/modal_detail.html', {'guidebook': guidebook, 'is_mine': is_mine})
+
+    return JsonResponse(data)

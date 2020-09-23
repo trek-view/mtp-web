@@ -162,31 +162,31 @@
                                         </div>
 
                                     </div>
+
                                     <div class="guidebook-others">
-                                            <div class="scenes text-center">
-                                                {% if guidebook.getSceneCount == 0 %}
-                                                    <img src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
-                                                {% else %}
-                                                    <img src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
-                                                {% endif %}
-                                                <p class="text-center m-0">
-                                                    {{ guidebook.getSceneCount }} Photos
-                                                </p>
-                                            </div>
-                                            <div class="like text-center">
-                                                {% if guidebook.getLikeCount == 0 %}
-                                                    <img src="{% static 'images/icon/icons8-love-100.png' %}" />
-                                                {% else %}
-                                                    <img src="{% static 'images/icon/icons8-love-48.png' %}" />
-                                                {% endif %}
-                                                <p class="text-center m-0">
-                                                    {{ guidebook.getLikeCount }} Likes
-                                                </p>
-                                            </div>
+                                        <div class="scenes text-center">
+                                            {% if guidebook.getSceneCount == 0 %}
+                                                <img src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                                            {% else %}
+                                                <img src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                                            {% endif %}
+                                            <p class="text-center m-0">
+                                                {{ guidebook.getSceneCount }} Photos
+                                            </p>
                                         </div>
+                                        <div class="like text-center">
+                                            {% if guidebook.getLikeCount == 0 %}
+                                                <img src="{% static 'images/icon/icons8-love-100.png' %}" />
+                                            {% else %}
+                                                <img src="{% static 'images/icon/icons8-love-48.png' %}" />
+                                            {% endif %}
+                                            <p class="text-center m-0">
+                                                {{ guidebook.getLikeCount }} Likes
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
                     {% endfor %}
                 {% else %}
@@ -224,6 +224,9 @@
             </div>
         </div>
         <div class="d-none" id="map"></div>
+    </div>
+
+    <div class="detail-modal modal fade" style="padding-top: 140px !important;" id="guidebookDetailModal">
     </div>
 </div>
 
@@ -377,12 +380,10 @@
                     }
                 });
             }
-        )
-
+        );
 
         map.on('click', 'points', function (e) {
-            gotoDetail(e.features[0].properties.guidebook_id);
-
+            getGuidebookDetail(e.features[0].properties.guidebook_id);
         });
 
         // Change the cursor to a pointer when the mouse is over the states layer.
@@ -395,6 +396,30 @@
             map.getCanvas().style.cursor = '';
         });
     });
+
+    function getGuidebookDetail(id) {
+        var url = "{% url 'guidebook.ajax_get_detail' unique_id='unique_id' %}";
+        url = url.replace('unique_id', id);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (!data.guidebook) {
+                    toastr.error(data.message);
+                }
+                else {
+                    console.log(data)
+                    $('#guidebookDetailModal').html(data.guidebook_html_detail)
+                    $('#guidebookDetailModal').modal({
+                        'backdrop': false,
+                        'show': true,
+                    });
+                }
+            }
+        });
+    }
 
 
     function gotoDetail(id) {

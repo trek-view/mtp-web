@@ -233,6 +233,9 @@
         </div>
         <div class="d-none" id="map"></div>
     </div>
+
+    <div class="detail-modal modal fade" style="padding-top: 140px !important;" id="sequenceDetailModal">
+    </div>
 </div>
 
 {% endblock %}
@@ -391,7 +394,7 @@
 
 
         map.on('click', 'points', function (e) {
-            gotoDetail(e.features[0].properties.sequence_id);
+            getSequenceDetail(e.features[0].properties.sequence_id);
 
         });
 
@@ -405,6 +408,29 @@
             map.getCanvas().style.cursor = '';
         });
     });
+
+    function getSequenceDetail(id) {
+        var url = "{% url 'sequence.ajax_get_detail' unique_id='unique_id' %}";
+        url = url.replace('unique_id', id);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (!data.sequence) {
+                    toastr.error(data.message);
+                }
+                else {
+                    $('#sequenceDetailModal').html(data.sequence_html_detail)
+                    $('#sequenceDetailModal').modal({
+                        'backdrop': false,
+                        'show': true,
+                    });
+                }
+            }
+        });
+    }
 
 
     function gotoDetail(id) {

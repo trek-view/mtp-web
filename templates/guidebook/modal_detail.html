@@ -1,0 +1,23 @@
+{% load static %}
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="guidebookDetailModalTitle">{{ guidebook.name }}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div>
+                <div class="guidebook-description">
+                    <p>
+                        {{ guidebook.description }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer d-flex flex-row justify-content-end">
+            <a type="button" href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}" id="show_guidebook" class="btn btn-success text-light" >Go to Detail Page</a>
+        </div>
+    </div>
+</div>

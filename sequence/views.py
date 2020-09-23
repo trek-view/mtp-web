@@ -1185,3 +1185,22 @@ def ajax_get_image_ele(request, unique_id):
         'message': '',
         'eles': ele_ary
     })
+
+
+def ajax_get_detail(request, unique_id):
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if sequence.user == request.user:
+        is_mine = True
+    else:
+        is_mine = False
+    serialized_obj = serializers.serialize('json', [sequence, ])
+    data = {
+        'sequence': json.loads(serialized_obj)
+    }
+
+    if not data['sequence']:
+        data['message'] = "The sequence id doesn't exist."
+    else:
+        data['sequence_html_detail'] = render_to_string('sequence/modal_detail.html', {'sequence': sequence, 'is_mine': is_mine})
+
+    return JsonResponse(data)

@@ -1,0 +1,23 @@
+{% load static %}
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="sequenceDetailModalTitle">{{ sequence.name }}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div>
+                <div class="sequence-description">
+                    <p>
+                        {{ sequence.description }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer d-flex flex-row justify-content-end">
+            <a type="button" href="{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}" id="show_sequence" class="btn btn-success text-light" >Go to Detail Page</a>
+        </div>
+    </div>
+</div>

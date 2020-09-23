@@ -199,6 +199,9 @@
         </div>
         <div class="d-none" id="map"></div>
     </div>
+
+    <div class="detail-modal modal fade" style="padding-top: 140px !important;" id="tourDetailModal">
+    </div>
 </div>
 
 {% endblock %}
@@ -352,7 +355,7 @@
 
 
         map.on('click', 'points', function (e) {
-            gotoDetail(e.features[0].properties.tour_id);
+            getTourDetail(e.features[0].properties.tour_id);
 
         });
 
@@ -366,6 +369,30 @@
             map.getCanvas().style.cursor = '';
         });
     });
+
+    function getTourDetail(id) {
+        var url = "{% url 'tour.ajax_get_detail' unique_id='unique_id' %}";
+        url = url.replace('unique_id', id);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (!data.tour) {
+                    toastr.error(data.message);
+                }
+                else {
+                    console.log(data)
+                    $('#tourDetailModal').html(data.tour_html_detail)
+                    $('#tourDetailModal').modal({
+                        'backdrop': false,
+                        'show': true,
+                    });
+                }
+            }
+        });
+    }
 
 
     function gotoDetail(id) {

@@ -667,3 +667,21 @@ def ajax_tour_check_like(request, unique_id):
             'is_checked': True,
             'liked_count': liked_count
         })
+
+def ajax_get_detail(request, unique_id):
+    tour = Tour.objects.get(unique_id=unique_id)
+    if tour.user == request.user:
+        is_mine = True
+    else:
+        is_mine = False
+    serialized_obj = serializers.serialize('json', [tour, ])
+    data = {
+        'tour': json.loads(serialized_obj)
+    }
+
+    if not data['tour']:
+        data['message'] = "The tour id doesn't exist."
+    else:
+        data['tour_html_detail'] = render_to_string('tour/modal_detail.html', {'tour': tour, 'is_mine': is_mine})
+
+    return JsonResponse(data)
