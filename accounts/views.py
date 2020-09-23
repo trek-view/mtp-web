@@ -132,7 +132,7 @@ def check_mapillary_oauth(request):
             messages.error(request, "Unauthorized for Mapillary")
             return redirect('home')
 
-        data = MapillaryUser.objects.filter(key=map_user_data['key'], user=request.user)
+        data = MapillaryUser.objects.filter(user=request.user)
         if data.count() == 0:
             map_user = MapillaryUser()
         else:
