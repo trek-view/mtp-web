@@ -119,39 +119,46 @@ class SequenceImport(APIView):
         data = request.data
         message = ''
 
-        google_street_view = data['google_street_view']
-        strava = data['strava']
 
-        if not google_street_view is None:
+
+
+        if 'google_street_view' in data.keys():
+            google_street_view = data['google_street_view']
             print(google_street_view)
             sequence.google_street_view = google_street_view
             message += 'Google Street View is updated \n'
             sequence.save()
 
-        if not strava is None:
+        if 'strava' in data.keys():
+            strava = data['strava']
             print(strava)
             sequence.strava = strava
             message += 'Strava is updated \n'
             sequence.save()
 
-        token = data['mapillary_user_token']
 
-        if token is None:
+
+        if not 'mapillary_user_token' in data.keys():
             if message != '':
                 return Response({'message': message, 'status': True})
             else:
                 return Response({'error': 'Mapillary token is missing', 'status': False})
+
+        token = data['mapillary_user_token']
+
         mapillary = Mapillary(token, source='mtpdu')
         map_user_data = mapillary.get_mapillary_user()
         if not map_user_data:
             return Response({'error': 'Mapillary token is invalid', 'status': False})
 
-        seq_key = data['mapillary_sequence_key']
-        if not seq_key or seq_key is None:
+
+        if not 'mapillary_sequence_key' in data.keys():
             if message != '':
                 return Response({'message': message, 'status': True})
             else:
                 return Response({'error': 'Sequence key is missing', 'status': False})
+
+        seq_key = data['mapillary_sequence_key']
 
         sequence_json = mapillary.get_sequence_by_key(seq_key)
         print('sequence_json')
