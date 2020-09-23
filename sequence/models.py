@@ -108,6 +108,9 @@ class Sequence(models.Model):
     is_mapillary = models.BooleanField(default=True)
     is_published = models.BooleanField(default=True)
 
+    google_street_view = models.BooleanField(default=False)
+    strava = models.BooleanField(default=False)
+
     def getImageCount(self):
         if not self.coordinates_image is None:
             return len(self.coordinates_image)

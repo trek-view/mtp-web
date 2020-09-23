@@ -112,23 +112,46 @@ class SequenceImport(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, unique_id, version='v1'):
+        sequence = Sequence.objects.get(unique_id=unique_id)
+        if not sequence or sequence is None:
+            return Response({'error': 'Sequence id is invalid', 'status': False})
+
         data = request.data
+        message = ''
+
+        google_street_view = data['google_street_view']
+        strava = data['strava']
+
+        if not google_street_view is None:
+            print(google_street_view)
+            sequence.google_street_view = google_street_view
+            message += 'Google Street View is updated \n'
+            sequence.save()
+
+        if not strava is None:
+            print(strava)
+            sequence.strava = strava
+            message += 'Strava is updated \n'
+            sequence.save()
+
         token = data['mapillary_user_token']
 
         if token is None:
-            return Response({'error': 'Mapillary token is missing', 'status': False})
+            if message != '':
+                return Response({'message': message, 'status': True})
+            else:
+                return Response({'error': 'Mapillary token is missing', 'status': False})
         mapillary = Mapillary(token, source='mtpdu')
         map_user_data = mapillary.get_mapillary_user()
         if not map_user_data:
             return Response({'error': 'Mapillary token is invalid', 'status': False})
 
-        sequence = Sequence.objects.get(unique_id=unique_id)
-        if not sequence or sequence is None:
-            return Response({'error': 'Sequence id is invalid', 'status': False})
-
         seq_key = data['mapillary_sequence_key']
         if not seq_key or seq_key is None:
-            return Response({'error': 'Sequence key is missing', 'status': False})
+            if message != '':
+                return Response({'message': message, 'status': True})
+            else:
+                return Response({'error': 'Sequence key is missing', 'status': False})
 
         sequence_json = mapillary.get_sequence_by_key(seq_key)
         print('sequence_json')
@@ -203,7 +226,7 @@ class SequenceImport(APIView):
 
         return JsonResponse({
             'status': 'success',
-            'message': 'Sequence successfully was imported. Sequence will be published in about 30 minutes.',
+            'message': 'Sequence successfully was imported. Sequence will be published in about 10 minutes.',
             'unique_id': str(sequence.unique_id)
         })
 
