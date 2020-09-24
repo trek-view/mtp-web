@@ -176,6 +176,9 @@
             <button class="btn btn-info" onclick="hide_image_detail_box()">
                 Back to Sequence
             </button>
+            <div class="switch-detection mt-2">
+                <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
+            </div>
         </div>
         <div class="image-detail">
             <div class="" id="image_detail_box">
@@ -215,6 +218,7 @@
                         </div>
                     </div>
                 {% endif %}
+
                 <div id='sequence_viewer' class="image-box display"></div>
             </div>
             <div class="show-or-hide">
@@ -234,6 +238,8 @@
 <script src="{% static 'js/mapillary.js' %}"></script>
 <script src="{% static 'js/chart.min.js' %}"></script>
 <script>
+
+
 
     var ctx = document.getElementById('myChart').getContext('2d');
 
@@ -483,13 +489,16 @@
             component: {
                 cover: false,
                 tag: true,
+                popup: true,
             },
         }
     );
     mapillaryViewer.on(Mapillary.Viewer.nodechanged, function (node) {
+        tagComponent.removeAll();
         current_node_point = [node.latLon.lat, node.latLon.lon];
         current_node_key = node.key;
         current_order_number = image_keys.indexOf(current_node_key);
+
         if (map.getLayer('markers')) map.removeLayer('markers');
         if (map.getSource('markers')) map.removeSource('markers');
         map.addSource('markers', {
@@ -515,6 +524,7 @@
                  "circle-radius": 9
              }
         });
+
         map.flyTo({center: [current_node_point[1], current_node_point[0]]});
         if (first_move) {
             first_move = false;
@@ -652,6 +662,7 @@
     function show_image_detail(image_key) {
         var url = "{% url 'sequence.ajax_get_image_detail' unique_id=sequence.unique_id image_key='image_key' %}";
         url = url.replace('image_key', image_key);
+
         $.ajax({
             url: url,
             type: 'GET',
@@ -667,8 +678,12 @@
                     if (is_opened_side_bar)
                         $('.image-detail-box').removeClass('d-none');
                     $('#image_detail_box').html(data.image_detail_box_html);
+                    if ($('#switch_detection').prop('checked')) {
+                        getDetection(image_key);
+                    }
                     $('.right-board .image-view-point span').text(data.view_points + ' View Points');
                 }
+
             }
         });
     }
@@ -754,12 +769,11 @@
 
     }
 
-    var ele_ary = []
+    var ele_ary = [];
     console.log(positions[0].length)
     function getEleByAsyncFalse(lng, lat) {
 
     }
-
 
     function drawChart() {
         var url = "{% url 'sequence.ajax_get_image_ele' unique_id=sequence.unique_id %}"
@@ -817,6 +831,172 @@
 
     drawChart()
 
+    var detect_ary = {};
+    var tagComponent = mapillaryViewer.getComponent("tag");
+    var polygon_tag_ary = [];
+
+    function getDetection(image_key, types = ['trafficsigns', 'segmentations', 'instances']) {
+        detect_ary = {};
+        polygon_tag_ary = [];
+        for (var k=0; k<types.length; k++) {
+            drawDetection(image_key, types[k])
+        }
+    }
+
+    function updateDetectionInSidebar() {
+        var html = '';
+        jQuery.each(detect_ary, function(i, val) {
+            console.log(i);
+            html += '<div class="border detection-tag"><span>' + i + ' <span style="color: #2F96B4">' + val + '</span></span></div>';
+        });
+        $('.image-detail .detections').html(html)
+    }
+
+    function drawDetection(image_key, type) {
+        $.ajax({
+            url: "https://a.mapillary.com/v3/object_detections/" + type + "?client_id=" + mapillaryClientId + "&image_keys=" + image_key,
+            success: function(data){
+                console.log(data);
+                var features = data.features;
+                var polygon_ary = []
+                for (var i=0; i<features.length; i++) {
+                    var properties = features[i].properties;
+                    var polygon = properties.shape.coordinates[0];
+                    var value = properties.value;
+                    polygon_ary.push(polygon);
+                    if (detect_ary.hasOwnProperty(value)) {
+                        detect_ary[value]++;
+                    }
+                    else {
+                        detect_ary[value] = 1;
+                    }
+                }
+                console.log(detect_ary);
+                updateDetectionInSidebar();
+                var regularColor = 0xffff00;
+                var regularOpacity = 0.2;
+
+                var hoverColor = 0xffa500;
+                var hoverOpacity = 0.5;
+
+                // Retrieve tag component
+
+
+                    // Create an outline tag showing a polygon with options options
+                var polygon = null;
+                var polygonGeometry = null;
+
+                var polygonTag = null;
+                for (var i=0; i<polygon_ary.length; i++) {
+                    polygon = polygon_ary[i]
+                    polygonGeometry = new Mapillary.TagComponent.PolygonGeometry(polygon);
+                    polygonTag = new Mapillary.TagComponent.OutlineTag(
+                        type + '_polygonTag_' + i,
+                        polygonGeometry,
+                        {
+                            fillColor: regularColor,
+                            fillOpacity: regularOpacity,
+                            lineColor: regularColor,
+                        });
+                    polygon_tag_ary.push(polygonTag)
+                }
+
+                // State
+                var tags = {};
+
+                for (var i=0; i<polygon_tag_ary.length; i++) {
+                    tags[polygon_tag_ary[i].id] = polygon_tag_ary[i];
+                }
+                var hoveredTag = null;
+
+                var lastPos = null;
+
+                // Functions for setting colors and changing hovered tag
+                var setRegularColors = function(tag) {
+                    if (tag == 'undefined')
+                        return;
+                    tag.setOptions({
+                        fillColor: regularColor,
+                        fillOpacity: regularOpacity,
+                        lineColor: regularColor,
+                    });
+                };
+
+                var setHoverColors = function(tag) {
+                    if (tag == 'undefined' || tag == undefined)
+                        return;
+                    tag.setOptions({
+                        fillColor: hoverColor,
+                        fillOpacity: hoverOpacity,
+                        lineColor: hoverColor,
+                        text: tag.id
+                    });
+                }
+
+                var setHoveredTag = function(pixelPoint) {
+                    tagComponent.getTagIdsAt(pixelPoint)
+                        .then(function(tagIds) {
+                            if (tagIds.length > 0) {
+                                var hoveredTagId = tagIds[0];
+                                if (hoveredTag != null && hoveredTag.id !== hoveredTagId) {
+                                    setRegularColors(hoveredTag);
+                                    hoveredTag = null;
+                                }
+
+                                if (hoveredTag == null) {
+                                    hoveredTag = tags[hoveredTagId];
+                                    setHoverColors(hoveredTag);
+                                }
+                            } else {
+                                if (hoveredTag != null) {
+                                    setRegularColors(hoveredTag);
+                                    hoveredTag = null;
+                                }
+                            }
+                        });
+                }
+
+                // Viewer event handling
+                // Listen to mousemove, mouseover and mouseup (which occurs
+                // just before a moveend) to set hovered tag and to keep
+                // track of last position.
+                var onMouseEvent = function(event) {
+                    lastPos = event.pixelPoint;
+                    setHoveredTag(event.pixelPoint);
+                }
+
+                mapillaryViewer.on("mousemove", onMouseEvent);
+                mapillaryViewer.on("mouseup", onMouseEvent);
+                mapillaryViewer.on("mouseover", onMouseEvent);
+
+                mapillaryViewer.on("mouseout", function(event) {
+                    lastPos = null;
+                    if (hoveredTag != null) {
+                        setRegularColors(hoveredTag);
+                        hoveredTag = null;
+                    }
+                });
+
+                // Change hovered tag on mouse end if last position is
+                // defined (i.e. mouse is over Viewer).
+                mapillaryViewer.on("moveend", function(event) {
+                    if (lastPos != null) {
+                        setHoveredTag(lastPos);
+                    }
+                });
+                tagComponent.add(polygon_tag_ary);
+            }
+        });
+    }
+
+    $('#switch_detection').change(function () {
+        if ($(this).prop('checked')) {
+            getDetection(current_node_key);
+        }
+        else {
+            tagComponent.removeAll();
+        }
+    })
 
 
 </script>

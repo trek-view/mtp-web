@@ -186,3 +186,13 @@ body {
     padding-top: 0px;
     padding-bottom: 0px;
 }
+
+.detection-tag {
+    margin: 3px;
+    white-space: nowrap;
+    padding: 1px;
+}
+
+.switch-detection > div {
+    width: 100px !important;
+}
