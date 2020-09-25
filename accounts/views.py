@@ -23,7 +23,7 @@ from lib.badge import get_finder_label, get_guidebook_label, get_mapper_label, g
 
 from .models import CustomUser, MapillaryUser
 from .forms import UserSignUpForm, UserProfileForm, UserAvatarForm, UserUpdateForm
-from sequence.models import Sequence, ImageViewPoint, SequenceLike
+from sequence.models import Sequence, ImageViewPoint, SequenceLike, ImageLabel, Image
 from tour.models import Tour, TourLike
 from guidebook.models import Guidebook, GuidebookLike
 UserModel = get_user_model()
@@ -199,10 +199,13 @@ def profile(request, username):
             tourLikes = TourLike.objects.filter(tour=tour)
             tourLikeCount += tourLikes.count()
 
+    imageLabels = ImageLabel.objects.filter(user=user)
+    imageLabelCount = imageLabels.count()
+
     mapper_label = get_mapper_label(imageCount)
     guidebook_label = get_guidebook_label(guidebookCount)
     finder_label = get_finder_label(imageViewPointCount)
-    spotter_label = get_spotter_label()
+    spotter_label = get_spotter_label(imageLabelCount)
 
 
 
