@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.db.models import Avg, Count, Min, Sum
 from django.db.models.expressions import F, Window
 from django.db.models.functions.window import RowNumber
-
+from .core import CustomRedirectView
 
 from datetime import datetime
 from mailerlite import MailerLiteApi
@@ -157,6 +157,11 @@ def check_mapillary_oauth(request):
     else:
         messages.error(request, 'Error, mapillary invalid token!')
         return redirect('home')
+
+
+def check_mtpu_mapillary_oauth(request):
+    return redirect()
+
 
 def profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
@@ -314,8 +319,29 @@ def ajax_user_update(request):
             }
         })
 
-
     return JsonResponse({
         'status': 'failed',
         'message': "You can't access."
     })
+
+
+class BaseTokenRedirectView(CustomRedirectView):
+    query_string = True
+    name = ''
+
+    def __init__(self, *args, **kwargs):
+        self.url = '{}://{}'.format(settings.MTPU_SCHEME, self.name)
+
+        super(BaseTokenRedirectView, self).__init__(**kwargs)
+
+
+class MapillaryTokenRedirectView(BaseTokenRedirectView):
+    name = 'mapillary'
+
+
+class GoogleTokenRedirectView(BaseTokenRedirectView):
+    name = 'google'
+
+
+class StravaTokenRedirectView(BaseTokenRedirectView):
+    name = 'strava'

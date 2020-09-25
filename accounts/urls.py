@@ -40,5 +40,8 @@ urlpatterns = [
     path('ajax_user_update', views.ajax_user_update, name='account.ajax_user_update'),
 
     path('check-mapillary-oauth', views.check_mapillary_oauth, name='check_mapillary_oauth'),
+    path('check-mtpu-mapillary-oauth', views.MapillaryTokenRedirectView.as_view(), name='check_mtpu_mapillary_oauth'),
+    path('check-mtpu-google-oauth', views.GoogleTokenRedirectView.as_view(), name='check_mtpu_google_oauth'),
+    path('check-mtpu-strava-oauth', views.StravaTokenRedirectView.as_view(), name='check_mtpu_strava_oauth'),
     path('', include('oauth2_provider.urls', namespace='oauth2_provider')),
 ]
