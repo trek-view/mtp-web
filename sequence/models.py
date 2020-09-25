@@ -15,6 +15,7 @@ from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from django.core.files import File
 from urllib.request import urlretrieve
+from colorful.fields import RGBColorField
 
 UserModel = get_user_model()
 
@@ -66,6 +67,38 @@ class TransType(MPTTModel):
 
     class Meta:
         verbose_name_plural = 'Transport Type'
+
+class LabelType(MPTTModel):
+    name = models.CharField(max_length=100, unique=True)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    description = models.TextField(blank=True, null=True)
+    # type is one of "point" and "polygon"
+    # type = models.CharField(max_length=50, choices=(('point', 'point'), ('polygon', 'polygon'),), default='point')
+    type = models.CharField(max_length=50, choices=(('polygon', 'polygon'),), default='polygon')
+    color = RGBColorField(default='#ffffff')
+
+
+    def __str__(self):
+        if self.parent is None:
+            return self.name
+        else:
+            return self.parent.name + '--' + self.name
+
+    def getKey(self):
+        if self.parent is None:
+            key = self.name
+        else:
+            key = self.parent.name + '--' + self.name
+        key = key.replace(' ', '-')
+        key = key.lower()
+        return key
+
+    class MPTTMeta:
+        level_attr = 'mptt_level'
+        order_insertion_by = ['name']
+
+    class Meta:
+        verbose_name_plural = 'Image Label Type'
 
 def getAllCaptureType():
     items = TransType.objects.all()
@@ -237,6 +270,8 @@ class Image(models.Model):
 
     mapillary_image = models.ImageField(upload_to=image_directory_path, null=True, blank=True)
 
+    image_label = models.ManyToManyField(LabelType, through='ImageLabel')
+
     def getSequence(self):
         if self.seq_key != '':
             sequence = Sequence.objects.get(seq_key=self.seq_key)
@@ -288,3 +323,12 @@ class SequenceLike(models.Model):
 class ImageViewPoint(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
+
+class ImageLabel(models.Model):
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    image = models.ForeignKey(Image, on_delete=models.CASCADE)
+    label_type = models.ForeignKey(LabelType, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=datetime.now, blank=True)
+    point = models.PointField(null=True, blank=True)
+    polygon = models.PolygonField(null=True, blank=True)
