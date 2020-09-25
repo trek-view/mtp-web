@@ -309,29 +309,32 @@
 
     var current_page = '0';
 
-    function goto_page(pageNum) {
-        current_page = pageNum;
+    function goto_page(pageNum, image_key='') {
         $.ajax({
             url: '{% url "sequence.ajax_get_image_list" unique_id=sequence.unique_id %}',
             type: 'GET',
-            data: {'page': pageNum},
+            data: {'page': pageNum, 'image_key': image_key},
             dataType: 'json',
             success: function (data) {
                 if (data.status == 'failed')
                     toastr.error(data.message);
                 else
                 {
+                    current_page = data.page;
                     var href = location.protocol + '//' + location.host + location.pathname ;
                     history.pushState({
                         id: 'Sequence Detail'
-                    }, "{{ pageTitle }}", href + '?page=' + pageNum);
+                    }, "{{ pageTitle }}", href + '?page=' + data.page);
                     $('#image_list').html(data.image_list_box_html);
+                    if (data.image_key != null) {
+                        show_image_detail(data.image_key)
+                    }
                 }
             }
         });
     }
 
-    goto_page("{{ page }}");
+    goto_page("{{ page }}", "{{ image_key }}");
 
     mapboxgl.accessToken = mapboxToken;
     // Create a popup, but don't add it to the map yet.
@@ -689,6 +692,13 @@
         var url = "{% url 'sequence.ajax_get_image_detail' unique_id=sequence.unique_id image_key='image_key' %}";
         url = url.replace('image_key', image_key);
 
+        var href = location.protocol + '//' + location.host + location.pathname ;
+        var page = current_page;
+        console.log(href)
+        history.pushState({
+            id: 'Image Detail'
+        }, "{{ pageTitle }}", href + '?page=' + page + '&image_key=' + image_key);
+
         $.ajax({
             url: url,
             type: 'GET',
@@ -704,6 +714,7 @@
                         $('.image-detail-box').removeClass('d-none');
                     $('#image_detail_box').html(data.image_detail_box_html);
                     $('.right-board .image-view-point span').text(data.view_points + ' View Points');
+
                 }
 
             }

@@ -248,6 +248,176 @@ def my_sequence_list(request):
     }
     return render(request, 'sequence/list.html', content)
 
+def image_leaderboard(request):
+    images = None
+    page = 1
+    m_type = None
+    image_view_points = ImageViewPoint.objects.filter()
+    if request.method == "GET":
+        page = request.GET.get('page')
+        if page is None:
+            page = 1
+        form = ImageSearchForm(request.GET)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            camera_makes = form.cleaned_data['camera_make']
+            camera_models = form.cleaned_data['camera_model']
+            transport_type = form.cleaned_data['transport_type']
+
+            images = Image.objects.all()
+            if not camera_makes is None and len(camera_makes) > 0:
+                images = images.filter(camera_make__in=camera_makes)
+            if not camera_models is None and len(camera_models) > 0:
+                images = images.filter(camera_model__in=camera_models)
+
+            if transport_type and transport_type != 0 and transport_type != '':
+                children_trans_type = TransType.objects.filter(parent_id=transport_type)
+                if children_trans_type.count() > 0:
+                    types = []
+                    types.append(transport_type)
+                    for t in children_trans_type:
+                        types.append(t.pk)
+                    sequences = Sequence.objects.filter(transport_type_id__in=types)
+                else:
+                    sequences = Sequence.objects.filter(transport_type_id=transport_type)
+
+                images = images.filter(sequence__in=sequences)
+
+            m_type = request.GET.get('type')
+            if username and username != '':
+                if m_type is None or m_type == 'received':
+                    users = CustomUser.objects.filter(username__contains=username)
+                    images = images.filter(user__in=users)
+                elif m_type == 'marked':
+                    users = CustomUser.objects.filter(username__contains=username)
+                    image_view_points = image_view_points.filter(user__in=users)
+
+    if images == None:
+        images = Image.objects.all()
+
+
+    image_view_points_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
+        rank=Window(expression=RowNumber()))
+
+    paginator = Paginator(image_view_points_json, 10)
+    page = 1
+    page = request.GET.get('page')
+    if not page or page is None:
+        page = 1
+    try:
+        pItems = paginator.page(page)
+    except PageNotAnInteger:
+        pItems = paginator.page(1)
+    except EmptyPage:
+        pItems = paginator.page(paginator.num_pages)
+
+    first_num = 1
+    last_num = paginator.num_pages
+    if paginator.num_pages > 7:
+        if pItems.number < 4:
+            first_num = 1
+            last_num = 7
+        elif pItems.number > paginator.num_pages - 3:
+            first_num = paginator.num_pages - 6
+            last_num = paginator.num_pages
+        else:
+            first_num = pItems.number - 3
+            last_num = pItems.number + 3
+    pItems.paginator.pages = range(first_num, last_num + 1)
+    pItems.count = len(pItems)
+    form = ImageSearchForm(request.GET)
+
+
+    for i in range(len(pItems)):
+        image = images.get(pk=pItems[i]['image'])
+
+        if image is None or not image:
+            continue
+        img = {}
+        img['unique_id'] = image.unique_id
+        img['image_key'] = image.image_key
+
+        if image.camera_make is None:
+            img['camera_make'] = ''
+        else:
+            img['camera_make'] = image.camera_make
+
+        if image.camera_model is None:
+            img['camera_model'] = ''
+        else:
+            img['camera_model'] = image.camera_model
+
+        if image.captured_at is None:
+            img['captured_at'] = ''
+        else:
+            img['captured_at'] = image.captured_at
+
+        if image.user_key is None:
+            img['user_key'] = ''
+        else:
+            img['user_key'] = image.user_key
+
+        if image.username is None:
+            img['username'] = ''
+        else:
+            img['username'] = image.username
+
+        if image.user is None:
+            img['user'] = ''
+        else:
+            img['user'] = image.user
+
+        if image.organization_key is None:
+            img['organization_key'] = ''
+        else:
+            img['organization_key'] = image.organization_key
+
+        if image.point is None:
+            img['point'] = [0, 0]
+        else:
+            img['point'] = [image.point.coords[0], image.point.coords[1]]
+
+        try:
+            img['transport_parent_icon'] = image.sequence.transport_type.parent.icon.font_awesome
+        except:
+            img['transport_parent_icon'] = ''
+
+        try:
+            img['transport_parent'] = image.sequence.transport_type.parent.name
+        except:
+            img['transport_parent'] = ''
+
+        try:
+            img['transport_icon'] = image.sequence.transport_type.icon.font_awesome
+        except:
+            img['transport_icon'] = ''
+
+        try:
+            img['transport'] = image.sequence.transport_type.name
+        except:
+            img['transport'] = ''
+
+        try:
+            img['sequence_unique_id'] = str(image.sequence.unique_id)
+        except:
+            img['sequence_unique_id'] = ''
+
+
+        pItems[i]['image'] = img
+
+
+    content = {
+        'items': pItems,
+        'form': form,
+        'pageName': 'Images',
+        'pageTitle': 'Images',
+        'pageDescription': 'This is image learderboard.',
+        'page': page
+    }
+    return render(request, 'sequence/image_leaderboard.html', content)
+
+
+
 def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, detection_insert=False, mf_insert=True, image_download=True):
     if token is None:
         token = sequence.user.mapillary_access_token
@@ -279,9 +449,25 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
             if 'altitude' in image_feature['properties'].keys():
                 image.ele = image_feature['properties']['altitude']
             if 'camera_make' in image_feature['properties'].keys():
-                image.camera_make = image_feature['properties']['camera_make']
+                camera_make_str = image_feature['properties']['camera_make']
+                camera_makes = CameraMake.objects.filter(name=camera_make_str)
+                if camera_makes.count() == 0:
+                    camera_make = CameraMake()
+                    camera_make.name = camera_make_str
+                    camera_make.save()
+                else:
+                    camera_make = camera_makes[0]
+                image.camera_make = camera_make
             if 'camera_model' in image_feature['properties'].keys():
-                image.camera_model = image_feature['properties']['camera_model']
+                camera_model_str = image_feature['properties']['camera_model']
+                camera_models = CameraModel.objects.filter(name=camera_model_str)
+                if camera_models.count() == 0:
+                    camera_model = CameraModel()
+                    camera_model.name = camera_model_str
+                    camera_model.save()
+                else:
+                    camera_model = camera_models[0]
+                image.camera_model = camera_model
             if 'key' in image_feature['properties'].keys():
                 image.image_key = image_feature['properties']['key']
             if 'pano' in image_feature['properties'].keys():
@@ -468,6 +654,7 @@ def sequence_detail(request, unique_id):
     page = 1
     if request.method == "GET":
         page = request.GET.get('page')
+        image_key = request.GET.get('image_key')
         if page is None:
             page = 1
 
@@ -506,7 +693,8 @@ def sequence_detail(request, unique_id):
         'page': page,
         'view_points': view_points,
         'addSequenceForm': addSequenceForm,
-        'label_types': label_types
+        'label_types': label_types,
+        'image_key': image_key
     }
     return render(request, 'sequence/detail.html', content)
 
@@ -1178,13 +1366,6 @@ def ajax_get_image_list(request, unique_id):
                 'message': "You can't access this sequence."
             })
 
-    page = 1
-    if request.method == "GET":
-        page = request.GET.get('page')
-        print('page', page)
-        if page is None:
-            page = 1
-
     geometry_coordinates_ary = sequence.geometry_coordinates_ary
     coordinates_image = sequence.coordinates_image
     coordinates_cas = sequence.coordinates_cas
@@ -1201,7 +1382,29 @@ def ajax_get_image_list(request, unique_id):
             }
         )
 
+    page = 1
+    image_key = None
+    if request.method == "GET":
+        page = request.GET.get('page')
+        image_key = request.GET.get('image_key')
+        if page is None:
+            page = 1
+    image_in_page = None
+    if not image_key is None and len(images) > 0:
+        for index in range(len(images)):
+            image = images[index]
+            if image_key == image['key']:
+                image_in_page = int(len(images) / 20) + 1
+                print('image_in_page: ', image_in_page)
+                break
+
+    if not image_in_page is None:
+        page = image_in_page
+    else:
+        image_key = None
+
     paginator = Paginator(images, 20)
+
 
     try:
         pImages = paginator.page(page)
@@ -1239,7 +1442,6 @@ def ajax_get_image_list(request, unique_id):
 
     addSequenceForm = AddSequeceForm(instance=sequence)
 
-
     content = {
         'sequence': sequence,
         'images': pImages,
@@ -1249,7 +1451,8 @@ def ajax_get_image_list(request, unique_id):
         'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page,
         'first_image': pImages[0],
-        'addSequenceForm': addSequenceForm
+        'addSequenceForm': addSequenceForm,
+        'image_key': image_key
     }
 
     image_list_box_html = render_to_string(
@@ -1261,6 +1464,7 @@ def ajax_get_image_list(request, unique_id):
     return JsonResponse({
         'image_list_box_html': image_list_box_html,
         'page': page,
+        'image_key': image_key,
         'status': 'success',
         'message': ''
     })

@@ -1,15 +1,16 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% block app_tour %}active{% endblock %}
+{% block app_image %}active{% endblock %}
 {% block app_style %}<link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">{% endblock %}
 {% block content %}
+
 <div class="main-body">
     <div class="left-side d-flex flex-column justify-content-between">
         <div>
             <div class="p-3">
                 <div class="pt-3 mb-3">
                     <h3>
-                        Tours
+                        Images
                     </h3>
                 </div>
 
@@ -28,24 +29,9 @@
                 {% endfor %}
             {% endif %}
 
-            <div class="w-100 d-flex p-3 justify-content-end mt-3">
-                <a class="btn btn-outline-primary" href="{% url 'tour.tour_create' %}">
-                    Create Tour
-                </a>
-            </div>
             <div class="ml-3 mb-2 mr-3">
-                <h4>Filter Tour</h4>
+                <h4>Filter Images</h4>
             </div>
-            {% if user.is_authenticated %}
-                <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
-                    <li class="nav-item" style="width: 30%;">
-                        <a class="nav-link {% if pageName == 'Tours' %}active{% endif %}" href="{% url 'tour.tour_list' %}">All</a>
-                    </li>
-                    <li class="nav-item" style="width: 50%">
-                        <a class="nav-link {% if pageName == 'My Tours' %}active{% endif %}" href="{% url 'tour.my_tour_list' %}">My Tours</a>
-                    </li>
-                </ul>
-            {% endif %}
 
             <div class="p-3" style="border-top: 1px solid #dee2e6;">
                 <div class="search-form">
@@ -68,9 +54,9 @@
         </div>
         <div id="list-view" class="mt-4 mb-2 ml-auto mr-auto">
             <div class="paginator">
-                {% if tours.has_other_pages %}
+                {% if items.has_other_pages %}
                     <ul class="pagination justify-content-center">
-                        {% if tours.number != 1 %}
+                        {% if items.number != 1 %}
                             <li class="page-item">
                                 <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
                             </li>
@@ -79,15 +65,15 @@
                                 <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
                             </li>
                         {% endif %}
-                        {% for i in tours.paginator.pages %}
-                            {% if tours.number == i %}
+                        {% for i in items.paginator.pages %}
+                            {% if items.number == i %}
                                 <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
                             {% else %}
                                 <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
                             {% endif %}
                         {% endfor %}
-                        {% if tours.number != tours.paginator.num_pages %}
-                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ tours.paginator.num_pages }}'>&raquo;</a></li>
+                        {% if items.number != items.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ items.paginator.num_pages }}'>&raquo;</a></li>
                         {% else %}
                             <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
                         {% endif %}
@@ -95,69 +81,75 @@
                 {% endif %}
             </div>
             <div class="item-list">
-                {% if tours.count > 0 %}
-                    {% for tour in tours %}
-                        <div class="card row tour p-3 m-3 d-flex flex-row align-items-center" id="tour_{{ tour.unique_id }}" data-tour-id="{{ tour.unique_id }}">
-                            <div class="col-md-5 col-lg-4 align-items-center">
+                {% if items.count > 0 %}
+                    {% for item in items %}
+                        <div class="card row sequence p-3 m-3 d-flex flex-row align-items-center" id="image_{{ item.image.unique_id }}" data-image-id="{{ item.image.unique_id }}" >
+                            <div class=" col-lg-5">
                                 <div class="row align-items-center">
-                                    <div class="col-sm-6 pl-0 pr-2">
-                                        <div class="min-map-box" id="map-{{ tour.unique_id }}">
+                                    <div class="col-sm-6 pl-2 pr-2">
+                                        <div class="min-map-box" id="map-{{ item.image.unique_id }}">
                                         </div>
                                     </div>
-                                    <div class="col-sm-6 cover-image-box">
-                                        <div class="row">
-                                            {% if tour.getCoverImage is None %}
-                                                <img class="w-100" style="height: 140px" src="{% static 'images/global/empty-1.png' %}">
-                                            {% else %}
-                                                <img class="w-100" style="height: 140px" src="https://images.mapillary.com/{{ tour.getCoverImage }}/thumb-320.jpg">
-                                            {% endif %}
+
+                                    <div class="col-sm-6">
+                                        <div class="cover-image-box">
+                                            <div class="row">
+                                                {% if item.image.image_key is None %}
+                                                    <img class="w-100" style="height: 140px" src="{% static 'images/global/empty-1.png' %}">
+                                                {% else %}
+                                                    <img class="w-100" style="height: 140px;" src="https://images.mapillary.com/{{ item.image.image_key }}/thumb-320.jpg">
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-7 col-lg-8">
-                                 <div class="item-detail-box pl-3 pr-3 w-auto">
-                                    <div class="item-main w-100 float-left">
-                                        <div class="item-title text-info d-flex flex-row justify-content-between">
-                                            <a href="{% url 'tour.tour_detail' unique_id=tour.unique_id %}">
-                                                <h6>{{ tour.name }}</h6>
-                                            </a>
+                            <div class="detail-box col-lg-7">
+                                <div class="w-100">
+                                    <div class="item-detail-box p-2">
+                                        <div class="item-main w-100 float-left">
+                                            <div class="item-title text-info d-flex flex-row justify-content-between">
+                                                <a href="{% url 'sequence.sequence_detail' unique_id=item.image.sequence_unique_id %}?image_key={{ item.image.image_key }}">
+                                                    <h6>{{ item.image.image_key }}</h6>
+                                                </a>
+                                            </div>
+
+                                            <div class="w-100 d-flex flex-row align-items-end">
+                                                <p class="mb-1 mr-3 item-transport-type text-center">
+                                                    <i class="transport-type-icon fas fa-{{ item.image.transport_parent_icon }}"></i>
+                                                    <br>
+                                                    {{ item.image.transport_parent }}
+                                                </p>
+                                                <p class="mb-1 mr-3 item-transport-type text-center">
+                                                    <i class="transport-type-icon fas fa-{{ item.image.transport_icon }}"></i>
+                                                    <br>
+                                                    {{ item.image.transport }}
+                                                </p>
+                                                <p class="mb-1 mr-3 item-image-count">
+                                                    {{ item.image.camera_make }}
+                                                </p>
+                                                <p class="mb-1 mr-3 item-distance">
+                                                    {{ item.image.camera_model }}
+                                                </p>
+                                            </div>
+
+
+                                            <div class="item-user">
+                                                <a href="{% url 'account.profile' username=item.image.user %}">
+                                                    <span class="user">{{ item.image.user }}</span>
+                                                </a>
+                                            </div>
+
+                                            <div>
+                                                <span>View Image Count ({{ item.image_count }})</span>
+                                            </div>
+
+                                            <div>
+                                                <span>{{ item.image.captured_at }}</span>
+                                            </div>
+
                                         </div>
-
-                                        <div class="item-description">
-                                            <p class="mb-1">
-                                                {{ tour.getShortDescription }}
-                                            </p>
-                                        </div>
-
-                                        <div class="w-100 d-flex flex-row">
-                                            <p class="mb-1 mr-3">
-                                                {{ tour.getSequenceCount }} Sequences
-                                            </p>
-                                            <p class="mb-1 mr-3">
-                                                {{ tour.getDistance }} Km
-                                            </p>
-                                            <p class="mb-1 mr-3">
-                                                {{ tour.getImageCount }} Panos
-                                            </p>
-                                        </div>
-
-                                        <div class="item-tag" style="min-height: 24px;">
-                                            {% for tag_name in tour.getTags %}
-                                                <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1" >
-                                                    {{ tag_name }}
-                                                </span>
-                                            {% endfor %}
-
-                                        </div>
-
-                                        <div class="item-user">
-                                            <a href="{% url 'account.profile' username=tour.user.username %}">
-                                                <span class="user" style="color: brown;">{{ tour.user.username }}</span>
-                                            </a>
-                                        </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -170,9 +162,9 @@
                 {% endif %}
             </div>
             <div class="paginator">
-                {% if tours.has_other_pages %}
+                {% if items.has_other_pages %}
                     <ul class="pagination justify-content-center">
-                        {% if tours.number != 1 %}
+                        {% if items.number != 1 %}
                             <li class="page-item">
                                 <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
                             </li>
@@ -181,15 +173,15 @@
                                 <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
                             </li>
                         {% endif %}
-                        {% for i in tours.paginator.pages %}
-                            {% if tours.number == i %}
+                        {% for i in items.paginator.pages %}
+                            {% if items.number == i %}
                                 <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
                             {% else %}
                                 <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
                             {% endif %}
                         {% endfor %}
-                        {% if tours.number != tours.paginator.num_pages %}
-                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ tours.paginator.num_pages }}'>&raquo;</a></li>
+                        {% if items.number != items.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ items.paginator.num_pages }}'>&raquo;</a></li>
                         {% else %}
                             <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
                         {% endif %}
@@ -200,7 +192,7 @@
         <div class="d-none" id="map"></div>
     </div>
 
-    <div class="detail-modal modal fade" style="padding-top: 140px !important;" id="tourDetailModal">
+    <div class="detail-modal modal fade" style="padding-top: 140px !important;" id="imageDetailModal">
     </div>
 </div>
 
@@ -208,6 +200,7 @@
 
 {% block scripts %}
 <script>
+
     $('.paginator-btn').click(function() {
         var pageNum = $(this).data('page');
         var current_url = window.location.href;
@@ -237,14 +230,16 @@
             url += '&page=' + pageNum;
         location.assign(url);
     });
+
     mapboxgl.accessToken = mapboxToken;
     var positions = [];
-    {% for tour in tours %}
-        positions.push({{ tour.geometrySequence }});
+    {% for item in items %}
+        positions.push({{ item.image.point }});
     {% endfor %}
 
     var map_ary = [];
-    function draw_map(i, data) {
+    console.log(positions);
+    function draw_map(data) {
         var obj = $('.min-map-box').eq(i);
         var obj_id = obj.attr('id');
         var sceneData = [];
@@ -308,7 +303,7 @@
                 }
             });
         });
-        map_ary.push(map);
+        map_ary.push(map)
         map.resize();
     }
 
@@ -322,8 +317,8 @@
 
     for (i = 0; i < positions.length; i++)
     {
-        draw_map(i, positions[i])
-        drawMapView(i, positions[i])
+        draw_map([positions[i]]);
+        drawMapView(i, [positions[i]])
     }
 
     function drawMapView(l, data) {
@@ -331,7 +326,7 @@
             return false;
         var centerItem = {
             "type": "Feature",
-            "properties": {"tour_id": $('.tour').eq(l).data('tour-id')},
+            "properties": {"image_id": $('.sequence').eq(l).data('image-id')},
             "geometry": {
                 "coordinates": [data[0][0], data[0][1]],
                 "type": "Point"
@@ -374,7 +369,7 @@
 
 
         map.on('click', 'points', function (e) {
-            getTourDetail(e.features[0].properties.tour_id);
+            getImageDetail(e.features[0].properties.image_id);
 
         });
 
@@ -389,34 +384,9 @@
         });
     });
 
-    function getTourDetail(id) {
-        var url = "{% url 'tour.ajax_get_detail' unique_id='unique_id' %}";
-        url = url.replace('unique_id', id);
-        $.ajax({
-            url: url,
-            type: 'GET',
-            data: {},
-            dataType: 'json',
-            success: function (data) {
-                if (!data.tour) {
-                    toastr.error(data.message);
-                }
-                else {
-                    console.log(data)
-                    $('#tourDetailModal').html(data.tour_html_detail)
-                    $('#tourDetailModal').modal({
-                        'backdrop': false,
-                        'show': true,
-                    });
-                }
-            }
-        });
-    }
 
-
-    function gotoDetail(id) {
-        var url = "{% url 'tour.tour_detail' unique_id='unique_id' %}";
-        url = url.replace('unique_id', id);
+    function getImageDetail(id) {
+        var url = 'test'
         location.assign(url);
     }
 
@@ -431,5 +401,7 @@
         }
         map.resize();
     })
+
+
 </script>
 {% endblock %}

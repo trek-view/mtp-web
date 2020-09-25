@@ -140,7 +140,7 @@
 
                                             <div class="w-100 d-flex flex-row align-items-end">
                                                 <p class="mb-1 mr-3 item-transport-type text-center">
-                                                    <i class=transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
+                                                    <i class="transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
                                                     <br>
                                                     {{ sequence.transport_type.parent }}
                                                 </p>
@@ -246,12 +246,31 @@
 <script>
     $('.paginator-btn').click(function() {
         var pageNum = $(this).data('page');
-        $('#search_form').find('input[name="page"]').val(pageNum);
-        {% if pageName == 'Sequences' %}
-            var url = "{% url 'sequence.sequence_list' %}?" + $('#search_form').serialize()
-        {% else %}
-            var url = "{% url 'sequence.my_sequence_list' %}?" + $('#search_form').serialize()
-        {% endif %}
+        var current_url = window.location.href;
+        var a = current_url.split("?");
+        if (a.length < 2)
+        {
+            current_url += '?page=' + pageNum;
+            location.assign(current_url);
+            return;
+        }
+
+        var b = a[1].split("&");
+        var i = 0;
+        var c = [];
+        var is_changed = false;
+        for (i=0;i<b.length;i++) {
+            if (b[i].substr(0, 5) == 'page=') {
+                c.push('page=' + pageNum);
+                is_changed = true;
+            }
+            else {
+                c.push(b[i]);
+            }
+        }
+        var url = a[0] + '?' + c.join('&');
+        if (!is_changed)
+            url += '&page=' + pageNum;
         location.assign(url);
     });
 

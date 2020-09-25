@@ -136,6 +136,39 @@ class SequenceSearchForm(forms.Form):
             required=False
         )
 
+class ImageSearchForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['camera_make'] = forms.ModelMultipleChoiceField(
+            required=False,
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            queryset=CameraMake.objects.all()
+        )
+        self.fields['camera_model'] = forms.ModelMultipleChoiceField(
+            required=False,
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            queryset=CameraModel.objects.all()
+        )
+
+        self.fields['username'] = forms.CharField(
+            label='Username',
+            widget=forms.TextInput(attrs={'class': 'form-control'}),
+            required=False
+        )
+
+        self.fields['transport_type'] = forms.ModelChoiceField(
+            required=False,
+            widget=forms.Select(
+                attrs={'class': 'form-control'}),
+            queryset=TransType.objects.all(),
+            empty_label='All Types'
+        )
+
 class SequenceSearchForTourForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

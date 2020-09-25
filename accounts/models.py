@@ -74,6 +74,13 @@ class CustomUser(AbstractUser):
             password_validation.password_changed(self._password, self)
             self._password = None
 
+    def getShortWebURL(self):
+        website_url = self.website_url
+        if len(website_url) > 30:
+            return website_url[0:30] + '...'
+        else:
+            return website_url
+
 class MapillaryUser(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     username = models.CharField(max_length=100, null=True)

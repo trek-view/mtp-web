@@ -65,6 +65,10 @@
                     <a class="nav-link" href="{% url 'sequence.index' %}">Sequence</a>
                 </li>
 
+                <li class="nav-item {% block app_image %}{% endblock %}">
+                    <a class="nav-link" href="{% url 'sequence.image_leaderboard' %}">Image</a>
+                </li>
+
                 <li class="nav-item {% block app_guidebook %}{% endblock %}">
                     <a class="nav-link" href="{% url 'guidebook.home' %}">Guidebooks</a>
                 </li>

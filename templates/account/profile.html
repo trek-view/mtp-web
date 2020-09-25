@@ -10,32 +10,23 @@
         <div class="row mt-3">
             <div class="col-md-6">
                 <div class="user-detail pt-3 pb-3">
-                    <div class="d-flex flex-row">
-                        <div class="d-flex flex-column align-items-center mr-3" style="width: 120px" id="user_avatar">
-                            <div class="dz-image-cover">
+                    <div class="row">
+                        <div class="col-lg-4" id="user_avatar">
+                            <div class="dz-image-cover text-center">
                                 {% if current_user.avatar != '' and current_user.avatar != None %}
                                     <img style="width: 120px; height: 120px; border-radius: 50%;"  src="{{ MEDIA_URL }}{{ current_user.avatar }}">
                                 {% else %}
                                     <img style="width: 120px; height: 120px; border-radius: 50%;" src="{% static 'images/icon/avatar1.png' %}">
                                 {% endif %}
                             </div>
-                            {% if request.user.is_authenticated and current_user == request.user %}
-                                <div class="text-right mt-3 ml-2">
-                                    <button type="button" data-toggle="modal" data-target="#uploadPictureModal" class="btn btn-sm btn-warning" id="change_file">Change Picture</button>
-                                </div>
-                            {% endif %}
                         </div>
-                        <div style="width: calc(100% - 140px)">
+                        <div class="col-lg-8">
                             <div class="main-user">
                                 <div class="d-flex flex-row justify-content-between w-100 user-username text-center text-info mt-1">
                                     <h3>
                                         {{ current_user.username }}
                                     </h3>
-                                    {% if request.user.is_authenticated  and current_user == request.user %}
-                                        <div class="action text-right mt-2">
-                                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#userDetailModal" id="edit_button">Edit</button>
-                                        </div>
-                                    {% endif %}
+
                                 </div>
 
                                 {% if request.user.is_authenticated and request.user == current_user %}
@@ -74,13 +65,21 @@
                                     </div>
                                 {% else %}
                                     <div class="user-website mt-2">
-                                        <a class="" href="{{ current_user.website_url }}">{{ current_user.website_url }}</a>
+                                        <a class="" href="{{ current_user.website_url }}">{{ current_user.getShortWebURL }}</a>
                                     </div>
                                 {% endif %}
 
                                 {% if request.user.is_authenticated and current_user == request.user %}
-                                    <div class="link-developer mt-2 text-right">
-                                        <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:list' %}">Developer</a>
+                                    <div class="actions d-flex flex-row mt-2 justify-content-between">
+                                        <div class="text-right ml-2">
+                                            <button type="button" data-toggle="modal" data-target="#uploadPictureModal" class="btn btn-sm btn-warning" id="change_file">Change Picture</button>
+                                        </div>
+                                        <div class="link-developer text-right">
+                                            <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:list' %}">Developer</a>
+                                        </div>
+                                        <div class="action text-right">
+                                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#userDetailModal" id="edit_button">Edit</button>
+                                        </div>
                                     </div>
                                 {% endif %}
                             </div>
@@ -92,44 +91,36 @@
             </div>
 
             <div class="col-md-6">
-                <div class="row pt-3">
-                    <div class="col-md-3">
-                        <div class="level-badge" id="mapper_label">
-                            <label >Mapper</label>
-                            <div class="level-badge-{{ mapper_label }}">
-                                <i class="fas fa-certificate"></i>
-                                <p>Level: {{ mapper_label }}</p>
-                            </div>
+                <div class="d-flex flex-row justify-content-between pt-3">
+                    <div class="level-badge" id="mapper_label">
+                        <label >Mapper</label>
+                        <div class="level-badge-{{ mapper_label }}">
+                            <i class="fas fa-certificate"></i>
+                            <p>Level: {{ mapper_label }}</p>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <div class="level-badge" id="guidebook_label">
-                            <label>Guidebook</label>
-                            <div class="level-badge-{{ guidebook_label }}">
-                                <i class="fas fa-certificate"></i>
-                                <p>Level: {{ guidebook_label }}</p>
-                            </div>
+                    <div class="level-badge" id="guidebook_label">
+                        <label>Guidebook</label>
+                        <div class="level-badge-{{ guidebook_label }}">
+                            <i class="fas fa-certificate"></i>
+                            <p>Level: {{ guidebook_label }}</p>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <div class="level-badge" id="finder_label">
-                            <label>Finder</label>
-                            <div class="level-badge-{{ finder_label }}">
-                                <i class="fas fa-certificate"></i>
-                                <p>Level: {{ finder_label }}</p>
-                            </div>
+                    <div class="level-badge" id="finder_label">
+                        <label>Finder</label>
+                        <div class="level-badge-{{ finder_label }}">
+                            <i class="fas fa-certificate"></i>
+                            <p>Level: {{ finder_label }}</p>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <div class="level-badge" id="spotter_label">
-                            <label>Spotter</label>
-                            <div class="level-badge-{{ spotter_label }}">
-                                <i class="fas fa-certificate"></i>
-                                <p>Level: {{ spotter_label }}</p>
-                            </div>
+                    <div class="level-badge" id="spotter_label">
+                        <label>Spotter</label>
+                        <div class="level-badge-{{ spotter_label }}">
+                            <i class="fas fa-certificate"></i>
+                            <p>Level: {{ spotter_label }}</p>
                         </div>
                     </div>
                 </div>
@@ -170,8 +161,8 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users h-100 d-flex flex-column justify-content-between">
-                        <a class="btn btn-outline-info" href="/sequence/list?username={{ current_user.username }}">Viewpoints received({{ view_point_count }})</a>
-                        <a class="btn btn-outline-info" href="/sequence/list?username={{ current_user.username }}&like=true">Viewpoints marked({{ marked_point_count }})</a>
+                        <a class="btn btn-outline-info" href="/sequence/image-leaderboard?username={{ current_user.username }}&type=received">Viewpoints received({{ view_point_count }})</a>
+                        <a class="btn btn-outline-info" href="/sequence/image-leaderboard?username={{ current_user.username }}&type=marked">Viewpoints marked({{ marked_point_count }})</a>
                     </div>
                 </div>
             </div>

@@ -63,7 +63,7 @@
         <ul class="pagination justify-content-center">
             {% if images.number != 1 %}
                 <li class="page-item">
-                    <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                    <a class="btn paginator-btn page-link" data-page='1' onclick="goto_page(1)">&laquo;</a>
                 </li>
             {% else %}
                 <li class="page-item disabled">
@@ -72,13 +72,13 @@
             {% endif %}
             {% for i in images.paginator.pages %}
                 {% if images.number == i %}
-                    <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                    <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}' >{{ i }}</a></li>
                 {% else %}
-                    <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                    <li><a class="btn paginator-btn page-link" data-page='{{ i }}' onclick="goto_page('{{ i }}')">{{ i }}</a></li>
                 {% endif %}
             {% endfor %}
             {% if images.number != images.paginator.num_pages %}
-                <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ images.paginator.num_pages }}'>&raquo;</a></li>
+                <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ images.paginator.num_pages }}' onclick="goto_page('{{ images.paginator.num_pages }}')">&raquo;</a></li>
             {% else %}
                 <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
             {% endif %}

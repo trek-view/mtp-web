@@ -113,6 +113,12 @@ class CameraMake(models.Model):
     def __str__(self):
         return self.name
 
+class CameraModel(models.Model):
+    name = models.CharField(max_length=50, default='')
+
+    def __str__(self):
+        return self.name
+
 class Sequence(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
@@ -247,8 +253,8 @@ class Image(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
 
-    camera_make = models.CharField(max_length=150, default='')
-    camera_model = models.CharField(max_length=150, default='')
+    camera_make = models.ForeignKey(CameraMake, on_delete=models.CASCADE, null=True, blank=True)
+    camera_model = models.ForeignKey(CameraModel, on_delete=models.CASCADE, null=True, blank=True)
     cas = models.FloatField(default=0)
     captured_at = models.DateTimeField(null=True, blank=True)
     sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE, null=True, blank=True)
