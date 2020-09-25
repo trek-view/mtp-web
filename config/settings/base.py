@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'mptt',
     'tags_input',
     'rest_framework',
+    'colorful'
 ]
 
 REST_FRAMEWORK = {

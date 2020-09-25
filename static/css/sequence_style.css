@@ -196,3 +196,15 @@ body {
 .switch-detection > div {
     width: 100px !important;
 }
+
+.switch-detection-auto > div {
+    width: 120px !important;
+}
+
+.image-detection .detections > div:first-child {
+    margin-top: 20px;
+}
+
+.image-detection .detections > div.selected {
+    background: #d6dad7;
+}

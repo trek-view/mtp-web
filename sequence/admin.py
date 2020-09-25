@@ -26,6 +26,13 @@ class TransTypeAdmin(admin.ModelAdmin):
         'description'
     )
 
+class LabelTypeAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'parent',
+        'description'
+    )
+
 
 class TagAdmin(admin.ModelAdmin):
     list_display = (
@@ -72,6 +79,7 @@ class IconAdmin(admin.ModelAdmin):
     )
 
 admin.site.register(TransType, TransTypeAdmin)
+admin.site.register(LabelType, LabelTypeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Sequence, SequenceAdmin)
 admin.site.register(Icon, IconAdmin)

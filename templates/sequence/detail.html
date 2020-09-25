@@ -176,12 +176,55 @@
             <button class="btn btn-info" onclick="hide_image_detail_box()">
                 Back to Sequence
             </button>
-            <div class="switch-detection mt-2">
-                <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
-            </div>
         </div>
+
+        <div class="switch-detection mt-2 ml-auto">
+            <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
+        </div>
+
         <div class="image-detail">
             <div class="" id="image_detail_box">
+            </div>
+        </div>
+
+        <div class="image-detection mt-3 d-none">
+            <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
+                    <li class="nav-item mtpw-label-tab active" style="width: 50%;">
+                        <a class="nav-link active" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>
+                    </li>
+                    <li class="nav-item mapillary-label-tab border-bottom" style="width: 50%">
+                        <a class="nav-link" href="javascript: switchMpaillaryLable('mapillary');">Mapillary Labels</a>
+                    </li>
+                </ul>
+            <div class="card" style="border-radius: 0">
+                <div class="p-2">
+                    <div class=" actions text-right">
+                        {% if request.user.is_authenticated %}
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text" for="add_label">Add Label</label>
+                                </div>
+                                <select class="custom-select" id="add_label">
+                                    <option selected value="0">Please select label type</option>
+                                    {% for label_type in label_types %}
+                                        <option value="{{ label_type.pk }}" data-color="{{ label_type.color }}" data-type="{{ label_type.type }}">{{ label_type }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="d-flex flex-row justify-content-between">
+                                <button class="btn btn-secondary" id="lbl_reset" onclick="labelReset()">
+                                    Reset
+                                </button>
+                                <button class="btn btn-danger" id="lbl_delete" onclick="labelDelete()">
+                                    Delete
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="detections">
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -235,15 +278,10 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/mapillary.js' %}"></script>
+<script src='https://unpkg.com/mapillary-js@2.21.0/dist/mapillary.min.js'></script>
 <script src="{% static 'js/chart.min.js' %}"></script>
 <script>
-
-
-
     var ctx = document.getElementById('myChart').getContext('2d');
-
-
     var first_move = true;
     $.ajaxSetup({
         data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
@@ -267,21 +305,6 @@
       "hideEasing": "linear",
       "showMethod": "fadeIn",
       "hideMethod": "fadeOut"
-    };
-    var poi_mouseup = function (e) {
-        var poi_id = e.target['data-poi-id'];
-    };
-    var poi_mousemove = function (e) {
-        return false;
-    };
-    var poi_mousedown = function (e) {
-        return false;
-    };
-    var poi_mouseover = function (e) {
-        refresh_mapillery_classes();
-    };
-    var poi_click = function (e) {
-        return false;
     };
 
     var current_page = '0';
@@ -413,7 +436,6 @@
 
       var coordinates = e.features[0].geometry.coordinates.slice();
       var key = e.features[0].properties.key;
-      console.log(key)
       var url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
 
       // Ensure that if the map is zoomed out such that multiple
@@ -526,6 +548,11 @@
         });
 
         map.flyTo({center: [current_node_point[1], current_node_point[0]]});
+        allClear();
+        if (state == 'detection_mtpu')
+            getImageLables();
+        else if (state == 'detection_mapillary')
+            getDetection(node.key);
         if (first_move) {
             first_move = false;
         }
@@ -548,7 +575,6 @@
                     toastr.error(data.message);
                 else {
                     toastr.success(data.message);
-                    console.log(data);
                     $('#sequence_name h3').text(data.sequence['name']);
                     $('#sequence_description p').text(data.sequence['description']);
                     $('.item-transport-type .parent-type').html(data.sequence['transport_parent_html']);
@@ -674,13 +700,9 @@
                     toastr.error(data.message)
                 }
                 else {
-                    console.log(is_opened_side_bar)
                     if (is_opened_side_bar)
                         $('.image-detail-box').removeClass('d-none');
                     $('#image_detail_box').html(data.image_detail_box_html);
-                    if ($('#switch_detection').prop('checked')) {
-                        getDetection(image_key);
-                    }
                     $('.right-board .image-view-point span').text(data.view_points + ' View Points');
                 }
 
@@ -698,6 +720,8 @@
     function hide_image_detail_box() {
         $('.image-detail-box').addClass('d-none');
         goto_page(current_page);
+        allClear();
+        state = 'original';
     }
 
     {% if not request.user.is_authenticated %}
@@ -769,12 +793,6 @@
 
     }
 
-    var ele_ary = [];
-    console.log(positions[0].length)
-    function getEleByAsyncFalse(lng, lat) {
-
-    }
-
     function drawChart() {
         var url = "{% url 'sequence.ajax_get_image_ele' unique_id=sequence.unique_id %}"
         $.ajax({
@@ -831,172 +849,512 @@
 
     drawChart()
 
-    var detect_ary = {};
+    var label_type_ary = {};
     var tagComponent = mapillaryViewer.getComponent("tag");
     var polygon_tag_ary = [];
+    var current_clicked_label_id = '';
+    var current_clicked_label_ary = [];
+    var current_clicked_label_index = 0;
+    var current_hover_label_id = '';
+    var lastPos = null;
+    var is_drawing = false;
+    var label_tags = {};
+    var createdIndex = 0;
+    var state = 'original';
+
+    var allClear = function () {
+        label_type_ary = {};
+        tagComponent = mapillaryViewer.getComponent("tag");
+        polygon_tag_ary = [];
+        current_clicked_label_id = '';
+        current_clicked_label_ary = [];
+        current_clicked_label_index = 0;
+        current_hover_label_id = '';
+        lastPos = null;
+        is_drawing = false;
+        label_tags = {};
+        createdIndex = 0;
+        tagComponent.removeAll();
+        $('.image-detection .detections').html('');
+    }
 
     function getDetection(image_key, types = ['trafficsigns', 'segmentations', 'instances']) {
-        detect_ary = {};
+        label_type_ary = {};
         polygon_tag_ary = [];
         for (var k=0; k<types.length; k++) {
             drawDetection(image_key, types[k])
         }
     }
 
+    function sortByKey(jsObj){
+        var startArray = [];
+
+        // Push each JSON Object entry in array by [key, value]
+        for(var i in jsObj)
+        {
+            startArray.push([i, jsObj[i]]);
+        }
+
+        var sortedArray = startArray.sort();
+
+        var sortedJson = {}
+
+        for (var i =0; i<sortedArray.length; i++) {
+            sortedJson[sortedArray[i][0]] = sortedArray[i][1]
+        }
+        // Run native sort function and returns sorted array.
+        return sortedJson;
+    }
+
     function updateDetectionInSidebar() {
         var html = '';
-        jQuery.each(detect_ary, function(i, val) {
-            console.log(i);
-            html += '<div class="border detection-tag"><span>' + i + ' <span style="color: #2F96B4">' + val + '</span></span></div>';
+        var detection_ary = sortByKey(label_type_ary);
+        jQuery.each(detection_ary, function(key, val) {
+            html += '<div class="border detection-tag" id="label_' + key + '" data-label-key="' + key + '" data-is-mine="' + val['is_mine'] + '"><span>' + key + ' <span style="color: #2F96B4">' + val['count'] + '</span></span></div>';
         });
-        $('.image-detail .detections').html(html)
+        $('.image-detection .detections').html(html)
     }
 
     function drawDetection(image_key, type) {
         $.ajax({
             url: "https://a.mapillary.com/v3/object_detections/" + type + "?client_id=" + mapillaryClientId + "&image_keys=" + image_key,
             success: function(data){
-                console.log(data);
-                var features = data.features;
-                var polygon_ary = []
-                for (var i=0; i<features.length; i++) {
-                    var properties = features[i].properties;
-                    var polygon = properties.shape.coordinates[0];
-                    var value = properties.value;
-                    polygon_ary.push(polygon);
-                    if (detect_ary.hasOwnProperty(value)) {
-                        detect_ary[value]++;
+                if (state == 'detection_mapillary') {
+                    var features = data.features;
+                    var polygon_ary = [];
+                    var image_label = null;
+                    var color = '#99e694';
+                    for (var i=0; i<features.length; i++) {
+                        var properties = features[i].properties;
+                        var polygon = properties.shape.coordinates[0];
+                        var value = properties.value;
+                        polygon_ary.push(polygon);
+                        addLabelTypeAry(properties.key, properties.value, color);
+                        addNewTag(properties.key, 'polygon', properties.shape.coordinates[0], properties.value, false);
+
                     }
-                    else {
-                        detect_ary[value] = 1;
-                    }
+                    updateDetectionInSidebar();
                 }
-                console.log(detect_ary);
-                updateDetectionInSidebar();
-                var regularColor = 0xffff00;
-                var regularOpacity = 0.2;
-
-                var hoverColor = 0xffa500;
-                var hoverOpacity = 0.5;
-
-                // Retrieve tag component
-
-
-                    // Create an outline tag showing a polygon with options options
-                var polygon = null;
-                var polygonGeometry = null;
-
-                var polygonTag = null;
-                for (var i=0; i<polygon_ary.length; i++) {
-                    polygon = polygon_ary[i]
-                    polygonGeometry = new Mapillary.TagComponent.PolygonGeometry(polygon);
-                    polygonTag = new Mapillary.TagComponent.OutlineTag(
-                        type + '_polygonTag_' + i,
-                        polygonGeometry,
-                        {
-                            fillColor: regularColor,
-                            fillOpacity: regularOpacity,
-                            lineColor: regularColor,
-                        });
-                    polygon_tag_ary.push(polygonTag)
-                }
-
-                // State
-                var tags = {};
-
-                for (var i=0; i<polygon_tag_ary.length; i++) {
-                    tags[polygon_tag_ary[i].id] = polygon_tag_ary[i];
-                }
-                var hoveredTag = null;
-
-                var lastPos = null;
-
-                // Functions for setting colors and changing hovered tag
-                var setRegularColors = function(tag) {
-                    if (tag == 'undefined')
-                        return;
-                    tag.setOptions({
-                        fillColor: regularColor,
-                        fillOpacity: regularOpacity,
-                        lineColor: regularColor,
-                    });
-                };
-
-                var setHoverColors = function(tag) {
-                    if (tag == 'undefined' || tag == undefined)
-                        return;
-                    tag.setOptions({
-                        fillColor: hoverColor,
-                        fillOpacity: hoverOpacity,
-                        lineColor: hoverColor,
-                        text: tag.id
-                    });
-                }
-
-                var setHoveredTag = function(pixelPoint) {
-                    tagComponent.getTagIdsAt(pixelPoint)
-                        .then(function(tagIds) {
-                            if (tagIds.length > 0) {
-                                var hoveredTagId = tagIds[0];
-                                if (hoveredTag != null && hoveredTag.id !== hoveredTagId) {
-                                    setRegularColors(hoveredTag);
-                                    hoveredTag = null;
-                                }
-
-                                if (hoveredTag == null) {
-                                    hoveredTag = tags[hoveredTagId];
-                                    setHoverColors(hoveredTag);
-                                }
-                            } else {
-                                if (hoveredTag != null) {
-                                    setRegularColors(hoveredTag);
-                                    hoveredTag = null;
-                                }
-                            }
-                        });
-                }
-
-                // Viewer event handling
-                // Listen to mousemove, mouseover and mouseup (which occurs
-                // just before a moveend) to set hovered tag and to keep
-                // track of last position.
-                var onMouseEvent = function(event) {
-                    lastPos = event.pixelPoint;
-                    setHoveredTag(event.pixelPoint);
-                }
-
-                mapillaryViewer.on("mousemove", onMouseEvent);
-                mapillaryViewer.on("mouseup", onMouseEvent);
-                mapillaryViewer.on("mouseover", onMouseEvent);
-
-                mapillaryViewer.on("mouseout", function(event) {
-                    lastPos = null;
-                    if (hoveredTag != null) {
-                        setRegularColors(hoveredTag);
-                        hoveredTag = null;
-                    }
-                });
-
-                // Change hovered tag on mouse end if last position is
-                // defined (i.e. mouse is over Viewer).
-                mapillaryViewer.on("moveend", function(event) {
-                    if (lastPos != null) {
-                        setHoveredTag(lastPos);
-                    }
-                });
-                tagComponent.add(polygon_tag_ary);
             }
         });
     }
 
     $('#switch_detection').change(function () {
+        allClear();
         if ($(this).prop('checked')) {
-            getDetection(current_node_key);
+            $('.image-detection').removeClass('d-none');
+            $('.image-detail').addClass('d-none');
+            state = 'detection_mtpu';
+            getImageLables();
         }
         else {
-            tagComponent.removeAll();
+            $('.image-detection').addClass('d-none');
+            $('.image-detail').removeClass('d-none');
+            state = 'original';
         }
     })
+
+    var getImageLables = function () {
+        var url = "{% url 'sequence.ajax_get_image_label' unique_id=sequence.unique_id image_key='image_key' %}";
+        url = url.replace('image_key', current_node_key);
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+            },
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.status == 'failed')
+                    toastr.error(resp.message);
+                else {
+                    if (state == 'detection_mtpu') {
+                        var image_label = null;
+                        for (var i=0; i<resp.data.image_labels.length; i++) {
+                            image_label = resp.data.image_labels[i];
+
+                            addLabelTypeAry(image_label.label_id, image_label.label_type_key, image_label.label_type_color);
+                            addNewTag(image_label.label_id, image_label.geo_type, image_label.geometry, image_label.label_type_key, image_label.is_mine);
+                        }
+                        updateDetectionInSidebar();
+                    }
+
+                }
+            }
+        });
+    }
+
+    var addLabelTypeAry = function (label_id, label_type_key, label_type_color) {
+        if (label_type_ary.hasOwnProperty(label_type_key)) {
+            if (!label_type_ary[label_type_key]['label_ids'].includes(label_id)){
+                label_type_ary[label_type_key]['label_ids'].push(label_id);
+                label_type_ary[label_type_key]['count'] = label_type_ary[label_type_key]['label_ids'].length;
+            }
+        }
+        else {
+            label_type_ary[label_type_key] = {
+                count: 1,
+                label_ids: [label_id],
+                label_type_color: label_type_color
+            };
+        }
+    }
+
+    var addNewTag = function (label_id, type, geo_data, label_type_key, is_mine) {
+        var id = label_id;
+        var tag;
+        var geometry;
+        var color = label_type_ary[label_type_key]['label_type_color'];
+        var linecolor = color;
+        if (is_mine)
+            linecolor = 'blue';
+
+        var options = {
+            editable: true,
+            text: id,
+            fillColor: color,
+            fillOpacity: 0.4,
+            lineColor: linecolor,
+        }
+        if (type == 'rect') {
+            geometry = new Mapillary.TagComponent.RectGeometry(geo_data);
+            tag = new Mapillary.TagComponent.OutlineTag(id, geometry, options);
+        } else if (type == 'point') {
+            geometry = new Mapillary.TagComponent.PointGeometry(geo_data);
+            tag = new Mapillary.TagComponent.SpotTag(id, geometry, options);
+        } else if (type == 'polygon') {
+            geometry = new Mapillary.TagComponent.PolygonGeometry(geo_data);
+            tag = new Mapillary.TagComponent.OutlineTag(id, geometry, options);
+        } else {
+            throw new Error("Unsupported geometry type");
+        }
+        tag.on(Mapillary.TagComponent.OutlineTag.geometrychanged, onTagGeometryChanged);
+        tagComponent.add([tag]);
+        label_tags[id] = {
+            tag: tag,
+            id: tag.id,
+            label_type_key: label_type_key,
+            is_mine: is_mine
+        }
+        return tag;
+    }
+
+    var setHoverEvent = function(label) {
+        if (label == undefined)
+            return;
+        if (label['tag'] == undefined)
+            return;
+
+        if (current_hover_label_id != '')
+            resetLabel(label_tags[current_hover_label_id], 'hover');
+        var color = label_type_ary[label['label_type_key']['label_type_color']];
+        var linecolor = color;
+        if (label['is_mine'])
+            linecolor = 'blue';
+        label['tag'].setOptions({
+            fillColor: color,
+            fillOpacity: 0.6,
+            lineColor: linecolor,
+            text: label['id']
+        });
+        current_hover_label_id = label['id'];
+    }
+
+    var setHoveredTag = function(pixelPoint) {
+        tagComponent.getTagIdsAt(pixelPoint)
+            .then(function(tagIds) {
+                if (tagIds.length > 0) {
+                    var hoveredTagId = tagIds[0];
+                    if (hoveredTagId == current_clicked_label_id) {
+                        current_hover_label_id = hoveredTagId;
+                        return;
+                    }
+                    if (current_hover_label_id == '') {
+                        current_hover_label_id = hoveredTagId;
+                        setHoverEvent(label_tags[hoveredTagId]);
+                    }
+                    else if (current_hover_label_id != hoveredTagId) {
+                        resetLabel(label_tags[current_hover_label_id], 'hover');
+                        current_hover_label_id = hoveredTagId;
+                        setHoverEvent(label_tags[hoveredTagId]);
+                    }
+                } else {
+                    if (current_hover_label_id != '') {
+                        resetLabel(label_tags[current_hover_label_id], 'hover');
+                    }
+                }
+            });
+    }
+
+    // Viewer event handling
+    // Listen to mousemove, mouseover and mouseup (which occurs
+    // just before a moveend) to set hovered tag and to keep
+    // track of last position.
+    var onMouseEvent = function(event) {
+        lastPos = event.pixelPoint;
+        setHoveredTag(event.pixelPoint);
+    }
+
+    mapillaryViewer.on("mousemove", onMouseEvent);
+    mapillaryViewer.on("mouseover", onMouseEvent);
+
+    // Clear last positions and hovered tag on mouse out.
+    mapillaryViewer.on("mouseout", function(event) {
+        lastPos = null;
+        if (current_hover_label_id != '') {
+            resetLabel(label_tags[current_hover_label_id], 'hover');
+            current_hover_label_id = '';
+        }
+    });
+
+    // Change hovered tag on mouse end if last position is
+    // defined (i.e. mouse is over Viewer).
+    mapillaryViewer.on("moveend", function(event) {
+        if (lastPos != null) {
+            setHoveredTag(lastPos);
+        }
+    });
+
+    var switchMpaillaryLable = function(type) {
+        allClear();
+        if (type == 'mtpw') {
+            $('li.mtpw-label-tab a').addClass('active');
+            $('li.mapillary-label-tab a').removeClass('active');
+            $('.image-detection .actions').removeClass('d-none');
+            state = 'detection_mtpu';
+            getImageLables();
+        }
+        else {
+            $('li.mtpw-label-tab a').removeClass('active');
+            $('li.mapillary-label-tab a').addClass('active');
+            $('.image-detection .actions').addClass('d-none');
+            state = 'detection_mapillary';
+            getDetection(current_node_key);
+        }
+    }
+
+    var resetLabel = function (label, type) {
+        if (label == undefined)
+            return;
+        if (label['tag'] == undefined)
+            return;
+        if (type == 'hover' && label['id'] == current_clicked_label_id) {
+            current_hover_label_id = '';
+            return;
+        }
+
+        var color = label_type_ary[label['label_type_key']][['label_type_color']];
+        var linecolor = color;
+        if (label['is_mine'])
+            linecolor = 'blue';
+        label['tag'].setOptions({
+            fillColor: color,
+            fillOpacity: 0.4,
+            lineColor: linecolor,
+            text: label['id']
+        });
+        if (type == 'click')
+        {
+            console.log('current_hover_label_id', current_hover_label_id)
+            console.log('current_clicked_label_id', current_clicked_label_id)
+            console.log(label['id'])
+            current_clicked_label_id = '';
+        }
+        else
+            current_hover_label_id = '';
+    }
+
+    {% if request.user.is_authenticated %}
+
+        $('#add_label').change(function () {
+            var label_type = $(this).val();
+            if (label_type == '0') {
+                is_drawing = false;
+                return;
+            }
+            is_drawing = true;
+            var geo_type = $(this).find('option[value="'+label_type+'"]').attr('data-type');
+            if (geo_type == 'polygon') {
+                 changeMode(Mapillary.TagComponent.TagMode.CreatePolygon);
+            }
+            else if (geo_type == 'point') {
+                changeMode(Mapillary.TagComponent.TagMode.CreatePoint)
+            }
+        })
+
+        function changeMode(tagMode) {
+            tagComponent.changeMode(tagMode);
+        }
+
+        // Create and add editable tags based on created geometry type
+
+        var onTagGeometryChanged = function(tag) { console.log(tag.id, tag.geometry); };
+        tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
+            var geo_data = null;
+            var geo_type = null;
+
+            var tag;
+            if (geometry instanceof Mapillary.TagComponent.RectGeometry) {
+                //tag = new Mapillary.TagComponent.OutlineTag(id, geometry, { editable: true, text: "rect" });
+            } else if (geometry instanceof Mapillary.TagComponent.PointGeometry) {
+                geo_type = 'point';
+                geo_data = geometry.point;
+            } else if (geometry instanceof Mapillary.TagComponent.PolygonGeometry) {
+                geo_type = 'polygon';
+                geo_data = geometry.polygon;
+            } else {
+                throw new Error("Unsupported geometry type");
+            }
+
+
+            var url = "{% url 'sequence.ajax_add_image_label' unique_id=sequence.unique_id image_key='image_key' %}";
+            url = url.replace('image_key', current_node_key);
+
+            var label_type = $('#add_label').val();
+            if (label_type != '0' && geo_type != null) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        'geo_type': geo_type,
+                        'label_type': label_type,
+                        'geometry': JSON.stringify(geo_data)
+                    },
+                    dataType: 'json',
+                    success: function (resp) {
+                        if (resp.status == 'failed')
+                            toastr.error(resp.message);
+                        else {
+                            toastr.success(resp.message);
+                            addLabelTypeAry(resp.data.label_id, resp.data.label_type_key, resp.data.label_type_color)
+                            var is_mine = true;
+                            addNewTag(resp.data.label_id, geo_type, geo_data, resp.data.label_type_key, is_mine);
+                            updateDetectionInSidebar();
+                        }
+                        labelReset();
+                        is_drawing = false;
+                    }
+                });
+            }
+
+        });
+
+
+        var setUpEvent = function(label) {
+            if (label == undefined)
+                return;
+            if (label['tag'] == undefined)
+                return;
+            if (!label['is_mine'] || is_drawing)
+                return;
+            if (current_clicked_label_id != '')
+                resetLabel(label_tags[current_clicked_label_id], 'click');
+            var color = label_type_ary[label['label_type_key']['label_type_color']];
+            label['tag'].setOptions({
+                fillColor: color,
+                fillOpacity: 0.8,
+                lineColor: 'red',
+                text: label['id']
+            });
+            current_clicked_label_id = label['id'];
+        }
+
+        mapillaryViewer.on("mouseup", function (event) {
+            tagComponent.getTagIdsAt(event.pixelPoint)
+                .then(function(tagIds) {
+                    var tag_id_ary = [];
+                    if (tagIds.length > 0) {
+                        var label = null;
+                        for (var i = 0; i < tagIds.length; i++) {
+                            label = label_tags[tagIds[i]];
+                            if (label['is_mine'])
+                                tag_id_ary.push(tagIds[i])
+                        }
+                    }
+                    if (tag_id_ary.length > 0) {
+                        if (current_clicked_label_ary.length == tag_id_ary.length)
+                        {
+                            var index=0;
+                            var c = 0;
+                            c = 0;
+                            for (index=0; index<tag_id_ary.length; index++) {
+                                if (current_clicked_label_ary[index] == tag_id_ary[index])
+                                    c++;
+                            }
+                            if (c == tag_id_ary.length) {
+                                if (current_clicked_label_index < tag_id_ary.length)
+                                    current_clicked_label_index++;
+                                if (current_clicked_label_index == tag_id_ary.length)
+                                    current_clicked_label_index = 0;
+                                if (tag_id_ary.length == 1) {
+                                    resetLabel(label_tags[current_clicked_label_id], 'click');
+                                    current_clicked_label_ary = [];
+                                    return;
+                                }
+                                current_clicked_label_ary = [];
+                                for (index=0; index<tag_id_ary.length; index++) {
+                                    current_clicked_label_ary.push(tag_id_ary[index]);
+                                }
+                                setUpEvent(label_tags[tag_id_ary[current_clicked_label_index]]);
+                                return;
+                            }
+                        }
+                        current_clicked_label_ary = [];
+                        for (index=0; index<tag_id_ary.length; index++) {
+                            current_clicked_label_ary.push(tag_id_ary[index]);
+                        }
+                        current_clicked_label_index = 0;
+                        setUpEvent(label_tags[tag_id_ary[0]]);
+                    }
+                });
+        });
+
+        var removeLabelTags = function (tagIds) {
+            tagComponent.remove(tagIds)
+        }
+
+        var labelReset = function () {
+            changeMode(Mapillary.TagComponent.TagMode.Default);
+            $('#add_label').val('0');
+            resetLabel(label_tags[current_clicked_label_id], 'click');
+        }
+
+        var labelDelete = function () {
+            if (current_clicked_label_id == '')
+                return
+            var url = "{% url 'sequence.ajax_delete_image_label' unique_id=sequence.unique_id image_key='image_key' %}";
+            url = url.replace('image_key', current_node_key);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    'label_id': current_clicked_label_id,
+                },
+                dataType: 'json',
+                success: function (resp) {
+                    if (resp.status == 'failed')
+                        toastr.error(resp.message);
+                    else {
+                        toastr.success(resp.message);
+                        tagComponent.remove([current_clicked_label_id]);
+                        var label_type_key = label_tags[current_clicked_label_id]['label_type_key'];
+                        delete label_tags[current_clicked_label_id];
+                        if (label_type_ary[label_type_key]['count'] > 1) {
+                            var index = label_type_ary[label_type_key]['label_ids'].indexOf(current_clicked_label_id);
+                            if (index > -1) {
+                                label_type_ary[label_type_key]['label_ids'].splice(index, 1);
+                                label_type_ary[label_type_key]['count'] = label_type_ary[label_type_key]['label_ids'].length;
+                            }
+                        }
+                        else if (label_type_ary[label_type_key]['count'] == 1) {
+                            delete label_type_ary[label_type_key];
+                        }
+                        updateDetectionInSidebar();
+                        current_clicked_label_id = '';
+                    }
+                }
+            });
+        }
+    {% endif %}
 
 
 </script>

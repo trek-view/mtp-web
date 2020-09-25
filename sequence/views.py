@@ -494,6 +494,9 @@ def sequence_detail(request, unique_id):
         view_points = i_vs.count()
 
     addSequenceForm = AddSequeceForm(instance=sequence)
+
+    label_types = LabelType.objects.all()
+
     content = {
         'sequence': sequence,
         'pageName': 'Sequence Detail',
@@ -502,7 +505,8 @@ def sequence_detail(request, unique_id):
         'first_image': images[0],
         'page': page,
         'view_points': view_points,
-        'addSequenceForm': addSequenceForm
+        'addSequenceForm': addSequenceForm,
+        'label_types': label_types
     }
     return render(request, 'sequence/detail.html', content)
 
@@ -980,6 +984,184 @@ def ajax_get_image_detail(request, unique_id, image_key):
         'message': "",
         'view_points': view_points.count()
     })
+
+def ajax_delete_image_label(request, unique_id, image_key):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'You are required login.'
+        })
+
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if not sequence:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Sequence does not exist.'
+        })
+
+    if not sequence.is_published:
+        if not request.user.is_authenticated or request.user != sequence.user:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "You can't access this sequence."
+            })
+
+    images = Image.objects.filter(sequence=sequence, image_key=image_key)[:1]
+
+    if images.count() == 0:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "The image doesn't exist.",
+        })
+    else:
+        image = images[0]
+
+    if request.method == 'POST':
+        label_id = request.POST.get('label_id')
+        if not label_id or label_id is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "label_id is required.",
+            })
+
+        image_labels = ImageLabel.objects.filter(user=request.user, image=image, unique_id=label_id)[:1]
+        if image_labels.count() > 0:
+            image_label = image_labels[0]
+            image_label.delete()
+            return JsonResponse({
+                'status': 'success',
+                'message': "Image label is successfully deleted.",
+            })
+    return JsonResponse({
+        'status': 'failed',
+        'message': "The image label doesn't exist.",
+    })
+
+
+def ajax_get_image_label(request, unique_id, image_key):
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if not sequence:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Sequence does not exist.'
+        })
+
+    if not sequence.is_published:
+        if not request.user.is_authenticated or request.user != sequence.user:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "You can't access this sequence."
+            })
+
+    images = Image.objects.filter(sequence=sequence, image_key=image_key)[:1]
+
+    if images.count() == 0:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "The image doesn't exist.",
+        })
+    else:
+        image = images[0]
+
+    image_labels = ImageLabel.objects.filter(image=image)
+    image_label_ary = []
+    if image_labels.count() > 0:
+        for image_label in image_labels:
+            if image_label.user == request.user:
+                is_mine = True
+            else:
+                is_mine = False
+            geometry = None
+            geo_type = None
+            if not image_label.point is None:
+                geometry = image_label.point.coords
+                geo_type = 'point'
+            elif not image_label.polygon is None:
+                geometry = image_label.polygon.coords[0]
+                geo_type = 'polygon'
+            image_label_json = {
+                'label_id': str(image_label.unique_id),
+                'is_mine': is_mine,
+                'image_key': image_key,
+                'geometry': geometry,
+                'geo_type': geo_type,
+                'label_type_key': image_label.label_type.getKey(),
+                'label_type_color': image_label.label_type.color
+            }
+            image_label_ary.append(image_label_json)
+    return JsonResponse({
+        'status': 'success',
+        'data': {
+            'image_labels': image_label_ary
+        },
+        'message': 'A new label is successfully added.'
+    })
+
+def ajax_add_image_label(request, unique_id, image_key):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'You are required login.'
+        })
+
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if not sequence:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Sequence does not exist.'
+        })
+
+    if not sequence.is_published:
+        if not request.user.is_authenticated or request.user != sequence.user:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "You can't access this sequence."
+            })
+
+    images = Image.objects.filter(sequence=sequence, image_key=image_key)[:1]
+
+    if images.count() == 0:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "The image doesn't exist.",
+        })
+    else:
+        image = images[0]
+
+    if request.method == 'POST':
+        geometry_str = request.POST.get('geometry')
+        geometry = json.loads(geometry_str)
+        label_id = request.POST.get('label_type')
+        geo_type = request.POST.get('geo_type')
+        print(label_id)
+        label_types = LabelType.objects.filter(pk=label_id)[:1]
+        if label_types.count() == 0:
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'The label type does not exist.'
+            })
+        else:
+            label_type = label_types[0]
+        print(geometry)
+        image_label = ImageLabel()
+        image_label.image = image
+        image_label.user = request.user
+        image_label.label_type = label_type
+        if geo_type == 'point' and label_type.type == 'point':
+            image_label.point = Point(geometry)
+            image_label.save()
+        elif geo_type == 'polygon' and label_type.type == 'polygon':
+            image_label.polygon = Polygon(geometry)
+            image_label.save()
+        return JsonResponse({
+            'status': 'success',
+            'data': {
+                'label_id': str(image_label.unique_id),
+                'label_type_key': image_label.label_type.getKey(),
+                'label_type_color': image_label.label_type.color
+            },
+            'message': 'A new label is successfully added.'
+        })
 
 def ajax_get_image_list(request, unique_id):
     sequence = Sequence.objects.get(unique_id=unique_id)
