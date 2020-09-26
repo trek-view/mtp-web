@@ -156,6 +156,7 @@ def index(request):
             u_sequences = u_sequences.filter(captured_at__month=m)
 
         if not transport_type is None and transport_type != 0 and transport_type != '':
+            print(transport_type)
             children_trans_type = TransType.objects.filter(parent_id=transport_type)
             if children_trans_type.count() > 0:
 
