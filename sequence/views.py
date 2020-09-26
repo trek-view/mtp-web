@@ -295,6 +295,7 @@ def image_leaderboard(request):
     if images == None:
         images = Image.objects.all()
 
+    images = images.exclude(sequence=None)
 
     image_view_points_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
         rank=Window(expression=RowNumber()))
