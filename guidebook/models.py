@@ -57,7 +57,6 @@ class Guidebook(models.Model):
     description = models.TextField(null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     cover_image = models.ImageField(upload_to=image_directory_path, null=True)
-    cover_test_image = models.ImageField(upload_to=image_directory_path, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME), null=True)
     tag = models.ManyToManyField(Tag)
     is_published = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=True)
