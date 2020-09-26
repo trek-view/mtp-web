@@ -14,7 +14,7 @@
                         <div class="col-lg-4" id="user_avatar">
                             <div class="dz-image-cover text-center">
                                 {% if current_user.avatar != '' and current_user.avatar != None %}
-                                    <img style="width: 120px; height: 120px; border-radius: 50%;"  src="{{ MEDIA_URL }}{{ current_user.avatar }}">
+                                    <img style="width: 120px; height: 120px; border-radius: 50%;"  src="{{ STATIC_URL }}{{ current_user.avatar }}">
                                 {% else %}
                                     <img style="width: 120px; height: 120px; border-radius: 50%;" src="{% static 'images/icon/avatar1.png' %}">
                                 {% endif %}
