@@ -158,6 +158,8 @@ def index(request):
         if transport_type and transport_type != 0 and transport_type != '':
             parent_types = TransType.objects.filter(pk=transport_type)
             children_trans_type = TransType.objects.filter(parent__in=parent_types)
+            print(children_trans_type)
+            print(children_trans_type.count())
             if children_trans_type.count() > 0:
 
                 types = []
