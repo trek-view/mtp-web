@@ -88,7 +88,7 @@ def index(request):
                 ).exclude(image_count=0)
                 time_type = 'yearly'
 
-        if transport_type and transport_type != 0 and transport_type != '':
+        if not transport_type is None and transport_type != 0 and transport_type != '':
             children_trans_type = TransType.objects.filter(parent_id=transport_type)
             if children_trans_type.count() > 0:
                 types = []
@@ -155,11 +155,8 @@ def index(request):
         if not m is None:
             u_sequences = u_sequences.filter(captured_at__month=m)
 
-        if transport_type and transport_type != 0 and transport_type != '':
-            parent_types = TransType.objects.filter(pk=transport_type)
-            children_trans_type = TransType.objects.filter(parent__in=parent_types)
-            print(children_trans_type)
-            print(children_trans_type.count())
+        if not transport_type is None and transport_type != 0 and transport_type != '':
+            children_trans_type = TransType.objects.filter(parent_id=transport_type)
             if children_trans_type.count() > 0:
 
                 types = []
