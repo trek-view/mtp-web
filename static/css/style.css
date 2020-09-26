@@ -7,9 +7,9 @@ body {
 }
 
 nav.navbar {
-    min-height: 80px !important;
+    min-height: 100px !important;
     position: fixed;
-    width: 100%;
+    width: 100vw;
     z-index: 2100;
     box-shadow: 3px 3px 0px 0px rgb(4 4 4 / 5%), 1px 2px 20px 0px rgb(0 0 0 / 86%) !important;
 }
@@ -35,6 +35,13 @@ nav.navbar {
     width: calc(100vw - 400px);
     min-height: calc(100vh - 100px);
     margin-left: 400px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.main-list-board {
+    position: relative;
+    overflow: auto;
 }
 
 .main-body {
@@ -188,9 +195,10 @@ i.transport-type-icon {
 }
 
 @media only screen and (max-width: 400px) {
-  .left-side {
-      width: 100vw;
-  }
+    .closed-sidebar.small-screen, .opened-sidebar.small-screen {
+        width: calc(100vw - 20px) !important;
+    }
+
 }
 
 .detail-box {
@@ -210,7 +218,7 @@ i.transport-type-icon {
 
 @media only screen and (max-width: 1200px) {
     .opened-sidebar.full-screen {
-        width: 100% !important;
+        margin-right: -400px !important;
     }
 
     .right-fixed-board {
@@ -219,7 +227,32 @@ i.transport-type-icon {
     }
 }
 
+@media only screen and (max-width: 800px) {
+
+    .right-board.list {
+        width: 100%;
+        margin-left: 0px;
+    }
+}
+
+.closed-sidebar.full-screen {
+    width: 100% !important;
+}
+.opened-sidebar.full-screen {
+    width: 100%;
+}
+.closed-sidebar.small-screen, .opened-sidebar.small-screen {
+    width: 400px;
+}
+
+
 @media only screen and (max-width: 600px) {
+    .left-side {
+        width: 100vw;
+    }
+    nav.navbar {
+        min-height: 80px !important;
+    }
     .left-side {
         height: calc(100vh - 80px);
     }
@@ -269,11 +302,7 @@ body {
 }
 
 @media only screen and (max-width: 600px) {
-    #map.mapboxgl-map {
-        height: calc(100vh - 80px) !important;
-    }
-
-    #map.mapboxgl-map {
+    .right-board > #map.mapboxgl-map {
         height: calc(100vh - 80px) !important;
     }
 }

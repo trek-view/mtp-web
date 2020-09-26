@@ -64,7 +64,7 @@
 
         {% include 'components/copyrite.html' %}
     </div>
-    <div class="right-board bg-light">
+    <div class="right-board list bg-light">
         <div class="switch-list-viewer">
             <input class="" type="checkbox" id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
         </div>
@@ -99,7 +99,7 @@
             <div class="guidebook-list">
                 {% if guidebooks.count > 0 %}
                     {% for guidebook in guidebooks %}
-                        <div class="card guidebook p-3 m-3" id="guidebook_{{ guidebook.unique_id }}" data-guidebook-id="{{ guidebook.unique_id }}" onclick="getGuidebookDetail('{{ guidebook.unique_id }}')">
+                        <div class="card guidebook p-3 m-3" id="guidebook_{{ guidebook.unique_id }}" data-guidebook-id="{{ guidebook.unique_id }}">
                             <div class="row">
                                 <div class="col-md-5 col-lg-4">
                                     <div class="row align-items-center">

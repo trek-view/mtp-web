@@ -65,7 +65,7 @@
         </div>
         {% include 'components/copyrite.html' %}
     </div>
-    <div class="right-board bg-light">
+    <div class="right-board list bg-light">
         <div class="switch-list-viewer">
             <input class="" type="checkbox" id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
         </div>
@@ -100,7 +100,7 @@
             <div class="item-list">
                 {% if sequences.count > 0 %}
                     {% for sequence in sequences %}
-                        <div class="card row sequence p-3 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}" onclick="getSequenceDetail('{{ sequence.unique_id }}')">
+                        <div class="card row sequence p-3 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}">
                             <div class=" col-lg-4">
                                 <div class="row align-items-center">
                                     <div class="col-sm-6 pl-2 pr-2">
