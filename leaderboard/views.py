@@ -156,9 +156,11 @@ def index(request):
             u_sequences = u_sequences.filter(captured_at__month=m)
 
         if transport_type and transport_type != 0 and transport_type != '':
-            children_trans_type = TransType.objects.filter(parent_id=transport_type)
+            children_trans_type = TransType.objects.filter(parent_id=transport_type)[:1]
             if children_trans_type.count() > 0:
+
                 types = []
+
                 types.append(transport_type)
                 for t in children_trans_type:
                     types.append(t.pk)
