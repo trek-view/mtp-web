@@ -12,17 +12,18 @@ import uuid
 from django.urls import reverse
 from django.core.validators import RegexValidator
 from sequence.models import Sequence
+from sequence.models import Tag as TourTag
 
 UserModel = get_user_model()
 
-class TourTag(models.Model):
-    alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Only alphanumeric characters are allowed for Username.')
-    name = models.CharField(max_length=50, unique=True, null=True, validators=[alphanumeric])
-    description = models.TextField(default=None, blank=True, null=True)
-    is_actived = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name
+# class TourTag(models.Model):
+#     alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Only alphanumeric characters are allowed for Username.')
+#     name = models.CharField(max_length=50, unique=True, null=True, validators=[alphanumeric])
+#     description = models.TextField(default=None, blank=True, null=True)
+#     is_actived = models.BooleanField(default=True)
+#
+#     def __str__(self):
+#         return self.name
 
 def getAllTourTags():
     items = TourTag.objects.filter(is_actived=True)

@@ -89,11 +89,6 @@ class CategoryAdmin(admin.ModelAdmin):
         'description'
     )
 
-class TagAdmin(admin.ModelAdmin):
-    list_display = (
-        'name',
-        'description'
-    )
 
 class POICategoryAdmin(admin.ModelAdmin):
     list_display = (
@@ -104,4 +99,3 @@ class POICategoryAdmin(admin.ModelAdmin):
 admin.site.register(Guidebook, GuidebookAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(POICategory, POICategoryAdmin)
-admin.site.register(Tag, TagAdmin)

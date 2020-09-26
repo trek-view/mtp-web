@@ -25,11 +25,4 @@ class TourAdmin(tags_input_admin.TagsInputAdmin):
         'description',
     )
 
-class TourTagAdmin(admin.ModelAdmin):
-    list_display = (
-        'name',
-        'description',
-    )
-
-admin.site.register(TourTag, TourTagAdmin)
 admin.site.register(Tour, TourAdmin)

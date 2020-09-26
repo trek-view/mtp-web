@@ -56,9 +56,9 @@ REST_FRAMEWORK = {
 }
 
 TAGS_INPUT_MAPPINGS = {
-    'guidebook.Tag': {'field': 'name'},
+    # 'guidebook.Tag': {'field': 'name'},
     'sequence.Tag': {'field': 'name'},
-    'tour.TourTag': {'field': 'name'}
+    # 'tour.TourTag': {'field': 'name'}
 }
 
 AUTHENTICATION_BACKENDS = (

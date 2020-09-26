@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.core.validators import RegexValidator
 from storages.backends.s3boto3 import S3Boto3Storage
 from django.conf import settings
+from sequence.models import Tag
 ## Python Packages
 import uuid
 
@@ -20,14 +21,14 @@ def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return 'guidebook/{0}/cover_image/{1}'.format(instance.unique_id, filename)
 
-class Tag(models.Model):
-    alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Only alphanumeric characters are allowed for Username.')
-    name = models.CharField(max_length=50, unique=True, null=True, validators=[alphanumeric])
-    description = models.TextField(default=None, blank=True, null=True)
-    is_actived = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name
+# class Tag(models.Model):
+#     alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Only alphanumeric characters are allowed for Username.')
+#     name = models.CharField(max_length=50, unique=True, null=True, validators=[alphanumeric])
+#     description = models.TextField(default=None, blank=True, null=True)
+#     is_actived = models.BooleanField(default=True)
+#
+#     def __str__(self):
+#         return self.name
 
 def getAllTags():
     items = Tag.objects.filter(is_actived=True)
