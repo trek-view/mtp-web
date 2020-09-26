@@ -69,7 +69,7 @@ AWS_QUERYSTRING_AUTH = False # This will make sure that the file URL does not ha
 AWS_S3_CUSTOM_DOMAIN = AWS_STORAGE_BUCKET_NAME
 AWS_S3_MAPILLARY_BUCKET = os.environ.get("AWS_S3_MAPILLARY_BUCKET")
 # Static media settings
-STATIC_URL = 'https://' + AWS_S3_BUCKET_CNAME + '/'
+STATIC_URL = 'https://' + AWS_STORAGE_BUCKET_NAME + '/'
 MEDIA_URL = 'https://' + AWS_S3_MAPILLARY_BUCKET + '/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), )
 STATIC_ROOT = 'staticfiles'
