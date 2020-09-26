@@ -148,7 +148,7 @@ class Sequence(models.Model):
     is_published = models.BooleanField(default=True)
 
     google_street_view = models.BooleanField(default=False)
-    strava = models.BooleanField(default=False)
+    strava = models.CharField(max_length=50, null=True, blank=True)
 
     def getImageCount(self):
         if not self.coordinates_image is None:
