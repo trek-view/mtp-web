@@ -83,6 +83,7 @@ urlpatterns = [
     re_path(r'', include(tf_urls)),
     path('mission-control/', admin.site.urls, name='admin'),
     path('api/', include('api.urls')),
+    path('exchange_token', include('accounts.strava_url')),
 ]
 
 # This part is for deploying this project as a production(DEBUG=True) on heroku.
