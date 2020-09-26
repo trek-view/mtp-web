@@ -286,42 +286,6 @@ class Image(models.Model):
             return sequence
         return None
 
-class ImageDetection(models.Model):
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    area = models.FloatField(default=0)
-    captured_at = models.DateTimeField(null=True, blank=True)
-    image_ca = models.FloatField(default=0)
-    image_key = models.CharField(max_length=100)
-    image_pano = models.BooleanField(default=False)
-    det_key = models.CharField(max_length=100, null=True, blank=True)
-    score = models.FloatField(default=0)
-    shape_type = models.CharField(max_length=50)
-    shape_multipolygon = models.MultiPolygonField(null=True, blank=True)
-    shape_point = models.PointField(null=True, blank=True)
-    value = models.CharField(max_length=100)
-    geometry_type = models.CharField(max_length=50)
-    geometry_point = models.PointField(null=True, blank=True)
-    type = models.CharField(max_length=50, null=True, blank=True)
-
-class MapFeature(models.Model):
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    accuracy = models.FloatField(default=0)
-    altitude = models.FloatField(default=0)
-    direction = models.FloatField(default=0)
-    first_seen_at = models.DateTimeField(null=True, blank=True)
-    mf_key = models.CharField(max_length=100, null=True, blank=True)
-    last_seen_at = models.DateTimeField(null=True, blank=True)
-    layer = models.CharField(max_length=50)
-    value = models.CharField(max_length=100)
-    geometry_type = models.CharField(max_length=50, default='Point')
-    geometry_point = models.PointField(null=True, blank=True)
-
-class MapFeatureDetection(models.Model):
-    image_key = models.CharField(max_length=100, null=True, blank=True)
-    detection_key = models.CharField(max_length=100, null=True, blank=True)
-    user_key = models.CharField(max_length=100, null=True, blank=True)
-    mf_key = models.CharField(max_length=100, null=True, blank=True)
-
 class SequenceLike(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE)

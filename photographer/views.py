@@ -55,6 +55,7 @@ def index(request):
 
 @my_login_required
 def photographer_create(request):
+    photographer = Photographer.objects.filter()
     if request.method == "POST":
         form = PhotographerForm(request.POST)
 
@@ -98,7 +99,6 @@ def photographer_create(request):
         'pageTitle': 'Create Photographer'
     }
     return render(request, 'photographer/create.html', content)
-
 
 @my_login_required
 def photographer_hire(request, unique_id):
