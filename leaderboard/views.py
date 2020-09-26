@@ -156,8 +156,7 @@ def index(request):
             u_sequences = u_sequences.filter(captured_at__month=m)
 
         if not transport_type is None and transport_type != 0 and transport_type != '':
-            print(transport_type)
-            children_trans_type = TransType.objects.filter(parent_id=transport_type)
+            children_trans_type = TransType.objects.filter(parent__in=transport_type)
             if children_trans_type.count() > 0:
 
                 types = []
@@ -182,10 +181,10 @@ def index(request):
         u_trans_sequences = u_sequences.values('transport_type').annotate(camera_count=Count('transport_type'))
         if u_trans_sequences.count() > 0:
             for u_s in u_trans_sequences:
-                transport_type = TransType.objects.filter(pk=u_s['transport_type'])
-                if transport_type.count() == 0:
+                transport_t = TransType.objects.filter(pk=u_s['transport_type'])
+                if transport_t.count() == 0:
                     continue
-                used_trans.append(transport_type[0].name)
+                used_trans.append(transport_t[0].name)
         used_trans.sort()
         used_trans_str = ', '.join(used_trans)
         pItems[i]['transport_type'] = used_trans_str
