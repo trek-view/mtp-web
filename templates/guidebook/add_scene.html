@@ -145,7 +145,7 @@
                                 <input type="text" name="start_x" class="form-control d-none" value="{{ scene.start_x }}" required="" id="id_start_x">
                                 <input type="text" name="start_y" class="form-control d-none" value="{{ scene.start_y }}" required="" id="id_start_y">
                                 <div class="text-right">
-                                    <button type="button" class="btn btn-sm btn-info point_list" data-scene-id="{{ scene.pk }}">Edit POI's ({{ scene.getPOICount }})</button>
+                                    <button type="button" class="btn btn-sm btn-info point_list" onclick="showPOIList('{{ scene.pk }}')" data-scene-id="{{ scene.pk }}">Edit POI's ({{ scene.getPOICount }})</button>
                                     <button type="button" id="change_scene_button" class="save btn btn-sm btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Edit Scene</button>
                                     <button type="button" id="save_scene_button" class="save btn btn-sm btn-primary save-btn d-none" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', {{ scene.pk }})">Save</button>
                                     <button type="button" class="btn btn-sm btn-danger delete_scene_button" data-scene-id="{{ scene.pk }}">Delete</button>
@@ -233,10 +233,6 @@
                 Back To Scenes
             </button>
         </div>
-
-
-
-
 
         <div class="poi-list">
             <div class="poi-header">
@@ -704,6 +700,7 @@
                     old_scene();
                     var position_x = 0;
                     var position_y = 0;
+                    $('#poi_list').html('');
                     for (i = 0; i < data.poi_list.length; i++)
                     {
                         position_x = data.poi_list[i].poi[0].fields.position_x;
@@ -877,7 +874,10 @@
                             $('.new-scene-box').addClass('d-none');
                             console.log(scene_box_html);
                             set_select_scene();
-                            $('#scene_' + current_scene_id).find('.point_list').trigger('click');
+                            $('.poi-list').removeClass('d-none');
+                            key_list.push(current_node_key);
+                            $('#poi_list').html('');
+                            showPOIList(current_scene_id);
                         }
                         else if (data.type == 'update')
                         {
@@ -1182,12 +1182,11 @@
         console.log('test')
     }
 
-    $('.point_list').click(function () {
-        var scene_id = $(this).attr('data-scene-id');
+    var showPOIList = function(scene_id) {
         current_scene_id = scene_id;
         is_show_poi_list = true;
         show_poi_list(current_scene_id);
-    });
+    }
 
     function show_poi_list(scene_id) {
         $('.left-side.poi-box').removeClass('d-none');
@@ -1505,14 +1504,6 @@
             startY = ev.clientY;
             startT = parseInt($el.css('top'));
             $el.addClass('selected');
-        });
-
-        $('.point_list').off('click');
-        $('.point_list').click(function () {
-            var scene_id = $(this).attr('data-scene-id');
-            current_scene_id = scene_id;
-            is_show_poi_list = true;
-            show_poi_list(current_scene_id);
         });
     }
 
