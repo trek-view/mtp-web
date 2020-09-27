@@ -80,6 +80,10 @@
                 <li class="nav-item {% block app_photographer %}{% endblock %}">
                     <a class="nav-link" href="{% url 'photographer.index' %}">Photographer</a>
                 </li>
+
+                <li class="nav-item {% block app_uploader %}{% endblock %}">
+                    <a class="nav-link" href="{% url 'app_download' %}">MTP Uploader</a>
+                </li>
             </ul>
 
             {% if user.is_authenticated %}

@@ -68,6 +68,7 @@ class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
 urlpatterns = [
     # path('', views.index, name='home'),
     path('', views.index, name='home'),
+    path('uploader', views.app_download, name='app_download'),
     # path('', RedirectView.as_view(url='marketplace', permanent=False), name='home'),
     path('accounts/', include('accounts.urls')),
     path('email/', include(mail_urls)),

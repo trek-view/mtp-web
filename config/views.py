@@ -12,3 +12,11 @@ def index(request):
         'pageDescription': MAIN_PAGE_DESCRIPTION
     }
     return render(request, 'home.html', content)
+
+def app_download(request):
+    content = {
+        'pageName': 'MTP Uploader',
+        'pageTitle': 'MTP Uploader',
+        'pageDescription': MAIN_PAGE_DESCRIPTION
+    }
+    return render(request, 'app_download.html', content)
