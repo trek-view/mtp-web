@@ -131,7 +131,7 @@ class CameraModel(models.Model):
 class Sequence(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    camera_make = models.ForeignKey(CameraMake, on_delete=models.CASCADE, null=True, blank=True)
+    camera_make = models.CharField(max_length=50, default='')
     captured_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(null=True, blank=True)
     seq_key = models.CharField(max_length=100, null=True, blank=True, verbose_name="Mapillary Sequence Key",)
