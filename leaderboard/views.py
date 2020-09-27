@@ -34,7 +34,7 @@ from tour.models import Tour, TourSequence
 ## App packages
 
 from .forms import *
-from sequence.models import Sequence, ImageViewPoint
+from sequence.models import Sequence, ImageViewPoint, CameraMake
 
 ############################################################################
 
@@ -75,6 +75,8 @@ def index(request):
         page = request.GET.get('page')
         transport_type = request.GET.get('transport_type')
         time_type = request.GET.get('time_type')
+        camera_makes = request.GET.get('camera_make')
+
         if time_type is None or not time_type or time_type == 'all_time':
             sequences = Sequence.objects.all().exclude(image_count=0)
         else:
@@ -117,8 +119,11 @@ def index(request):
             else:
                 sequences = sequences.filter(transport_type_id=transport_type)
 
-
             form.set_transport_type(transport_type)
+
+        if not camera_makes is None and len(camera_makes) > 0:
+            sequences = sequences.filter(camera_make__in=camera_makes)
+            form.set_camera_makes(camera_makes)
 
     if sequences == None:
 
@@ -174,7 +179,6 @@ def index(request):
 
         if user is None or not user:
             continue
-        print(pItems[i]['user'])
         pItems[i]['username'] = user.username
 
         u_sequences = sequences.filter(user=user)
@@ -183,8 +187,11 @@ def index(request):
         u_camera_sequences = u_sequences.values('camera_make').annotate(camera_count=Count('camera_make'))
         if u_camera_sequences.count() > 0:
             for u_s in u_camera_sequences:
-                used_cameras.append(u_s['camera_make'])
-        used_cameras.sort()
+                if u_s['camera_make'] is None:
+                    continue
+                camera = CameraMake.objects.get(pk=u_s['camera_make'])
+                used_cameras.append(camera.name)
+
         used_cameras_str = ', '.join(used_cameras)
         pItems[i]['used_cameras_str'] = used_cameras_str
 
@@ -216,7 +223,7 @@ def index(request):
 
     if time_type is None:
         time_type = 'all_time'
-    form.sef_time_type(time_type)
+    form.set_time_type(time_type)
     content = {
         'items': pItems,
         'form': form,
