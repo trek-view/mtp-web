@@ -309,32 +309,7 @@
 
     var current_page = '0';
 
-    function goto_page(pageNum, image_key='') {
-        $.ajax({
-            url: '{% url "sequence.ajax_get_image_list" unique_id=sequence.unique_id %}',
-            type: 'GET',
-            data: {'page': pageNum, 'image_key': image_key},
-            dataType: 'json',
-            success: function (data) {
-                if (data.status == 'failed')
-                    toastr.error(data.message);
-                else
-                {
-                    current_page = data.page;
-                    var href = location.protocol + '//' + location.host + location.pathname ;
-                    history.pushState({
-                        id: 'Sequence Detail'
-                    }, "{{ pageTitle }}", href + '?page=' + data.page);
-                    $('#image_list').html(data.image_list_box_html);
-                    if (data.image_key != null) {
-                        show_image_detail(data.image_key)
-                    }
-                }
-            }
-        });
-    }
 
-    goto_page("{{ page }}", "{{ image_key }}");
 
     mapboxgl.accessToken = mapboxToken;
     // Create a popup, but don't add it to the map yet.
@@ -366,10 +341,19 @@
         sceneData.push(item);
     }
 
+    var first_image_key = "{{ first_image.key }}";
+
+    {% if not image_key is None and image_key != ''  %}
+        first_image_key = "{{ image_key }}";
+    {% endif %}
+
+    var first_image_index = image_keys.indexOf(first_image_key);
     if (scene_positions.length > 0)
-        var first_point = scene_positions[0];
+        var first_point = scene_positions[first_image_index];
     else
         var first_point = null;
+
+
 
     if (first_point != null) {
         var map = new mapboxgl.Map({
@@ -509,7 +493,7 @@
     var mapillaryViewer = new Mapillary.Viewer(
         'sequence_viewer',
         mapillaryClientId,
-        "{{ first_image.key }}",
+        first_image_key,
         {
             component: {
                 cover: false,
@@ -563,6 +547,33 @@
             show_image_detail(node.key)
     });
     window.addEventListener('resize', function() { mapillaryViewer.resize(); });
+
+    function goto_page(pageNum, image_key='') {
+        $.ajax({
+            url: '{% url "sequence.ajax_get_image_list" unique_id=sequence.unique_id %}',
+            type: 'GET',
+            data: {'page': pageNum, 'image_key': image_key},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else
+                {
+                    current_page = data.page;
+                    var href = location.protocol + '//' + location.host + location.pathname ;
+                    history.pushState({
+                        id: 'Sequence Detail'
+                    }, "{{ pageTitle }}", href + '?page=' + data.page);
+                    $('#image_list').html(data.image_list_box_html);
+                    if (data.image_key != null) {
+                        show_image_detail(data.image_key)
+                    }
+                }
+            }
+        });
+    }
+
+
 
     $('.btn-save').click(function () {
         if (!$('#edit_form').isValid())
@@ -1368,6 +1379,7 @@
         }
     {% endif %}
 
+    goto_page("{{ page }}", "{{ image_key }}");
 
 </script>
 {% endblock %}
