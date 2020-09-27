@@ -227,7 +227,8 @@ def challenge_list(request):
             if not end_time is None:
                 challenges = challenges.filter(start_time__lte=end_time)
             if not camera_makes is None and len(camera_makes) > 0:
-                challenges = challenges.filter(camera_make__in=camera_makes)
+                cs = Challenge.objects.filter(camera_make__in=camera_makes)
+                challenges = challenges.filter(pk__in=cs)
 
     if challenges == None:
         challenges = Challenge.objects.all().filter(is_published=True)

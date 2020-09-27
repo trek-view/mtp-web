@@ -74,13 +74,20 @@ class PhotographerSearchForm(forms.Form):
 
         self.fields['capture_type'] = forms.ModelMultipleChoiceField(
             required=False,
-            widget=forms.CheckboxSelectMultiple(),
-            queryset=CaptureType.objects.all(),
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            # choices=getAllCameraMake()
+            queryset=CaptureType.objects.all()
         )
+
         self.fields['capture_method'] = forms.ModelMultipleChoiceField(
             required=False,
-            widget=forms.CheckboxSelectMultiple(),
-            queryset=CaptureMethod.objects.all(),
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            # choices=getAllCameraMake()
+            queryset=CaptureMethod.objects.all()
         )
         self.fields['image_quality'] = forms.ModelChoiceField(
             widget=forms.RadioSelect(attrs={'class': '', 'data-validation': 'required'}),
@@ -92,9 +99,6 @@ class PhotographerSearchForm(forms.Form):
 class PhotographerEnquireForm(forms.ModelForm):
     subject = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
                               required=False)
-    # email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    # phone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
-    # website = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2}), required=False)
     description = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation': 'required'}),
         required=False)
@@ -102,10 +106,6 @@ class PhotographerEnquireForm(forms.ModelForm):
     class Meta:
         model = PhotographerEnquire
         fields = (
-            # 'user_id',
             'subject',
-            # 'email',
-            # 'phone',
-            # 'website',
             'description',
         )

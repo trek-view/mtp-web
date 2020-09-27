@@ -30,21 +30,25 @@
                 {% endfor %}
             {% endif %}
             <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
-                <a href="{% url 'photographer.photographer_create' %}" class="btn btn-outline-primary">Create Photographer</a>
+                {% if photographer is None %}
+                    <a href="{% url 'photographer.photographer_create' %}" class="btn btn-outline-primary">Create Photographer</a>
+                {% else %}
+                    <a href="{% url 'photographer.my_photographer_edit' unique_id=photographer.unique_id %}" class="btn btn-outline-primary">Edit Photographer</a>
+                {% endif %}
             </div>
             <div class="ml-3 mb-2 mr-3">
                 <h4>Filter Photographer</h4>
             </div>
-            {% if user.is_authenticated %}
-                <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
-                    <li class="nav-item" style="width: 30%;">
-                        <a class="nav-link {% if pageName == 'Photographers' %}active{% endif %}" href="{% url 'photographer.photographer_list' %}">All</a>
-                    </li>
-                    <li class="nav-item" style="width: 50%;">
-                        <a class="nav-link {% if pageName == 'My Photographers' %}active{% endif %}" href="{% url 'photographer.my_photographer_list'  %}">My Photographers</a>
-                    </li>
-                </ul>
-            {% endif %}
+{#            {% if user.is_authenticated %}#}
+{#                <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">#}
+{#                    <li class="nav-item" style="width: 30%;">#}
+{#                        <a class="nav-link {% if pageName == 'Photographers' %}active{% endif %}" href="{% url 'photographer.photographer_list' %}">All</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item" style="width: 50%;">#}
+{#                        <a class="nav-link {% if pageName == 'My Photographers' %}active{% endif %}" href="{% url 'photographer.my_photographer_list'  %}">My Photographers</a>#}
+{#                    </li>#}
+{#                </ul>#}
+{#            {% endif %}#}
 
             <div class="p-3" style="border-top: 1px solid #dee2e6;">
                 <div class="search-form">

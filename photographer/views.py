@@ -220,7 +220,6 @@ def photographer_edit(request, unique_id):
     }
     return render(request, 'photographer/edit.html', content)
 
-
 @my_login_required
 def my_photographer_delete(request, unique_id):
     photographer = get_object_or_404(Photographer, unique_id=unique_id)
@@ -232,7 +231,6 @@ def my_photographer_delete(request, unique_id):
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-
 def photographer_list(request):
     photographers = None
     page = 1
@@ -243,18 +241,23 @@ def photographer_list(request):
             page = 1
         if form.is_valid():
 
-            capture_type = form.cleaned_data['capture_type']
+            capture_types = form.cleaned_data['capture_type']
             capture_method = form.cleaned_data['capture_method']
             image_quality = form.cleaned_data['image_quality']
             print(image_quality)
 
             photographers = Photographer.objects.all().filter(is_published=True)
-            if len(capture_type) > 0:
-                photographers = photographers.filter(capture_type__in=capture_type)
-            if len(capture_method) > 0:
-                photographers = photographers.filter(capture_method__in=capture_method)
+
             if not image_quality is None:
                 photographers = photographers.filter(image_quality=image_quality)
+
+            if not capture_types is None and len(capture_types) > 0:
+                ps = Photographer.objects.filter(capture_type__in=capture_types)
+                photographers = photographers.filter(pk__in=ps)
+
+            if not capture_method is None and len(capture_method) > 0:
+                ps = Photographer.objects.filter(capture_method__in=capture_method)
+                photographers = photographers.filter(pk__in=ps)
 
     if photographers == None:
         photographers = Photographer.objects.all().filter(is_published=True)
@@ -284,13 +287,19 @@ def photographer_list(request):
     pPhotographers.paginator.pages = range(first_num, last_num + 1)
     pPhotographers.count = len(pPhotographers)
 
+    photographers = Photographer.objects.filter(user=request.user)
+    photographer = None
+    if photographers.count() > 0:
+        photographer = photographers[0]
+
     content = {
         'photographers': pPhotographers,
         'form': form,
         'pageName': 'Photographers',
         'pageTitle': 'Photographers',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
+        'page': page,
+        'photographer': photographer
     }
 
     return render(request, 'photographer/list.html', content)

@@ -26,6 +26,8 @@ from .forms import UserSignUpForm, UserProfileForm, UserAvatarForm, UserUpdateFo
 from sequence.models import Sequence, ImageViewPoint, SequenceLike, ImageLabel, Image
 from tour.models import Tour, TourLike
 from guidebook.models import Guidebook, GuidebookLike
+from photographer.models import Photographer
+
 UserModel = get_user_model()
 import requests
 
@@ -212,7 +214,10 @@ def profile(request, username):
     finder_label = get_finder_label(imageViewPointCount)
     spotter_label = get_spotter_label(imageLabelCount)
 
-
+    photographers = Photographer.objects.filter(user=user)
+    photographer = None
+    if photographers.count() > 0:
+        photographer = photographers[0]
 
     content = {
         'current_user': user,
@@ -231,7 +236,8 @@ def profile(request, username):
         'view_point_count': imageViewPointCount,
         'marked_point_count': markedImageViewPointCount,
         'pageName': 'Profile',
-        'pageTitle': 'Profile'
+        'pageTitle': 'Profile',
+        'photographer': photographer
     }
 
     return render(request, 'account/profile.html', content)

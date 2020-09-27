@@ -128,7 +128,27 @@
                         </div>
                     </div>
                 </div>
-
+                <div class="">
+                    <div class="hire-profile text-right">
+                    {% if not photographer is None %}
+                        {% if request.user.username != current_user.username %}
+                            <a class="btn btn-info" href="{% url 'photographer.photographer_detail' unique_id=photographer.unique_id %}">
+                                FOR HIRE
+                            </a>
+                        {% else %}
+                            <a class="btn btn-info" href="{% url 'photographer.my_photographer_edit' unique_id=photographer.unique_id %}">
+                                Edit Hire Profile
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        {% if request.user.username == current_user.username %}
+                            <a class="btn btn-info" href="{% url 'photographer.photographer_create' %}">
+                                Create Hire Profile
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
 
