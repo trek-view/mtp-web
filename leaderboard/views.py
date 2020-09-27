@@ -212,7 +212,7 @@ def index(request):
         pItems[i]['distance'] = "%.3f" % u_distance
         pItems[i]['photo_count'] = u_photo_count
 
-        u_viewpoints = ImageViewPoint.objects.filter(image__sequence__in=u_sequences, owner=user)
+        u_viewpoints = ImageViewPoint.objects.filter(image__sequence__in=sequences, owner=user)
         u_view_point = u_viewpoints.count()
         pItems[i]['view_points'] = u_view_point
 
