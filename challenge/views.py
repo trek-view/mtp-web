@@ -91,7 +91,6 @@ def challenge_create(request):
 
             challenge.save()
             camera_make = form.cleaned_data['camera_make']
-            print(camera_make)
             if not camera_make is None and len(camera_make) > 0:
                 for cm in camera_make:
                     challenge.camera_make.add(cm)
@@ -156,6 +155,10 @@ def challenge_edit(request, unique_id):
             challenge.save()
             transport_type = form.cleaned_data['transport_type']
             if not transport_type is None:
+                tr = challenge.transport_type.all()
+                if tr.count() > 0:
+                    for t in tr:
+                        t.delete()
                 challenge.transport_type.add(transport_type)
             messages.success(request, 'Challenge "%s" is updated successfully.' % challenge.name)
             return redirect('challenge.index')
@@ -326,7 +329,7 @@ def challenge_leaderboard(request, unique_id):
         pItems = paginator.page(1)
     except EmptyPage:
         pItems = paginator.page(paginator.num_pages)
-
+    print(challenge.transport_type)
     first_num = 1
     last_num = paginator.num_pages
     if paginator.num_pages > 7:
@@ -349,6 +352,16 @@ def challenge_leaderboard(request, unique_id):
         if user is None or not user:
             continue
         pItems[i]['username'] = user.username
+
+        u_sequences = Sequence.objects.filter(
+            user=user
+        )
+
+        u_distance = 0
+        if u_sequences.count() > 0:
+            for u_s in u_sequences:
+                u_distance += float(u_s.getDistance())
+        pItems[i]['distance'] = "%.3f" % u_distance
 
 
     return render(request, 'challenge/leaderboard.html',

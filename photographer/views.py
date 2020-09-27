@@ -149,7 +149,6 @@ def photographer_hire(request, unique_id):
     }
     return render(request, 'photographer/hire.html', content)
 
-
 @my_login_required
 def photographer_edit(request, unique_id):
     photographer = get_object_or_404(Photographer, unique_id=unique_id)
