@@ -1160,7 +1160,8 @@ def ajax_get_image_detail(request, unique_id, image_key):
     content = {
         'image': image,
         'view_points': view_points.count(),
-        'guidebook_count': scenes.count()
+        'guidebook_count': scenes.count(),
+        'sequence': sequence
     }
     image_detail_box_html = render_to_string(
         'sequence/image_detail_box.html',
