@@ -28,18 +28,23 @@ class PhotographerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+
         self.fields['capture_type'] = forms.ModelMultipleChoiceField(
             required=False,
-            widget=forms.CheckboxSelectMultiple(
-                attrs={'data-validation': 'checkbox_group', 'data-validation-qty': 'min1'}),
-            queryset=CaptureType.objects.all(),
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            # choices=getAllCameraMake()
+            queryset=CaptureType.objects.all()
         )
 
         self.fields['capture_method'] = forms.ModelMultipleChoiceField(
             required=False,
-            widget=forms.CheckboxSelectMultiple(
-                attrs={'data-validation': 'checkbox_group', 'data-validation-qty': 'min1'}),
-            queryset=CaptureMethod.objects.all(),
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            # choices=getAllCameraMake()
+            queryset=CaptureMethod.objects.all()
         )
 
         self.fields['image_quality'] = forms.ModelChoiceField(

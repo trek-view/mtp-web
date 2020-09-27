@@ -88,6 +88,17 @@ def photographer_create(request):
 
             photographer.save()
 
+            capture_types = form.cleaned_data['capture_type']
+            capture_method = form.cleaned_data['capture_method']
+            if not capture_types is None:
+                photographer.capture_type.clear()
+                for capture_type in capture_types:
+                    photographer.capture_type.add(capture_type)
+            if not capture_method is None:
+                photographer.capture_method.clear()
+                for capture_m in capture_method:
+                    photographer.capture_method.add(capture_m)
+
             messages.success(request, 'A photographer was created successfully.')
 
             return redirect('photographer.my_photographer_list')
@@ -184,6 +195,18 @@ def photographer_edit(request, unique_id):
                 geo['properties']['photographer_id'] = str(photographer.unique_id)
             photographer.geometry = json.dumps(geometry)
             photographer.save()
+
+            capture_types = form.cleaned_data['capture_type']
+            capture_method = form.cleaned_data['capture_method']
+            if not capture_types is None:
+                photographer.capture_type.clear()
+                for capture_type in capture_types:
+                    photographer.capture_type.add(capture_type)
+            if not capture_method is None:
+                photographer.capture_method.clear()
+                for capture_m in capture_method:
+                    photographer.capture_method.add(capture_m)
+
             messages.success(request, 'Photographer "%s" is updated successfully.' % photographer.name)
             return redirect('photographer.index')
     else:

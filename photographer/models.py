@@ -94,8 +94,7 @@ class Photographer(models.Model):
 
     def getCaptureType(self):
         captureType = []
-        for t in self.capture_type.all():
-            cType = CaptureType.objects.get(pk=t)
+        for cType in self.capture_type.all():
             if cType:
                 captureType.append(cType.name)
 
@@ -106,8 +105,7 @@ class Photographer(models.Model):
 
     def getCaptureMethod(self):
         captureMethod = []
-        for t in self.capture_method.all():
-            cMethod = CaptureMethod.objects.get(pk=t)
+        for cMethod in self.capture_method.all():
             if cMethod:
                 captureMethod.append(cMethod.name)
         if len(captureMethod) > 0:
