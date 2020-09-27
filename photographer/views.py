@@ -122,6 +122,9 @@ def photographer_hire(request, unique_id):
                 )
                 send_mail_with_html(subject, html_message, request.user.email)
 
+            except:
+                print('email 1 sending error!')
+            try:
                 # send email to photographer creator
                 subject = request.user.username + ' hired for "' + photographer.name + '".'
                 html_message = render_to_string(
@@ -131,7 +134,7 @@ def photographer_hire(request, unique_id):
                 )
                 send_mail_with_html(subject, html_message, photographer.user.email)
             except:
-                print('email sending error!')
+                print('email 2 sending error!')
 
             messages.success(request, 'You have succeeded in hiring photographers.')
 
