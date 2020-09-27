@@ -9,8 +9,6 @@ class PhotographerForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}), required=False)
     business_website = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'data-validation': 'url'}), required=False)
-    business_email = forms.EmailField(
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'data-validation': 'email'}), required=False)
     description = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation': 'required'}),
         required=False)
@@ -61,7 +59,6 @@ class PhotographerForm(forms.ModelForm):
             'name',
             'business_name',
             'business_website',
-            'business_email',
             'geometry',
             'description',
             'capture_type',

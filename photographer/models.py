@@ -68,7 +68,6 @@ class Photographer(models.Model):
     name = models.CharField(max_length=100)
     business_name = models.CharField(max_length=200)
     business_website = models.TextField()
-    business_email = models.CharField(max_length=200)
     description = models.TextField()
     capture_type = models.ManyToManyField(CaptureType)
     capture_method = models.ManyToManyField(CaptureMethod)

@@ -7,7 +7,7 @@ import time
 import requests
 import math
 
-def send_mail_with_html(subject, html_message, to_email, from_email = None):
+def send_mail_with_html(subject, html_message, to_email, reply_to, from_email = None):
     if isinstance(to_email, str):
         to = [to_email]
     else:
@@ -16,7 +16,7 @@ def send_mail_with_html(subject, html_message, to_email, from_email = None):
         subject=subject,
         from_email=from_email,
         to=to, 
-        reply_to=[settings.SMTP_REPLY_TO]
+        reply_to=reply_to
     )
     msg.attach_alternative(html_message, 'text/html')
     msg.send()
