@@ -1526,6 +1526,7 @@ def ajax_image_mark_view(request, unique_id, image_key):
         image_view_point = ImageViewPoint()
         image_view_point.image = image
         image_view_point.user = request.user
+        image_view_point.owner = image.sequence.user
         image_view_point.save()
         marked_images = ImageViewPoint.objects.filter(image=image)
         if not marked_images:
@@ -1572,7 +1573,6 @@ def ajax_get_image_ele(request, unique_id):
         'message': '',
         'eles': ele_ary
     })
-
 
 def ajax_get_detail(request, unique_id):
     sequence = Sequence.objects.get(unique_id=unique_id)

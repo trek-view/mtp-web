@@ -299,6 +299,7 @@ class SequenceLike(models.Model):
 class ImageViewPoint(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
+    owner = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, blank=True, related_name='owner_id')
 
 class ImageLabel(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)

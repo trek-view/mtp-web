@@ -43,6 +43,18 @@ MAIN_PAGE_DESCRIPTION = "Leaderboard shows the ranking of users by Monthly and T
 ############################################################################
 
 def index(request):
+
+    ############
+    # update db
+    image_vs = ImageViewPoint.objects.filter(owner_id=None)
+    print('image_vs: ', image_vs.count())
+    if image_vs.count() > 0:
+        for image_v in image_vs:
+            image_v.owner = image_v.image.sequence.user
+            image_v.save()
+    ############
+
+
     sequences = None
     page = 1
     form = LeaderboardSearchForm()
@@ -109,12 +121,14 @@ def index(request):
 
     user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
 
+    print(user_json)
+
     filter_type = request.GET.get('filter_type')
     if not filter_type is None and filter_type == '1':
         user_ary = []
         for u in user_json:
             user_ary.append(u['user'])
-        user_json = ImageViewPoint.objects.filter(user_id__in=user_ary).values('user').annotate(image_count=Count('image')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
+        user_json = ImageViewPoint.objects.filter(owner_id__in=user_ary).values('user').annotate(image_count=Count('image')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
         form.set_filter_type(filter_type)
     paginator = Paginator(user_json, 10)
 
@@ -198,7 +212,7 @@ def index(request):
         pItems[i]['distance'] = "%.3f" % u_distance
         pItems[i]['photo_count'] = u_photo_count
 
-        u_viewpoints = ImageViewPoint.objects.filter(user=user)
+        u_viewpoints = ImageViewPoint.objects.filter(image__sequence__in=u_sequences, owner=user)
         u_view_point = u_viewpoints.count()
         pItems[i]['view_points'] = u_view_point
 
