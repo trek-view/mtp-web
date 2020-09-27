@@ -125,6 +125,7 @@ def challenge_edit(request, unique_id):
             camera_make = form.cleaned_data['camera_make']
             print(camera_make)
             if not camera_make is None and len(camera_make) > 0:
+                challenge.transport_type.clear()
                 for cm in camera_make:
                     challenge.camera_make.add(cm)
 
@@ -154,12 +155,11 @@ def challenge_edit(request, unique_id):
             challenge.geometry = json.dumps(geometry)
             challenge.save()
             transport_type = form.cleaned_data['transport_type']
+            print(transport_type.count())
             if not transport_type is None:
-                tr = challenge.transport_type.all()
-                if tr.count() > 0:
-                    for t in tr:
-                        t.delete()
-                challenge.transport_type.add(transport_type)
+                challenge.transport_type.clear()
+                for transport_t in transport_type:
+                    challenge.transport_type.add(transport_t)
             messages.success(request, 'Challenge "%s" is updated successfully.' % challenge.name)
             return redirect('challenge.index')
     else:

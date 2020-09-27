@@ -26,12 +26,11 @@ class ChallengeForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation': 'required'}),
         required=False)
 
-    transport_type = forms.ModelChoiceField(
+    transport_type = forms.ModelMultipleChoiceField(
         required=False,
-        widget=forms.Select(
+        widget=forms.SelectMultiple(
             attrs={'class': 'form-control'}),
         queryset=TransType.objects.filter(parent__isnull=False),
-        empty_label='All Types'
     )
 
     camera_make = forms.ModelMultipleChoiceField(

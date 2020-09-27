@@ -67,6 +67,9 @@ class TransType(MPTTModel):
         else:
             return self.parent.name + ' - ' + self.name
 
+    def getPK(self):
+        return self.pk
+
     class MPTTMeta:
         level_attr = 'mptt_level'
         order_insertion_by = ['name']

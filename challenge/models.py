@@ -53,3 +53,12 @@ class Challenge(models.Model):
                 t.append(transport_type.getFullName())
 
         return ', '.join(t)
+
+    def getCameraMake(self):
+        camera_makes = self.camera_make.all()
+        t = []
+        if camera_makes.count() > 0:
+            for camera_make in camera_makes:
+                t.append(camera_make.name)
+
+        return ', '.join(t)
