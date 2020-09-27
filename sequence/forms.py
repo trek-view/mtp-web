@@ -104,10 +104,12 @@ class SequenceSearchForm(forms.Form):
             required=False
         )
 
-        self.fields['camera_make'] = forms.CharField(
-            label='Camera Make/Model',
-            widget=forms.TextInput(attrs={'class': 'form-control'}),
-            required=False
+        self.fields['camera_make'] = forms.ModelMultipleChoiceField(
+            required=False,
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            queryset=CameraMake.objects.all()
         )
 
         self.fields['transport_type'] = forms.ModelChoiceField(

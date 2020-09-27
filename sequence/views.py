@@ -68,7 +68,7 @@ def sequence_list(request):
         form = SequenceSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
-            camera_make = form.cleaned_data['camera_make']
+            camera_makes = form.cleaned_data['camera_make']
             tags = form.cleaned_data['tag']
             transport_type = form.cleaned_data['transport_type']
             username = form.cleaned_data['username']
@@ -79,8 +79,8 @@ def sequence_list(request):
             ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)
-            if camera_make and camera_make != '':
-                sequences = sequences.filter(camera_make__contains=camera_make)
+            if not camera_makes is None and len(camera_makes) > 0:
+                sequences = sequences.filter(camera_make__in=camera_makes)
             if transport_type and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
@@ -166,7 +166,7 @@ def my_sequence_list(request):
         form = SequenceSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
-            camera_make = form.cleaned_data['camera_make']
+            camera_makes = form.cleaned_data['camera_make']
             tags = form.cleaned_data['tag']
             transport_type = form.cleaned_data['transport_type']
             like = form.cleaned_data['like']
@@ -176,8 +176,8 @@ def my_sequence_list(request):
             ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)
-            if camera_make and camera_make != '':
-                sequences = sequences.filter(camera_make__contains=camera_make)
+            if not camera_makes is None and len(camera_makes) > 0:
+                sequences = sequences.filter(camera_make__in=camera_makes)
             if transport_type and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
@@ -966,7 +966,15 @@ def ajax_import(request, seq_key):
                         sequence = Sequence()
                     sequence.user = request.user
                     if 'camera_make' in properties:
-                        sequence.camera_make = properties['camera_make']
+                        camera_makes = CameraMake.objects.filter(name=properties['camera_make'])
+                        if camera_makes.count() > 0:
+                            c = camera_makes[0]
+                        else:
+                            c = CameraMake()
+                            c.name = properties['camera_make']
+                            c.save()
+                        sequence.camera_make = c
+
                     sequence.captured_at = properties['captured_at']
                     if 'created_at' in properties:
                         sequence.created_at = properties['created_at']
@@ -980,24 +988,7 @@ def ajax_import(request, seq_key):
                     sequence.geometry_coordinates_ary = geometry['coordinates']
                     sequence.image_count = len(geometry['coordinates'])
 
-                    lineString = LineString()
-                    firstPoint = None
-                    if sequence.image_count == 0:
-                        firstPoint = Point(sequence.geometry_coordinates_ary[0][0], sequence.geometry_coordinates_ary[0][1])
-                        lineString = LineString(firstPoint.coords, firstPoint.coords)
-                    else:
-                        for i in range(len(sequence.geometry_coordinates_ary)):
-                            coor = sequence.geometry_coordinates_ary[i]
-                            if i == 0:
-                                firstPoint = Point(coor[0], coor[1])
-                                continue
-                            point = Point(coor[0], coor[1])
-                            if i == 1:
-                                lineString = LineString(firstPoint.coords, point.coords)
-                            else:
-                                lineString.append(point.coords)
-
-                    sequence.geometry_coordinates = lineString
+                    sequence.geometry_coordinates = LineString(sequence.geometry_coordinates_ary)
 
                     sequence.coordinates_cas = properties['coordinateProperties']['cas']
                     sequence.coordinates_image = properties['coordinateProperties']['image_keys']
