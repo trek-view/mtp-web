@@ -52,6 +52,12 @@ def index(request):
         for image_v in image_vs:
             image_v.owner = image_v.image.sequence.user
             image_v.save()
+
+    ss = Sequence.objects.filter(distance=None)
+    if ss.count() > 0:
+        for s in ss:
+            s.distance = s.getDistance()
+            s.save()
     ############
 
 
@@ -118,18 +124,25 @@ def index(request):
 
         sequences = Sequence.objects.all().exclude(image_count=0)
 
-
-    user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
-
-    print(user_json)
-
     filter_type = request.GET.get('filter_type')
+
+    top_title = 'Uploads Leaderboard'
     if not filter_type is None and filter_type == '1':
-        user_ary = []
-        for u in user_json:
-            user_ary.append(u['user'])
-        user_json = ImageViewPoint.objects.filter(owner_id__in=user_ary).values('user').annotate(image_count=Count('image')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
+        user_json = sequences.values('user').annotate(all_distance=Sum('distance')).order_by('-all_distance').annotate(
+            rank=Window(expression=RowNumber()))
         form.set_filter_type(filter_type)
+        top_title = 'Distance Leaderboard'
+
+    elif not filter_type is None and filter_type == '2':
+        user_json = ImageViewPoint.objects.filter(image__sequence__in=sequences).values('owner').annotate(
+            image_view_count=Count('image')).order_by('-image_view_count').annotate(rank=Window(expression=RowNumber()))
+        form.set_filter_type(filter_type)
+        top_title = 'View Points Leaderboard'
+
+    else:
+        user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(
+            rank=Window(expression=RowNumber()))
+
     paginator = Paginator(user_json, 10)
 
     try:
@@ -153,34 +166,18 @@ def index(request):
             last_num = pItems.number + 3
     pItems.paginator.pages = range(first_num, last_num + 1)
     pItems.count = len(pItems)
+
     for i in range(len(pItems)):
+        if 'owner' in pItems[i].keys():
+            pItems[i]['user'] = pItems[i]['owner']
         user = CustomUser.objects.get(pk=pItems[i]['user'])
 
         if user is None or not user:
             continue
+        print(pItems[i]['user'])
         pItems[i]['username'] = user.username
 
-        u_sequences = Sequence.objects.filter(
-            user=user
-        )
-
-        if not y is None:
-            u_sequences = u_sequences.filter(captured_at__year=y)
-        if not m is None:
-            u_sequences = u_sequences.filter(captured_at__month=m)
-
-        if not transport_type is None and transport_type != 0 and transport_type != '':
-            children_trans_type = TransType.objects.filter(parent__in=transport_type)
-            if children_trans_type.count() > 0:
-
-                types = []
-
-                types.append(transport_type)
-                for t in children_trans_type:
-                    types.append(t.pk)
-                u_sequences = u_sequences.filter(transport_type_id__in=types)
-            else:
-                u_sequences = u_sequences.filter(transport_type_id=transport_type)
+        u_sequences = sequences.filter(user=user)
 
         used_cameras = []
         u_camera_sequences = u_sequences.values('camera_make').annotate(camera_count=Count('camera_make'))
@@ -227,6 +224,7 @@ def index(request):
         'pageTitle': 'Leaderboard',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page,
-        'time_type': time_type
+        'time_type': time_type,
+        'top_title': top_title
     }
     return render(request, 'leaderboard/list.html', content)

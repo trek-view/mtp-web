@@ -159,6 +159,8 @@ class Sequence(models.Model):
     google_street_view = models.BooleanField(default=False)
     strava = models.CharField(max_length=50, null=True, blank=True)
 
+    distance = models.FloatField(null=True, blank=True)
+
     def getImageCount(self):
         if not self.coordinates_image is None:
             return len(self.coordinates_image)

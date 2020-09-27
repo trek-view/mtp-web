@@ -417,8 +417,6 @@ def image_leaderboard(request):
     }
     return render(request, 'sequence/image_leaderboard.html', content)
 
-
-
 def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, detection_insert=False, mf_insert=True, image_download=True):
     if token is None:
         token = sequence.user.mapillary_access_token
@@ -633,7 +631,6 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
         if image_insert:
             sequence.is_published = True
             sequence.save()
-
     return image_json
 
 def set_camera_make(sequence):
@@ -1011,6 +1008,9 @@ def ajax_import(request, seq_key):
                     sequence.description = form.cleaned_data['description']
                     sequence.transport_type = form.cleaned_data['transport_type']
                     sequence.is_published = True
+                    sequence.save()
+
+                    sequence.distance = sequence.getDistance()
                     sequence.save()
 
                     set_camera_make(sequence)

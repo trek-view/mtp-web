@@ -119,9 +119,6 @@ class SequenceImport(APIView):
         data = request.data
         message = ''
 
-
-
-
         if 'google_street_view' in data.keys():
             google_street_view = data['google_street_view']
             print(google_street_view)
@@ -224,6 +221,9 @@ class SequenceImport(APIView):
 
 
         sequence.is_published = True
+        sequence.save()
+
+        sequence.distance = sequence.getDistance()
         sequence.save()
 
         print('1')
