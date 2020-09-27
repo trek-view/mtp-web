@@ -22,7 +22,7 @@ def send_mail_with_html(subject, html_message, to_email, reply_to, from_email = 
         reply_to=[reply_to]
     )
     msg.attach_alternative(html_message, 'text/html')
-    msg.send()
+    print(msg.send())
 
 def my_login_required(function):
     def wrapper(request, *args, **kw):
