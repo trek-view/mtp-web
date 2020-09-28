@@ -244,7 +244,6 @@ def tour_list(request):
             tours = Tour.objects.all().filter(
                 is_published=True
             )
-            print(tours.count())
             if name and name != '':
                 tours = tours.filter(name__contains=name)
             if username and username != '':
@@ -255,7 +254,6 @@ def tour_list(request):
                     tours = tours.filter(tour_tag=tour_tag)
             if like and like != 'all':
                 tour_likes = TourLike.objects.all().values('tour').annotate()
-                print(tour_likes)
                 tour_ary = []
                 if tour_likes.count() > 0:
                     for tour_like in tour_likes:
@@ -325,7 +323,6 @@ def my_tour_list(request):
                     tours = tours.filter(tour_tag=tour_tag)
             if like and like != 'all':
                 tour_likes = TourLike.objects.all().values('tour').annotate()
-                print(tour_likes)
                 tour_ary = []
                 if tour_likes.count() > 0:
                     for tour_like in tour_likes:

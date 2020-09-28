@@ -87,6 +87,20 @@ class Tour(models.Model):
 
         return geometry
 
+    def getFirstSequenceCaptured(self):
+        tour_sequences = TourSequence.objects.filter(tour=self)
+        if tour_sequences.count() > 0:
+            return tour_sequences[0].sequence.captured_at
+        else:
+            return ''
+
+    def getFirstSequenceCreated(self):
+        tour_sequences = TourSequence.objects.filter(tour=self)
+        if tour_sequences.count() > 0:
+            return tour_sequences[0].sequence.created_at
+        else:
+            return ''
+
     def getImageCount(self):
         tour_sequences = TourSequence.objects.filter(tour=self)
         image_count = 0
