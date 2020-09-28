@@ -54,6 +54,8 @@ def get_table_count(request):
     print('ImageViewPoint count: ', ImageViewPoint.objects.all().count())
     print('ImageLabel count: ', ImageLabel.objects.all().count())
     print('SequenceLike count: ', SequenceLike.objects.all().count())
+    print('CameraMake count: ', CameraMake.objects.all().count())
+    print('CameraModel count: ', CameraModel.objects.all().count())
 
     return HttpResponse('test')
 
