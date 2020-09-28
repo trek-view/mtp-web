@@ -866,9 +866,11 @@ def import_sequence_list(request):
             y = month.split('-')[0]
             m = month.split('-')[1]
 
-            map_user = MapillaryUser.objects.get(user=request.user)
-            if map_user is None:
+            map_users = MapillaryUser.objects.filter(user=request.user)
+            if map_users.count() == 0:
                 return redirect('home')
+            else:
+                map_user = map_users[0]
 
             if page is None:
                 start_time = month + '-01'
