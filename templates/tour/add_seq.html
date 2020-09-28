@@ -527,8 +527,10 @@
 
         var classInfo = '';
         var item_count = 0;
-
-        var selectionHeight = document.getElementsByClassName('list_item ')[0].clientHeight;
+        if (document.getElementsByClassName('list_item ')[0] == undefined)
+            var selectionHeight = 100;
+        else
+            var selectionHeight = document.getElementsByClassName('list_item ')[0].clientHeight;
         if (selectionHeight > 620)
             selectionHeight = 746
         else if (selectionHeight <= 620 && selectionHeight > 400)
