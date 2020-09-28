@@ -688,10 +688,6 @@ def set_camera_make(sequence):
 
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
-    print('1')
-    p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
-    p.start()
-    print('2')
     set_camera_make(sequence)
     page = 1
     if request.method == "GET":
@@ -1194,9 +1190,6 @@ def ajax_get_image_detail(request, unique_id, image_key):
             'status': 'failed',
             'message': "The image doesn't exist.",
         })
-
-    print('mapillary image: ')
-    print(image.mapillary_image)
 
     view_points = ImageViewPoint.objects.filter(image=image)
     scenes = Scene.objects.filter(image_key=image_key)
