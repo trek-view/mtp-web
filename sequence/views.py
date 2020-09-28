@@ -1195,6 +1195,9 @@ def ajax_get_image_detail(request, unique_id, image_key):
             'message': "The image doesn't exist.",
         })
 
+    print('mapillary image: ')
+    print(image.mapillary_image)
+
     view_points = ImageViewPoint.objects.filter(image=image)
     scenes = Scene.objects.filter(image_key=image_key)
     content = {
