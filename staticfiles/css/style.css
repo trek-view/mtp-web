@@ -7,9 +7,9 @@ body {
 }
 
 nav.navbar {
-    min-height: 80px !important;
+    min-height: 100px !important;
     position: fixed;
-    width: 100%;
+    width: 100vw;
     z-index: 2100;
     box-shadow: 3px 3px 0px 0px rgb(4 4 4 / 5%), 1px 2px 20px 0px rgb(0 0 0 / 86%) !important;
 }
@@ -35,6 +35,13 @@ nav.navbar {
     width: calc(100vw - 400px);
     min-height: calc(100vh - 100px);
     margin-left: 400px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.main-list-board {
+    position: relative;
+    overflow: auto;
 }
 
 .main-body {
@@ -188,9 +195,10 @@ i.transport-type-icon {
 }
 
 @media only screen and (max-width: 400px) {
-  .left-side {
-      width: 100vw;
-  }
+    .closed-sidebar.small-screen, .opened-sidebar.small-screen {
+        width: calc(100vw - 20px) !important;
+    }
+
 }
 
 .detail-box {
@@ -203,14 +211,14 @@ i.transport-type-icon {
 
 .switch-list-viewer {
     position: absolute;
-    margin-top: 20px;
+    margin-top: 24px;
     right: 20px;
     z-index: 100;
 }
 
 @media only screen and (max-width: 1200px) {
     .opened-sidebar.full-screen {
-        width: 100% !important;
+        margin-right: -400px !important;
     }
 
     .right-fixed-board {
@@ -219,7 +227,32 @@ i.transport-type-icon {
     }
 }
 
+@media only screen and (max-width: 800px) {
+
+    .right-board.list {
+        width: 100%;
+        margin-left: 0px;
+    }
+}
+
+.closed-sidebar.full-screen {
+    width: 100% !important;
+}
+.opened-sidebar.full-screen {
+    width: 100%;
+}
+.closed-sidebar.small-screen, .opened-sidebar.small-screen {
+    width: 400px;
+}
+
+
 @media only screen and (max-width: 600px) {
+    .left-side {
+        width: 100vw;
+    }
+    nav.navbar {
+        min-height: 80px !important;
+    }
     .left-side {
         height: calc(100vh - 80px);
     }
@@ -248,6 +281,11 @@ i.transport-type-icon {
         left: 0px !important;
         top: 80px;
     }
+
+    .right-board .paginator:first-child {
+        min-height: 38px;
+        margin-top: 70px;
+    }
 }
 
 .right-board > #map.mapboxgl-map {
@@ -264,8 +302,25 @@ body {
 }
 
 @media only screen and (max-width: 600px) {
-    #map.mapboxgl-map {
+    .right-board > #map.mapboxgl-map {
         height: calc(100vh - 80px) !important;
     }
 }
 
+.detail-modal {
+    position: fixed;
+    left: unset;
+    /* bottom: 0 !important; */
+    right: 0 !important;
+    z-index: 1050;
+    display: none;
+    width: 400px;
+    /* height: 250px; */
+    overflow: hidden;
+    outline: 0;
+    max-height: calc(100vh - 110px);
+}
+
+.tagsinput div input::placeholder {
+    color: #ff6b6b;
+}

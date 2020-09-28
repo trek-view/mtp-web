@@ -77,6 +77,7 @@ class AddSequeceForm(forms.ModelForm):
             Tag.objects.filter(is_actived=True),
             create_missing=True,
             required=False,
+            help_text='Add a tag'
         )
 
     class Meta:
@@ -124,6 +125,7 @@ class SequenceSearchForm(forms.Form):
             create_missing=False,
             required=False,
         )
+        self.fields['tag'].help_text = 'Search for a tag'
         self.fields['like'] = forms.ChoiceField(
             label='Like',
             widget=forms.RadioSelect(),
@@ -199,6 +201,7 @@ class SequenceSearchForTourForm(forms.Form):
             create_missing=False,
             required=False,
         )
+        self.fields['tag'].help_text = 'Search for a tag'
         self.fields['like'] = forms.ChoiceField(
             label='Like',
             widget=forms.RadioSelect(),

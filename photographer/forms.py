@@ -5,6 +5,7 @@ from django.conf import settings
 class PhotographerForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
                            required=False)
+
     business_name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}), required=False)
     business_website = forms.CharField(

@@ -28,6 +28,8 @@ class TourForm(forms.ModelForm):
             create_missing=True,
             required=False,
         )
+
+        self.fields['tour_tag'].help_text = 'Add a tag'
     #
 
 
@@ -60,6 +62,7 @@ class TourSearchForm(forms.Form):
             create_missing=False,
             required=False,
         )
+        self.fields['tour_tag'].help_text = 'Search for a tag'
 
         self.fields['like'] = forms.ChoiceField(
             label='Like',

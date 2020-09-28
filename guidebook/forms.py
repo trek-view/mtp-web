@@ -31,7 +31,9 @@ class GuidebookForm(forms.ModelForm):
         Tag.objects.filter(is_actived=True),
         create_missing=True,
         required=False,
+        help_text='Add for a tag'
     )
+
 
     # cover_image = forms.FileField(
     #     widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
@@ -51,6 +53,7 @@ class GuidebookForm(forms.ModelForm):
             Tag.objects.filter(is_actived=True),
             create_missing=True,
             required=False,
+            help_text='Add for a tag'
         )
 
     class Meta:
@@ -179,6 +182,7 @@ class GuidebookSearchForm(forms.Form):
             create_missing=False,
             required=False,
         )
+        self.fields['tag'].help_text = 'Search for a tag'
 
         self.fields['username'] = forms.CharField(
             label='Username',

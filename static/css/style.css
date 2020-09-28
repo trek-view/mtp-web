@@ -320,3 +320,11 @@ body {
     outline: 0;
     max-height: calc(100vh - 110px);
 }
+
+input.ui-autocomplete-input::placeholder {
+    color: #ffffff00 !important;
+}
+
+span.helptext {
+    color: chocolate;
+}
