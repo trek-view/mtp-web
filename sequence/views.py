@@ -536,7 +536,8 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                 if images.count() == 0:
                     print('image_count: ', images.count())
                     continue
-                if not images[0].mapillary_image is None:
+                if not images[0].mapillary_image is None and images[0].mapillary_image != '':
+                    print(images[0].mapillary_image)
                     print('mapillary_image is not none')
                     continue
                 image = images[0]
