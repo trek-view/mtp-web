@@ -48,6 +48,15 @@ IMPORT_PAGE_DESCRIPTION = "First start by choosing the month your sequences we'r
 
 ############################################################################
 
+def get_table_count(request):
+    print('Image count: ', Image.objects.all().count())
+    print('Sequence count: ', Sequence.objects.all().count())
+    print('ImageViewPoint count: ', ImageViewPoint.objects.all().count())
+    print('ImageLabel count: ', ImageLabel.objects.all().count())
+    print('SequenceLike count: ', SequenceLike.objects.all().count())
+
+    return HttpResponse('test')
+
 def index(request):
     return redirect('sequence.sequence_list')
 
