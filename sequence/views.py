@@ -527,24 +527,24 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
             image.save()
             print('image key: ', image.image_key)
 
-        # if len(image_keys) > 0 and image_download:
-        #     # Create the model you want to save the image to
-        #     for image_key in image_keys:
-        #         images = Image.objects.filter(image_key=image_key)
-        #         if images.count() == 0:
-        #             continue
-        #         if not images[0].mapillary_image is None:
-        #             continue
-        #         image = images[0]
-        #
-        #         lf = mapillary.download_mapillary_image(image.image_key)
-        #         # Save the temporary image to the model#
-        #         # This saves the model so be sure that is it valid
-        #         if lf:
-        #             image.mapillary_image.save(image.image_key, files.File(lf))
-        #             image.save()
-        #             print(image.mapillary_image)
-        #
+        if len(image_keys) > 0 and image_download:
+            # Create the model you want to save the image to
+            for image_key in image_keys:
+                images = Image.objects.filter(image_key=image_key)
+                if images.count() == 0:
+                    continue
+                if not images[0].mapillary_image is None:
+                    continue
+                image = images[0]
+
+                lf = mapillary.download_mapillary_image(image.image_key)
+                # Save the temporary image to the model#
+                # This saves the model so be sure that is it valid
+                if lf:
+                    image.mapillary_image.save(image.image_key, files.File(lf))
+                    image.save()
+                    print(image.mapillary_image)
+
         # if len(image_keys) > 0 and detection_insert:
         #     detection_types = ['trafficsigns', 'segmentations', 'instances']
         #     for detection_type in detection_types:

@@ -21,7 +21,7 @@ from sys_setting.models import Tag
 UserModel = get_user_model()
 
 def image_directory_path(instance, filename):
-    path = 'sequence/{}/{}/{}.jpg'.format(instance.username, instance.seq_key, filename)
+    path = 'sequence/{}/{}/{}.jpg'.format(instance.username, instance.seq_key, instance.image_key)
     print("image path: ", path)
     return path
 
