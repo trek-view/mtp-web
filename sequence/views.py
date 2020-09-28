@@ -56,12 +56,7 @@ def get_table_count(request):
     print('SequenceLike count: ', SequenceLike.objects.all().count())
     print('CameraMake count: ', CameraMake.objects.all().count())
     print('CameraModel count: ', CameraModel.objects.all().count())
-    images = Image.objects.all()
-    c = 0
-    for image in images:
-        c += image.camera_make.all().count()
-        c += image.camera_model.all().count()
-    print('c count: ', c)
+
     return HttpResponse('test')
 
 def index(request):
