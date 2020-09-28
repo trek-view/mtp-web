@@ -1,7 +1,21 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 {% block app_sequence %}active{% endblock %}
-{% block app_style %}<link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">{% endblock %}
+{% block app_style %}
+    <link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">
+    <style>
+    #label_popup {
+        position: fixed;
+        background: black;
+        color: white;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 1px;
+        padding-bottom: 1px;
+        border-radius: 4px;
+    }
+    </style>
+{% endblock %}
 {% block content %}
 
 <link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
@@ -285,6 +299,7 @@
         </div>
     </div>
 </div>
+    <div title="regular tooltip" id="label_popup">Hover me</div>
 {% endblock %}
 
 {% block scripts %}
@@ -1109,6 +1124,7 @@
                         setHoverEvent(label_tags[hoveredTagId]);
                     }
                 } else {
+                    $tooltipSpan.addClass('d-none');
                     if (current_hover_label_id != '') {
                         resetLabel(label_tags[current_hover_label_id], 'hover');
                     }
@@ -1120,10 +1136,42 @@
     // Listen to mousemove, mouseover and mouseup (which occurs
     // just before a moveend) to set hovered tag and to keep
     // track of last position.
+    var $tooltipSpan = $('#label_popup');
     var onMouseEvent = function(event) {
         lastPos = event.pixelPoint;
         setHoveredTag(event.pixelPoint);
     }
+    window.onmousemove = function (e) {
+        var x = e.clientX,
+            y = e.clientY,
+            w = window.innerWidth,
+            h = window.innerHeight;
+        var start_x = 0;
+        if (is_opened_side_bar) {
+            start_x = 400;
+        }
+        if (current_hover_label_id != '')
+        {
+            $tooltipSpan.css('top', y + 'px');
+            $tooltipSpan.css('left', x + 'px');
+
+            if (x < start_x + 250) {
+                $tooltipSpan.css('left', (x + 20) + 'px');
+                $tooltipSpan.css('right', 'unset');
+            }
+            else if (x > w - 250) {
+                $tooltipSpan.css('left', 'unset');
+                $tooltipSpan.css('right', (w - x + 20) + 'px');
+            }
+            else {
+                $tooltipSpan.css('left', (x + 20) + 'px');
+                $tooltipSpan.css('right', 'unset');
+            }
+            $tooltipSpan.css('margin-top', '-15px');
+            $tooltipSpan.text(label_tags[current_hover_label_id]['label_type_key']);
+            $tooltipSpan.removeClass('d-none');
+        }
+    };
 
     mapillaryViewer.on("mousemove", onMouseEvent);
     mapillaryViewer.on("mouseover", onMouseEvent);
@@ -1135,6 +1183,7 @@
             resetLabel(label_tags[current_hover_label_id], 'hover');
             current_hover_label_id = '';
         }
+        $tooltipSpan.addClass('d-none');
     });
 
     // Change hovered tag on mouse end if last position is
@@ -1144,6 +1193,8 @@
             setHoveredTag(lastPos);
         }
     });
+
+
 
     var switchMpaillaryLable = function(type) {
         allClear();
