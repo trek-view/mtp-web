@@ -4,7 +4,8 @@ from django.views.generic import RedirectView
 from django_email_verification import urls as mail_urls
 from django.conf import settings
 from django.conf.urls.static import static
-from two_factor.urls import urlpatterns as tf_urls
+# from two_factor.urls import urlpatterns as tf_urls
+from .two_factor_urls import urlpatterns as tf_urls
 from two_factor.admin import AdminSiteOTPRequired, AdminSiteOTPRequiredMixin
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.urls import reverse
@@ -85,6 +86,8 @@ urlpatterns = [
     path('mission-control/', admin.site.urls, name='admin'),
     path('api/', include('api.urls')),
     path('exchange_token', include('accounts.strava_url')),
+
+
 ]
 
 # This part is for deploying this project as a production(DEBUG=True) on heroku.
