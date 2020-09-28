@@ -78,8 +78,14 @@ class IconAdmin(admin.ModelAdmin):
         'font_awesome',
     )
 
+class ImageAdmin(admin.ModelAdmin):
+    list_display = (
+        'image_key',
+    )
+
 admin.site.register(TransType, TransTypeAdmin)
 admin.site.register(LabelType, LabelTypeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Sequence, SequenceAdmin)
 admin.site.register(Icon, IconAdmin)
+admin.site.register(Image, ImageAdmin)
