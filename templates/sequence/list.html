@@ -30,11 +30,13 @@
                 {% endfor %}
             {% endif %}
 
-            <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
-                <a class="btn btn-outline-primary" href="{% url 'sequence.import_sequence' %}">
-                    Import from Mapillary
-                </a>
-            </div>
+            {% if request.user.is_authenticated %}
+                <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
+                    <a class="btn btn-outline-primary" href="{% url 'sequence.import_sequence' %}">
+                        Import from Mapillary
+                    </a>
+                </div>
+            {% endif %}
 
             <div class="ml-3 mb-2 mr-3">
                 <h4>Filter Sequence</h4>

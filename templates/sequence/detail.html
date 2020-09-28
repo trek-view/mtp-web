@@ -206,24 +206,28 @@
                 <div class="p-2">
                     <div class=" actions text-right">
                         {% if request.user.is_authenticated %}
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <label class="input-group-text" for="add_label">Add Label</label>
-                                </div>
-                                <select class="custom-select" id="add_label">
-                                    <option selected value="0">Please select label type</option>
-                                    {% for label_type in label_types %}
-                                        <option value="{{ label_type.pk }}" data-color="{{ label_type.color }}" data-type="{{ label_type.type }}">{{ label_type }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="d-flex flex-row justify-content-between">
-                                <button class="btn btn-secondary" id="lbl_reset" onclick="labelReset()">
-                                    Reset
+                            <div class="add-label-button w-100 d-flex justify-content-between">
+                                <button class="btn btn-primary" id="add_label_button">
+                                    Add Label
                                 </button>
-                                <button class="btn btn-danger" id="lbl_delete" onclick="labelDelete()">
+
+                                <button class="btn btn-secondary d-none" id="lbl_reset" onclick="labelReset()">
+                                    Cancel
+                                </button>
+
+                                <button class="btn btn-danger d-none" id="lbl_delete" onclick="labelDelete()">
                                     Delete
                                 </button>
+                            </div>
+                            <div class="add-label-group d-none input-group mb-3">
+                                <div class="w-100 mt-2">
+                                    <select class="custom-select" id="add_label">
+                                        <option selected value="0">First select a label classification</option>
+                                        {% for label_type in label_types %}
+                                            <option value="{{ label_type.pk }}" data-color="{{ label_type.color }}" data-type="{{ label_type.type }}">{{ label_type }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
                         {% endif %}
                     </div>
@@ -711,7 +715,6 @@
 
         var href = location.protocol + '//' + location.host + location.pathname ;
         var page = current_page;
-        console.log(href)
         history.pushState({
             id: 'Image Detail'
         }, "{{ pageTitle }}", href + '?page=' + page + '&image_key=' + image_key);
@@ -1182,9 +1185,6 @@
         });
         if (type == 'click')
         {
-            console.log('current_hover_label_id', current_hover_label_id)
-            console.log('current_clicked_label_id', current_clicked_label_id)
-            console.log(label['id'])
             current_clicked_label_id = '';
         }
         else
@@ -1201,6 +1201,7 @@
                 return;
             }
             is_drawing = true;
+            toastr.info('Now draw the outline of this object in the image to label it');
             var geo_type = $(this).find('option[value="'+label_type+'"]').attr('data-type');
             if (geo_type == 'polygon') {
                  changeMode(Mapillary.TagComponent.TagMode.CreatePolygon);
@@ -1285,6 +1286,7 @@
                 text: label['id']
             });
             current_clicked_label_id = label['id'];
+            $('#lbl_delete').removeClass('d-none');
         }
 
         mapillaryViewer.on("mouseup", function (event) {
@@ -1312,11 +1314,10 @@
                             if (c == tag_id_ary.length) {
                                 if (current_clicked_label_index < tag_id_ary.length)
                                     current_clicked_label_index++;
-                                if (current_clicked_label_index == tag_id_ary.length)
-                                    current_clicked_label_index = 0;
-                                if (tag_id_ary.length == 1) {
+                                if (current_clicked_label_index == tag_id_ary.length || tag_id_ary.length == 1) {
                                     resetLabel(label_tags[current_clicked_label_id], 'click');
                                     current_clicked_label_ary = [];
+                                    $('#lbl_delete').addClass('d-none');
                                     return;
                                 }
                                 current_clicked_label_ary = [];
@@ -1344,7 +1345,9 @@
         var labelReset = function () {
             changeMode(Mapillary.TagComponent.TagMode.Default);
             $('#add_label').val('0');
-            resetLabel(label_tags[current_clicked_label_id], 'click');
+            is_drawing = false;
+            // resetLabel(label_tags[current_clicked_label_id], 'click');
+            disable_label_draw();
         }
 
         var labelDelete = function () {
@@ -1383,7 +1386,21 @@
                 }
             });
         }
+
+        $('#add_label_button').click(function () {
+            $('.add-label-group').removeClass('d-none');
+            $('#add_label_button').addClass('d-none');
+            $('#lbl_reset').removeClass('d-none')
+        })
+
+        function disable_label_draw() {
+            $('.add-label-group').addClass('d-none');
+            $('#add_label_button').removeClass('d-none');
+            $('#lbl_reset').addClass('d-none')
+        }
     {% endif %}
+
+
 
     goto_page("{{ page }}", "{{ image_key }}");
 

@@ -731,7 +731,7 @@ def sequence_detail(request, unique_id):
 
     addSequenceForm = AddSequeceForm(instance=sequence)
 
-    label_types = LabelType.objects.all()
+    label_types = LabelType.objects.filter(parent__isnull=False)
     tours = TourSequence.objects.filter(sequence=sequence)
     tour_count = tours.count()
 
@@ -1397,7 +1397,7 @@ def ajax_add_image_label(request, unique_id, image_key):
                 'label_type_key': image_label.label_type.getKey(),
                 'label_type_color': image_label.label_type.color
             },
-            'message': 'A new label is successfully added.'
+            'message': 'Label added successfully'
         })
 
 def ajax_get_image_list(request, unique_id):
