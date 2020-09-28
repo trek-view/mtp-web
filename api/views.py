@@ -47,6 +47,7 @@ from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, Token
 import threading
 from accounts.models import MapillaryUser
 from sequence.views import get_images_by_sequence
+from sequence.models import CameraMake
 from lib.mapillary import Mapillary
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -179,10 +180,16 @@ class SequenceImport(APIView):
                         t_s.delete()
                 seq.delete()
 
-
         sequence.user = request.user
         if 'camera_make' in properties:
-            sequence.camera_make = properties['camera_make']
+            camera_makes = CameraMake.objects.filter(name=properties['camera_make'])
+            if camera_makes.count() > 0:
+                c = camera_makes[0]
+            else:
+                c = CameraMake()
+                c.name = properties['camera_make']
+                c.save()
+            sequence.camera_make = c
         sequence.captured_at = properties['captured_at']
         if 'created_at' in properties:
             sequence.created_at = properties['created_at']
