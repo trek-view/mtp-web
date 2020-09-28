@@ -25,7 +25,6 @@ class Challenge(models.Model):
     camera_make = models.ManyToManyField(CameraMake)
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
-    expected_count = models.IntegerField(null=True, blank=True)
     geometry = models.TextField(default='')
     multipolygon = models.MultiPolygonField(null=True, blank=True)
     is_published = models.BooleanField(default=True)

@@ -42,11 +42,6 @@ class ChallengeForm(forms.ModelForm):
         queryset=CameraMake.objects.all()
     )
 
-    expected_count = forms.IntegerField(
-        required=False,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 0})
-    )
-
     geometry = forms.CharField(widget=forms.Textarea(attrs={'class': 'd-none'}), label='', required=False)
 
     zoom = forms.CharField(widget=forms.TextInput(attrs={'class': 'd-none'}), label='', required=False)
@@ -95,7 +90,6 @@ class ChallengeForm(forms.ModelForm):
             'description',
             'start_time',
             'end_time',
-            'expected_count',
             'transport_type',
             'zoom',
             'is_published'
@@ -118,15 +112,6 @@ class ChallengeSearchForm(forms.Form):
         ),
         # choices=getAllCameraMake()
         queryset=CameraMake.objects.all()
-    )
-    expected_count_min = forms.IntegerField(
-        required=False,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 0})
-    )
-
-    expected_count_max = forms.IntegerField(
-        required=False,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 0})
     )
 
     start_time = forms.DateField(

@@ -199,8 +199,6 @@ def challenge_list(request):
 
             name = form.cleaned_data['name']
             transport_type = form.cleaned_data['transport_type']
-            expected_count_min = form.cleaned_data['expected_count_min']
-            expected_count_max = form.cleaned_data['expected_count_max']
             start_time = form.cleaned_data['start_time']
             end_time = form.cleaned_data['end_time']
             camera_makes = form.cleaned_data['camera_make']
@@ -218,10 +216,6 @@ def challenge_list(request):
                 else:
                     challenges = challenges.filter(transport_type=transport_type)
 
-            if not expected_count_min is None:
-                challenges = challenges.filter(expected_count__gte=expected_count_min)
-            if not expected_count_max is None:
-                challenges = challenges.filter(expected_count__lte=expected_count_max)
             if not start_time is None:
                 challenges = challenges.filter(end_time__gte=start_time)
             if not end_time is None:
@@ -310,11 +304,8 @@ def challenge_leaderboard(request, unique_id):
     sequences = Sequence.objects.filter(is_published=True, geometry_coordinates__intersects=challenge.multipolygon)
 
     cm = challenge.camera_make.all()
-    cm_names = []
     if cm.count() > 0:
-        for _cm in cm:
-            cm_names.append(_cm.name)
-        sequences = sequences.filter(camera_make__in=cm_names)
+        sequences = sequences.filter(camera_make__in=cm)
     print(sequences.count())
 
     user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
@@ -389,8 +380,6 @@ def my_challenge_list(request):
 
             name = form.cleaned_data['name']
             transport_type = form.cleaned_data['transport_type']
-            expected_count_min = form.cleaned_data['expected_count_min']
-            expected_count_max = form.cleaned_data['expected_count_max']
             start_time = form.cleaned_data['start_time']
             end_time = form.cleaned_data['end_time']
             camera_makes = form.cleaned_data['camera_make']
@@ -408,10 +397,6 @@ def my_challenge_list(request):
                 else:
                     challenges = challenges.filter(transport_type=transport_type)
 
-            if not expected_count_min is None:
-                challenges = challenges.filter(expected_count__gte=expected_count_min)
-            if not expected_count_max is None:
-                challenges = challenges.filter(expected_count__lte=expected_count_max)
             if not start_time is None:
                 challenges = challenges.filter(end_time__gte=start_time)
             if not end_time is None:
