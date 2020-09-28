@@ -19,7 +19,7 @@ def send_mail_with_html(subject, html_message, to_email, reply_to, from_email = 
         subject=subject,
         from_email=from_email,
         to=to, 
-        reply_to=[reply_to]
+        reply_to=reply_to
     )
     msg.attach_alternative(html_message, 'text/html')
     print(msg.send())
