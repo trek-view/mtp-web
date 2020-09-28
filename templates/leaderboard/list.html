@@ -91,7 +91,7 @@
             </div>
             <div class="item-list">
                 {% if items.count > 0 %}
-                    <table class="w-100 table">
+                    <table class="w-100 table list-table">
                         <thead>
                             <tr>
                                 <th>Position</th>
@@ -105,7 +105,7 @@
                         </thead>
                         <tbody>
                             {% for item in items %}
-                                <tr class="border-top">
+                                <tr class="border-top" data-username="{{ item.username }}">
                                     <td>{{ item.rank }}</td>
                                     <td>{{ item.username }}</td>
                                     <td>{{ item.used_cameras_str }}</td>
@@ -158,6 +158,20 @@
 
 {% block scripts %}
 <script>
+    $('table tr').click(function () {
+        var username = $(this).attr('data-username');
+        var filter_time = '';
+        var time_type = '';
+        {% if not filter_time is None %}
+            filter_time = "{{ filter_time }}"
+        {% endif %}
+        {% if not time_type is None %}
+            time_type = "{{ time_type }}"
+        {% endif %}
+        var url = "{% url 'sequence.sequence_list' %}?username=" + username + "&time_type=" + time_type + "&time=" + filter_time;
+        location.assign(url);
+    });
+
     $('.paginator-btn').click(function() {
         var pageNum = $(this).data('page');
         var current_url = window.location.href;

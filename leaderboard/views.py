@@ -232,6 +232,7 @@ def index(request):
         'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page,
         'time_type': time_type,
-        'top_title': top_title
+        'top_title': top_title,
+        'filter_time': filter_time
     }
     return render(request, 'leaderboard/list.html', content)

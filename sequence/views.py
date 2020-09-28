@@ -74,6 +74,7 @@ def sequence_list(request):
             username = form.cleaned_data['username']
             like = form.cleaned_data['like']
 
+
             sequences = Sequence.objects.all().filter(
                 is_published=True
             ).exclude(image_count=0)
@@ -108,6 +109,41 @@ def sequence_list(request):
                     sequences = sequences.filter(pk__in=sequence_ary)
                 elif like == 'false':
                     sequences = sequences.exclude(pk__in=sequence_ary)
+
+            filter_time = request.GET.get('time')
+            time_type = request.GET.get('time_type')
+
+            print('count: ', sequences.count())
+            if time_type is None or not time_type or time_type == 'all_time':
+                sequences = sequences
+            else:
+                if time_type == 'monthly':
+                    if filter_time is None or filter_time == '':
+                        now = datetime.now()
+                        y = now.year
+                        m = now.month
+                    else:
+                        y = filter_time.split('-')[0]
+                        m = filter_time.split('-')[1]
+                    print(m)
+                    print(y)
+                    sequences = sequences.filter(
+                        captured_at__month=m,
+                        captured_at__year=y
+                    )
+
+                elif time_type == 'yearly':
+                    print(filter_time)
+                    if filter_time is None or filter_time == '':
+                        now = datetime.now()
+                        y = now.year
+                    else:
+                        y = filter_time
+                    sequences = sequences.filter(
+                        captured_at__year=y
+                    )
+
+            print('count: ', sequences.count())
 
     if sequences == None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
