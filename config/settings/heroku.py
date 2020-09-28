@@ -16,9 +16,8 @@ SECURE_SSL_REDIRECT = True
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-DATABASE_URL = os.environ.get('HEROKU_POSTGRESQL_AQUA_URL', 'default')
 DATABASES = {
-    'default': dj_database_url.config(env=DATABASE_URL, conn_max_age=600, ssl_require=True)
+    'default': dj_database_url.config(env='HEROKU_POSTGRESQL_AQUA_URL', conn_max_age=600, ssl_require=True)
 }
 DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
