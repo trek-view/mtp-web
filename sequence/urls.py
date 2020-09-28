@@ -6,7 +6,7 @@ urlpatterns = [
     path('list', views.sequence_list, name='sequence.sequence_list'),
     path('my-sequence-list', views.my_sequence_list, name='sequence.my_sequence_list'),
 
-    path('image-leaderboard', views.image_leaderboard, name='sequence.image_leaderboard'),
+    path('image', views.image_leaderboard, name='sequence.image_leaderboard'),
 
     path('<str:unique_id>/detail', views.sequence_detail, name='sequence.sequence_detail'),
     path('<str:unique_id>/delete', views.sequence_delete, name='sequence.sequence_delete'),

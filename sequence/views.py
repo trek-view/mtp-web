@@ -297,14 +297,14 @@ def image_leaderboard(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             camera_makes = form.cleaned_data['camera_make']
-            camera_models = form.cleaned_data['camera_model']
+            # camera_models = form.cleaned_data['camera_model']
             transport_type = form.cleaned_data['transport_type']
 
             images = Image.objects.all()
             if not camera_makes is None and len(camera_makes) > 0:
                 images = images.filter(camera_make__in=camera_makes)
-            if not camera_models is None and len(camera_models) > 0:
-                images = images.filter(camera_model__in=camera_models)
+            # if not camera_models is None and len(camera_models) > 0:
+            #     images = images.filter(camera_model__in=camera_models)
 
             if transport_type and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)

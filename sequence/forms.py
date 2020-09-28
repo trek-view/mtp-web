@@ -149,13 +149,13 @@ class ImageSearchForm(forms.Form):
             ),
             queryset=CameraMake.objects.all()
         )
-        self.fields['camera_model'] = forms.ModelMultipleChoiceField(
-            required=False,
-            widget=forms.SelectMultiple(
-                attrs={'class': 'form-control'}
-            ),
-            queryset=CameraModel.objects.all()
-        )
+        # self.fields['camera_model'] = forms.ModelMultipleChoiceField(
+        #     required=False,
+        #     widget=forms.SelectMultiple(
+        #         attrs={'class': 'form-control'}
+        #     ),
+        #     queryset=CameraModel.objects.all()
+        # )
 
         self.fields['username'] = forms.CharField(
             label='Username',
