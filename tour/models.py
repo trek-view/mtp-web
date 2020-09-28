@@ -12,7 +12,7 @@ import uuid
 from django.urls import reverse
 from django.core.validators import RegexValidator
 from sequence.models import Sequence
-from sequence.models import Tag as TourTag
+from sys_setting.models import Tag as TourTag
 
 UserModel = get_user_model()
 

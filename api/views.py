@@ -39,7 +39,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from sequence.models import Sequence, TransType, Tag as SeqTag
+from sequence.models import Sequence, TransType
+from sys_setting.models import Tag as SeqTag
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication

@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.core.validators import RegexValidator
 from storages.backends.s3boto3 import S3Boto3Storage
 from django.conf import settings
-from sequence.models import Tag
+from sys_setting.models import Tag
 ## Python Packages
 import uuid
 

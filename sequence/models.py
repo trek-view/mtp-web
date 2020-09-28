@@ -7,7 +7,7 @@ from django.contrib.auth import (
 from datetime import datetime
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
-from django.core.validators import RegexValidator
+
 ## Python Packages
 import uuid
 from lib.functions import *
@@ -16,6 +16,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 from django.core.files import File
 from urllib.request import urlretrieve
 from colorful.fields import RGBColorField
+from sys_setting.models import Tag
 
 UserModel = get_user_model()
 
@@ -28,15 +29,6 @@ class Icon(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=100)
     font_awesome = models.CharField(max_length=100, null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-
-class Tag(models.Model):
-    alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Only alphanumeric characters are allowed for Username.')
-    name = models.CharField(max_length=50, unique=True, null=True, validators=[alphanumeric])
-    description = models.TextField(default=None, blank=True, null=True)
-    is_actived = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name

@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'sequence.apps.SequenceConfig',
     'tour.apps.TourConfig',
     'leaderboard.apps.LeaderboardConfig',
+    'sys_setting.apps.SysSettingConfig',
     # ========================
     'oauth2_provider',
     'corsheaders',
@@ -57,7 +58,7 @@ REST_FRAMEWORK = {
 
 TAGS_INPUT_MAPPINGS = {
     # 'guidebook.Tag': {'field': 'name'},
-    'sequence.Tag': {'field': 'name'},
+    'sys_setting.Tag': {'field': 'name'},
     # 'tour.TourTag': {'field': 'name'}
 }
 
