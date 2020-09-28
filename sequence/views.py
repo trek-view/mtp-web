@@ -717,6 +717,8 @@ def sequence_detail(request, unique_id):
     addSequenceForm = AddSequeceForm(instance=sequence)
 
     label_types = LabelType.objects.all()
+    tours = TourSequence.objects.filter(sequence=sequence)
+    tour_count = tours.count()
 
     content = {
         'sequence': sequence,
@@ -728,7 +730,8 @@ def sequence_detail(request, unique_id):
         'view_points': view_points,
         'addSequenceForm': addSequenceForm,
         'label_types': label_types,
-        'image_key': image_key
+        'image_key': image_key,
+        'tour_count': tour_count
     }
     return render(request, 'sequence/detail.html', content)
 
