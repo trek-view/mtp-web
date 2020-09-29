@@ -35,7 +35,7 @@
                                     </div>
                                 {% endif %}
 
-                                {% if current_user.first_name == '' or current_user.last_name == '' %}
+                                {% if current_user.first_name is None or current_user.last_name is None or current_user.first_name == '' or current_user.last_name == '' %}
                                     <div class="user-name">
                                         <p class="mb-1">
                                             Name field is empty.
@@ -68,10 +68,6 @@
                                         <a class="" href="{{ current_user.website_url }}">{{ current_user.getShortWebURL }}</a>
                                     </div>
                                 {% endif %}
-
-                                <div class="hire">
-                                    <a>FOR HIRE</a>/<a>CREATE HIRE PROFILE</a>
-                                </div>
 
                                 {% if request.user.is_authenticated and current_user == request.user %}
                                     <div class="actions d-flex flex-row mt-2 justify-content-between">
