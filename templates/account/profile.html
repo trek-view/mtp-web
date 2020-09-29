@@ -55,14 +55,22 @@
 
                                 {% if request.user.is_authenticated and current_user == request.user %}
                                     <div class="actions d-flex flex-row mt-2 justify-content-between">
-                                        <div class="text-right ml-2">
+                                        <div class="text-right">
                                             <button type="button" data-toggle="modal" data-target="#uploadPictureModal" class="btn btn-sm btn-warning" id="change_file">Change Picture</button>
                                         </div>
-                                        <div class="link-developer text-right">
-                                            <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:list' %}">Developer</a>
-                                        </div>
+
                                         <div class="action text-right">
                                             <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#userDetailModal" id="edit_button">Edit</button>
+                                        </div>
+                                    </div>
+                                    <hr class="p-1">
+                                    Developer
+                                    <div class="d-flex flex-row mt-2 justify-content-between">
+                                        <div class="link-developer text-right">
+                                            <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:list' %}">Applications</a>
+                                        </div>
+                                         <div class="link-developer text-right">
+                                            <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:authorized-token-list' %}">Authorized Tokens</a>
                                         </div>
                                     </div>
                                 {% endif %}

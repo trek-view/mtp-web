@@ -251,7 +251,7 @@ def tour_list(request):
                 t_ids = []
                 if t_s.count() > 0:
                     for t in t_s:
-                        t_ids.append(t.pk)
+                        t_ids.append(t.tour.pk)
                 tours = tours.filter(pk__in=t_ids)
 
             if name and name != '':
