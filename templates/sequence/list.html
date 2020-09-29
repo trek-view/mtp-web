@@ -125,7 +125,7 @@
                             </div>
 
                             <div class="detail-box col-lg-8">
-                                <div class="row w-100">
+                                <div class="row" style="width: calc(100% + 30px)">
                                     <div class="col-md-6 item-detail-box p-2">
                                         <div class="item-main w-100 float-left">
                                             <div class="item-title text-info d-flex flex-row justify-content-between">
@@ -182,13 +182,23 @@
                                     <div class="col-md-3">
                                         <canvas id="chart_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}" class="ele-chart" width="250" height="190"></canvas>
                                     </div>
-                                    <div class="col-md-3 p-2 " style="font-size: 13px;">
-                                        <div class="d-flex flex-row align-items-center">
-                                            <a target="_blank" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
-                                                <img style="width: 40px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}">
+                                    <div class="col-md-3 p-2 text-center" style="font-size: 13px;">
+                                        <div class="d-flex flex-row justify-content-center  align-items-center text-right">
+                                            <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
+                                                <img style="width: 32px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}" />
                                             </a>
-                                            <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
-                                                <img style="width: 120px" src="{% static "images/icon/mapillary_icon.png" %}">
+                                            {% if sequence.google_street_view %}
+                                                <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.getFirstPointLat }},{{ sequence.getFirstPointLng }},14z">
+                                                    <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico" />
+                                                </a>
+                                            {% endif %}
+                                            {% if not sequence.strava is None and sequence.strava != ''  %}
+                                                <a class="mr-2" target="_blank" href="https://www.strava.com/activities/{{ sequence.strava }}">
+                                                    <img style="width: 35px" src="https://a4k2d2q5.rocketcdn.me/wp-content/uploads/2018/02/Strava-Running-and-Cycling-GPS.png">
+                                                </a>
+                                            {% endif %}
+                                            <a target="_blank" class="" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}" />
+                                                <img style="width: 32px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQiTHrSFBxGdPFbRSCEXLo3IB1IzMS50F_V0Q&usqp=CAU">
                                             </a>
                                         </div>
 
