@@ -35,35 +35,19 @@
                                     </div>
                                 {% endif %}
 
-                                {% if current_user.first_name is None or current_user.last_name is None or current_user.first_name == '' or current_user.last_name == '' %}
-                                    <div class="user-name">
-                                        <p class="mb-1">
-                                            Name field is empty.
-                                        </p>
-                                    </div>
-                                {% else %}
+                                {% if not current_user.first_name is None and not current_user.last_name is None and not current_user.first_name == '' and not current_user.last_name == '' %}
                                     <div class="user-name">
                                         <p class="mb-1">{{ current_user.first_name }} {{ current_user.last_name }}</p>
                                     </div>
                                 {% endif %}
 
-                                {% if current_user.description is None or current_user.description == '' %}
-                                    <div class="user-description mt-2" >
-                                        <p class="mb-1">
-                                            Description field is empty.
-                                        </p>
-                                    </div>
-                                {% else %}
+                                {% if not current_user.description is None and not current_user.description == '' %}
                                     <div class="user-description mt-2" >
                                         <p class="mb-1">{{ current_user.description }}</p>
                                     </div>
                                 {% endif %}
 
-                                {% if current_user.website_url == '' or current_user.website_url is None %}
-                                    <div class="user-website mt-2">
-                                       Website Url field is empty.
-                                    </div>
-                                {% else %}
+                                {% if not current_user.website_url == '' and not current_user.website_url is None %}
                                     <div class="user-website mt-2">
                                         <a class="" href="{{ current_user.website_url }}">{{ current_user.getShortWebURL }}</a>
                                     </div>
