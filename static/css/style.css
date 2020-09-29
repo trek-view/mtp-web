@@ -328,3 +328,7 @@ input.ui-autocomplete-input::placeholder {
 span.helptext {
     color: chocolate;
 }
+
+i.fas, i.far {
+    font-size: 27px;
+}

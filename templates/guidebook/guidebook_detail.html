@@ -77,23 +77,23 @@
                     </a>
                 </div>
                 <div class="guidebook-others float-right d-flex flex-row justify-content-between mt-2">
-                    <div class="scenes text-center">
+                    <div class="scenes text-center d-flex align-items-center">
                         {% if guidebook.getSceneCount == 0 %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                            <i class="fas fa-image"></i>
                         {% else %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                            <i class="fas fa-image"></i>
                         {% endif %}
-                        <span class="text-center m-0">
+                        <span class="text-center ml-2 m-0">
                             {{ guidebook.getSceneCount }} Photos
                         </span>
                     </div>
-                    <div class="like text-center">
+                    <div class="like text-center d-flex align-items-center">
                         {% if guidebook.getLikeCount == 0 %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
+                            <i class="far fa-thumbs-up"></i>
                         {% else %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
+                            <i class="far fa-thumbs-up"></i>
                         {% endif %}
-                        <span class="text-center m-0">
+                        <span class="text-center ml-2 m-0">
                             {{ guidebook.getLikeCount }} Likes
                         </span>
                     </div>

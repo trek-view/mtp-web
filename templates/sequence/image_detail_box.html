@@ -65,7 +65,7 @@
 
     <div class="image-others float-right d-flex flex-row justify-content-between mt-2">
         <div class="guidebook text-center">
-            <img style="width: 40px" src="{% static 'images/icon/62-512.png' %}" />
+            <i class="fas fa-map-marked-alt"></i>
             <a href="{% url 'guidebook.guidebook_list' %}?image_key={{ image.image_key }}">
                 <span class="text-center m-0">
                     {{ guidebook_count }} Guidebooks
@@ -73,7 +73,7 @@
             </a>
         </div>
         <div class="view_point text-center">
-            <img style="width: 40px; " src="{% static 'images/icon/images (1).jfif' %}" />
+            <i class="fas fa-binoculars"></i>
             <span class="text-center m-0">
                 {{ view_points }} View Points
             </span>
