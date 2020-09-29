@@ -53,6 +53,10 @@ class Challenge(models.Model):
 
         return ', '.join(t)
 
+    def getTrasTypesObj(self):
+        transport_types = self.transport_type.all()
+        return transport_types
+
     def getCameraMake(self):
         camera_makes = self.camera_make.all()
         t = []

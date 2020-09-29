@@ -22,6 +22,7 @@ from sequence.models import Sequence
 from django.db.models.expressions import F, Window
 from django.db.models.functions.window import RowNumber
 from django.db.models import Avg, Count, Min, Sum
+from datetime import datetime
 ## Custom Libs ##
 from lib.functions import *
 
@@ -97,7 +98,10 @@ def challenge_create(request):
 
             transport_type = form.cleaned_data['transport_type']
             if not transport_type is None:
-                challenge.transport_type.add(transport_type)
+                challenge.transport_type.clear()
+                if len(transport_type) > 0:
+                    for transport_t in transport_type:
+                        challenge.transport_type.add(transport_t)
 
             messages.success(request, 'A challenge was created successfully.')
 
@@ -196,12 +200,10 @@ def challenge_list(request):
             page = 1
         if form.is_valid():
             challenges = Challenge.objects.all().filter(is_published=True)
-
             name = form.cleaned_data['name']
             transport_type = form.cleaned_data['transport_type']
-            start_time = form.cleaned_data['start_time']
-            end_time = form.cleaned_data['end_time']
             camera_makes = form.cleaned_data['camera_make']
+            challenge_type = form.cleaned_data['challenge_type']
 
             if not name is None:
                 challenges = challenges.filter(name__contains=name)
@@ -211,15 +213,16 @@ def challenge_list(request):
                     types = []
                     types.append(transport_type)
                     for t in children_trans_type:
-                        types.append(t)
-                    challenges = challenges.filter(transport_type__in=types)
+                        types.append(t.pk)
+                    challenges = challenges.filter(transport_type_id__in=types)
                 else:
-                    challenges = challenges.filter(transport_type=transport_type)
+                    challenges = challenges.filter(transport_type_id=transport_type)
 
-            if not start_time is None:
-                challenges = challenges.filter(end_time__gte=start_time)
-            if not end_time is None:
-                challenges = challenges.filter(start_time__lte=end_time)
+            current_time = datetime.now()
+            if not challenge_type is None and challenge_type == 'active':
+                challenges = challenges.filter(end_time__gte=current_time)
+            if not challenge_type is None and challenge_type == 'completed':
+                challenges = challenges.filter(end_time__lt=current_time)
             if not camera_makes is None and len(camera_makes) > 0:
                 cs = Challenge.objects.filter(camera_make__in=camera_makes)
                 challenges = challenges.filter(pk__in=cs)
@@ -261,6 +264,82 @@ def challenge_list(request):
         'page': page
     }
 
+    return render(request, 'challenge/list.html', content)
+
+@my_login_required
+def my_challenge_list(request):
+    challenges = None
+    page = 1
+    if request.method == "GET":
+        form = ChallengeSearchForm(request.GET)
+        page = request.GET.get('page')
+        if page is None:
+            page = 1
+        if form.is_valid():
+            challenges = Challenge.objects.all().filter(user=request.user)
+
+            name = form.cleaned_data['name']
+            transport_type = form.cleaned_data['transport_type']
+            camera_makes = form.cleaned_data['camera_make']
+
+            if not name is None:
+                challenges = challenges.filter(name__contains=name)
+            if not transport_type is None and transport_type != 0 and transport_type != '':
+                children_trans_type = TransType.objects.filter(parent_id=transport_type)
+                if children_trans_type.count() > 0:
+                    types = []
+                    types.append(transport_type)
+                    for t in children_trans_type:
+                        types.append(t)
+                    challenges = challenges.filter(transport_type__in=types)
+                else:
+                    challenges = challenges.filter(transport_type=transport_type)
+
+            challenge_type = form.cleaned_data['challenge_type']
+            current_time = datetime.now()
+            if not challenge_type is None and challenge_type == 'active':
+                challenges = challenges.filter(end_time__gte=current_time)
+            if not challenge_type is None and challenge_type == 'completed':
+                challenges = challenges.filter(end_time__lt=current_time)
+            if not camera_makes is None and len(camera_makes) > 0:
+
+                challenges = challenges.filter(camera_make__in=camera_makes)
+
+    if challenges == None:
+        challenges = Challenge.objects.all().filter(user=request.user)
+        form = ChallengeSearchForm()
+
+    paginator = Paginator(challenges.order_by('-created_at'), 5)
+
+    try:
+        pChallenges = paginator.page(page)
+    except PageNotAnInteger:
+        pChallenges = paginator.page(1)
+    except EmptyPage:
+        pChallenges = paginator.page(paginator.num_pages)
+
+    first_num = 1
+    last_num = paginator.num_pages
+    if paginator.num_pages > 7:
+        if pChallenges.number < 4:
+            first_num = 1
+            last_num = 7
+        elif pChallenges.number > paginator.num_pages - 3:
+            first_num = paginator.num_pages - 6
+            last_num = paginator.num_pages
+        else:
+            first_num = pChallenges.number - 3
+            last_num = pChallenges.number + 3
+    pChallenges.paginator.pages = range(first_num, last_num + 1)
+    pChallenges.count = len(pChallenges)
+    content = {
+        'challenges': pChallenges,
+        'form': form,
+        'pageName': 'My Challenges',
+        'pageTitle': 'My Challenges',
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'page': page
+    }
     return render(request, 'challenge/list.html', content)
 
 def challenge_detail(request, unique_id):
@@ -365,81 +444,6 @@ def challenge_leaderboard(request, unique_id):
               'pageTitle': challenge.name + ' - Challenge Leaderboard',
               'page': page
           })
-
-@my_login_required
-def my_challenge_list(request):
-    challenges = None
-    page = 1
-    if request.method == "GET":
-        form = ChallengeSearchForm(request.GET)
-        page = request.GET.get('page')
-        if page is None:
-            page = 1
-        if form.is_valid():
-            challenges = Challenge.objects.all().filter(user=request.user)
-
-            name = form.cleaned_data['name']
-            transport_type = form.cleaned_data['transport_type']
-            start_time = form.cleaned_data['start_time']
-            end_time = form.cleaned_data['end_time']
-            camera_makes = form.cleaned_data['camera_make']
-
-            if not name is None:
-                challenges = challenges.filter(name__contains=name)
-            if not transport_type is None and transport_type != 0 and transport_type != '':
-                children_trans_type = TransType.objects.filter(parent_id=transport_type)
-                if children_trans_type.count() > 0:
-                    types = []
-                    types.append(transport_type)
-                    for t in children_trans_type:
-                        types.append(t)
-                    challenges = challenges.filter(transport_type__in=types)
-                else:
-                    challenges = challenges.filter(transport_type=transport_type)
-
-            if not start_time is None:
-                challenges = challenges.filter(end_time__gte=start_time)
-            if not end_time is None:
-                challenges = challenges.filter(start_time__lte=end_time)
-            if not camera_makes is None and len(camera_makes) > 0:
-                challenges = challenges.filter(camera_make__in=camera_makes)
-
-    if challenges == None:
-        challenges = Challenge.objects.all().filter(user=request.user)
-        form = ChallengeSearchForm()
-
-    paginator = Paginator(challenges.order_by('-created_at'), 5)
-
-    try:
-        pChallenges = paginator.page(page)
-    except PageNotAnInteger:
-        pChallenges = paginator.page(1)
-    except EmptyPage:
-        pChallenges = paginator.page(paginator.num_pages)
-
-    first_num = 1
-    last_num = paginator.num_pages
-    if paginator.num_pages > 7:
-        if pChallenges.number < 4:
-            first_num = 1
-            last_num = 7
-        elif pChallenges.number > paginator.num_pages - 3:
-            first_num = paginator.num_pages - 6
-            last_num = paginator.num_pages
-        else:
-            first_num = pChallenges.number - 3
-            last_num = pChallenges.number + 3
-    pChallenges.paginator.pages = range(first_num, last_num + 1)
-    pChallenges.count = len(pChallenges)
-    content = {
-        'challenges': pChallenges,
-        'form': form,
-        'pageName': 'My Challenges',
-        'pageTitle': 'My Challenges',
-        'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
-    }
-    return render(request, 'challenge/list.html', content)
 
 def ajax_challenge_detail(request, unique_id):
     challenge = Challenge.objects.get(unique_id=unique_id)

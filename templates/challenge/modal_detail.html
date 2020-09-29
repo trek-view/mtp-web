@@ -7,26 +7,40 @@
             </button>
         </div>
         <div class="modal-body">
-            <div class="challenge-description">
-                <p>
+            <div class="item-description">
+                <p class="mb-1">
                     {{ challenge.description }}
                 </p>
             </div>
 
-            <div class="challenge-camera-make">
-                <p>
+            <div class="item-camera-make">
+                <p class="mb-1">
                     {{ challenge.getCameraMake }}
                 </p>
             </div>
 
-            <div class="challenge-transport-type">
-                <p>
-                    {{ challenge.getTrasTypes }}
-                </p>
+            <div class="w-100 d-flex " style="white-space: nowrap">
+                {% if challenge.getTrasTypesObj.count > 0 %}
+                    {% for transport_type in challenge.getTrasTypesObj %}
+                        <div class="d-flex flex-row">
+                            <p class="mb-1 mr-1 item-transport-type text-center">
+                                <i class="transport-type-icon fas fa-{{ transport_type.parent.icon.font_awesome }}"></i>
+                                <br>
+                                [{{ transport_type.parent }}
+                            </p>
+                            <p class="mb-1 mr-1"><i class="transport-type-icon fas fa"></i><br>-</p>
+                            <p class="mb-1 mr-1 item-transport-type text-center">
+                                <i class="transport-type-icon fas fa-{{ transport_type.icon.font_awesome }}"></i>
+                                <br>
+                                {{ transport_type.name }}]
+                            </p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
             </div>
 
-            <div class="challenge-options">
-                <p>
+            <div class="item-time">
+                <p class="mb-1">
                     {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
                 </p>
             </div>
