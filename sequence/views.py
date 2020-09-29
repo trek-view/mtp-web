@@ -29,6 +29,7 @@ from django.core import files
 ## Custom Libs ##
 from lib.functions import *
 from lib.mapillary import Mapillary
+from lib.weatherstack import Weatherstack
 import threading
 from asgiref.sync import sync_to_async
 ## Project packages
@@ -464,7 +465,194 @@ def image_leaderboard(request):
     }
     return render(request, 'sequence/image_leaderboard.html', content)
 
-def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, detection_insert=False, mf_insert=True, image_download=True):
+def save_weather(sequence):
+    sequence_weathers = SequenceWeather.objects.filter(sequence=sequence)
+    if sequence_weathers.count() == 0:
+        weatherstack = Weatherstack()
+        point = [sequence.getFirstPointLat(), sequence.getFirstPointLng()]
+        historical_date = sequence.captured_at.strftime('%Y-%m-%d')
+        print('historical_date: ', historical_date)
+        weather_json = weatherstack.get_historical_data(point=point, historical_date=historical_date)
+        print(weather_json)
+
+        if weather_json:
+            sequence_weather = SequenceWeather()
+
+            sequence_weather.sequence = sequence
+
+            if 'location' in weather_json.keys():
+                location = weather_json['location']
+                if 'name' in location.keys():
+                    sequence_weather.location_name = location['name']
+                if 'country' in location.keys():
+                    sequence_weather.location_country = location['country']
+                if 'region' in location.keys():
+                    sequence_weather.location_region = location['region']
+                if 'lat' in location.keys():
+                    sequence_weather.location_lat = float(location['lat'])
+                if 'lon' in location.keys():
+                    sequence_weather.location_lon = float(location['lon'])
+                if 'timezone_id' in location.keys():
+                    sequence_weather.location_timezone_id = location['timezone_id']
+                if 'localtime' in location.keys():
+                    sequence_weather.location_localtime = location['localtime']
+                if 'localtime_epoch' in location.keys():
+                    sequence_weather.location_localtime_epoch = location['localtime_epoch']
+                if 'utc_offset' in location.keys():
+                    sequence_weather.location_utc_offset = location['utc_offset']
+
+            if 'current' in weather_json.keys():
+                current = weather_json['current']
+                if 'observation_time' in current.keys():
+                    sequence_weather.current_observation_time = current['observation_time']
+                if 'temperature' in current.keys():
+                    sequence_weather.current_temperature = current['temperature']
+                if 'weather_code' in current.keys():
+                    sequence_weather.current_weather_code = current['weather_code']
+                if 'weather_icons' in current.keys():
+                    sequence_weather.current_weather_icons = current['weather_icons']
+                if 'weather_descriptions' in current.keys():
+                    sequence_weather.current_weather_descriptions = current['weather_descriptions']
+                if 'wind_speed' in current.keys():
+                    sequence_weather.current_wind_speed = current['wind_speed']
+                if 'wind_degree' in current.keys():
+                    sequence_weather.current_wind_degree = current['wind_degree']
+                if 'wind_dir' in current.keys():
+                    sequence_weather.current_wind_dir = current['wind_dir']
+                if 'pressure' in current.keys():
+                    sequence_weather.current_pressure = current['pressure']
+                if 'precip' in current.keys():
+                    sequence_weather.current_precip = current['precip']
+                if 'humidity' in current.keys():
+                    sequence_weather.current_humidity = current['humidity']
+                if 'cloudcover' in current.keys():
+                    sequence_weather.current_cloudcover = current['cloudcover']
+                if 'feelslike' in current.keys():
+                    sequence_weather.current_feelslike = current['feelslike']
+                if 'uv_index' in current.keys():
+                    sequence_weather.current_uv_index = current['uv_index']
+                if 'is_day' in current.keys():
+                    sequence_weather.current_is_day = current['is_day']
+
+            if 'historical' in weather_json.keys():
+                historical = weather_json['historical']
+                if historical_date in historical.keys():
+                    historical_data = historical[historical_date]
+                    if 'date' in historical_data.keys():
+                        sequence_weather.his_date = historical_data['date']
+                    if 'date_epoch' in historical_data.keys():
+                        sequence_weather.his_date_epoch = historical_data['date_epoch']
+                    if 'astro' in historical_data.keys():
+                        astro = historical_data['astro']
+                        if 'sunrise' in astro.keys():
+                            sequence_weather.his_astro_sunrise = astro['sunrise']
+                        if 'sunset' in astro.keys():
+                            sequence_weather.his_astro_sunset = astro['sunset']
+                        if 'moonrise' in astro.keys():
+                            sequence_weather.his_astro_moonrise = astro['moonrise']
+                        if 'moonset' in astro.keys():
+                            sequence_weather.his_astro_moonset = astro['moonset']
+                        if 'moon_phase' in astro.keys():
+                            sequence_weather.his_astro_moon_phase = astro['moon_phase']
+                        if 'moon_illumination' in astro.keys():
+                            sequence_weather.his_astro_moon_illumination = astro['moon_illumination']
+
+                    if 'mintemp' in historical_data.keys():
+                        sequence_weather.his_mintemp = historical_data['mintemp']
+                    if 'maxtemp' in historical_data.keys():
+                        sequence_weather.his_maxtemp = historical_data['maxtemp']
+                    if 'avgtemp' in historical_data.keys():
+                        sequence_weather.his_avgtemp = historical_data['avgtemp']
+                    if 'totalsnow' in historical_data.keys():
+                        sequence_weather.his_totalsnow = historical_data['totalsnow']
+                    if 'sunhour' in historical_data.keys():
+                        sequence_weather.his_sunhour = historical_data['sunhour']
+                    if 'uv_index' in historical_data.keys():
+                        sequence_weather.his_uv_index = historical_data['uv_index']
+                    if 'hourly' in historical_data.keys():
+                        hourly_data = historical_data['hourly']
+                        if len(hourly_data) > 0:
+                            different_time = 24
+                            d_index = 0
+                            for h_index in range(len(hourly_data)):
+                                if 'time' in hourly_data[h_index].keys():
+                                    time_str = hourly_data[h_index]['time']
+                                    time_float = float(time_str) / 100
+                                    capture_h = float(sequence.captured_at.strftime('%H'))
+                                    capture_m = float(sequence.captured_at.strftime('%M'))
+                                    d_time = abs(capture_h + capture_m / 60 - time_float)
+                                    if d_time < different_time:
+                                        d_index = h_index
+                                        different_time = d_time
+
+                            h_data = hourly_data[d_index]
+                            if 'time' in h_data.keys():
+                                sequence_weather.his_hourly_time = h_data['time']
+                            if 'temperature' in h_data.keys():
+                                sequence_weather.his_hourly_temperature = h_data['temperature']
+                            if 'wind_speed' in h_data.keys():
+                                sequence_weather.his_hourly_wind_speed = h_data['wind_speed']
+                            if 'wind_degree' in h_data.keys():
+                                sequence_weather.his_hourly_wind_degree = h_data['wind_degree']
+                            if 'wind_dir' in h_data.keys():
+                                sequence_weather.his_hourly_wind_dir = h_data['wind_dir']
+                            if 'weather_code' in h_data.keys():
+                                sequence_weather.his_hourly_weather_code = h_data['weather_code']
+                            if 'weather_icons' in h_data.keys():
+                                sequence_weather.his_hourly_weather_icons = h_data['weather_icons']
+                            if 'weather_descriptions' in h_data.keys():
+                                sequence_weather.his_hourly_weather_descriptions = h_data['weather_descriptions']
+                            if 'precip' in h_data.keys():
+                                sequence_weather.his_hourly_precip = h_data['precip']
+                            if 'humidity' in h_data.keys():
+                                sequence_weather.his_hourly_humidity = h_data['humidity']
+                            if 'visibility' in h_data.keys():
+                                sequence_weather.his_hourly_visibility = h_data['visibility']
+                            if 'pressure' in h_data.keys():
+                                sequence_weather.his_hourly_pressure = h_data['pressure']
+                            if 'cloudcover' in h_data.keys():
+                                sequence_weather.his_hourly_cloudcover = h_data['cloudcover']
+                            if 'heatindex' in h_data.keys():
+                                sequence_weather.his_hourly_heatindex = h_data['heatindex']
+                            if 'dewpoint' in h_data.keys():
+                                sequence_weather.his_hourly_dewpoint = h_data['dewpoint']
+                            if 'windchill' in h_data.keys():
+                                sequence_weather.his_hourly_windchill = h_data['windchill']
+                            if 'windgust' in h_data.keys():
+                                sequence_weather.his_hourly_windgust = h_data['windgust']
+                            if 'feelslike' in h_data.keys():
+                                sequence_weather.his_hourly_feelslike = h_data['feelslike']
+                            if 'chanceofrain' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofrain = h_data['chanceofrain']
+                            if 'chanceofremdry' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofremdry = h_data['chanceofremdry']
+                            if 'chanceofwindy' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofwindy = h_data['chanceofwindy']
+                            if 'chanceofovercast' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofovercast = h_data['chanceofovercast']
+                            if 'chanceofsunshine' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofsunshine = h_data['chanceofsunshine']
+                            if 'chanceoffrost' in h_data.keys():
+                                sequence_weather.his_hourly_chanceoffrost = h_data['chanceoffrost']
+                            if 'chanceofhightemp' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofhightemp = h_data['chanceofhightemp']
+                            if 'chanceoffog' in h_data.keys():
+                                sequence_weather.his_hourly_chanceoffog = h_data['chanceoffog']
+                            if 'chanceofsnow' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofsnow = h_data['chanceofsnow']
+                            if 'chanceofthunder' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofthunder = h_data['chanceofthunder']
+                            if 'uv_index' in h_data.keys():
+                                sequence_weather.his_hourly_ = h_data['uv_index']
+
+            sequence_weather.save()
+            return True
+    return False
+
+def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, image_download=True, is_weather=True):
+    if is_weather and not sequence.getFirstPointLat() is None and not sequence.getFirstPointLng() is None:
+        print(save_weather(sequence))
+
     if token is None:
         token = sequence.user.mapillary_access_token
     mapillary = Mapillary(token, source=source)
@@ -561,125 +749,6 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                     image.save()
                     print(image.mapillary_image)
 
-        # if len(image_keys) > 0 and detection_insert:
-        #     detection_types = ['trafficsigns', 'segmentations', 'instances']
-        #     for detection_type in detection_types:
-        #         image_keys_t = []
-        #         image_num = 0
-        #         for image_k in image_keys:
-        #             image_keys_t.append(image_k)
-        #             image_num += 1
-        #             if (len(image_keys_t) == 10 or image_num == len(image_keys)) and len(image_keys_t) > 0:
-        #                 print(image_keys_t)
-        #                 image_detection_json = mapillary.get_detection_by_image_key(image_keys_t, detection_type)
-        #                 if image_detection_json:
-        #                     image_detection_features = image_detection_json['features']
-        #                     for image_detection_feature in image_detection_features:
-        #                         properties = image_detection_feature['properties']
-        #                         geometry = image_detection_feature['geometry']
-        #                         image_detection = ImageDetection.objects.filter(image_key=properties['key'])
-        #                         if image_detection.count() > 0:
-        #                             continue
-        #                         image_detection = ImageDetection()
-        #                         images = Image.objects.filter(image_key=properties['image_key'])[:1]
-        #                         if images.count() == 0:
-        #                             continue
-        #
-        #                         if 'area' in properties.keys():
-        #                             image_detection.area = properties['area']
-        #                         if 'captured_at' in properties.keys():
-        #                             image_detection.captured_at = properties['captured_at']
-        #                         if 'image_ca' in properties.keys():
-        #                             image_detection.image_ca = properties['image_ca']
-        #                         if 'image_key' in properties.keys():
-        #                             image_detection.image_key = properties['image_key']
-        #                         if 'image_pano' in properties.keys():
-        #                             image_detection.image_pano = properties['image_pano']
-        #                         if 'key' in properties.keys():
-        #                             image_detection.det_key = properties['key']
-        #                         if 'score' in properties.keys():
-        #                             image_detection.score = properties['score']
-        #                         if 'shape' in properties.keys():
-        #                             image_detection.shape_type = properties['shape']['type']
-        #                         if 'shape' in properties.keys():
-        #                             coordinates = properties['shape']['coordinates']
-        #                             multiPolygon = MultiPolygon()
-        #                             for coordinate in coordinates:
-        #                                 polygon = Polygon(coordinate)
-        #                                 multiPolygon.append(polygon)
-        #                             image_detection.shape_multipolygon = multiPolygon
-        #                         if 'value' in properties.keys():
-        #                             image_detection.value = properties['value']
-        #
-        #                         image_detection.geometry_type = geometry['type']
-        #                         image_detection.geometry_point = Point(geometry['coordinates'])
-        #                         image_detection.type = detection_type
-        #                         image_detection.save()
-        #                         print('image detection: ', image_detection.det_key)
-        #                 image_keys_t = []
-        #                 continue
-        #
-        # if len(image_position_ary) > 0 and mf_insert:
-        #     print('Image len: ', len(image_position_ary))
-        #     mm = 0
-        #     for image_position in image_position_ary:
-        #         mm += 1
-        #         print('===== {} ====='.format(mm))
-        #         map_feature_json = mapillary.get_map_feature_by_close_to(image_position)
-        #         if map_feature_json:
-        #             map_features = map_feature_json['features']
-        #             print('map_features len: ', len(map_features))
-        #             tt = 0
-        #             for map_feature in map_features:
-        #                 tt += 1
-        #                 print('---- {} -----'.format(tt))
-        #                 mf_properties = map_feature['properties']
-        #                 mf_geometry = map_feature['geometry']
-        #                 mf_item = MapFeature.objects.filter(mf_key=mf_properties['key'])[:1]
-        #                 if mf_item.count() > 0:
-        #                     continue
-        #
-        #                 mf_item = MapFeature()
-        #                 if 'accuracy' in mf_properties.keys():
-        #                     mf_item.accuracy = mf_properties['accuracy']
-        #                 if 'altitude' in mf_properties.keys():
-        #                     mf_item.altitude = mf_properties['altitude']
-        #                 if 'direction' in mf_properties.keys():
-        #                     mf_item.direction = mf_properties['direction']
-        #                 if 'first_seen_at' in mf_properties.keys():
-        #                     mf_item.first_seen_at = mf_properties['first_seen_at']
-        #                 if 'key' in mf_properties.keys():
-        #                     mf_item.mf_key = mf_properties['key']
-        #                 if 'last_seen_at' in mf_properties.keys():
-        #                     mf_item.last_seen_at = mf_properties['last_seen_at']
-        #                 if 'layer' in mf_properties.keys():
-        #                     mf_item.layer = mf_properties['layer']
-        #                 if 'value' in mf_properties.keys():
-        #                     mf_item.value = mf_properties['value']
-        #
-        #                 mf_item.geometry_type = mf_geometry['type']
-        #                 mf_item.geometry_point = Point(mf_geometry['coordinates'])
-        #
-        #                 mf_item.save()
-        #
-        #                 if 'detections' in mf_properties.keys():
-        #                     for detection in mf_properties['detections']:
-        #                         detection_key = detection['detection_key']
-        #                         image_key = detection['image_key']
-        #                         user_key = detection['user_key']
-        #                         mf_key = mf_item.mf_key
-        #                         print(detection)
-        #                         mf_detection = MapFeatureDetection.objects.filter(mf_key=mf_key, detection_key=detection_key, image_key=image_key, user_key=user_key)
-        #                         if mf_detection.count() > 0:
-        #                             continue
-        #                         else:
-        #                             mf_detection = MapFeatureDetection()
-        #                             mf_detection.mf_key = mf_key
-        #                             mf_detection.detection_key = detection_key
-        #                             mf_detection.image_key = image_key
-        #                             mf_detection.user_key = user_key
-        #                             mf_detection.save()
-
         if image_insert:
             sequence.is_published = True
             sequence.save()
@@ -699,7 +768,9 @@ def set_camera_make(sequence):
 
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
+    save_weather(sequence)
     set_camera_make(sequence)
+
     page = 1
     if request.method == "GET":
         page = request.GET.get('page')
@@ -734,7 +805,11 @@ def sequence_detail(request, unique_id):
     label_types = LabelType.objects.filter(parent__isnull=False)
     tours = TourSequence.objects.filter(sequence=sequence)
     tour_count = tours.count()
-
+    sequence_weathers = SequenceWeather.objects.filter(sequence=sequence)
+    sequence_weather = None
+    if sequence_weathers.count() > 0:
+        sequence_weather = sequence_weathers[0]
+    print(sequence_weather)
     content = {
         'sequence': sequence,
         'pageName': 'Sequence Detail',
@@ -746,7 +821,8 @@ def sequence_detail(request, unique_id):
         'addSequenceForm': addSequenceForm,
         'label_types': label_types,
         'image_key': image_key,
-        'tour_count': tour_count
+        'tour_count': tour_count,
+        'sequence_weather': sequence_weather
     }
     return render(request, 'sequence/detail.html', content)
 

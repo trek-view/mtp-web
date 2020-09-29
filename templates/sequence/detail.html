@@ -91,6 +91,46 @@
                         </a>
                     </div>
 
+                    <div class="sequence-weather border-top border-bottom mt-2 pt-2" id="sequence_weather">
+                        <h6>Location Weather: </h6>
+                        <div class="mt-2">
+                            <label class="col-6">Sunrise: </label>
+                            <span class="col-6">{{ sequence_weather.his_astro_sunrise }}</span>
+                        </div>
+                        <div class="mt-2">
+                            <label class="col-6">Sunset: </label>
+                            <span class="col-6">{{ sequence_weather.his_astro_sunset }}</span>
+                        </div>
+                        <div class="mt-2">
+                            <label class="col-6">Temperature: </label>
+                            <span class="col-6">{{ sequence_weather.his_hourly_temperature }}</span>
+                        </div>
+                        <div class="mt-2">
+                            <label class="col-6">Wind Speed: </label>
+                            <span class="col-6">{{ sequence_weather.his_hourly_wind_speed }}</span>
+                        </div>
+                        <div class="mt-2">
+                            <label class="col-6">Wind direction: </label>
+                            <span class="col-6">{{ sequence_weather.his_hourly_wind_dir }}</span>
+                        </div>
+{#                        <div class="mt-2">#}
+{#                            <label class="col-4">Weather: </label>#}
+{#                            <span class="col-8">{{ imagesequence_weather.his_astro_sunrise }}</span>#}
+{#                        </div>#}
+                        <div class="mt-2">
+                            <label class="col-6">Precip: </label>
+                            <span class="col-6">{{ sequence_weather.his_hourly_precip }}</span>
+                        </div>
+                        <div class="mt-2">
+                            <label class="col-6">Cloud Cover: </label>
+                            <span class="col-6">{{ sequence_weather.his_hourly_cloudcover }}</span>
+                        </div>
+                        <div class="mt-2">
+                            <label class="col-6">Visibility: </label>
+                            <span class="col-6">{{ sequence_weather.his_hourly_visibility }}</span>
+                        </div>
+                    </div>
+
                     <div class="guidebook-created-at d-flex flex-row align-items-center justify-content-between mt-2">
                         <div class="text-secondary">
                             <p >
