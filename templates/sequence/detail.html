@@ -101,13 +101,14 @@
                             <label class="col-6">Sunset: </label>
                             <span class="col-6">{{ sequence_weather.his_astro_sunset }}</span>
                         </div>
+                        <h6>Conditions at time of photo:</h6>
                         <div class="mt-2">
                             <label class="col-6">Temperature: </label>
-                            <span class="col-6">{{ sequence_weather.his_hourly_temperature }}</span>
+                            <span class="col-6">{{ sequence_weather.his_hourly_temperature }} °C</span>
                         </div>
                         <div class="mt-2">
                             <label class="col-6">Wind Speed: </label>
-                            <span class="col-6">{{ sequence_weather.his_hourly_wind_speed }}</span>
+                            <span class="col-6">{{ sequence_weather.his_hourly_wind_speed }} Km/h</span>
                         </div>
                         <div class="mt-2">
                             <label class="col-6">Wind direction: </label>
@@ -119,7 +120,7 @@
 {#                        </div>#}
                         <div class="mt-2">
                             <label class="col-6">Precip: </label>
-                            <span class="col-6">{{ sequence_weather.his_hourly_precip }}</span>
+                            <span class="col-6">{{ sequence_weather.his_hourly_precip }} mm</span>
                         </div>
                         <div class="mt-2">
                             <label class="col-6">Cloud Cover: </label>
@@ -127,7 +128,7 @@
                         </div>
                         <div class="mt-2">
                             <label class="col-6">Visibility: </label>
-                            <span class="col-6">{{ sequence_weather.his_hourly_visibility }}</span>
+                            <span class="col-6">{{ sequence_weather.his_hourly_visibility }} Km</span>
                         </div>
                     </div>
 
