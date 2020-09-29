@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
+from django.utils.html import mark_safe
 
 ## Custom Libs ##
 from lib.functions import send_mail_with_html
@@ -30,9 +31,17 @@ class LabelTypeAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'parent',
-        'description'
+        'description',
+        'label_color',
+        'source'
     )
 
+    def label_color(self, obj):
+        if obj.color is None:
+            return ''
+        return mark_safe('<span style="color: '+obj.color+'">'+obj.color+'</span>')
+
+    label_color.short_description = 'color'
 
 class TagAdmin(admin.ModelAdmin):
     list_display = (

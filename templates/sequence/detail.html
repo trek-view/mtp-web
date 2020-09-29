@@ -977,19 +977,39 @@
             success: function(data){
                 if (state == 'detection_mapillary') {
                     var features = data.features;
-                    var polygon_ary = [];
-                    var image_label = null;
-                    var color = '#99e694';
+                    var key_ary = [];
                     for (var i=0; i<features.length; i++) {
                         var properties = features[i].properties;
-                        var polygon = properties.shape.coordinates[0];
-                        var value = properties.value;
-                        polygon_ary.push(polygon);
-                        addLabelTypeAry(properties.key, properties.value, color);
-                        addNewTag(properties.key, 'polygon', properties.shape.coordinates[0], properties.value, false);
-
+                        if (key_ary.indexOf(properties.value) < 0)
+                            key_ary.push(properties.value)
                     }
-                    updateDetectionInSidebar();
+                    $.ajax({
+                        url: "{% url 'sequence.ajax_add_label_type' %}",
+                        type: 'POST',
+                        data: {'keys': key_ary.join(',')},
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.status == 'failed')
+                            {
+                                console.log(data.message)
+                            }
+                            else {
+                                var color = '#99e694';
+                                var label_types_json = data.data.label_types_json
+
+                                for (var i=0; i<features.length; i++) {
+                                    var properties = features[i].properties;
+                                    if (label_types_json.hasOwnProperty(properties.value)) {
+                                        color = label_types_json[properties.value];
+                                    }
+                                    addLabelTypeAry(properties.key, properties.value, color);
+                                    addNewTag(properties.key, 'polygon', properties.shape.coordinates[0], properties.value, false);
+                                }
+                                updateDetectionInSidebar();
+                            }
+                        }
+                    });
+
                 }
             }
         });

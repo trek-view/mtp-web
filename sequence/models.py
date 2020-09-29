@@ -17,6 +17,8 @@ from django.core.files import File
 from urllib.request import urlretrieve
 from colorful.fields import RGBColorField
 from sys_setting.models import Tag
+import random
+r = lambda: random.randint(0,255)
 
 UserModel = get_user_model()
 
@@ -70,20 +72,43 @@ class TransType(MPTTModel):
         verbose_name_plural = 'Transport Type'
 
 class LabelType(MPTTModel):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
     description = models.TextField(blank=True, null=True)
     # type is one of "point" and "polygon"
     # type = models.CharField(max_length=50, choices=(('point', 'point'), ('polygon', 'polygon'),), default='point')
     type = models.CharField(max_length=50, choices=(('polygon', 'polygon'),), default='polygon')
-    color = RGBColorField(default='#ffffff')
-
+    color = RGBColorField(null=True, blank=True)
+    source = models.CharField(max_length=50, choices=(('mtpw', 'MTPW'), ('mapillary', 'Mapillary')), default='mtpw')
 
     def __str__(self):
         if self.parent is None:
             return self.name
         else:
             return self.parent.name + '--' + self.name
+
+    def save(self, *args, **kwargs):
+        color = self.color
+        if self.pk is None:
+            super().save(*args, **kwargs)
+            if self.parent is None or self.source == 'mapillary':
+                while True:
+                    while color is None or color == '#000000':
+                        color = '#%02X%02X%02X' % (r(), r(), r())
+                    labelType = LabelType.objects.filter(color=color).exclude(pk=self.pk)
+                    if labelType.count() == 0:
+                        self.color = color
+                        break
+                    color = '#%02X%02X%02X' % (r(), r(), r())
+            else:
+                if color is None or color == '#000000':
+                    self.color = self.parent.color
+            self.save()
+        else:
+            labelType = LabelType.objects.get(pk=self.pk)
+            if labelType.parent != self.parent:
+                self.color = self.parent.color
+            super().save(*args, **kwargs)
 
     def getKey(self):
         if self.parent is None:

@@ -1274,7 +1274,6 @@ def ajax_delete_image_label(request, unique_id, image_key):
         'message': "The image label doesn't exist.",
     })
 
-
 def ajax_get_image_label(request, unique_id, image_key):
     sequence = Sequence.objects.get(unique_id=unique_id)
     if not sequence:
@@ -1333,6 +1332,58 @@ def ajax_get_image_label(request, unique_id, image_key):
         },
         'message': 'A new label is successfully added.'
     })
+
+def ajax_add_label_type(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'You are required login.'
+        })
+    if request.method == 'POST':
+        label_type_keys = request.POST.get('keys')
+        if not label_type_keys is None and label_type_keys != '':
+            label_types = label_type_keys.split(',')
+            if len(label_types) > 0:
+                for label_type in label_types:
+                    l_ary = label_type.split('--')
+                    index = 0
+                    if (len(l_ary) > 0):
+                        l_type = None
+                        for l in l_ary:
+                            if index == 0:
+                                types = LabelType.objects.filter(parent__isnull=True, name=l)
+                            else:
+                                types = LabelType.objects.filter(parent=l_type, name=l)
+                            if types.count() == 0:
+                                l_parent_type = l_type
+                                l_type = LabelType()
+                                l_type.name = l
+                                l_type.source = 'mapillary'
+                                l_type.parent = l_parent_type
+                                print(l_type.name)
+                                l_type.save()
+                            else:
+                                l_type = types[0]
+                            index += 1
+
+        label_types_json = {}
+        label_types = LabelType.objects.filter(source='mapillary')
+        if label_types.count() > 0:
+            for label_type in label_types:
+                label_types_json[label_type.getKey()] = label_type.color
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'label types updated.',
+            'data': {
+                'label_types_json': label_types_json
+            }
+        })
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'You are required login.'
+    })
+
 
 def ajax_add_image_label(request, unique_id, image_key):
     if not request.user.is_authenticated:
