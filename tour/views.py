@@ -244,6 +244,16 @@ def tour_list(request):
             tours = Tour.objects.all().filter(
                 is_published=True
             )
+
+            sequence_key = request.GET.get('sequence_key')
+            if not sequence_key is None and sequence_key != '':
+                t_s = TourSequence.objects.filter(sequence__seq_key=sequence_key)
+                t_ids = []
+                if t_s.count() > 0:
+                    for t in t_s:
+                        t_ids.append(t.pk)
+                tours = tours.filter(pk__in=t_ids)
+
             if name and name != '':
                 tours = tours.filter(name__contains=name)
             if username and username != '':
