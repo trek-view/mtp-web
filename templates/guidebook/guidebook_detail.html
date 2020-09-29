@@ -9,7 +9,6 @@
             width: 50px;
             height: 50px;
             background: unset !important;
-            background: url("{% static 'images/icon/info.png' %}") !important;
             background-repeat: no-repeat;
             background-size: cover !important;
         }
@@ -423,6 +422,7 @@
             var start_x = $this.find('.start_x').text();
             var start_y = $this.find('.start_y').text();
             mapillaryViewer.setCenter([start_x, start_y]);
+            add_poi_icon();
         });
     });
 
@@ -672,6 +672,7 @@
             var start_x = $('.scene-box').eq(index).find('.start_x').text();
             var start_y = $('.scene-box').eq(index).find('.start_y').text();
             mapillaryViewer.setCenter([start_x, start_y]);
+            add_poi_icon();
         });
     });
 
@@ -696,6 +697,7 @@
             var start_x = $('.scene-box').eq(index).find('.start_x').text();
             var start_y = $('.scene-box').eq(index).find('.start_y').text();
             mapillaryViewer.setCenter([start_x, start_y]);
+            add_poi_icon();
         });
     });
 
@@ -802,6 +804,9 @@
     }
 
     function refresh_poi_list(show = false) {
+        $('.TagVertex').each(function (i) {
+            $(this).html('<i class="fas fa-info-circle" style="font-size: 50px"></i>')
+        });
         $('.card.poi .collapse-button').off('click');
         $('.card.poi .collapse-button').click(function () {
             selected_poi_id = $(this).data('poi-id');
@@ -818,11 +823,21 @@
             }
             var position_x = $('#poi_body_' + selected_poi_id).find('.position-x').text();
             var position_y = $('#poi_body_' + selected_poi_id).find('.position-y').text();
-            mapillaryViewer.setCenter([position_x, position_y])
+            mapillaryViewer.setCenter([position_x, position_y]);
+            add_poi_icon();
         });
         if (show)
             $('#poi_list').find('.card-header').eq(0).find('button').trigger('click');
     }
+    var add_poi_icon = function() {
+        $('.TagVertex').each(function (i) {
+            $(this).html('<i class="fas fa-info-circle" style="font-size: 50px"></i>')
+        });
+    }
+    mapillaryViewer.on("mousemove", add_poi_icon);
+    mapillaryViewer.on("mouseover", add_poi_icon);
+    mapillaryViewer.on("mousedown", add_poi_icon);
+    mapillaryViewer.on("mouseup", add_poi_icon);
 
     function refresh_mapillery_classes() {
 

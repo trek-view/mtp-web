@@ -114,6 +114,12 @@ class ChallengeSearchForm(forms.Form):
         queryset=CameraMake.objects.all()
     )
 
+    # challenge_type = forms.ChoiceField(
+    #     widget=forms.RadioSelect(attrs={'class': '', 'data-validation': 'required', 'value': '0'}),
+    #     choices=(('0', 'All'), ('1', 'Active'), ('2', 'Completed')),
+    #     required=False,
+    # )
+
     start_time = forms.DateField(
         widget=DatePickerInput(
             format='YYYY-MM-DD',
@@ -123,6 +129,7 @@ class ChallengeSearchForm(forms.Form):
                 "showClear": False,
                 "showTodayButton": False,
             },
+            attrs={'class': 'd-none'}
         ),
         required=False
     )
@@ -139,4 +146,8 @@ class ChallengeSearchForm(forms.Form):
         required=False
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        print(self.fields['challenge_type'].widget.attrs)
 

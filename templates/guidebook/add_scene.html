@@ -8,15 +8,17 @@
             width: 50px;
             height: 50px;
             background: unset !important;
-            background: url("{% static 'images/icon/info.png' %}") !important;
+
             background-repeat: no-repeat;
             background-size: cover !important;
+
         }
         .TagContainer .TagSpotInteractor {
             width: 50px;
             height: 50px;
             border-radius: 50%;
         }
+
     </style>
 {% endblock %}
 {% block content %}
@@ -480,8 +482,14 @@
             }
         );
 
+    var add_poi_icon = function() {
+        $('.TagVertex').each(function (i) {
+            $(this).html('<i class="fas fa-info-circle" style="font-size: 50px"></i>')
+        });
+    }
     if (init_node != null) {
         mapillaryViewer.setCenter([init_start_x, init_start_y]);
+        add_poi_icon();
     }
 
     $('.scene-box').click(function () {
@@ -993,10 +1001,16 @@
         tagComponent.add([tag]);
     }
 
+    mapillaryViewer.on("mousemove", add_poi_icon);
+    mapillaryViewer.on("mouseover", add_poi_icon);
+    mapillaryViewer.on("mousedown", add_poi_icon);
+    mapillaryViewer.on("mouseup", add_poi_icon);
     function refresh_poi_list(show = false) {
+        add_poi_icon();
         $('.collapse-button').off('click');
         $('.collapse-button').click(function () {
             selected_poi_id = $(this).data('poi-id');
+
             if (!poi_clicking) {
                 var position_x = $('#poi_body_' + selected_poi_id).find('.position-x').text();
                 var position_y = $('#poi_body_' + selected_poi_id).find('.position-y').text();
@@ -1458,7 +1472,7 @@
     var order_ary = [];
     var old_item_class = '';
     function  reorder_scene() {
-
+        add_poi_icon();
         item_count = $('.list_container .list_item').length;
         $('.list_container').height(selectionHeight * item_count);
         item_list = [];
