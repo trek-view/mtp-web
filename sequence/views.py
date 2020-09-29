@@ -469,8 +469,10 @@ def save_weather(sequence):
     sequence_weathers = SequenceWeather.objects.filter(sequence=sequence)
     if sequence_weathers.count() == 0:
         weatherstack = Weatherstack()
+
         point = [sequence.getFirstPointLat(), sequence.getFirstPointLng()]
         historical_date = sequence.captured_at.strftime('%Y-%m-%d')
+        print(point)
         print('historical_date: ', historical_date)
         weather_json = weatherstack.get_historical_data(point=point, historical_date=historical_date)
         print(weather_json)
