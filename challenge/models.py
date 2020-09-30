@@ -8,7 +8,7 @@ from django.db.models import Manager as GeoManager
 from datetime import datetime
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
-from sequence.models import TransType, CameraMake
+from sequence.models import TransType, CameraMake, LabelType
 
 ## Python Packages
 import uuid
@@ -65,3 +65,35 @@ class Challenge(models.Model):
                 t.append(camera_make.name)
 
         return ', '.join(t)
+
+
+class LabelChallenge(models.Model):
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    label_type = models.ManyToManyField(LabelType)
+    start_time = models.DateTimeField(null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
+    geometry = models.TextField(default='')
+    multipolygon = models.MultiPolygonField(null=True, blank=True)
+    is_published = models.BooleanField(default=True)
+    zoom = models.FloatField(default=5)
+    created_at = models.DateTimeField(default=datetime.now, blank=True)
+    updated_at = models.DateTimeField(default=datetime.now, blank=True)
+
+    objects = GeoManager()
+
+    def get_absolute_url(self):
+        return reverse('label_challenge.challenge_detail', kwargs={'unique_id': str(self.unique_id)})
+
+    def getShortDescription(self):
+        description = self.description
+        if len(description) > 50:
+            return description[0:80] + '...'
+        else:
+            return description
+
+    def getLabelTypeObjs(self):
+        label_types = self.label_type.all()
+        return label_types

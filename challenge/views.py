@@ -18,7 +18,7 @@ from django.template import RequestContext
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 from django.contrib.gis.geos import Point, Polygon, MultiPolygon, LinearRing, LineString
-from sequence.models import Sequence
+from sequence.models import Sequence, Image, ImageLabel
 from django.db.models.expressions import F, Window
 from django.db.models.functions.window import RowNumber
 from django.db.models import Avg, Count, Min, Sum
@@ -113,7 +113,7 @@ def challenge_create(request):
         'pageName': 'Create Challenge',
         'pageTitle': 'Create Challenge'
     }
-    return render(request, 'challenge/create.html', content)
+    return render(request, 'challenge/capture/create.html', content)
 
 @my_login_required
 def challenge_edit(request, unique_id):
@@ -174,15 +174,14 @@ def challenge_edit(request, unique_id):
         'challenge': challenge,
         'pageTitle': challenge.name + ' - Edit Challenge'
     }
-    return render(request, 'challenge/edit.html', content)
+    return render(request, 'challenge/capture/edit.html', content)
 
 @my_login_required
 def my_challenge_delete(request, unique_id):
     challenge = get_object_or_404(Challenge, unique_id=unique_id)
     if challenge.user == request.user:
-        if challenge.camera_make.all().count() > 0:
-            for cm in challenge.camera_make.all():
-                cm.delete()
+        challenge.camera_make.clear()
+        challenge.transport_type.clear()
         challenge.delete()
         messages.success(request, 'Challenge "%s" is deleted successfully.' % challenge.name)
     else:
@@ -216,7 +215,7 @@ def challenge_list(request):
                         types.append(t.pk)
                     challenges = challenges.filter(transport_type_id__in=types)
                 else:
-                    challenges = challenges.filter(transport_type_id=transport_type)
+                    challenges = challenges.filter(transport_type=transport_type)
 
             current_time = datetime.now()
             if not challenge_type is None and challenge_type == 'active':
@@ -264,7 +263,7 @@ def challenge_list(request):
         'page': page
     }
 
-    return render(request, 'challenge/list.html', content)
+    return render(request, 'challenge/capture/list.html', content)
 
 @my_login_required
 def my_challenge_list(request):
@@ -340,7 +339,7 @@ def my_challenge_list(request):
         'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page
     }
-    return render(request, 'challenge/list.html', content)
+    return render(request, 'challenge/capture/list.html', content)
 
 def challenge_detail(request, unique_id):
     challenge = get_object_or_404(Challenge, unique_id=unique_id)
@@ -360,9 +359,9 @@ def challenge_detail(request, unique_id):
     else:
         is_mine = False
 
-    challenge_html_detail = render_to_string('challenge/modal_detail.html', {'challenge': challenge, 'is_mine': is_mine})
+    challenge_html_detail = render_to_string('challenge/capture/modal_detail.html', {'challenge': challenge, 'is_mine': is_mine})
 
-    return render(request, 'challenge/challenge_detail.html',
+    return render(request, 'challenge/capture/challenge_detail.html',
           {
               'challenge': challenge,
               'challenge_html_detail': challenge_html_detail,
@@ -435,7 +434,7 @@ def challenge_leaderboard(request, unique_id):
         pItems[i]['distance'] = "%.3f" % u_distance
 
 
-    return render(request, 'challenge/leaderboard.html',
+    return render(request, 'challenge/capture/leaderboard.html',
           {
               'items': pItems,
               'challenge': challenge,
@@ -459,6 +458,360 @@ def ajax_challenge_detail(request, unique_id):
     if not data['challenge']:
         data['error_message'] = "The challenge id doesn't exist."
     else:
-        data['challenge_html_detail'] = render_to_string('challenge/modal_detail.html', {'challenge': challenge, 'is_mine': is_mine})
+        data['challenge_html_detail'] = render_to_string('challenge/capture/modal_detail.html', {'challenge': challenge, 'is_mine': is_mine})
+
+    return JsonResponse(data)
+
+
+
+
+
+
+
+
+
+@my_login_required
+def label_challenge_create(request):
+    if request.method == "POST":
+        form = LabelChallengeForm(request.POST)
+
+        if form.is_valid():
+            challenge = form.save(commit=False)
+            challenge.user = request.user
+            geometry = json.loads(challenge.geometry)
+
+            multipoly_ary = []
+            for geo in geometry:
+                coordinates = geo['geometry']['coordinates']
+                print(coordinates)
+                multipoly_ary.append(Polygon(coordinates[0]))
+
+            challenge.multipolygon = MultiPolygon(multipoly_ary)
+
+            for geo in geometry:
+                geo['properties']['challenge_id'] = str(challenge.unique_id)
+            challenge.geometry = json.dumps(geometry)
+
+            challenge.save()
+            label_type = form.cleaned_data['label_type']
+            if not label_type is None and len(label_type) > 0:
+                for lt in label_type:
+                    challenge.label_type.add(lt)
+
+            messages.success(request, 'A label challenge was created successfully.')
+
+            return redirect('challenge.my_label_challenge_list')
+    else:
+        form = LabelChallengeForm()
+    content = {
+        'form': form,
+        'pageName': 'Create Label Challenge',
+        'pageTitle': 'Create Label Challenge'
+    }
+    return render(request, 'challenge/label/create.html', content)
+
+@my_login_required
+def label_challenge_edit(request, unique_id):
+    challenge = get_object_or_404(LabelChallenge, unique_id=unique_id)
+    if request.method == "POST":
+        form = LabelChallengeForm(request.POST, instance=challenge)
+        if form.is_valid():
+            challenge = form.save(commit=False)
+            challenge.user = request.user
+            challenge.updated_at = datetime.now()
+            challenge.save()
+
+            geometry = json.loads(challenge.geometry)
+
+            multipoly_ary = []
+            for geo in geometry:
+                coordinates = geo['geometry']['coordinates']
+                print(coordinates)
+                multipoly_ary.append(Polygon(coordinates[0]))
+
+            challenge.multipolygon = MultiPolygon(multipoly_ary)
+
+            for geo in geometry:
+                geo['properties']['challenge_id'] = str(challenge.unique_id)
+            challenge.geometry = json.dumps(geometry)
+            challenge.save()
+
+            label_type = form.cleaned_data['label_type']
+            if not label_type is None:
+                challenge.label_type.clear()
+                for label_t in label_type:
+                    challenge.label_type.add(label_t)
+            messages.success(request, 'Challenge "%s" is updated successfully.' % challenge.name)
+            return redirect('challenge.label_challenge_list')
+    else:
+        form = LabelChallengeForm(instance=challenge)
+    content = {
+        'form': form,
+        'pageName': 'Edit Label Challenge',
+        'challenge': challenge,
+        'pageTitle': challenge.name + ' - Edit Label Challenge'
+    }
+    return render(request, 'challenge/label/edit.html', content)
+
+@my_login_required
+def my_label_challenge_delete(request, unique_id):
+    challenge = get_object_or_404(LabelChallenge, unique_id=unique_id)
+    if challenge.user == request.user:
+        challenge.label_type.clear()
+        challenge.delete()
+        messages.success(request, 'Challenge "%s" is deleted successfully.' % challenge.name)
+    else:
+        messages.error(request, "This user hasn't permission")
+
+    return redirect('challenge.label_challenge_list')
+
+def label_challenge_list(request):
+    challenges = None
+    page = 1
+    if request.method == "GET":
+        form = LabelChallengeSearchForm(request.GET)
+        page = request.GET.get('page')
+        if page is None:
+            page = 1
+        if form.is_valid():
+            challenges = LabelChallenge.objects.all().filter(is_published=True)
+            name = form.cleaned_data['name']
+            labe_type = form.cleaned_data['label_type']
+            challenge_type = form.cleaned_data['challenge_type']
+
+            if not name is None:
+                challenges = challenges.filter(name__contains=name)
+            print(labe_type)
+            if not labe_type is None and labe_type != 0 and labe_type != '':
+                children_label_type = LabelType.objects.filter(parent_id=labe_type)
+                if children_label_type.count() > 0:
+                    types = []
+                    types.append(labe_type)
+                    for t in children_label_type:
+                        types.append(t.pk)
+                    challenges = challenges.filter(label_type_id__in=types)
+                else:
+                    challenges = challenges.filter(label_type=labe_type)
+
+            current_time = datetime.now()
+            if not challenge_type is None and challenge_type == 'active':
+                challenges = challenges.filter(end_time__gte=current_time)
+            if not challenge_type is None and challenge_type == 'completed':
+                challenges = challenges.filter(end_time__lt=current_time)
+
+
+    if challenges == None:
+        challenges = LabelChallenge.objects.all().filter(is_published=True)
+        form = LabelChallengeSearchForm()
+
+    paginator = Paginator(challenges.order_by('-created_at'), 5)
+
+    try:
+        pChallenges = paginator.page(page)
+    except PageNotAnInteger:
+        pChallenges = paginator.page(1)
+    except EmptyPage:
+        pChallenges = paginator.page(paginator.num_pages)
+
+    first_num = 1
+    last_num = paginator.num_pages
+    if paginator.num_pages > 7:
+        if pChallenges.number < 4:
+            first_num = 1
+            last_num = 7
+        elif pChallenges.number > paginator.num_pages - 3:
+            first_num = paginator.num_pages - 6
+            last_num = paginator.num_pages
+        else:
+            first_num = pChallenges.number - 3
+            last_num = pChallenges.number + 3
+    pChallenges.paginator.pages = range(first_num, last_num + 1)
+    pChallenges.count = len(pChallenges)
+
+    content = {
+        'challenges': pChallenges,
+        'form': form,
+        'pageName': 'Label Challenges',
+        'pageTitle': 'Label Challenges',
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'page': page
+    }
+
+    return render(request, 'challenge/label/list.html', content)
+
+@my_login_required
+def my_label_challenge_list(request):
+    challenges = None
+    page = 1
+    if request.method == "GET":
+        form = LabelChallengeSearchForm(request.GET)
+        page = request.GET.get('page')
+        if page is None:
+            page = 1
+        if form.is_valid():
+            challenges = LabelChallenge.objects.all().filter(user=request.user)
+
+            name = form.cleaned_data['name']
+            label_type = form.cleaned_data['label_type']
+
+            if not name is None:
+                challenges = challenges.filter(name__contains=name)
+            if not label_type is None and label_type != 0 and label_type != '':
+                children_label_type = LabelType.objects.filter(parent_id=label_type)
+                if children_label_type.count() > 0:
+                    types = []
+                    types.append(label_type)
+                    for t in children_label_type:
+                        types.append(t)
+                    challenges = challenges.filter(label_type__in=types)
+                else:
+                    challenges = challenges.filter(label_type=label_type)
+
+            challenge_type = form.cleaned_data['challenge_type']
+            current_time = datetime.now()
+            if not challenge_type is None and challenge_type == 'active':
+                challenges = challenges.filter(end_time__gte=current_time)
+            if not challenge_type is None and challenge_type == 'completed':
+                challenges = challenges.filter(end_time__lt=current_time)
+
+    if challenges == None:
+        challenges = Challenge.objects.all().filter(user=request.user)
+        form = ChallengeSearchForm()
+
+    paginator = Paginator(challenges.order_by('-created_at'), 5)
+
+    try:
+        pChallenges = paginator.page(page)
+    except PageNotAnInteger:
+        pChallenges = paginator.page(1)
+    except EmptyPage:
+        pChallenges = paginator.page(paginator.num_pages)
+
+    first_num = 1
+    last_num = paginator.num_pages
+    if paginator.num_pages > 7:
+        if pChallenges.number < 4:
+            first_num = 1
+            last_num = 7
+        elif pChallenges.number > paginator.num_pages - 3:
+            first_num = paginator.num_pages - 6
+            last_num = paginator.num_pages
+        else:
+            first_num = pChallenges.number - 3
+            last_num = pChallenges.number + 3
+    pChallenges.paginator.pages = range(first_num, last_num + 1)
+    pChallenges.count = len(pChallenges)
+    content = {
+        'challenges': pChallenges,
+        'form': form,
+        'pageName': 'My Label Challenges',
+        'pageTitle': 'My Label Challenges',
+        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'page': page
+    }
+    return render(request, 'challenge/label/list.html', content)
+
+def label_challenge_detail(request, unique_id):
+    challenge = get_object_or_404(LabelChallenge, unique_id=unique_id)
+
+    if (not request.user.is_authenticated or request.user != challenge.user) and not challenge.is_published:
+        messages.success(request, "You can't access this challenge.")
+        return redirect('challenge.label_challenge_list')
+
+    form = LabelChallengeSearchForm(request.GET)
+
+    geometry = json.dumps(challenge.geometry)
+
+    page = 1
+
+    if challenge.user == request.user:
+        is_mine = True
+    else:
+        is_mine = False
+
+    challenge_html_detail = render_to_string('challenge/label/modal_detail.html', {'challenge': challenge, 'is_mine': is_mine})
+
+    return render(request, 'challenge/label/challenge_detail.html',
+          {
+              'challenge': challenge,
+              'challenge_html_detail': challenge_html_detail,
+              'form': form,
+              'geometry': geometry,
+              'pageName': 'Label Challenge Detail',
+              'pageTitle': challenge.name + ' - Label Challenge',
+              'page': page
+          })
+
+def label_challenge_leaderboard(request, unique_id):
+    challenge = get_object_or_404(LabelChallenge, unique_id=unique_id)
+
+    if (not request.user.is_authenticated or request.user != challenge.user) and not challenge.is_published:
+        messages.success(request, "You can't access this challenge.")
+        return redirect('challenge.label_challenge_list')
+
+    images = Image.objects.filter(point__intersects=challenge.multipolygon)
+    user_json = ImageLabel.objects.filter(image__in=images).values('user').annotate(image_label_count=Count('image')).order_by('-image_label_count').annotate(rank=Window(expression=RowNumber()))
+
+    paginator = Paginator(user_json, 10)
+    page = request.GET.get('page')
+    if not page or page is None:
+        page = 1
+    try:
+        pItems = paginator.page(page)
+    except PageNotAnInteger:
+        pItems = paginator.page(1)
+    except EmptyPage:
+        pItems = paginator.page(paginator.num_pages)
+    first_num = 1
+    last_num = paginator.num_pages
+    if paginator.num_pages > 7:
+        if pItems.number < 4:
+            first_num = 1
+            last_num = 7
+        elif pItems.number > paginator.num_pages - 3:
+            first_num = paginator.num_pages - 6
+            last_num = paginator.num_pages
+        else:
+            first_num = pItems.number - 3
+            last_num = pItems.number + 3
+    pItems.paginator.pages = range(first_num, last_num + 1)
+    pItems.count = len(pItems)
+
+    for i in range(len(pItems)):
+        user = CustomUser.objects.get(pk=pItems[i]['user'])
+
+        if user is None or not user:
+            continue
+        pItems[i]['username'] = user.username
+
+        u_images = images.filter(user=user)
+
+        pItems[i]['image_count'] = u_images.count()
+
+
+    return render(request, 'challenge/label/leaderboard.html',
+          {
+              'items': pItems,
+              'challenge': challenge,
+              'pageName': 'Challenge Leaderboard',
+              'pageTitle': challenge.name + ' - Challenge Leaderboard',
+              'page': page
+          })
+
+def ajax_label_challenge_detail(request, unique_id):
+    challenge = LabelChallenge.objects.get(unique_id=unique_id)
+    if challenge.user == request.user:
+        is_mine = True
+    else:
+        is_mine = False
+    serialized_obj = serializers.serialize('json', [challenge, ])
+    data = {
+        'challenge': json.loads(serialized_obj)
+    }
+
+    if not data['challenge']:
+        data['error_message'] = "The challenge id doesn't exist."
+    else:
+        data['challenge_html_detail'] = render_to_string('challenge/label/modal_detail.html', {'challenge': challenge, 'is_mine': is_mine})
 
     return JsonResponse(data)

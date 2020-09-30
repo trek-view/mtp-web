@@ -1,0 +1,200 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block app_label_challenge %}active{% endblock %}
+{% block app_style %}<link rel="stylesheet" href="{% static 'css/challenge_style.css' %}">{% endblock %}
+{% block content %}
+
+<div class="main-body">
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="market p-3">
+                <div class="text-right mt-2 mb-2">
+{#                    <button type="button" class="btn btn-info" onclick="window.history.back()">Back to challenge list</button>#}
+                    <a type="button" class="btn btn-info" href="{% url 'challenge.challenge_list' %}">Back to challenge list</a>
+                </div>
+                <div class="market-header pt-3 mb-3">
+                    <h2>
+                        Label Challenge
+                    </h2>
+                </div>
+            </div>
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            <div class="challenge-detail card m-2 p-2">
+                <div class="challenge-title text-center text-info mt-1">
+                    <h3>
+                        {{ challenge.name }}
+                    </h3>
+                </div>
+
+                <div class="challenge-description">
+                    <p class="mb-1">
+                        {{ challenge.description }}
+                    </p>
+                </div>
+
+                <div class="item-tag" style="min-height: 24px;">
+                    {% for label_type in challenge.getLabelTypeObjs %}
+                        <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1" style="white-space: nowrap">
+                            {{ label_type.getKey }}
+                        </span>
+                    {% endfor %}
+                </div>
+
+                <div class="challenge-options">
+                    <p>
+                        {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
+                    </p>
+                </div>
+
+                <div class="challenge-created-at text-secondary">
+                    <h6>
+                        {{ challenge.created_at }}
+                    </h6>
+                </div>
+
+            </div>
+
+        </div>
+        {% include 'components/copyrite.html' %}
+    </div>
+    <div class="right-board bg-light">
+        <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
+            <div class="table-header mb-2">
+                <h4>Leaderboard</h4>
+            </div>
+            <div class="paginator">
+                {% if items.has_other_pages %}
+                    <ul class="pagination justify-content-center">
+                        {% if items.number != 1 %}
+                            <li class="page-item">
+                                <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in items.paginator.pages %}
+                            {% if items.number == i %}
+                                <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% else %}
+                                <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if items.number != items.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ items.paginator.num_pages }}'>&raquo;</a></li>
+                        {% else %}
+                            <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="item-list">
+                {% if items.count > 0 %}
+                    <table class="w-100 table">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Username</th>
+                                <th>Photos</th>
+                                <th>Labels</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                                <tr class="border-top">
+                                    <td>{{ item.rank }}</td>
+                                    <td>
+                                        <a href="{% url 'account.profile' username=item.username %}">
+                                            <span class="user">{{ item.username }}</span>
+                                        </a>
+                                    </td>
+                                    <td>{{ item.image_count }}</td>
+                                    <td>{{ item.image_label_count }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="no-results d-flex justify-content-center align-items-center">
+                        <h5 class="text-info">No results match your criteria.</h5>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="paginator">
+                {% if items.has_other_pages %}
+                    <ul class="pagination justify-content-center">
+                        {% if items.number != 1 %}
+                            <li class="page-item">
+                                <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in items.paginator.pages %}
+                            {% if items.number == i %}
+                                <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% else %}
+                                <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if items.number != items.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ items.paginator.num_pages }}'>&raquo;</a></li>
+                        {% else %}
+                            <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="challenge-detail modal fade" id="challengeDetailModal">
+        {{ challenge_html_detail }}
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    $('.paginator-btn').click(function() {
+        var pageNum = $(this).data('page');
+        $('#search_form').find('input[name="page"]').val(pageNum);
+        var url = "{% url 'challenge.label_challenge_leaderboard' unique_id=challenge.unique_id %}?" + $('#search_form').serialize()
+        location.assign(url);
+    });
+
+
+    function goWithSearchParam(url) {
+        location.assign(url + '?' + $('#search_form').serialize());
+    }
+
+    $('#headingOne').click(function () {
+        if ($(this).hasClass('collapsed'))
+        {
+            $(this).find('.fa-chevron-down').addClass('d-none');
+            $(this).find('.fa-chevron-up').removeClass('d-none');
+        }
+        else
+        {
+            $(this).find('.fa-chevron-down').removeClass('d-none');
+            $(this).find('.fa-chevron-up').addClass('d-none');
+        }
+    });
+</script>
+{% endblock %}

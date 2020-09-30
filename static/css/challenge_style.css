@@ -32,10 +32,6 @@
     display: none !important;
 }
 
-.card.challenge {
-    cursor: pointer;
-}
-
 @media (min-width: 576px) {
     .modal-dialog {
         margin: unset;
@@ -73,4 +69,13 @@
 
 .challenge-detail.modal{
     max-height: calc(100vh - 110px);
+}
+
+.tag {
+    border-radius: 3px;
+    border: 1px solid lightsteelblue;
+    margin: 1px;
+    font-size: 13px;
+    padding-left: 1px;
+    padding-right: 1px;
 }

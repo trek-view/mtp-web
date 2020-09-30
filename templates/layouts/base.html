@@ -70,7 +70,11 @@
                 </li>
 
                 <li class="nav-item {% block app_challenge %}{% endblock %}">
-                    <a class="nav-link" href="{% url 'challenge.index' %}">Challenge</a>
+                    <a class="nav-link" href="{% url 'challenge.index' %}">Capture Challenge</a>
+                </li>
+
+                <li class="nav-item {% block app_label_challenge %}{% endblock %}">
+                    <a class="nav-link" href="{% url 'challenge.label_challenge_list' %}">Label Challenge</a>
                 </li>
 
                 <li class="nav-item {% block app_photographer %}{% endblock %}">

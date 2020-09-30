@@ -20,5 +20,9 @@ from .models import *
 class ChallengeAdmin(admin.ModelAdmin):
     list_display = ('name', 'user', 'created_at')
 
+class LabelChallengeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user', 'created_at')
+
 admin.site.register(Challenge, ChallengeAdmin)
+admin.site.register(LabelChallenge, LabelChallengeAdmin)
 
