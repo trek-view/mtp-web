@@ -287,10 +287,12 @@ def photographer_list(request):
     pPhotographers.paginator.pages = range(first_num, last_num + 1)
     pPhotographers.count = len(pPhotographers)
 
-    photographers = Photographer.objects.filter(user=request.user)
     photographer = None
-    if photographers.count() > 0:
-        photographer = photographers[0]
+    if request.user.is_authenticated:
+        photographers = Photographer.objects.filter(user=request.user)
+
+        if photographers.count() > 0:
+            photographer = photographers[0]
 
     content = {
         'photographers': pPhotographers,
