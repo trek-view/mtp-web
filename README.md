@@ -6,17 +6,17 @@ Click [Map the Paths](https://map-the-paths.herokuapp.com/) to experience them.
 
 ## Install
 
-- git clone https://github.com/trek-view/map-the-paths.git
+- git clone https://github.com/trek-view/mtp-web.git
 
 
 ### Running on Local
 
-Set DJANGO_SETTINGS_MODULE to config.settings_local in manage.py.
+Set DJANGO_SETTINGS_MODULE to config.settings.local in manage.py.
 ``` python
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
 ```
 
-Fill following values in config/setting_local.py
+Fill following values in config/setting/local.py
 ``` python
 DATABASES = {
     'default': {
@@ -32,36 +32,21 @@ DATABASES = {
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = ''
 
-MAPBOX_PUBLISH_TOKEN = 'your_mapbox_token'
-
-MAILERLIST_API_KEY = 'your_maillist_api_key'
-
-MAILERLIST_GROUP_ID = 'your_maillist_aroup_id'
-
-GOOGLE_ANALYTICS = 'your_google_analysis_key'
-
-# EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
-
-# SMTP settings
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp_host'
-DEFAULT_FROM_EMAIL = 'xxx@your_domain'
-EMAIL_HOST_USER = 'xxx@your_domain'
-EMAIL_HOST_PASSWORD = 'smtp_password'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-
-SMTP_REPLY_TO = DEFAULT_FROM_EMAIL
 ```
 
 The following command will build Map the Paths.
 
 ``` python
 pip install -r requirements.txt
-python manage.py makemigrations
 python manage.py migrate
+```
+
+Run following command to create super admin.
+```
 python manage.py createsuperuser
+```
+Run following command to run server.
+```
 python manage.py runserver
 ```
 
@@ -80,8 +65,22 @@ And then push on git.
 
 Run following command. ([Deploying with Git](https://devcenter.heroku.com/articles/git))
 
+Quick install and run server using cli on heroku:
+```
+heroku git:remote -a your_heroku_app
+git push heroku [git_branch:]master
+heroku run python manage.py migrate [-a your_heroku_app]
+heroku run python manage.py collectstatic --noinput [-a your_heroku_app]
+heroku run python manage.py createsuperuser [-a your_heroku_app]
+```
+
+Run following command to check logs.
+```
+heroku logs --tail [-a your_heroku_app]
+```
+
 ### Prerequisites
 
 - PostgreSql 10.0+
 - Postgis package
-- Python 3.5+
+- Python 3.6+
