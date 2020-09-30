@@ -53,48 +53,75 @@
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
             <ul class="navbar-nav mr-4 ml-auto mt-2 mt-lg-0">
-                <li class="nav-item {% block app_leaderboard %}{% endblock %}">
-                    <a class="nav-link" href="{% url 'leaderboard.index' %}">Leaderboard</a>
-                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">  Explore  </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item nav-item {% block app_tour %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'tour.index' %}">Tour</a>
+                        </li>
 
-                <li class="nav-item {% block app_tour %}{% endblock %}">
-                    <a class="nav-link" href="{% url 'tour.index' %}">Tour</a>
-                </li>
+                        <li class="dropdown-item nav-item {% block app_sequence %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'sequence.index' %}">Sequence</a>
+                        </li>
 
-                <li class="nav-item {% block app_sequence %}{% endblock %}">
-                    <a class="nav-link" href="{% url 'sequence.index' %}">Sequence</a>
+                        <li class="dropdown-item nav-item {% block app_guidebook %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'guidebook.home' %}">Guidebooks</a>
+                        </li>
+                    </ul>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">  Challenge  </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item nav-item {% block app_challenge %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'challenge.index' %}">Capture Challenge</a>
+                        </li>
 
-                <li class="nav-item {% block app_guidebook %}{% endblock %}">
-                    <a class="nav-link" href="{% url 'guidebook.home' %}">Guidebooks</a>
+                        <li class="dropdown-item nav-item {% block app_label_challenge %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'challenge.label_challenge_list' %}">Label Challenge</a>
+                        </li>
+                    </ul>
                 </li>
-
-                <li class="nav-item {% block app_challenge %}{% endblock %}">
-                    <a class="nav-link" href="{% url 'challenge.index' %}">Capture Challenge</a>
+                <li class="li-white {% block app_photographer %}{% endblock %}">
+                    <a class="nav-link text-white" href="{% url 'photographer.index' %}">Photographer</a>
                 </li>
-
-                <li class="nav-item {% block app_label_challenge %}{% endblock %}">
-                    <a class="nav-link" href="{% url 'challenge.label_challenge_list' %}">Label Challenge</a>
-                </li>
-
-                <li class="nav-item {% block app_photographer %}{% endblock %}">
-                    <a class="nav-link" href="{% url 'photographer.index' %}">Photographer</a>
-                </li>
-
-                <li class="nav-item {% block app_uploader %}{% endblock %}">
-                    <a class="nav-link" href="{% url 'app_download' %}">MTP Uploader</a>
-                </li>
-            </ul>
+                {% if user.is_authenticated %}
+                    <li class="li-white  {% block app_uploader %}{% endblock %}">
+                        <a class="nav-link text-white" href="{% url 'app_download' %}">MTP Uploader</a>
+                    </li>
+                {% endif %}
 
             {% if user.is_authenticated %}
-                <div>
-                    <a href="{% url 'account.profile' username=request.user.username %}" class="text-white">{{ request.user.username }}</a>
-                    <a href="{% url 'logout' %}" class="text-white">Logout</a>
-                </div>
+                <li class="nav-item dropdown">
+
+                    <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">
+                        {% if request.user.avatar is None or request.user.avatar == '' %}
+                            <i class="fas fa-user-alt" style="font-size: 20px !important;"></i>
+                        {% else %}
+                            <img class="small-avatar" src="{{ STATIC_URL }}{{ request.user.avatar }}">
+                        {% endif %}
+                        {{ request.user.username }}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item nav-item {% block app_profile %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'account.profile' username=request.user.username %}" >My Account</a>
+                        </li>
+
+                        <li class="dropdown-item nav-item ">
+                            <a class="nav-link" href="{% url 'logout' %}" class="text-white">Logout</a>
+                        </li>
+
+
+                    </ul>
+                </li>
+
             {% else %}
-                <a href="{% url 'login' %}" class="text-white">Login</a>
+                <li class="li-white">
+                    <a href="{% url 'login' %}" class="text-white">Login</a>
+                </li>
+
             {% endif %}
-        </div>
+            </ul>
+        </div> <!-- navbar-collapse.// -->
     </nav>
 
     <main>

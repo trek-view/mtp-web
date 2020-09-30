@@ -2,6 +2,50 @@ body {
     overflow-y: hidden;
 }
 
+@media all and (min-width: 992px) {
+	.navbar .nav-item .dropdown-menu{ display: none; }
+	.navbar .nav-item:hover .nav-link{ color: #fff;  }
+	.navbar .nav-item:hover .dropdown-menu{ display: block; }
+	.navbar .nav-item .dropdown-menu{ margin-top:0; }
+}
+
+li.nav-item, li.nav-item > a {
+    color: #1b1e21 !important;
+}
+
+.nav-item.dropdown > a {
+    color: white !important;
+}
+
+.dropdown-item.nav-item.active {
+    background: #28a745b8 !important;
+    color: white !important;
+}
+
+.dropdown-item.nav-item.active > a {
+    color: white !important;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+    color: #fff;
+    text-decoration: none;
+    background-color: #28a745bf !important;
+}
+
+.small-avatar {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+}
+
+.li-white {
+    color: white !important;
+}
+
+.li-white.active > a {
+    color: #9fcdff !important;
+}
+
 .card.login {
     width: 400px;
 }
