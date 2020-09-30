@@ -322,16 +322,18 @@
                 {% if request.user.is_authenticated and request.user == sequence.user %}
                     <div class="image-view-point" >
                         <div class="view_point text-center">
+                            <i class="fas fa-binoculars"></i>
                             <span class="text-center m-0">
-                                {{ view_points }} View Points
+                                {{ view_points }} Viewpoints
                             </span>
                         </div>
                     </div>
                 {% else %}
                     <div class="image-view-point" style="cursor: pointer;" onclick="mark_view_point()" style="">
                         <div class="view_point text-center">
+                            <i class="fas fa-binoculars"></i>
                             <span class="text-center m-0 disabled">
-                                {{ view_points }} View Points
+                                {{ view_points }} Viewpoints
                             </span>
                         </div>
                     </div>
@@ -799,7 +801,7 @@
                     if (is_opened_side_bar)
                         $('.image-detail-box').removeClass('d-none');
                     $('#image_detail_box').html(data.image_detail_box_html);
-                    $('.right-board .image-view-point span').text(data.view_points + ' View Points');
+                    $('.right-board .image-view-point span').text(data.view_points + ' Viewpoints');
 
                 }
 

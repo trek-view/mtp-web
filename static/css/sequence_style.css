@@ -174,8 +174,12 @@ body {
     background: rgba(0,0,0,.5);
     z-index: 300;
     position: absolute;
-    left: 15px;
+    right: 15px;
     padding: 5px;
+}
+
+.right-board .image-view-point i {
+    font-size: 14px;
 }
 
 .right-board .image-view-point img {
