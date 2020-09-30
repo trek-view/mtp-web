@@ -48,8 +48,8 @@ from .forms import *
 
 ############################################################################
 
-MAIN_PAGE_DESCRIPTION = "Find or offer help on image collection projects to create fresh street level map data in locations where it's needed for Google Street View, Mapillary, and more..."
-JOB_PAGE_DESCRIPTION = ""
+CAPTURE_CHALLENGE_DESCRIPTION = "Find or offer help on image collection projects to create fresh street level map data in locations where it's needed for Google Street View, Mapillary, and more..."
+LABEL_CHALLENGE_DESCRIPTION = "Help label images to help researchers identify what's inside an image; from species of tree to road surface type."
 
 
 ############################################################################
@@ -259,7 +259,7 @@ def challenge_list(request):
         'form': form,
         'pageName': 'Challenges',
         'pageTitle': 'Challenges',
-        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'pageDescription': CAPTURE_CHALLENGE_DESCRIPTION,
         'page': page
     }
 
@@ -336,7 +336,7 @@ def my_challenge_list(request):
         'form': form,
         'pageName': 'My Challenges',
         'pageTitle': 'My Challenges',
-        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'pageDescription': CAPTURE_CHALLENGE_DESCRIPTION,
         'page': page
     }
     return render(request, 'challenge/capture/list.html', content)
@@ -633,7 +633,7 @@ def label_challenge_list(request):
         'form': form,
         'pageName': 'Label Challenges',
         'pageTitle': 'Label Challenges',
-        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'pageDescription': LABEL_CHALLENGE_DESCRIPTION,
         'page': page
     }
 
@@ -706,7 +706,7 @@ def my_label_challenge_list(request):
         'form': form,
         'pageName': 'My Label Challenges',
         'pageTitle': 'My Label Challenges',
-        'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'pageDescription': LABEL_CHALLENGE_DESCRIPTION,
         'page': page
     }
     return render(request, 'challenge/label/list.html', content)
