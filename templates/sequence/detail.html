@@ -1009,9 +1009,77 @@
         var html = '';
         var detection_ary = sortByKey(label_type_ary);
         jQuery.each(detection_ary, function(key, val) {
-            html += '<div class="border detection-tag" id="label_' + key + '" data-label-key="' + key + '" data-is-mine="' + val['is_mine'] + '"><span>' + key + ' <span style="color: #2F96B4">' + val['count'] + '</span></span></div>';
+            html += '<div class="border detection-tag" id="label_' + key + '" data-label-key="' + key + '" data-is-mine="' + val['is_mine'] + '" onclick="show_label_group(\''+ key +'\')"><span>' + key + ' <span style="color: #2F96B4">' + val['count'] + '</span></span></div>';
         });
         $('.image-detection .detections').html(html)
+    }
+
+    var current_selected_label_type_key = '';
+
+    var resetLabelGroup = function () {
+        if (current_selected_label_type_key != '') {
+            var key = current_selected_label_type_key;
+            var label_ids = label_type_ary[key]['label_ids'];
+            var lb = null;
+            for (var i = 0; i<label_ids.length; i++) {
+                lb = label_tags[label_ids[i]]
+                if (lb == undefined)
+                    continue;
+                if (lb['tag'] == undefined)
+                    continue;
+                if (current_clicked_label_id == label_ids[i])
+                    continue;
+                var color = label_type_ary[lb['label_type_key']['label_type_color']];
+                var linecolor = color;
+                if (lb['is_mine'])
+                    linecolor = 'blue';
+                lb['tag'].setOptions({
+                    fillColor: color,
+                    fillOpacity: 0.3,
+                    lineColor: linecolor,
+                    text: lb['id']
+                });
+            }
+            current_selected_label_type_key = '';
+            $('#label_' + key).removeClass('selected');
+        }
+
+    }
+
+    function show_label_group(key) {
+        console.log('key', key)
+        var label_ids = label_type_ary[key]['label_ids'];
+        var lb = null;
+        if ($('#label_' + key).hasClass('selected'))
+        {
+            resetLabelGroup();
+            return;
+        }
+        if (current_selected_label_type_key != '')
+            resetLabelGroup();
+        for (var i = 0; i<label_ids.length; i++) {
+            lb = label_tags[label_ids[i]]
+            if (lb == undefined)
+                continue;
+            if (lb['tag'] == undefined)
+                continue;
+            if (current_clicked_label_id == label_ids[i])
+                continue;
+
+            var color = label_type_ary[lb['label_type_key']['label_type_color']];
+            var linecolor = color;
+            if (lb['is_mine'])
+                linecolor = 'blue';
+            lb['tag'].setOptions({
+                fillColor: color,
+                fillOpacity: 0.5,
+                lineColor: linecolor,
+                text: lb['id']
+            });
+
+        }
+        current_selected_label_type_key = key;
+        $('#label_' + key).addClass('selected');
     }
 
     function drawDetection(image_key, type) {
@@ -1131,7 +1199,7 @@
             editable: true,
             text: id,
             fillColor: color,
-            fillOpacity: 0.4,
+            fillOpacity: 0.3,
             lineColor: linecolor,
         }
         if (type == 'rect') {
@@ -1171,7 +1239,7 @@
             linecolor = 'blue';
         label['tag'].setOptions({
             fillColor: color,
-            fillOpacity: 0.6,
+            fillOpacity: 0.7,
             lineColor: linecolor,
             text: label['id']
         });
@@ -1298,12 +1366,15 @@
         }
 
         var color = label_type_ary[label['label_type_key']][['label_type_color']];
+        var fillOpacity = 0.3;
+        if (label['label_type_key'] == current_selected_label_type_key)
+            fillOpacity = 0.5;
         var linecolor = color;
         if (label['is_mine'])
             linecolor = 'blue';
         label['tag'].setOptions({
             fillColor: color,
-            fillOpacity: 0.4,
+            fillOpacity: fillOpacity,
             lineColor: linecolor,
             text: label['id']
         });
@@ -1405,7 +1476,7 @@
             var color = label_type_ary[label['label_type_key']['label_type_color']];
             label['tag'].setOptions({
                 fillColor: color,
-                fillOpacity: 0.8,
+                fillOpacity: 0.9,
                 lineColor: 'red',
                 text: label['id']
             });

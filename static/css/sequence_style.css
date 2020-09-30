@@ -207,6 +207,15 @@ body {
 
 .image-detection .detections > div:first-child {
     margin-top: 20px;
+
+}
+
+.image-detection .detection-tag {
+    cursor: pointer;
+}
+
+.image-detection .detection-tag.selected {
+    /*border-color: green !important;*/
 }
 
 .image-detection .detections > div.selected {
