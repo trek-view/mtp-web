@@ -51,11 +51,16 @@
                 <img style="width: 32px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}" />
             </a>
             {% if sequence.google_street_view %}
-            <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ image.lng }},{{ image.lat }},14z">
-                <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico" />
-            </a>
+                <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.getFirstPointLat }},{{ sequence.getFirstPointLng }},14z">
+                    <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico" />
+                </a>
             {% endif %}
-            <a target="_blank" class="" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}" />
+            {% if not sequence.strava is None and sequence.strava != ''  %}
+                <a class="mr-2" target="_blank" href="https://www.strava.com/activities/{{ sequence.strava }}">
+                    <img style="width: 35px" src="https://a4k2d2q5.rocketcdn.me/wp-content/uploads/2018/02/Strava-Running-and-Cycling-GPS.png">
+                </a>
+            {% endif %}
+            <a target="_blank" class="" href="https://www.mapillary.com/app/?pKey={{ sequence.getFirstImageKey }}&focus=photo">
                 <img style="width: 32px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQiTHrSFBxGdPFbRSCEXLo3IB1IzMS50F_V0Q&usqp=CAU">
             </a>
         </div>
