@@ -406,8 +406,10 @@
     });
 
     function getChallengeDetail(id) {
+        var url = "{% url 'challenge.ajax_challenge_detail' unique_id='unique_id' %}";
+        url = url.replace('unique_id', id);
         $.ajax({
-            url: '/challenge/ajax/get_challenge_detail/' + id,
+            url: url,
             type: 'GET',
             data: {},
             dataType: 'json',
