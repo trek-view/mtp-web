@@ -49,20 +49,10 @@ IMPORT_PAGE_DESCRIPTION = "First start by choosing the month your sequences we'r
 
 ############################################################################
 
-def get_table_count(request):
-    print('Image count: ', Image.objects.all().count())
-    print('Sequence count: ', Sequence.objects.all().count())
-    print('ImageViewPoint count: ', ImageViewPoint.objects.all().count())
-    print('ImageLabel count: ', ImageLabel.objects.all().count())
-    print('SequenceLike count: ', SequenceLike.objects.all().count())
-    print('CameraMake count: ', CameraMake.objects.all().count())
-    print('CameraModel count: ', CameraModel.objects.all().count())
-
-    return HttpResponse('test')
-
 def index(request):
     return redirect('sequence.sequence_list')
 
+@my_login_required
 def import_sequence(request):
     map_user_data = check_mapillary_token(request.user)
     if not map_user_data:
@@ -780,6 +770,11 @@ def sequence_detail(request, unique_id):
         if page is None:
             page = 1
 
+        view_mode = request.GET.get('view_mode')
+        if view_mode is None:
+            view_mode = 'original'
+
+
     geometry_coordinates_ary = sequence.geometry_coordinates_ary
     coordinates_image = sequence.coordinates_image
     coordinates_cas = sequence.coordinates_cas
@@ -824,7 +819,8 @@ def sequence_detail(request, unique_id):
         'label_types': label_types,
         'image_key': image_key,
         'tour_count': tour_count,
-        'sequence_weather': sequence_weather
+        'sequence_weather': sequence_weather,
+        'view_mode': view_mode
     }
     return render(request, 'sequence/detail.html', content)
 
@@ -1462,7 +1458,6 @@ def ajax_add_label_type(request):
         'message': 'You are required login.'
     })
 
-
 def ajax_add_image_label(request, unique_id, image_key):
     if not request.user.is_authenticated:
         return JsonResponse({
@@ -1572,7 +1567,7 @@ def ajax_get_image_list(request, unique_id):
         for index in range(len(images)):
             image = images[index]
             if image_key == image['key']:
-                image_in_page = int(len(images) / 20) + 1
+                image_in_page = int(index / 20) + 1
                 print('image_in_page: ', image_in_page)
                 break
 
@@ -1580,7 +1575,7 @@ def ajax_get_image_list(request, unique_id):
         page = image_in_page
     else:
         image_key = None
-
+    print('page: ', page)
     paginator = Paginator(images, 20)
 
 

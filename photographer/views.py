@@ -101,7 +101,7 @@ def photographer_create(request):
 
             messages.success(request, 'A photographer was created successfully.')
 
-            return redirect('photographer.my_photographer_list')
+            return redirect('photographer.index')
     else:
         form = PhotographerForm()
     content = {
@@ -150,7 +150,7 @@ def photographer_hire(request, unique_id):
 
             messages.success(request, 'You have succeeded in hiring photographers.')
 
-            return redirect('photographer.photographer_list')
+            return redirect('photographer.index')
     else:
         form = PhotographerEnquireForm()
     content = {
@@ -229,7 +229,7 @@ def my_photographer_delete(request, unique_id):
     else:
         messages.error(request, "This user hasn't permission")
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect('photographer.index')
 
 def photographer_list(request):
     photographers = None

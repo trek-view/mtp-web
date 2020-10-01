@@ -271,21 +271,25 @@
         </div>
 
         <div class="switch-detection mt-2 ml-auto">
-            <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
+            {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' %}
+                <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary" checked>
+            {% else %}
+                <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
+            {% endif %}
         </div>
 
-        <div class="image-detail">
+        <div class="image-detail {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' %}d-none{% endif %}">
             <div class="" id="image_detail_box">
             </div>
         </div>
 
-        <div class="image-detection mt-3 d-none">
+        <div class="image-detection mt-3 {% if view_mode != 'mtpw_label' and view_mode != 'autodetected_label' %}d-none{% endif %}">
             <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
-                    <li class="nav-item mtpw-label-tab active" style="width: 50%;">
-                        <a class="nav-link active" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>
+                    <li class="nav-item mtpw-label-tab " style="width: 50%;">
+                        <a class="nav-link {% if view_mode != 'autodetected_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>
                     </li>
-                    <li class="nav-item mapillary-label-tab border-bottom" style="width: 50%">
-                        <a class="nav-link" href="javascript: switchMpaillaryLable('mapillary');">Autodetected Labels</a>
+                    <li class="nav-item mapillary-label-tab border-bottom {% if view_mode != 'autodetected_label' %}active{% endif %}" style="width: 50%">
+                        <a class="nav-link {% if view_mode == 'autodetected_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mapillary');">Autodetected Labels</a>
                     </li>
                 </ul>
             <div class="card" style="border-radius: 0">
@@ -635,9 +639,9 @@
 
         map.flyTo({center: [current_node_point[1], current_node_point[0]]});
         allClear();
-        if (state == 'detection_mtpu')
+        if (view_mode == 'mtpw_label')
             getImageLables();
-        else if (state == 'detection_mapillary')
+        else if (view_mode == 'autodetected_label')
             getDetection(node.key);
         if (first_move) {
             first_move = false;
@@ -802,11 +806,8 @@
         var url = "{% url 'sequence.ajax_get_image_detail' unique_id=sequence.unique_id image_key='image_key' %}";
         url = url.replace('image_key', image_key);
 
-        var href = location.protocol + '//' + location.host + location.pathname ;
-        var page = current_page;
-        history.pushState({
-            id: 'Image Detail'
-        }, "{{ pageTitle }}", href + '?page=' + page + '&image_key=' + image_key);
+        console.log('image_key', image_key)
+        image_url_reset(image_key);
 
         $.ajax({
             url: url,
@@ -833,6 +834,13 @@
                         }
                         myLineChart.update();
                     }
+                    if (view_mode == 'mtpw_label') {
+                        console.log('switch_detection', $('#switch_detection').prop('checked'));
+                        getImageLables();
+                    }
+                    else if (view_mode == 'autodeteced_label') {
+                        getDetection(current_node_key)
+                    }
                 }
             }
         });
@@ -849,7 +857,6 @@
         $('.image-detail-box').addClass('d-none');
         goto_page(current_page);
         allClear();
-        state = 'original';
     }
 
     {% if not request.user.is_authenticated %}
@@ -1000,7 +1007,7 @@
     var is_drawing = false;
     var label_tags = {};
     var createdIndex = 0;
-    var state = 'original';
+    var view_mode = "{{ view_mode }}";
 
     var allClear = function () {
         label_type_ary = {};
@@ -1127,7 +1134,7 @@
         $.ajax({
             url: "https://a.mapillary.com/v3/object_detections/" + type + "?client_id=" + mapillaryClientId + "&image_keys=" + image_key,
             success: function(data){
-                if (state == 'detection_mapillary') {
+                if (view_mode == 'autodetected_label') {
                     var features = data.features;
                     var key_ary = [];
                     for (var i=0; i<features.length; i++) {
@@ -1167,18 +1174,28 @@
         });
     }
 
+    var image_url_reset = function(image_key) {
+        var href = location.protocol + '//' + location.host + location.pathname ;
+        history.pushState({
+            id: 'Image Detail'
+        }, "{{ pageTitle }}", href + '?image_key=' + image_key + '&view_mode=' + view_mode);
+    }
+
     $('#switch_detection').change(function () {
         allClear();
+        var image_key = current_node_key;
         if ($(this).prop('checked')) {
             $('.image-detection').removeClass('d-none');
             $('.image-detail').addClass('d-none');
-            state = 'detection_mtpu';
+            view_mode = 'mtpw_label';
+            image_url_reset(image_key)
             getImageLables();
         }
         else {
             $('.image-detection').addClass('d-none');
             $('.image-detail').removeClass('d-none');
-            state = 'original';
+            view_mode = 'original';
+            image_url_reset(image_key)
         }
     })
 
@@ -1195,7 +1212,7 @@
                 if (resp.status == 'failed')
                     toastr.error(resp.message);
                 else {
-                    if (state == 'detection_mtpu') {
+                    if (view_mode == 'mtpw_label') {
                         var image_label = null;
                         for (var i=0; i<resp.data.image_labels.length; i++) {
                             image_label = resp.data.image_labels[i];
@@ -1380,18 +1397,21 @@
 
     var switchMpaillaryLable = function(type) {
         allClear();
+        var image_key = current_node_key;
         if (type == 'mtpw') {
             $('li.mtpw-label-tab a').addClass('active');
             $('li.mapillary-label-tab a').removeClass('active');
             $('.image-detection .actions').removeClass('d-none');
-            state = 'detection_mtpu';
+            view_mode = 'mtpw_label';
+            image_url_reset(image_key);
             getImageLables();
         }
         else {
             $('li.mtpw-label-tab a').removeClass('active');
             $('li.mapillary-label-tab a').addClass('active');
             $('.image-detection .actions').addClass('d-none');
-            state = 'detection_mapillary';
+            view_mode = 'autodetected_label';
+            image_url_reset(image_key);
             getDetection(current_node_key);
         }
     }
@@ -1636,8 +1656,6 @@
             $('#lbl_reset').addClass('d-none')
         }
     {% endif %}
-
-
 
     goto_page("{{ page }}", "{{ image_key }}");
 
