@@ -133,20 +133,18 @@ def index(request):
 
     top_title = 'Uploads Leaderboard'
     if not filter_type is None and filter_type == '1':
-        user_json = sequences.values('user').annotate(all_distance=Sum('distance')).order_by('-all_distance').annotate(
-            rank=Window(expression=RowNumber()))
+        user_json = sequences.values('user').annotate(all_distance=Sum('distance')).order_by('-all_distance')
         form.set_filter_type(filter_type)
         top_title = 'Distance Leaderboard'
 
     elif not filter_type is None and filter_type == '2':
         user_json = ImageViewPoint.objects.filter(image__sequence__in=sequences).values('owner').annotate(
-            image_view_count=Count('image')).order_by('-image_view_count').annotate(rank=Window(expression=RowNumber()))
+            image_view_count=Count('image')).order_by('-image_view_count')
         form.set_filter_type(filter_type)
         top_title = 'View Points Leaderboard'
 
     else:
-        user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(
-            rank=Window(expression=RowNumber()))
+        user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count')
 
     paginator = Paginator(user_json, 10)
 
@@ -173,6 +171,7 @@ def index(request):
     pItems.count = len(pItems)
 
     for i in range(len(pItems)):
+        pItems[i]['rank'] = i + 1
         if 'owner' in pItems[i].keys():
             pItems[i]['user'] = pItems[i]['owner']
         user = CustomUser.objects.get(pk=pItems[i]['user'])
