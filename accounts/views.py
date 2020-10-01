@@ -45,17 +45,17 @@ def signup(request):
                 user.save()
 
                 # confirm email 
-                # try:
-                # send email to creator
-                subject = 'Please confirm your email'
-                html_message = render_to_string(
-                    'emails/account/signup_email_confirm.html',
-                    {'subject': subject, 'url': '/accounts/email-verify/' + user.verify_email_key},
-                    request
-                )
-                send_mail_with_html(subject, html_message, email, settings.SMTP_REPLY_TO)
-                # except:
-                print('email sending error!')
+                try:
+                    # send email to creator
+                    subject = 'Please confirm your email'
+                    html_message = render_to_string(
+                        'emails/account/signup_email_confirm.html',
+                        {'subject': subject, 'url': '/accounts/email-verify/' + user.verify_email_key},
+                        request
+                    )
+                    send_mail_with_html(subject, html_message, email, settings.SMTP_REPLY_TO)
+                except:
+                    print('email sending error!')
 
 
                 # add maillist
