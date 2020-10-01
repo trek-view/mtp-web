@@ -171,7 +171,7 @@ body {
     color: white;
     border-radius: 4px;
     text-align: center;
-    background: rgba(0,0,0,.5);
+    background: #28a745 !important;
     z-index: 300;
     position: absolute;
     right: 15px;
