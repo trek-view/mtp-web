@@ -53,6 +53,9 @@
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
             <ul class="navbar-nav mr-4 ml-auto mt-2 mt-lg-0">
+                <li class="li-white {% block app_leaderboard %}{% endblock %}">
+                    <a class="nav-link text-white" href="{% url 'leaderboard.index' %}">Leaderboard</a>
+                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">  Explore  </a>
                     <ul class="dropdown-menu">
