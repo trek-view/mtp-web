@@ -180,7 +180,7 @@ class Sequence(models.Model):
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('sequence.sequence_detail', kwargs={'username': str(self.unique_id)})
+        return reverse('sequence.sequence_detail', kwargs={'unique_id': str(self.unique_id)})
 
     def getImageCount(self):
         if not self.coordinates_image is None:
@@ -312,7 +312,7 @@ class Image(models.Model):
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('sequence.sequence_detail', kwargs={'username': str(self.unique_id)})
+        return reverse('sequence.sequence_detail', kwargs={'unique_id': str(self.unique_id)})
 
     def getSequence(self):
         if self.seq_key != '':

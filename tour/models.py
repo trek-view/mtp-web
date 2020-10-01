@@ -48,7 +48,7 @@ class Tour(models.Model):
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('sequence.sequence_detail', kwargs={'username': str(self.unique_id)})
+        return reverse('sequence.sequence_detail', kwargs={'unique_id': str(self.unique_id)})
 
     def getTagStr(self):
         tags = []
