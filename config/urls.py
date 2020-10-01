@@ -46,9 +46,6 @@ sitemaps = {
     'tour': GenericSitemap({
         'queryset': Tour.objects.filter(is_published=True)
     }, priority=0.9),
-    'image': GenericSitemap({
-        'queryset': Image.objects.all(),
-    }, priority=0.9),
 }
 
 class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):

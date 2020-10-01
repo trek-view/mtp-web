@@ -310,10 +310,6 @@ class Image(models.Model):
 
     image_label = models.ManyToManyField(LabelType, through='ImageLabel')
 
-    def get_absolute_url(self):
-        from django.urls import reverse
-        return reverse('sequence.sequence_detail', kwargs={'unique_id': str(self.unique_id)})
-
     def getSequence(self):
         if self.seq_key != '':
             sequence = Sequence.objects.get(seq_key=self.seq_key)
