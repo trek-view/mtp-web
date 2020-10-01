@@ -84,7 +84,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="li-white {% block app_photographer %}{% endblock %}">
+                <li class="li-white d-flex align-items-center {% block app_photographer %}{% endblock %}">
                     <a class="nav-link text-white" href="{% url 'photographer.index' %}">Photographer</a>
                 </li>
                 {% if user.is_authenticated %}
