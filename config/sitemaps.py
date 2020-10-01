@@ -5,7 +5,7 @@ class StaticViewSitemap(Sitemap):
         return [
             'home',
             'login',
-            'challenge.challenge_list'
+            'challenge.challenge_list',
             'challenge.challenge_create',
             'challenge.my_label_challenge_list',
             'challenge.label_challenge_create',
