@@ -178,6 +178,10 @@ class Sequence(models.Model):
 
     distance = models.FloatField(null=True, blank=True)
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('sequence.sequence_detail', kwargs={'username': str(self.unique_id)})
+
     def getImageCount(self):
         if not self.coordinates_image is None:
             return len(self.coordinates_image)
@@ -305,6 +309,10 @@ class Image(models.Model):
     mapillary_image = models.ImageField(upload_to=image_directory_path, null=True, blank=True)
 
     image_label = models.ManyToManyField(LabelType, through='ImageLabel')
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('sequence.sequence_detail', kwargs={'username': str(self.unique_id)})
 
     def getSequence(self):
         if self.seq_key != '':

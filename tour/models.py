@@ -46,6 +46,10 @@ class Tour(models.Model):
     updated_at = models.DateTimeField(default=datetime.now, blank=True)
     is_published = models.BooleanField(default=True)
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('sequence.sequence_detail', kwargs={'username': str(self.unique_id)})
+
     def getTagStr(self):
         tags = []
         if self.tour_tag is None:
