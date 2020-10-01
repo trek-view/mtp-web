@@ -475,6 +475,7 @@ def ajax_challenge_detail(request, unique_id):
 def label_challenge_create(request):
     if request.method == "POST":
         form = LabelChallengeForm(request.POST)
+        new_label_types = request.POST.get('new_label_types', '')
 
         if form.is_valid():
             challenge = form.save(commit=False)
@@ -499,15 +500,44 @@ def label_challenge_create(request):
                 for lt in label_type:
                     challenge.label_type.add(lt)
 
+            if not new_label_types is None and new_label_types != '':
+                label_types = new_label_types.split(',')
+                if len(label_types) > 0:
+                    for label_type in label_types:
+                        l_ary = label_type.split('--')
+                        index = 0
+                        if (len(l_ary) > 0):
+                            l_type = None
+                            for l in l_ary:
+                                if index == 0:
+                                    types = LabelType.objects.filter(parent__isnull=True, name=l)
+                                else:
+                                    types = LabelType.objects.filter(parent=l_type, name=l)
+                                if types.count() == 0:
+                                    l_parent_type = l_type
+                                    l_type = LabelType()
+                                    l_type.name = l
+                                    l_type.parent = l_parent_type
+                                    print(l_type.name)
+                                    l_type.save()
+                                else:
+                                    l_type = types[0]
+                                index += 1
+                                if index == len(l_ary):
+                                    challenge.label_type.add(l_type)
+
             messages.success(request, 'A label challenge was created successfully.')
 
             return redirect('challenge.my_label_challenge_list')
     else:
         form = LabelChallengeForm()
+
+    label_types = LabelType.objects.all()
     content = {
         'form': form,
         'pageName': 'Create Label Challenge',
-        'pageTitle': 'Create Label Challenge'
+        'pageTitle': 'Create Label Challenge',
+        'label_types': label_types
     }
     return render(request, 'challenge/label/create.html', content)
 

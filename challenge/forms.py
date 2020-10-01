@@ -135,7 +135,7 @@ class LabelChallengeForm(forms.ModelForm):
         widget=forms.SelectMultiple(
             attrs={'class': 'form-control'}
         ),
-        queryset=LabelType.objects.all()
+        queryset=LabelType.objects.filter(source='mtpw')
     )
 
     geometry = forms.CharField(widget=forms.Textarea(attrs={'class': 'd-none'}), label='', required=False)
@@ -181,12 +181,12 @@ class LabelChallengeForm(forms.ModelForm):
         fields = (
             'name',
             'geometry',
-            'label_type',
             'description',
             'start_time',
             'end_time',
             'zoom',
-            'is_published'
+            'is_published',
+            'label_type',
         )
 
 class LabelChallengeSearchForm(forms.Form):

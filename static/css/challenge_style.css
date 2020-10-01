@@ -79,3 +79,11 @@
     padding-left: 1px;
     padding-right: 1px;
 }
+
+.tag.selected {
+    background: lightgray;
+}
+
+#new_label_types_box .tag {
+    white-space: nowrap;
+}
