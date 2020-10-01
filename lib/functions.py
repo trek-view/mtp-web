@@ -6,6 +6,8 @@ from django.http import (
 import time
 import requests
 import math
+from django.urls import reverse
+from django.shortcuts import redirect
 
 def send_mail_with_html(subject, html_message, to_email, reply_to, from_email = None):
     if isinstance(to_email, str):
@@ -27,7 +29,7 @@ def send_mail_with_html(subject, html_message, to_email, reply_to, from_email = 
 def my_login_required(function):
     def wrapper(request, *args, **kw):
         if not request.user.is_authenticated:
-            return HttpResponseRedirect('/accounts/login')
+            return redirect('{}?next={}'.format(reverse('login'), request.path))
         else:
             return function(request, *args, **kw)
     return wrapper
