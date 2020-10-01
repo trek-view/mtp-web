@@ -260,30 +260,6 @@ def guidebook_create(request, unique_id=None):
                     for tag in guidebook.tag.all():
                         if not tag in form.cleaned_data['tag']:
                             guidebook.tag.remove(tag)
-                try:
-                    # send email to creator
-                    subject = 'Your guidebook post is under review'
-                    html_message = render_to_string(
-                        'emails/guidebook/guidebook/create.html',
-                        {'subject': subject, 'guidebook': guidebook},
-                        request
-                    )
-                    send_mail_with_html(subject, html_message, request.user.email)
-                    # send email to admin
-                    staffs = CustomUser.objects.filter(is_staff=True, is_active=True)
-                    staff_emails = []
-                    for staff in staffs:
-                        staff_emails.append(staff.email)
-                    if len(staff_emails) > 0:
-                        subject = 'Guidebook post needs to be approved'
-                        html_message = render_to_string(
-                            'emails/guidebook/guidebook/create_admin.html',
-                            {'subject': subject, 'guidebook': guidebook},
-                            request
-                        )
-                        send_mail_with_html(subject, html_message, staff_emails)
-                except:
-                    print('email sending error!')
             else:
                 guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
                 guidebook.name = form.cleaned_data['name']

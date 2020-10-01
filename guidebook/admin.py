@@ -52,7 +52,7 @@ class GuidebookAdmin(tags_input_admin.TagsInputAdmin):
                     {'subject': subject, 'guidebook': guidebook},
                     request
                 )
-                send_mail_with_html(subject, html_message, guidebook.user.email)
+                send_mail_with_html(subject, html_message, guidebook.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
             

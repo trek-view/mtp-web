@@ -50,10 +50,10 @@ def signup(request):
                     subject = 'Please confirm your email'
                     html_message = render_to_string(
                         'emails/account/signup_email_confirm.html', 
-                        { 'subject': subject, 'url': '/accounts/email-verify/' + user.verify_email_key}, 
+                        {'subject': subject, 'url': '/accounts/email-verify/' + user.verify_email_key},
                         request
                     )
-                    send_mail_with_html(subject, html_message, email)
+                    send_mail_with_html(subject, html_message, email, settings.SMTP_REPLY_TO)
                 except:
                     print('email sending error!')
 
@@ -90,7 +90,7 @@ def email_verify(request, key):
                 { 'subject': subject}, 
                 request
             )
-            send_mail_with_html(subject, html_message, user.email)
+            send_mail_with_html(subject, html_message, user.email, settings.SMTP_REPLY_TO)
         except:
             print('email sending error!')
         messages.success(request, 'Your account is confirmed. You can now login.')
