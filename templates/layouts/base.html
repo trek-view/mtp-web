@@ -53,10 +53,10 @@
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
             <ul class="navbar-nav mr-4 ml-auto mt-2 mt-lg-0">
-                <li class="li-white {% block app_leaderboard %}{% endblock %}">
+                <li class="li-white d-flex align-items-center {% block app_leaderboard %}{% endblock %}">
                     <a class="nav-link text-white" href="{% url 'leaderboard.index' %}">Leaderboard</a>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="nav-item d-flex align-items-center dropdown">
                     <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">  Explore  </a>
                     <ul class="dropdown-menu">
                         <li class="dropdown-item nav-item {% block app_tour %}{% endblock %}">
@@ -68,11 +68,11 @@
                         </li>
 
                         <li class="dropdown-item nav-item {% block app_guidebook %}{% endblock %}">
-                            <a class="nav-link" href="{% url 'guidebook.home' %}">Guidebooks</a>
+                            <a class="nav-link" href="{% url 'guidebook.home' %}">Guidebook</a>
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="nav-item d-flex align-items-center dropdown">
                     <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">  Challenge  </a>
                     <ul class="dropdown-menu">
                         <li class="dropdown-item nav-item {% block app_challenge %}{% endblock %}">
@@ -88,13 +88,13 @@
                     <a class="nav-link text-white" href="{% url 'photographer.index' %}">Photographer</a>
                 </li>
                 {% if user.is_authenticated %}
-                    <li class="li-white  {% block app_uploader %}{% endblock %}">
-                        <a class="nav-link text-white" href="{% url 'app_download' %}">MTP Uploader</a>
+                    <li class="li-white d-flex align-items-center {% block app_uploader %}{% endblock %}">
+                        <a class="nav-link text-white btn btn-primary" href="{% url 'app_download' %}">Upload Imagery</a>
                     </li>
                 {% endif %}
 
             {% if user.is_authenticated %}
-                <li class="nav-item dropdown">
+                <li class="nav-item d-flex align-items-center dropdown">
 
                     <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">
                         {% if request.user.avatar is None or request.user.avatar == '' %}
@@ -112,13 +112,11 @@
                         <li class="dropdown-item nav-item ">
                             <a class="nav-link" href="{% url 'logout' %}" class="text-white">Logout</a>
                         </li>
-
-
                     </ul>
                 </li>
 
             {% else %}
-                <li class="li-white">
+                <li class="li-white d-flex align-items-center">
                     <a class="nav-link text-white" href="{% url 'login' %}">Login</a>
                 </li>
 
