@@ -148,20 +148,23 @@
                         </div>
                     </div>
 
-
-
                     <div class="guidebook-created-at d-flex flex-row align-items-center justify-content-between mt-2">
-                        <div class="text-secondary">
-                            <p >
-                            {{ sequence.captured_at }}
-                            </p>
-                            <p class="">
-                                {{ sequence.created_at }}
-                            </p>
+                        <div class="text-secondary w-100">
+                            <div class="w-100 p-1 ">
+                                <label class="" style="width: 40%">Capture at: </label>
+                                <span class="" style="font-size: 13px; width: 60%">{{ sequence.captured_at }}</span>
+                            </div>
+
+                            <div class="w-100 p-1 ">
+                                <label class="" style="width: 40%">Uploaded at: </label>
+                                <span class="" style="font-size: 13px; width: 60%">{{ sequence.created_at }}</span>
+                            </div>
+
+                            <a href="{% url 'account.profile' username=sequence.user.username %}">
+                                <span class="" style="color: brown;">{{ sequence.user.username }}</span>
+                            </a>
                         </div>
-                        <a href="{% url 'account.profile' username=sequence.user.username %}">
-                            <span class="" style="color: brown;">{{ sequence.user.username }}</span>
-                        </a>
+
                     </div>
 
                     <canvas id="myChart" width="350" height="150"></canvas>
