@@ -386,7 +386,7 @@ def challenge_leaderboard(request, unique_id):
         sequences = sequences.filter(camera_make__in=cm)
     print(sequences.count())
 
-    user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count').annotate(rank=Window(expression=RowNumber()))
+    user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count')
 
     paginator = Paginator(user_json, 10)
     page = 1
@@ -417,6 +417,7 @@ def challenge_leaderboard(request, unique_id):
     form = ChallengeSearchForm(request.GET)
 
     for i in range(len(pItems)):
+        pItems[i]['rank'] = i + 1
         user = CustomUser.objects.get(pk=pItems[i]['user'])
 
         if user is None or not user:
@@ -750,7 +751,7 @@ def label_challenge_leaderboard(request, unique_id):
         return redirect('challenge.label_challenge_list')
 
     images = Image.objects.filter(point__intersects=challenge.multipolygon)
-    user_json = ImageLabel.objects.filter(image__in=images).values('user').annotate(image_label_count=Count('image')).order_by('-image_label_count').annotate(rank=Window(expression=RowNumber()))
+    user_json = ImageLabel.objects.filter(image__in=images).values('user').annotate(image_label_count=Count('image')).order_by('-image_label_count')
 
     paginator = Paginator(user_json, 10)
     page = request.GET.get('page')
@@ -778,6 +779,7 @@ def label_challenge_leaderboard(request, unique_id):
     pItems.count = len(pItems)
 
     for i in range(len(pItems)):
+        pItems[i]['rank'] = i + 1
         user = CustomUser.objects.get(pk=pItems[i]['user'])
 
         if user is None or not user:

@@ -23,7 +23,7 @@ r = lambda: random.randint(0,255)
 UserModel = get_user_model()
 
 def image_directory_path(instance, filename):
-    path = 'sequence/{}/{}/{}.jpg'.format(instance.username, instance.seq_key, instance.image_key)
+    path = 'sequence/{}/{}/{}.jpg'.format(instance.user.username, instance.seq_key, instance.image_key)
     print("image path: ", path)
     return path
 
