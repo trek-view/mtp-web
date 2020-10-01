@@ -18,17 +18,36 @@ from django.contrib.sitemaps.views import sitemap
 from django.contrib.sitemaps import GenericSitemap
 from photographer.models import Photographer
 from guidebook.models import Guidebook
+from accounts.models import CustomUser
+from challenge.models import Challenge
+from sequence.models import Sequence, Image
+from tour.models import Tour
 from django.contrib import admin as admin_tmp
 from accounts import views as account_views
 from . import views
 
 sitemaps = {
     'static': StaticViewSitemap,
-    'photographer': GenericSitemap({
-        'queryset': Photographer.objects.filter(is_published=True),
+    'profile': GenericSitemap({
+        'queryset': CustomUser.objects.filter(is_active=True)
+    }, priority=0.9),
+    'challenge': GenericSitemap({
+        'queryset': Challenge.objects.filter(is_published=True)
     }, priority=0.9),
     'guidebook': GenericSitemap({
-        'queryset': Guidebook.objects.filter(is_published=True, is_approved=True),
+        'queryset': Guidebook.objects.filter(is_published=True)
+    }, priority=0.9),
+    'photographer': GenericSitemap({
+        'queryset': Photographer.objects.filter(is_published=True)
+    }, priority=0.9),
+    'sequence': GenericSitemap({
+        'queryset': Sequence.objects.filter(is_published=True)
+    }, priority=0.9),
+    'tour': GenericSitemap({
+        'queryset': Tour.objects.filter(is_published=True)
+    }, priority=0.9),
+    'image': GenericSitemap({
+        'queryset': Image.objects.all(),
     }, priority=0.9),
 }
 

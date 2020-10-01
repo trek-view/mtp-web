@@ -69,6 +69,10 @@ class CustomUser(AbstractUser):
         return self.username
         # return self.email
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('account.profile', kwargs={'username': self.username})
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self._password is not None:
