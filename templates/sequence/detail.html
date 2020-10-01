@@ -823,9 +823,17 @@
                         $('.image-detail-box').removeClass('d-none');
                     $('#image_detail_box').html(data.image_detail_box_html);
                     $('.right-board .image-view-point span').text(data.view_points + ' Viewpoints');
-
+                    var image_index = image_keys.indexOf(image_key);
+                    if (image_index >= 0)
+                    {
+                        for (var i=0; i<myLineChart.data.datasets[0].pointBackgroundColor.length; i++) {
+                            myLineChart.data.datasets[0].pointBackgroundColor[i] = '#28a74578';
+                            if (i == image_index)
+                                myLineChart.data.datasets[0].pointBackgroundColor[i] = 'red';
+                        }
+                        myLineChart.update();
+                    }
                 }
-
             }
         });
     }
@@ -912,7 +920,7 @@
         }
 
     }
-
+    var myLineChart = null;
     function drawChart() {
         var url = "{% url 'sequence.ajax_get_image_ele' unique_id=sequence.unique_id %}"
         $.ajax({
@@ -926,11 +934,13 @@
                     toastr.error(data.message)
                 }
                 else {
-                    var num_ary = []
+                    var num_ary = [];
+                    var backgroud_color_ary = [];
                     for (var i=0; i<data.eles.length;i++) {
-                        num_ary.push(i+1)
+                        num_ary.push(i+1);
+                        backgroud_color_ary.push('#28a74578');
                     }
-                    var myLineChart = new Chart(document.getElementById("myChart"), {
+                    myLineChart = new Chart(document.getElementById("myChart"), {
                         type: 'line',
                         data: {
                             labels: num_ary,
@@ -938,7 +948,8 @@
                                 data: data.eles,
                                 borderWidth: 1,
                                 borderColor: "#3e95cd",
-                                fill: false
+                                fill: false,
+                                pointBackgroundColor: backgroud_color_ary
                             }]
                         },
                         options: {
@@ -958,7 +969,16 @@
                                         labelString: 'photo num'
                                     }
                                 }]
-                            }
+                            },
+                            onClick: function(evt) {
+                                var element = myLineChart.getElementAtEvent(evt);
+                                if(element.length > 0)
+                                    {
+                                        var ind = element[0]._index;
+                                        move_image(image_keys[ind]);
+                                    }
+                            },
+
                         }
                     });
                 }
