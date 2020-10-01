@@ -31,9 +31,17 @@
             {% endif %}
 
             {% if request.user.is_authenticated %}
-                <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
-                    <a class="btn btn-outline-primary" href="{% url 'sequence.import_sequence' %}">
+                <div class="w-100 mb-3 pr-3 pl-3">
+                    <span>If you've already uploaded imagery to Mapillary</span>
+                    <a class="btn btn-outline-primary mt-2" href="{% url 'sequence.import_sequence' %}">
                         Import from Mapillary
+                    </a>
+                </div>
+
+                <div class="w-100 mb-3 pr-3 pl-3">
+                    <span>Or upload your images now</span>
+                    <a class="btn btn-outline-primary mt-2" href="{% url 'app_download' %}">
+                        Upload new imagery
                     </a>
                 </div>
             {% endif %}
