@@ -1,5 +1,5 @@
 ## Python packages
-
+from datetime import datetime
 import json
 import re
 from binascii import a2b_base64
@@ -41,7 +41,7 @@ from guidebook.models import Guidebook, Scene
 
 # That includes from .models import *
 from .forms import * 
-from datetime import datetime
+
 ############################################################################
 
 MAIN_PAGE_DESCRIPTION = "Sequences are collections of images continuously captured by a user at a give time. Browse those created by others, or import your own from Mapillary."
@@ -461,7 +461,10 @@ def save_weather(sequence):
         weatherstack = Weatherstack()
 
         point = [sequence.getFirstPointLat(), sequence.getFirstPointLng()]
-        historical_date = sequence.captured_at[0:10]
+        if isinstance(sequence.captured_at, str):
+            historical_date = sequence.captured_at[0:10]
+        else:
+            historical_date = sequence.captured_at.strftime('%Y-%m-%d')
         print(point)
         print('historical_date: ', historical_date)
         weather_json = weatherstack.get_historical_data(point=point, historical_date=historical_date)
@@ -760,7 +763,10 @@ def set_camera_make(sequence):
 
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
-    save_weather(sequence)
+    print('1')
+    p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
+    p.start()
+    print('2')
     set_camera_make(sequence)
 
     page = 1
