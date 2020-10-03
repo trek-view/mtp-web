@@ -90,12 +90,16 @@ class PhotographerSearchForm(forms.Form):
             # choices=getAllCameraMake()
             queryset=CaptureMethod.objects.all()
         )
-        self.fields['image_quality'] = forms.ModelChoiceField(
-            widget=forms.RadioSelect(attrs={'class': '', 'data-validation': 'required'}),
-            queryset=ImageQuality.objects.all(),
+
+        self.fields['image_quality'] = forms.ModelMultipleChoiceField(
             required=False,
-            empty_label='All'
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            # choices=getAllCameraMake()
+            queryset=ImageQuality.objects.all()
         )
+
 
 class PhotographerEnquireForm(forms.ModelForm):
     subject = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),

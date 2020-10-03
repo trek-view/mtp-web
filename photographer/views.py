@@ -249,7 +249,7 @@ def photographer_list(request):
             photographers = Photographer.objects.all().filter(is_published=True)
 
             if not image_quality is None:
-                photographers = photographers.filter(image_quality=image_quality)
+                photographers = photographers.filter(image_quality__in=image_quality)
 
             if not capture_types is None and len(capture_types) > 0:
                 ps = Photographer.objects.filter(capture_type__in=capture_types)
