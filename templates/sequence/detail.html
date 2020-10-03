@@ -91,6 +91,46 @@
                         </a>
                     </div>
 
+                    <div class="guidebook-created-at d-flex flex-row align-items-center justify-content-between mt-2">
+                        <div class="text-secondary w-100">
+                            <div class="w-100 p-1 ">
+                                <label class="" style="width: 40%">Capture at: </label>
+                                <span class="" style="font-size: 13px; width: 60%">{{ sequence.captured_at }}</span>
+                            </div>
+
+                            <div class="w-100 p-1 ">
+                                <label class="" style="width: 40%">Uploaded at: </label>
+                                <span class="" style="font-size: 13px; width: 60%">{{ sequence.created_at }}</span>
+                            </div>
+
+                            <a href="{% url 'account.profile' username=sequence.user.username %}">
+                                <span class="" style="color: brown;">{{ sequence.user.username }}</span>
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <canvas id="myChart" width="350" height="150"></canvas>
+
+                    <div class="mt-2 d-flex flex-row justify-content-center" id="mapillary-view">
+                        <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
+                            <img style="width: 32px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}" />
+                        </a>
+                        {% if sequence.google_street_view %}
+                            <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.getFirstPointLat }},{{ sequence.getFirstPointLng }},14z">
+                                <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico" />
+                            </a>
+                        {% endif %}
+                        {% if not sequence.strava is None and sequence.strava != ''  %}
+                            <a class="mr-2" target="_blank" href="https://www.strava.com/activities/{{ sequence.strava }}">
+                                <img style="width: 35px" src="https://a4k2d2q5.rocketcdn.me/wp-content/uploads/2018/02/Strava-Running-and-Cycling-GPS.png">
+                            </a>
+                        {% endif %}
+                        <a target="_blank" class="" href="https://www.mapillary.com/app/?pKey={{ sequence.getFirstImageKey }}&focus=photo">
+                            <img style="width: 32px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQiTHrSFBxGdPFbRSCEXLo3IB1IzMS50F_V0Q&usqp=CAU">
+                        </a>
+                    </div>
+
                     <div id="accordion" class="mt-2">
                         <div class="card">
                             <div class="card-header p-0" id="headingOne">
@@ -105,6 +145,14 @@
                                 <div class="card-body">
                                     <div class="sequence-weather pt-2" id="sequence_weather">
                                         <h6>Location Weather: </h6>
+                                        <div class="mt-2">
+                                            <label class="col-6">Min Temp: </label>
+                                            <span class="col-6">{{ sequence_weather.his_mintemp }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Max Temp: </label>
+                                            <span class="col-6">{{ sequence_weather.his_maxtemp }}</span>
+                                        </div>
                                         <div class="mt-2">
                                             <label class="col-6">Sunrise: </label>
                                             <span class="col-6">{{ sequence_weather.his_astro_sunrise }}</span>
@@ -146,46 +194,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="guidebook-created-at d-flex flex-row align-items-center justify-content-between mt-2">
-                        <div class="text-secondary w-100">
-                            <div class="w-100 p-1 ">
-                                <label class="" style="width: 40%">Capture at: </label>
-                                <span class="" style="font-size: 13px; width: 60%">{{ sequence.captured_at }}</span>
-                            </div>
-
-                            <div class="w-100 p-1 ">
-                                <label class="" style="width: 40%">Uploaded at: </label>
-                                <span class="" style="font-size: 13px; width: 60%">{{ sequence.created_at }}</span>
-                            </div>
-
-                            <a href="{% url 'account.profile' username=sequence.user.username %}">
-                                <span class="" style="color: brown;">{{ sequence.user.username }}</span>
-                            </a>
-                        </div>
-
-                    </div>
-
-                    <canvas id="myChart" width="350" height="150"></canvas>
-
-                    <div class="mt-2 d-flex flex-row justify-content-center" id="mapillary-view">
-                        <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
-                            <img style="width: 32px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}" />
-                        </a>
-                        {% if sequence.google_street_view %}
-                            <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.getFirstPointLat }},{{ sequence.getFirstPointLng }},14z">
-                                <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico" />
-                            </a>
-                        {% endif %}
-                        {% if not sequence.strava is None and sequence.strava != ''  %}
-                            <a class="mr-2" target="_blank" href="https://www.strava.com/activities/{{ sequence.strava }}">
-                                <img style="width: 35px" src="https://a4k2d2q5.rocketcdn.me/wp-content/uploads/2018/02/Strava-Running-and-Cycling-GPS.png">
-                            </a>
-                        {% endif %}
-                        <a target="_blank" class="" href="https://www.mapillary.com/app/?pKey={{ sequence.getFirstImageKey }}&focus=photo">
-                            <img style="width: 32px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQiTHrSFBxGdPFbRSCEXLo3IB1IzMS50F_V0Q&usqp=CAU">
-                        </a>
                     </div>
 
                     <div class="mt-2" id="mapillary-view">
