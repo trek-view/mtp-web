@@ -79,6 +79,11 @@ Run following command to check logs.
 heroku logs --tail [-a your_heroku_app]
 ```
 
+If you want to enable two auth for admin users, please add this in local.py
+```
+admin.site.__class__ = AdminSiteOTPRequiredMixinRedirSetup
+```
+
 ### Prerequisites
 
 - PostgreSql 10.0+
