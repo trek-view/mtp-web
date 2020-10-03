@@ -6,17 +6,25 @@
 <div class="main-body">
     <div class="container">
         <div class="row mt-3">
-            <div class="text-center col-md-6">
-                <a  href="https://test.com">
-                    <img src="https://user-images.githubusercontent.com/1296409/91702290-6c0edf80-eb70-11ea-9c13-48b3ed7cc0a0.jpg" />
-                </a>
-            </div>
-
-            <div class="text-center col-md-6">
-                <a href="https://test.com">
-                    <img src="https://user-images.githubusercontent.com/1296409/91702292-6c0edf80-eb70-11ea-8155-15850525dace.png" />
-                </a>
-            </div>
+            <h3>Upload imagery</h3>
+            <h4>If you're imagery already exists on Mapillary</h4>
+            <p>Import your Mapillary imagery directly to Map the Paths web.</p>
+            <p><a class="btn btn-outline-primary mt-2" href="{% url 'sequence.import_sequence' %}">Import from Mapillary</a></p>
+            <h4>If you're imagery does not exist on Mapillary</h4>
+            <p>Process and upload your imagery using the Map the Paths Uploader.</p>
+            <p>Features:</p>
+            <ul>
+                <li>Works with 360 and standard (flat) photos</li>
+                <li>Add metadata to sequence for easy management and discovery (name, description, tags)</li>
+                <li>Convert video to photo frames</li>
+                <li>Geotag images using .gpx track file</li>
+                <li>Define photo spacing</li>
+                <li>Modify photo GPS information (position and heading)</li>
+                <li>Add a nadir</li>
+                <li>Add copyright information</li>
+                <li>Upload to web platforms (Map the Paths Web, Mapillary, Google Street View, Strava</li>
+            </li>
+            <p><a class="btn btn-outline-primary mt-2" href="https://github.com/trek-view/mtp-desktop-uploader/releases" target="_blank">Download for Mac</a> <a class="btn btn-outline-primary mt-2" href="https://github.com/trek-view/mtp-desktop-uploader/releases" target="_blank">Download for Windows</a></p>
         </div>
     </div>
 
