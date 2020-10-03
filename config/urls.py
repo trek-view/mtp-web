@@ -80,7 +80,7 @@ class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
 # handler404 = marketplaceViews.handler404
 # handler500 = marketplaceViews.handler500
 
-# admin.site.__class__ = AdminSiteOTPRequiredMixinRedirSetup
+admin.site.__class__ = AdminSiteOTPRequiredMixinRedirSetup
 
 urlpatterns = [
     # path('', views.index, name='home'),
