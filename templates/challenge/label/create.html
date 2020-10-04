@@ -217,7 +217,7 @@
         if (parent_label != '')
             label = parent_label + '--' + label
         own_types.push(label);
-        var html_label_type = '<span class="tag" style="font-size: 16px; cursor: pointer" onclick="clickLabelTag(\'' + label + '\')" data-key="' + label + '">' + label + '</span>';
+        var html_label_type = '<span class="tag d-inline-block" style="font-size: 16px; cursor: pointer" onclick="clickLabelTag(\'' + label + '\')" data-key="' + label + '">' + label + '</span>';
         $('#new_label_types_box').append(html_label_type);
         $('#newLabelTypeModal').modal('hide');
     });
