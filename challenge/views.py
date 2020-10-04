@@ -497,6 +497,7 @@ def label_challenge_create(request):
             challenge.save()
             label_type = form.cleaned_data['label_type']
             if not label_type is None and len(label_type) > 0:
+                challenge.label_type.clear()
                 for lt in label_type:
                     challenge.label_type.add(lt)
 
@@ -546,6 +547,8 @@ def label_challenge_edit(request, unique_id):
     challenge = get_object_or_404(LabelChallenge, unique_id=unique_id)
     if request.method == "POST":
         form = LabelChallengeForm(request.POST, instance=challenge)
+        new_label_types = request.POST.get('new_label_types', '')
+        print(new_label_types)
         if form.is_valid():
             challenge = form.save(commit=False)
             challenge.user = request.user
@@ -572,15 +575,43 @@ def label_challenge_edit(request, unique_id):
                 challenge.label_type.clear()
                 for label_t in label_type:
                     challenge.label_type.add(label_t)
+
+            if not new_label_types is None and new_label_types != '':
+                label_types = new_label_types.split(',')
+                if len(label_types) > 0:
+                    for label_type in label_types:
+                        l_ary = label_type.split('--')
+                        index = 0
+                        if (len(l_ary) > 0):
+                            l_type = None
+                            for l in l_ary:
+                                if index == 0:
+                                    types = LabelType.objects.filter(parent__isnull=True, name=l)
+                                else:
+                                    types = LabelType.objects.filter(parent=l_type, name=l)
+                                if types.count() == 0:
+                                    l_parent_type = l_type
+                                    l_type = LabelType()
+                                    l_type.name = l
+                                    l_type.parent = l_parent_type
+                                    print(l_type.name)
+                                    l_type.save()
+                                else:
+                                    l_type = types[0]
+                                index += 1
+                                if index == len(l_ary):
+                                    challenge.label_type.add(l_type)
             messages.success(request, 'Challenge "%s" is updated successfully.' % challenge.name)
             return redirect('challenge.label_challenge_list')
     else:
         form = LabelChallengeForm(instance=challenge)
+    label_types = LabelType.objects.filter(parent__isnull=True, source='mtpw')
     content = {
         'form': form,
         'pageName': 'Edit Label Challenge',
         'challenge': challenge,
-        'pageTitle': challenge.name + ' - Edit Label Challenge'
+        'pageTitle': challenge.name + ' - Edit Label Challenge',
+        'label_types': label_types
     }
     return render(request, 'challenge/label/edit.html', content)
 
