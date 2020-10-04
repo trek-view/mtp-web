@@ -33,6 +33,13 @@
             <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
                 <a href="{% url 'photographer.photographer_create' %}" class="btn btn-outline-primary">Create Photographer</a>
             </div>
+            <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
+                {% if request.user.is_authenticated and request.user == photographer.user %}
+                    <a href="{% url 'photographer.my_photographer_edit' unique_id=photographer.unique_id %}" class="btn btn-outline-primary">Edit Photographer</a>
+                {% else %}
+                    <a href="{% url 'photographer.photographer_create' %}" class="btn btn-outline-primary">Create Photographer</a>
+                {% endif %}
+            </div>
             {% if user.is_authenticated %}
                 <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
                     <li class="nav-item" style="width: 30%;">
