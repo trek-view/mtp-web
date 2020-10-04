@@ -108,15 +108,15 @@
                         </li>
                     </ul>
                 </li>
-                <li class="li-white d-flex align-items-center {% block app_uploader %}{% endblock %}">
-                    <a class="nav-link text-white btn btn-primary" href="{% url 'app_download' %}">Upload Imagery</a>
-                </li>
+
             {% else %}
                 <li class="li-white d-flex align-items-center">
                     <a class="nav-link text-white" href="{% url 'login' %}">Login</a>
                 </li>
-
             {% endif %}
+            <li class="li-white d-flex align-items-center {% block app_uploader %}{% endblock %}">
+                <a class="nav-link text-white btn btn-primary" href="{% url 'app_download' %}">Upload Imagery</a>
+            </li>
             </ul>
         </div> <!-- navbar-collapse.// -->
     </nav>
