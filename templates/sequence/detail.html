@@ -814,7 +814,6 @@
         var url = "{% url 'sequence.ajax_get_image_detail' unique_id=sequence.unique_id image_key='image_key' %}";
         url = url.replace('image_key', image_key);
 
-        console.log('image_key', image_key)
         image_url_reset(image_key);
 
         $.ajax({
@@ -843,7 +842,6 @@
                         myLineChart.update();
                     }
                     if (view_mode == 'mtpw_label') {
-                        console.log('switch_detection', $('#switch_detection').prop('checked'));
                         getImageLables();
                     }
                     else if (view_mode == 'autodeteced_label') {
@@ -1071,10 +1069,9 @@
     }
 
     var current_selected_label_type_key = '';
-
+    var disabled_label_ids = [];
     var resetLabelGroup = function () {
-        if (current_selected_label_type_key != '') {
-            var key = current_selected_label_type_key;
+        Object.keys(label_type_ary).forEach(function(key){
             var label_ids = label_type_ary[key]['label_ids'];
             var lb = null;
             for (var i = 0; i<label_ids.length; i++) {
@@ -1089,30 +1086,51 @@
                 var linecolor = color;
                 if (lb['is_mine'])
                     linecolor = 'blue';
-                lb['tag'].setOptions({
-                    fillColor: color,
-                    fillOpacity: 0.3,
-                    lineColor: linecolor,
-                    text: lb['id']
-                });
+                lb['tag'].fillOpacity = 0;
+                lb['tag'].lineOpacity = 0;
+                if (disabled_label_ids.indexOf(lb['id']) == -1)
+                    disabled_label_ids.push(lb['id']);
             }
-            current_selected_label_type_key = '';
-            $('#label_' + key).removeClass('selected');
-        }
 
+            $('#label_' + key).removeClass('selected');
+        });
+        current_selected_label_type_key = '';
+    }
+
+    var allLabelGroup = function () {
+        Object.keys(label_type_ary).forEach(function(key){
+            var label_ids = label_type_ary[key]['label_ids'];
+            var lb = null;
+            for (var i = 0; i<label_ids.length; i++) {
+                lb = label_tags[label_ids[i]]
+                if (lb == undefined)
+                    continue;
+                if (lb['tag'] == undefined)
+                    continue;
+                if (current_clicked_label_id == label_ids[i])
+                    continue;
+                var color = label_type_ary[lb['label_type_key']['label_type_color']];
+                var linecolor = color;
+                if (lb['is_mine'])
+                    linecolor = 'blue';
+                lb['tag'].fillOpacity = 0.3;
+                lb['tag'].lineOpacity = 1;
+                disabled_label_ids = [];
+            }
+        });
+        current_selected_label_type_key = '';
     }
 
     function show_label_group(key) {
-        console.log('key', key)
         var label_ids = label_type_ary[key]['label_ids'];
         var lb = null;
         if ($('#label_' + key).hasClass('selected'))
         {
-            resetLabelGroup();
+            $('#label_' + key).removeClass('selected');
+            allLabelGroup();
             return;
         }
-        if (current_selected_label_type_key != '')
-            resetLabelGroup();
+        resetLabelGroup();
         for (var i = 0; i<label_ids.length; i++) {
             lb = label_tags[label_ids[i]]
             if (lb == undefined)
@@ -1126,13 +1144,12 @@
             var linecolor = color;
             if (lb['is_mine'])
                 linecolor = 'blue';
-            lb['tag'].setOptions({
-                fillColor: color,
-                fillOpacity: 0.5,
-                lineColor: linecolor,
-                text: lb['id']
-            });
+            lb['tag'].lineOpacity = 1;
+            lb['tag'].fillOpacity = 0.5;
 
+            if (disabled_label_ids.indexOf(lb['id']) >= 0) {
+                disabled_label_ids.splice(disabled_label_ids.indexOf(lb['id']), 1);
+            }
         }
         current_selected_label_type_key = key;
         $('#label_' + key).addClass('selected');
@@ -1267,6 +1284,7 @@
             fillColor: color,
             fillOpacity: 0.3,
             lineColor: linecolor,
+            lineOpacity: 1,
         }
         if (type == 'rect') {
             geometry = new Mapillary.TagComponent.RectGeometry(geo_data);
@@ -1317,6 +1335,8 @@
             .then(function(tagIds) {
                 if (tagIds.length > 0) {
                     var hoveredTagId = tagIds[0];
+                    if (disabled_label_ids.indexOf(hoveredTagId) > -1)
+                        return;
                     if (hoveredTagId == current_clicked_label_id) {
                         current_hover_label_id = hoveredTagId;
                         return;
@@ -1561,7 +1581,7 @@
                         var label = null;
                         for (var i = 0; i < tagIds.length; i++) {
                             label = label_tags[tagIds[i]];
-                            if (label['is_mine'])
+                            if (label['is_mine'] && disabled_label_ids.indexOf(tagIds[i]) == -1)
                                 tag_id_ary.push(tagIds[i])
                         }
                     }
