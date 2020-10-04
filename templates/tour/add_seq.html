@@ -295,8 +295,8 @@
                                             </a>
                                         </div>
 
-                                        <p class="mt-3">{{ sequence.captured_at }}</p>
-                                        <p>{{ sequence.created_at }}</p>
+                                        <p class="mt-3">Captured at: {{ sequence.captured_at }}</p>
+                                        <p>Uploaded at: {{ sequence.created_at }}</p>
                                         {% if not sequence.unique_id in t_sequence_ary %}
                                             <button type="button" class="mt-2 btn btn-warning btn-sm" id="action_{{ sequence.unique_id }}" onclick="add_sequence_in_tour('{{ sequence.unique_id }}')">Add in Tour</button>
                                         {% else %}

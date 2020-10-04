@@ -152,7 +152,7 @@ def tour_add_sequence(request, unique_id):
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForTourForm()
 
-    sequences = sequences.order_by('-created_at')
+    sequences = sequences.order_by('-captured_at')
 
     sequence_ary = []
     tour_sequences = TourSequence.objects.filter(tour=tour)

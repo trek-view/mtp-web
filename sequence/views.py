@@ -151,7 +151,7 @@ def sequence_list(request):
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
-    paginator = Paginator(sequences.order_by('-created_at'), 5)
+    paginator = Paginator(sequences.order_by('-captured_at'), 5)
 
     try:
         pSequences = paginator.page(page)
@@ -245,7 +245,7 @@ def my_sequence_list(request):
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
-    paginator = Paginator(sequences.order_by('-created_at'), 5)
+    paginator = Paginator(sequences.order_by('-captured_at'), 5)
 
     try:
         pSequences = paginator.page(page)
