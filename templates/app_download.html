@@ -5,216 +5,41 @@
 {% block app_style %}<link rel="stylesheet" href="{% static 'css/uploader_style.css' %}">{% endblock %}
 <div class="main-body">
     <div class="container">
-        <div class="row mt-3">
-            <h3>Upload imagery</h3>
-            <br />
-            <br />
-            <h4>If your imagery already exists on Mapillary</h4>
-            <p>Import your Mapillary imagery directly to Map the Paths web.</p>
-            <p><a class="btn btn-outline-primary mt-2" href="{% url 'sequence.import_sequence' %}">Import from Mapillary</a></p>
-            <h4>If you're imagery does not exist on Mapillary</h4>
-            <p>Process and upload your imagery using the Map the Paths Uploader.</p>
-            <p>Features:</p>
-            <ul>
-                <li>Works with 360 and standard (flat) photos</li>
-                <li>Add metadata to sequence for easy management and discovery (name, description, tags)</li>
-                <li>Convert video to photo frames</li>
-                <li>Geotag images using .gpx track file</li>
-                <li>Define photo spacing</li>
-                <li>Modify photo GPS information (position and heading)</li>
-                <li>Add a nadir</li>
-                <li>Add copyright information</li>
-                <li>Upload to web platforms (Map the Paths Web, Mapillary, Google Street View, Strava</li>
-            </li>
-            <p><a class="btn btn-outline-primary mt-2" href="https://github.com/trek-view/mtp-desktop-uploader/releases/download/v0.0.1/Map.the.Paths.Uploader-0.0.1.dmg" target="_blank">Download for Mac</a> <a class="btn btn-outline-primary mt-2" href="https://github.com/trek-view/mtp-desktop-uploader/releases/download/v0.0.1/Map.the.Paths.Uploader.Setup.0.0.1.exe" target="_blank">Download for Windows</a></p>
-        </div>
-    </div>
-
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="uploadPictureModal" tabindex="-1" role="dialog" aria-labelledby="uploadPictureModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="uploadPictureModalLabel">Upload Picture</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="file-upload">
-                    <form action="{% url 'account.ajax_upload_file' %}" class="dropzone ml-auto mr-auto d-flex align-items-center justify-content-center">
-                      <div class="fallback">
-                        <input name="avatar" type="file" multiple="false" />
-                      </div>
-                    </form>
-                    <div class="text-right mt-3">
-
-                    </div>
+        <div class="mt-3">
+            <div class="p-3">
+                <div class="pt-3 mb-3">
+                    <h3>
+                        Upload imagery
+                    </h3>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary d-none" id='uploadfile'>Upload</button>
-                <button type="button" class="btn btn-danger d-none" id="removefile">Remove</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Modal -->
-<div class="modal fade" id="userDetailModal" tabindex="-1" role="dialog" aria-labelledby="userDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                    <h5 class="modal-title" id="userDetailModalLabel">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <p class="mb-2">
+                    If your imagery already exists on Mapillary, import your Mapillary imagery directly to Map the Paths web.
+                </p>
+                <a class="btn btn-outline-primary mt-2" href="{% url 'sequence.import_sequence' %}">Import from Mapillary</a>
             </div>
-            <div class="modal-body">
-                <div class="main-user-form">
-                    <form method="POST" class="post-form" id="user_edit_form" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                    </form>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary save-btn" id="user_save_button">Save changes</button>
+
+            <div class="p-3">
+                <p class="mb-2">
+                    If you're imagery does not exist on Mapillary, process and upload your imagery using the Map the Paths Uploader.
+                </p>
+                <p>Features:</p>
+                <ul>
+                    <li>Works with 360 and standard (flat) photos</li>
+                    <li>Add metadata to sequence for easy management and discovery (name, description, tags)</li>
+                    <li>Convert video to photo frames</li>
+                    <li>Geotag images using .gpx track file</li>
+                    <li>Define photo spacing</li>
+                    <li>Modify photo GPS information (position and heading)</li>
+                    <li>Add a nadir</li>
+                    <li>Add copyright information</li>
+                    <li>Upload to web platforms (Map the Paths Web, Mapillary, Google Street View, Strava</li>
+                </ul>
+                <a class="btn btn-outline-primary mt-2" href="https://github.com/trek-view/mtp-desktop-uploader/releases/download/v0.0.1/Map.the.Paths.Uploader-0.0.1.dmg" target="_blank">Download for Mac</a> <a class="btn btn-outline-primary mt-2" href="https://github.com/trek-view/mtp-desktop-uploader/releases/download/v0.0.1/Map.the.Paths.Uploader.Setup.0.0.1.exe" target="_blank">Download for Windows</a>
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}
 
-{% block scripts %}
-    <script>
-    $.ajaxSetup({
-        data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
-    });
-
-    $('#user_cancel_button').click(function () {
-        $('.main-user-form').addClass('d-none');
-        $('.main-user').removeClass('d-none');
-    });
-    $('#user_save_button').click(function () {
-        if ($('#user_edit_form').isValid()) {
-            $.ajax({
-                url: "{% url 'account.ajax_user_update' %}",
-                type: 'POST',
-                data: $('#user_edit_form').serialize(),
-                dataType: 'json',
-                success: function (data) {
-                    if (data.status == 'failed')
-                        toastr.error(data.message);
-                    else
-                    {
-                        toastr.success(data.message);
-                        var user = data.user;
-                        $('.main-user .user-email h5').html(user.email);
-                        $('.main-user .user-name p').html(user.first_name + ' ' + user.last_name);
-                        $('.main-user .user-description p').html(user.description);
-                        $('.main-user .user-website').html('<a class="" href="' + user.website_url + '">' + user.website_url + '</a>');
-                    }
-                    $('#userDetailModal').modal('hide');
-                }
-            });
-        }
-    });
-
-    Dropzone.autoDiscover = false;
-    {% if current_user.avatar == '' or current_user.avatar is None %}
-        var server_image = false;
-    {% else %}
-        var server_image = true;
-    {% endif %}
-
-    var myDropzone = new Dropzone(".dropzone", {
-        autoProcessQueue: false,
-        uploadMultiple: false,
-        parallelUploads: 1,
-        paramName: "avatar", // The name that will be used to transfer the file
-        maxFilesize: 20,
-        {#addRemoveLinks: true,#}
-        maxFiles: 1,
-        thumbnailWidth: 200,
-        thumbnailHeight: 200,
-        sending: function(file, xhr, formData) {
-            formData.append("csrfmiddlewaretoken", '{{ csrf_token }}');
-        },
-        init: function() {
-            this.on("maxfilesexceeded", function(file) {
-                this.removeAllFiles();
-                this.addFile(file);
-            });
-            this.on("success", function(file, responseText) {
-                toastr.success('A picture is updated successfully.');
-            });
-            this.on("thumbnail", function(file, dataUrl) {
-                $('.dz-image').css('border-radius', '0px');
-                $('.dz-image img').css('width', '100%');
-                $('.dz-image img').css('height', '100%');
-                $('.dz-details').remove();
-                $('.dropzone .dz-preview').off('hover');
-            });
-            this.on('addedfile', function () {
-                $('#uploadfile').removeClass('d-none');
-                $('#removefile').removeClass('d-none');
-                if (server_image)
-                    $('#cancelfile').removeClass('d-none');
-                else
-                    $('#cancelfile').addClass('d-none');
-            });
-            this.on('removedfile', function () {
-                $('#uploadfile').addClass('d-none');
-                $('#removefile').addClass('d-none');
-            });
-            this.on('complete', function () {
-                var h = $('.dz-image').html();
-                $('.dz-image-cover').html(h);
-                server_image = true;
-                this.removeAllFiles();
-                $('#cancelfile').addClass('d-none');
-                $('#uploadPictureModal').modal('hide');
-                $('#user_cover_image').removeClass('d-none');
-            });
-
-            $('#change_file').click(function () {
-                $('#user_cover_image').addClass('d-none');
-                $('#file-upload').removeClass('d-none');
-            });
-        }
-    });
-
-    $('#cancelfile').click(function () {
-        myDropzone.removeAllFiles();
-        $('#user_cover_image').removeClass('d-none');
-        $('#file-upload').addClass('d-none');
-    });
-
-    $('#removefile').click(function () {
-        myDropzone.removeAllFiles();
-    });
-
-    $('#uploadfile').click(function(){
-        myDropzone.processQueue();
-    });
-</script>
-
-<script>
-    function switch_maillist() {
-        if ($('#id_is_maillist').hasClass('d-none'))
-        {
-            $('#id_is_maillist').prev().addClass('d-none');
-        }
-        else {
-            $('#id_is_maillist').prev().addClass('d-none');
-        }
-    }
-
-    switch_maillist()
-</script>
-{% endblock %}
