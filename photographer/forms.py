@@ -46,11 +46,13 @@ class PhotographerForm(forms.ModelForm):
             queryset=CaptureMethod.objects.all()
         )
 
-        self.fields['image_quality'] = forms.ModelChoiceField(
-            widget=forms.RadioSelect(attrs={'class': '', 'data-validation': 'required'}),
-            queryset=ImageQuality.objects.all(),
+        self.fields['image_quality'] = forms.ModelMultipleChoiceField(
             required=False,
-            empty_label=None
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            # choices=getAllCameraMake()
+            queryset=ImageQuality.objects.all()
         )
 
     class Meta:

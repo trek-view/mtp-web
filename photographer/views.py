@@ -90,6 +90,7 @@ def photographer_create(request):
 
             capture_types = form.cleaned_data['capture_type']
             capture_method = form.cleaned_data['capture_method']
+            image_quality = form.cleaned_data['image_quality']
             if not capture_types is None:
                 photographer.capture_type.clear()
                 for capture_type in capture_types:
@@ -98,6 +99,10 @@ def photographer_create(request):
                 photographer.capture_method.clear()
                 for capture_m in capture_method:
                     photographer.capture_method.add(capture_m)
+            if not image_quality is None:
+                photographer.image_quality.clear()
+                for image_q in image_quality:
+                    photographer.image_quality.add(image_q)
 
             messages.success(request, 'A photographer was created successfully.')
 
@@ -199,6 +204,7 @@ def photographer_edit(request, unique_id):
 
             capture_types = form.cleaned_data['capture_type']
             capture_method = form.cleaned_data['capture_method']
+            image_quality = form.cleaned_data['image_quality']
             if not capture_types is None:
                 photographer.capture_type.clear()
                 for capture_type in capture_types:
@@ -207,6 +213,10 @@ def photographer_edit(request, unique_id):
                 photographer.capture_method.clear()
                 for capture_m in capture_method:
                     photographer.capture_method.add(capture_m)
+            if not image_quality is None:
+                photographer.image_quality.clear()
+                for image_q in image_quality:
+                    photographer.image_quality.add(image_q)
 
             messages.success(request, 'Photographer "%s" is updated successfully.' % photographer.name)
             return redirect('photographer.index')
@@ -244,20 +254,17 @@ def photographer_list(request):
             capture_types = form.cleaned_data['capture_type']
             capture_method = form.cleaned_data['capture_method']
             image_quality = form.cleaned_data['image_quality']
-            print(image_quality)
 
             photographers = Photographer.objects.all().filter(is_published=True)
 
-            if not image_quality is None:
+            if not image_quality is None and len(image_quality) > 0:
                 photographers = photographers.filter(image_quality__in=image_quality)
 
             if not capture_types is None and len(capture_types) > 0:
-                ps = Photographer.objects.filter(capture_type__in=capture_types)
-                photographers = photographers.filter(pk__in=ps)
+                photographers = photographers.filter(capture_type__in=capture_types)
 
             if not capture_method is None and len(capture_method) > 0:
-                ps = Photographer.objects.filter(capture_method__in=capture_method)
-                photographers = photographers.filter(pk__in=ps)
+                photographers = photographers.filter(capture_method__in=capture_method)
 
     if photographers == None:
         photographers = Photographer.objects.all().filter(is_published=True)
@@ -351,11 +358,14 @@ def my_photographer_list(request):
         if form.is_valid():
             capture_type = form.cleaned_data['capture_type']
             capture_method = form.cleaned_data['capture_method']
+            image_quality = form.cleaned_data['image_quality']
             photographers = Photographer.objects.all().filter(user=request.user)
-            if len(capture_type) > 0:
+            if not capture_type is None and len(capture_type) > 0:
                 photographers = photographers.filter(capture_type__in=capture_type)
-            if len(capture_method) > 0:
+            if not capture_method is None and len(capture_method) > 0:
                 photographers = photographers.filter(capture_method__in=capture_method)
+            if not image_quality is None and len(image_quality) > 0:
+                photographers = photographers.filter(image_quality__in=image_quality)
 
     if photographers == None:
         photographers = Photographer.objects.all().filter(user=request.user)

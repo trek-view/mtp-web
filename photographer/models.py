@@ -71,7 +71,7 @@ class Photographer(models.Model):
     description = models.TextField()
     capture_type = models.ManyToManyField(CaptureType)
     capture_method = models.ManyToManyField(CaptureMethod)
-    image_quality = models.ForeignKey(ImageQuality, on_delete=models.CASCADE, null=True, blank=True)
+    image_quality = models.ManyToManyField(ImageQuality)
     geometry = models.TextField(default='')
     multipolygon = models.MultiPolygonField(null=True, blank=True)
     is_published = models.BooleanField(default=True)
@@ -113,9 +113,12 @@ class Photographer(models.Model):
             return ''
 
     def getImageQuality(self):
-        image_quality = ImageQuality.objects.get(pk=self.image_quality)
-        if image_quality:
-            return image_quality.name
+        imageQuality = []
+        for iQuality in self.image_quality.all():
+            if iQuality:
+                imageQuality.append(iQuality.name)
+        if len(imageQuality) > 0:
+            return ', '.join(imageQuality)
         else:
             return ''
 

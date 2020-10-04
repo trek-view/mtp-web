@@ -148,7 +148,7 @@ class UserUpdateForm(forms.ModelForm):
     )
 
     website_url = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'style': 'resize: none;', 'data-validation': 'url'}), required=False)
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'style': 'resize: none;', 'data-validation': 'url', 'data-validation-optional': 'true'}), required=False)
 
     class Meta:
         model = CustomUser
