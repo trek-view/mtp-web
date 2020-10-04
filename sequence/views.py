@@ -677,7 +677,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                 image.cas = image_feature['properties']['ca']
             if 'altitude' in image_feature['properties'].keys():
                 image.ele = image_feature['properties']['altitude']
-            if 'camera_make' in image_feature['properties'].keys():
+            if 'camera_make' in image_feature['properties'].keys() and image_feature['properties']['camera_make'] != '':
                 camera_make_str = image_feature['properties']['camera_make']
                 camera_makes = CameraMake.objects.filter(name=camera_make_str)
                 if camera_makes.count() == 0:
@@ -687,7 +687,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                 else:
                     camera_make = camera_makes[0]
                 image.camera_make = camera_make
-            if 'camera_model' in image_feature['properties'].keys():
+            if 'camera_model' in image_feature['properties'].keys() and image_feature['properties']['camera_model'] != '':
                 camera_model_str = image_feature['properties']['camera_model']
                 camera_models = CameraModel.objects.filter(name=camera_model_str)
                 if camera_models.count() == 0:
@@ -1101,7 +1101,7 @@ def ajax_import(request, seq_key):
                     else:
                         sequence = Sequence()
                     sequence.user = request.user
-                    if 'camera_make' in properties:
+                    if 'camera_make' in properties and properties['camera_make'] != '':
                         camera_makes = CameraMake.objects.filter(name=properties['camera_make'])
                         if camera_makes.count() > 0:
                             c = camera_makes[0]

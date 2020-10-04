@@ -92,9 +92,21 @@ class ImageAdmin(admin.ModelAdmin):
         'image_key',
     )
 
+class CameraMakeAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+    )
+
+class CameraModelAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+    )
+
 admin.site.register(TransType, TransTypeAdmin)
 admin.site.register(LabelType, LabelTypeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Sequence, SequenceAdmin)
 admin.site.register(Icon, IconAdmin)
 admin.site.register(Image, ImageAdmin)
+admin.site.register(CameraMake, CameraMakeAdmin)
+admin.site.register(CameraModel, CameraModelAdmin)
