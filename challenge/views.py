@@ -781,7 +781,8 @@ def label_challenge_leaderboard(request, unique_id):
         return redirect('challenge.label_challenge_list')
 
     images = Image.objects.filter(point__intersects=challenge.multipolygon)
-    user_json = ImageLabel.objects.filter(image__in=images).values('user').annotate(image_label_count=Count('image')).order_by('-image_label_count')
+    image_labels = ImageLabel.objects.filter(image__in=images)
+    user_json = image_labels.values('user').annotate(image_label_count=Count('image')).order_by('-image_label_count')
 
     paginator = Paginator(user_json, 10)
     page = request.GET.get('page')
@@ -815,8 +816,9 @@ def label_challenge_leaderboard(request, unique_id):
         if user is None or not user:
             continue
         pItems[i]['username'] = user.username
-        u_images = images.filter(user=user)
-        pItems[i]['image_count'] = u_images.count()
+        u_image_labels = image_labels.filter(user=user).values('label_type').annotate(image_count=Count('image'))
+        print(u_image_labels)
+        pItems[i]['label_type_count'] = u_image_labels.count()
 
     return render(request, 'challenge/label/leaderboard.html',
         {

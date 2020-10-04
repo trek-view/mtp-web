@@ -105,6 +105,7 @@
                             <tr>
                                 <th>Position</th>
                                 <th>Username</th>
+                                <th>Label Type</th>
                                 <th>Labels</th>
                             </tr>
                         </thead>
@@ -117,6 +118,7 @@
                                             <span class="user">{{ item.username }}</span>
                                         </a>
                                     </td>
+                                    <td>{{ item.label_type_count }}</td>
                                     <td>{{ item.image_label_count }}</td>
                                 </tr>
                             {% endfor %}
