@@ -436,14 +436,14 @@ def challenge_leaderboard(request, unique_id):
 
 
     return render(request, 'challenge/capture/leaderboard.html',
-          {
-              'items': pItems,
-              'challenge': challenge,
-              'form': form,
-              'pageName': 'Challenge Leaderboard',
-              'pageTitle': challenge.name + ' - Challenge Leaderboard',
-              'page': page
-          })
+        {
+            'items': pItems,
+            'challenge': challenge,
+            'form': form,
+            'pageName': 'Challenge Leaderboard',
+            'pageTitle': challenge.name + ' - Challenge Leaderboard',
+            'page': page
+        })
 
 def ajax_challenge_detail(request, unique_id):
     challenge = Challenge.objects.get(unique_id=unique_id)
@@ -815,20 +815,17 @@ def label_challenge_leaderboard(request, unique_id):
         if user is None or not user:
             continue
         pItems[i]['username'] = user.username
-
         u_images = images.filter(user=user)
-
         pItems[i]['image_count'] = u_images.count()
 
-
     return render(request, 'challenge/label/leaderboard.html',
-          {
-              'items': pItems,
-              'challenge': challenge,
-              'pageName': 'Challenge Leaderboard',
-              'pageTitle': challenge.name + ' - Challenge Leaderboard',
-              'page': page
-          })
+        {
+            'items': pItems,
+            'challenge': challenge,
+            'pageName': 'Challenge Leaderboard',
+            'pageTitle': challenge.name + ' - Challenge Leaderboard',
+            'page': page
+        })
 
 def ajax_label_challenge_detail(request, unique_id):
     challenge = LabelChallenge.objects.get(unique_id=unique_id)
