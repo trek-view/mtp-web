@@ -94,8 +94,13 @@
 
                     <form class="d-none" id="add_new_label_form_full_name">
                         <p id="input_full_name_p">
-                            <label for="new_label_type">Full Label Type Name:</label>
+                            <label for="new_full_label_type">Name:</label>
                             <input class="form-control" data-validation="alphanumeric" data-validation-allowing="-" id="new_full_label_type" />
+
+                        </p>
+                        <p id="input_full_name_parent_p">
+                            <label for="new_full_label_parent_type">Parent:</label>
+                            <input class="form-control" data-validation="alphanumeric" data-validation-optional="true" data-validation-allowing="-"  id="new_full_label_parent_type" />
                         </p>
                     </form>
                 </div>
@@ -153,10 +158,10 @@
     }
 
     $('#add_label_type_btn').click(function () {
-        console.log($('input[name="add_type"]').val());
         var label = '';
+        var parent_label = '';
         if (add_type == 'exist_name' && $('#add_new_label_form').isValid()) {
-            var parent_key = $('#parent_key').val();
+            parent_label = $('#parent_key').val();
             var new_label_type = $('#new_label_type').val();
             var str_ary = new_label_type.split(' ');
 
@@ -182,27 +187,26 @@
             }
             else
                 label = new_label_type;
-            if (parent_key != '')
-                label = parent_key + '--' + label;
         }
         if (add_type == 'full_name' && $('#add_new_label_form_full_name').isValid())
         {
             label = $('#new_full_label_type').val();
-            if (label.search('---') >= 0) {
+            parent_label = $('#new_full_label_parent_type').val();
+            if (label.search('--') >= 0) {
                 $('#input_full_name_p').addClass('has-error');
                 $('#input_full_name_p').removeClass('has-success');
                 $('#new_full_label_type').addClass('error');
-                $('#input_full_name_p').append('<span class="help-block form-error">The input value can\'t contain "---".</span>')
-                return;
-            }
-            else if (label.split('--').length > 2) {
-                $('#input_full_name_p').addClass('has-error');
-                $('#input_full_name_p').removeClass('has-success');
-                $('#new_full_label_type').addClass('error');
-                $('#input_full_name_p').append('<span class="help-block form-error">The input value can\'t contain more than two "--".</span>')
+                $('#input_full_name_p').append('<span class="help-block form-error">The input value can\'t contain "--".</span>')
                 return;
             }
 
+            if (parent_label.search('--') >= 0) {
+                $('#input_full_name_parent_p').addClass('has-error');
+                $('#input_full_name_parent_p').removeClass('has-success');
+                $('#new_full_label_parent_type').addClass('error');
+                $('#input_full_name_parent_p').append('<span class="help-block form-error">The input value can\'t contain "--".</span>')
+                return;
+            }
         }
         if (label == '') return;
 
@@ -210,6 +214,8 @@
             toastr.info('The value already exist in your own label type list.')
             return;
         }
+        if (parent_label != '')
+            label = parent_label + '--' + label
         own_types.push(label);
         var html_label_type = '<span class="tag" style="font-size: 16px; cursor: pointer" onclick="clickLabelTag(\'' + label + '\')" data-key="' + label + '">' + label + '</span>';
         $('#new_label_types_box').append(html_label_type);

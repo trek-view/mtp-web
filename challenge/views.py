@@ -532,7 +532,7 @@ def label_challenge_create(request):
     else:
         form = LabelChallengeForm()
 
-    label_types = LabelType.objects.all()
+    label_types = LabelType.objects.filter(parent__isnull=True, source='mtpw')
     content = {
         'form': form,
         'pageName': 'Create Label Challenge',
