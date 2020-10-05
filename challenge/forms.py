@@ -35,6 +35,7 @@ class ChallengeForm(forms.ModelForm):
 
     camera_make = forms.ModelMultipleChoiceField(
         required=False,
+        label='Camera Make (leave blank for all)',
         widget=forms.SelectMultiple(
             attrs={'class': 'form-control'}
         ),
