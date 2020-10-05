@@ -77,13 +77,8 @@
                         </div>
                     </div>
                     <form class="" id="add_new_label_form">
-                        <p id="input_name_p">
-                            <label for="new_label_type">Label Type Name:</label>
-                            <input class="form-control" data-validation="alphanumeric required" data-validation-allowing=" " id="new_label_type" />
-                        </p>
-
                         <p>
-                            <label>Parent:</label>
+                            <label>Parent Label:</label>
                             <select class="form-control" id="parent_key">
                                 <option value="">---</option>
                                 {% for label_type in label_types %}
@@ -91,17 +86,23 @@
                                 {% endfor %}
                             </select>
                         </p>
+
+                        <p id="input_name_p">
+                            <label for="new_label_type">Child Label:</label>
+                            <input class="form-control" data-validation="alphanumeric required" data-validation-allowing=" " id="new_label_type" />
+                        </p>
                     </form>
 
                     <form class="d-none" id="add_new_label_form_full_name">
+                        <p id="input_full_name_parent_p">
+                            <label for="new_full_label_parent_type">Parent Label:</label>
+                            <input class="form-control" data-validation="alphanumeric" data-validation-optional="true" data-validation-allowing="-"  id="new_full_label_parent_type" />
+                        </p>
+
                         <p id="input_full_name_p">
-                            <label for="new_full_label_type">Name:</label>
+                            <label for="new_full_label_type">Child Label:</label>
                             <input class="form-control" data-validation="alphanumeric" data-validation-allowing="-" id="new_full_label_type" />
 
-                        </p>
-                        <p id="input_full_name_parent_p">
-                            <label for="new_full_label_parent_type">Parent:</label>
-                            <input class="form-control" data-validation="alphanumeric" data-validation-optional="true" data-validation-allowing="-"  id="new_full_label_parent_type" />
                         </p>
                     </form>
                 </div>

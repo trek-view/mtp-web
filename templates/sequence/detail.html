@@ -1491,7 +1491,7 @@
                  changeMode(Mapillary.TagComponent.TagMode.CreatePolygon);
             }
             else if (geo_type == 'point') {
-                changeMode(Mapillary.TagComponent.TagMode.CreatePoint)
+                changeMode(Mapillary.TagComponent.TagMode.CreatePoint);
             }
         })
 
@@ -1500,8 +1500,6 @@
         }
 
         // Create and add editable tags based on created geometry type
-
-
         tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
             var geo_data = null;
             var geo_type = null;
@@ -1518,7 +1516,6 @@
             } else {
                 throw new Error("Unsupported geometry type");
             }
-
 
             var url = "{% url 'sequence.ajax_add_image_label' unique_id=sequence.unique_id image_key='image_key' %}";
             url = url.replace('image_key', current_node_key);
@@ -1549,9 +1546,7 @@
                     }
                 });
             }
-
         });
-
 
         var setUpEvent = function(label) {
             if (label == undefined)
