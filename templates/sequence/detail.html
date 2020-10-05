@@ -352,16 +352,7 @@
                     <img class="w-100" src="{% static 'images/icon/flap.svg' %}">
                 </div>
                 <div class="switch-cover"></div>
-                {% if request.user.is_authenticated and request.user == sequence.user %}
-                    <div class="image-view-point" >
-                        <div class="view_point text-center">
-                            <i class="fas fa-binoculars"></i>
-                            <span class="text-center m-0">
-                                {{ view_points }} Viewpoints
-                            </span>
-                        </div>
-                    </div>
-                {% else %}
+
                     <div class="image-view-point" style="cursor: pointer;" onclick="mark_view_point()" style="">
                         <div class="view_point text-center">
                             <i class="fas fa-binoculars"></i>
@@ -370,7 +361,6 @@
                             </span>
                         </div>
                     </div>
-                {% endif %}
 
                 <div id='sequence_viewer' class="image-box display"></div>
             </div>
@@ -773,19 +763,18 @@
     });
 
     {% if not request.user.is_authenticated %}
-        $('.sequence-others .like img').css('cursor', 'pointer');
-        $('.sequence-others .like img').click(function () {
+        function mark_view_point(image_key) {
             Swal.fire({
                 title: 'Need to login!',
-                html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
+                html: 'Please click <a href="{% url 'login' %}?next='+window.location.href +'">here</a> to login. <br>' +
                         "If you don't have your account, please <a href=\"{% url 'signup' %}\">sign up</a>",
                 showCancelButton: false,
                 confirmButtonText: 'OK'
             })
-        });
-    {% elif request.user != sequence.user %}
-        $('.sequence-others .like img').css('cursor', 'pointer');
-        $('.sequence-others .like img').click(function () {
+        }
+    {% else %}
+        $('.sequence-others .like i').css('cursor', 'pointer');
+        $('.sequence-others .like i').click(function () {
             $.ajax({
                 url: "{% url 'sequence.ajax_sequence_check_like' unique_id=sequence.unique_id %}",
                 type: 'POST',
@@ -797,13 +786,11 @@
                         toastr.error(data.message)
                     }
                     else {
-                        var loved = "{% static 'images/icon/icons8-love-48.png' %}";
-                        var unloved = "{% static 'images/icon/icons8-love-100.png' %}"
                         $('.sequence-others .like span').text(data.liked_count + ' Likes');
                         if (data.liked_count == 0)
-                            $('.sequence-others .like img').attr('src', unloved);
+                            $('.sequence-others .like i').removeClass('fas').addClass('far');
                         else
-                            $('.sequence-others .like img').attr('src', loved);
+                            $('.sequence-others .like i').addClass('fas').removeClass('far');
                     }
                 }
             });
@@ -869,13 +856,13 @@
         function mark_view_point(image_key) {
             Swal.fire({
                 title: 'Need to login!',
-                html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
+                html: 'Please click <a href="{% url 'login' %}?next='+window.location.href +'">here</a> to login. <br>' +
                         "If you don't have your account, please <a href=\"{% url 'signup' %}\">sign up</a>",
                 showCancelButton: false,
                 confirmButtonText: 'OK'
             })
         }
-    {% elif request.user != sequence.user %}
+    {% else %}
         function mark_view_point() {
             image_key = current_node_key
             var url = "{% url 'sequence.ajax_image_mark_view' unique_id=sequence.unique_id image_key='image_key' %}";
@@ -896,10 +883,6 @@
                     }
                 }
             });
-        }
-    {% else %}
-        function mark_view_point() {
-            toastr.error('This sequense and image are imported by you.')
         }
     {% endif %}
 

@@ -116,11 +116,11 @@ class Tour(models.Model):
         return image_count
 
     def getLikeCount(self):
-        liked_guidebook = TourLike.objects.filter(tour=self)
-        if not liked_guidebook:
+        liked_tour = TourLike.objects.filter(tour=self)
+        if not liked_tour:
             return 0
         else:
-            return liked_guidebook.count()
+            return liked_tour.count()
 
     def getSequenceCount(self):
         tour_sequences = TourSequence.objects.filter(tour=self)

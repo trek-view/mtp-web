@@ -223,6 +223,9 @@ def my_guidebook_list(request):
 
 def guidebook_detail(request, unique_id):
     guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if not guidebook.is_published and request.user != guidebook.user:
+        messages.error(request, 'The guidebook is not published.')
+        return redirect('guidebook.guidebook_list')
     if request.user.is_authenticated:
         guidebook_like = GuidebookLike.objects.filter(guidebook=guidebook, user=request.user)
         if guidebook_like and guidebook_like.count() > 0:
@@ -845,10 +848,10 @@ def check_like(request, unique_id):
             'message': 'The Guidebook does not exist.'
         })
 
-    if guidebook.user == request.user:
+    if not guidebook.is_published:
         return JsonResponse({
             'status': 'failed',
-            'message': 'This guidebook is created by you.'
+            'message': "This guidebook is not published."
         })
 
     guidebook_like = GuidebookLike.objects.filter(guidebook=guidebook, user=request.user)

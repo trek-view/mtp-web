@@ -91,7 +91,7 @@
                         {% if guidebook.getLikeCount == 0 %}
                             <i class="far fa-thumbs-up"></i>
                         {% else %}
-                            <i class="far fa-thumbs-up"></i>
+                            <i class="fas fa-thumbs-up"></i>
                         {% endif %}
                         <span class="text-center ml-2 m-0">
                             {{ guidebook.getLikeCount }} Likes
@@ -269,8 +269,8 @@
     }
 
     {% if not request.user.is_authenticated %}
-        $('.guidebook-others .like img').css('cursor', 'pointer');
-        $('.guidebook-others .like img').click(function () {
+        $('.guidebook-others .like i').css('cursor', 'pointer');
+        $('.guidebook-others .like i').click(function () {
             Swal.fire({
                 title: 'Need to login!',
                 html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
@@ -279,9 +279,9 @@
                 confirmButtonText: 'OK'
             })
         });
-    {% elif request.user != guidebook.user %}
-        $('.guidebook-others .like img').css('cursor', 'pointer');
-        $('.guidebook-others .like img').click(function () {
+    {% else %}
+        $('.guidebook-others .like i').css('cursor', 'pointer');
+        $('.guidebook-others .like i').click(function () {
             $.ajax({
                 url: "{% url 'guidebook.check_like' unique_id=guidebook.unique_id %}",
                 type: 'POST',
@@ -293,13 +293,11 @@
                         toastr.error(data.message)
                     }
                     else {
-                        var loved = "{% static 'images/icon/icons8-love-48.png' %}";
-                        var unloved = "{% static 'images/icon/icons8-love-100.png' %}"
                         $('.guidebook-others .like span').text(data.liked_count + ' Likes');
                         if (data.liked_count == 0)
-                            $('.guidebook-others .like img').attr('src', unloved)
+                            $('.guidebook-others .like i').removeClass('fas').addClass('far');
                         else
-                            $('.guidebook-others .like img').attr('src', loved)
+                            $('.guidebook-others .like i').addClass('fas').removeClass('far');
                     }
                 }
             });

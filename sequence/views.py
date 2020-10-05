@@ -774,6 +774,9 @@ def set_camera_make(sequence):
 
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
+    if not sequence.is_published and request.user != sequence.user:
+        messages.error(request, 'The sequence is not published.')
+        return redirect('sequence.index')
     print('1')
     p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
     p.start()
@@ -1232,12 +1235,6 @@ def ajax_sequence_check_like(request, unique_id):
             'message': 'The sequence does not exist.'
         })
 
-    if sequence.user == request.user:
-        return JsonResponse({
-            'status': 'failed',
-            'message': 'This sequence is created by you.'
-        })
-
     sequence_like = SequenceLike.objects.filter(sequence=sequence, user=request.user)
     if sequence_like:
         for g in sequence_like:
@@ -1673,18 +1670,11 @@ def ajax_image_mark_view(request, unique_id, image_key):
             'message': 'The Sequence does not exist.'
         })
 
-    if sequence.user == request.user:
+    if not sequence.is_published:
         return JsonResponse({
             'status': 'failed',
-            'message': 'The sequence and image are imported by you.'
+            'message': "This sequence is not published."
         })
-
-    if not sequence.is_published:
-        if not request.user.is_authenticated or request.user != sequence.user:
-            return JsonResponse({
-                'status': 'failed',
-                'message': "You can't access this sequence."
-            })
 
     images = Image.objects.filter(seq_key=sequence.seq_key, image_key=image_key)
 

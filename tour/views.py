@@ -382,6 +382,9 @@ def my_tour_list(request):
 
 def tour_detail(request, unique_id):
     tour = get_object_or_404(Tour, unique_id=unique_id)
+    if not tour.is_published and request.user != tour.user:
+        messages.error(request, 'The tour is not published.')
+        return redirect('tour.index')
     sequence_ary = []
     tour_sequences = TourSequence.objects.filter(tour=tour).order_by('sort')
     t_count_ary = []
@@ -640,10 +643,10 @@ def ajax_tour_check_like(request, unique_id):
             'message': 'The tour does not exist.'
         })
 
-    if tour.user == request.user:
+    if not tour.is_published:
         return JsonResponse({
             'status': 'failed',
-            'message': 'This tour is created by you.'
+            'message': "This tour is not published."
         })
 
     tour_like = TourLike.objects.filter(tour=tour, user=request.user)

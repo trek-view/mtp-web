@@ -233,6 +233,12 @@ i.transport-type-icon {
     opacity: .4;
 }
 
+i.open-sidebar {
+    color: white;
+    background: black;
+    padding: 3px;
+}
+
 .close-sidebar:hover, .open-sidebar:hover {
     opacity: 1;
     cursor: pointer;

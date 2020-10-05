@@ -66,7 +66,7 @@
                         {% if tour.getLikeCount == 0 %}
                             <i class="far fa-thumbs-up"></i>
                         {% else %}
-                            <i class="far fa-thumbs-up"></i>
+                            <i class="fas fa-thumbs-up"></i>
                         {% endif %}
                         <span class="text-center ml-2 m-0">
                             {{ tour.getLikeCount }} Likes
@@ -137,7 +137,7 @@
 
                                         <div class="w-100 d-flex flex-row align-items-end">
                                             <p class="mb-1 mr-3 item-transport-type text-center">
-                                                <i class=transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
+                                                <i class="transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
                                                 <br>
                                                 {{ sequence.transport_type.parent }}
                                             </p>
@@ -365,8 +365,8 @@
     });
 
     {% if not request.user.is_authenticated %}
-        $('.tour-others .like img').css('cursor', 'pointer');
-        $('.tour-others .like img').click(function () {
+        $('.tour-others .like i').css('cursor', 'pointer');
+        $('.tour-others .like i').click(function () {
             Swal.fire({
                 title: 'Need to login!',
                 html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
@@ -375,9 +375,9 @@
                 confirmButtonText: 'OK'
             })
         });
-    {% elif request.user != guidebook.user %}
-        $('.tour-others .like img').css('cursor', 'pointer');
-        $('.tour-others .like img').click(function () {
+    {% else %}
+        $('.tour-others .like i').css('cursor', 'pointer');
+        $('.tour-others .like i').click(function () {
             $.ajax({
                 url: "{% url 'tour.ajax_tour_check_like' unique_id=tour.unique_id %}",
                 type: 'POST',
@@ -389,13 +389,11 @@
                         toastr.error(data.message)
                     }
                     else {
-                        var loved = "{% static 'images/icon/icons8-love-48.png' %}";
-                        var unloved = "{% static 'images/icon/icons8-love-100.png' %}"
                         $('.tour-others .like span').text(data.liked_count + ' Likes');
                         if (data.liked_count == 0)
-                            $('.tour-others .like img').attr('src', unloved);
+                            $('.tour-others .like i').removeClass('fas').addClass('far');
                         else
-                            $('.tour-others .like img').attr('src', loved);
+                            $('.tour-others .like i').addClass('fas').removeClass('far');
                     }
                 }
             });
