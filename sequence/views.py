@@ -36,7 +36,7 @@ from asgiref.sync import sync_to_async
 from accounts.models import CustomUser, MapillaryUser
 from tour.models import Tour, TourSequence
 from guidebook.models import Guidebook, Scene
-
+from challenge.models import Challenge, LabelChallenge
 ## App packages
 
 # That includes from .models import *
@@ -76,7 +76,6 @@ def sequence_list(request):
             username = form.cleaned_data['username']
             like = form.cleaned_data['like']
 
-
             sequences = Sequence.objects.all().filter(
                 is_published=True
             ).exclude(image_count=0)
@@ -115,7 +114,6 @@ def sequence_list(request):
             filter_time = request.GET.get('time')
             time_type = request.GET.get('time_type')
 
-            print('count: ', sequences.count())
             if time_type is None or not time_type or time_type == 'all_time':
                 sequences = sequences
             else:
@@ -145,7 +143,13 @@ def sequence_list(request):
                         captured_at__year=y
                     )
 
-            print('count: ', sequences.count())
+            challenge_id = request.GET.get('challenge_id')
+            if not challenge_id is None and challenge_id != '':
+                challenges = Challenge.objects.filter(unique_id=challenge_id)
+                if challenges.count() > 0:
+                    challenge = challenges[0]
+                    sequences = sequences.filter(geometry_coordinates__intersects=challenge.multipolygon)
+
 
     if sequences == None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
@@ -329,6 +333,13 @@ def image_leaderboard(request):
                 elif m_type == 'marked':
                     users = CustomUser.objects.filter(username__contains=username)
                     image_view_points = image_view_points.filter(user__in=users)
+
+            challenge_id = request.GET.get('challenge_id')
+            if not challenge_id is None and challenge_id != '':
+                label_challenges = LabelChallenge.objects.filter(unique_id=challenge_id)
+                if label_challenges.count() > 0:
+                    label_challenge = label_challenges[0]
+                    images = images.filter(point__intersects=label_challenge.multipolygon)
 
     if images == None:
         images = Image.objects.all()

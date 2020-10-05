@@ -87,3 +87,7 @@
 #new_label_types_box .tag {
     white-space: nowrap;
 }
+
+table.list-table tbody tr {
+    cursor: pointer;
+}

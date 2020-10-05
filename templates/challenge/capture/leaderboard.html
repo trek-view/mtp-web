@@ -104,7 +104,7 @@
             </div>
             <div class="item-list">
                 {% if items.count > 0 %}
-                    <table class="w-100 table">
+                    <table class="w-100 table list-table">
                         <thead>
                             <tr>
                                 <th>Position</th>
@@ -115,12 +115,10 @@
                         </thead>
                         <tbody>
                             {% for item in items %}
-                                <tr class="border-top">
+                                <tr class="border-top" data-username="{{ item.username }}">
                                     <td>{{ item.rank }}</td>
                                     <td>
-                                        <a href="{% url 'account.profile' username=item.username %}">
-                                            <span class="user">{{ item.username }}</span>
-                                        </a>
+                                        <span class="user">{{ item.username }}</span>
                                     </td>
                                     <td>{{ item.distance }}</td>
                                     <td>{{ item.image_count }}</td>
@@ -199,6 +197,13 @@
             $(this).find('.fa-chevron-down').removeClass('d-none');
             $(this).find('.fa-chevron-up').addClass('d-none');
         }
+    });
+
+    $('table tr').click(function () {
+        var username = $(this).attr('data-username');
+        var challenge_id = "{{ challenge.unique_id }}";
+        var url = "{% url 'sequence.sequence_list' %}?username=" + username + "&challenge_id=" + challenge_id;
+        location.assign(url);
     });
 </script>
 {% endblock %}
