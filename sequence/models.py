@@ -24,7 +24,6 @@ UserModel = get_user_model()
 
 def image_directory_path(instance, filename):
     path = 'sequence/{}/{}/{}.jpg'.format(instance.user.username, str(instance.sequence.unique_id), instance.image_key)
-    print("image path: ", path)
     return path
 
 class Icon(models.Model):

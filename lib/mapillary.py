@@ -120,7 +120,6 @@ class Mapillary():
         url = '{}images/{}/download_original?client_id={}'.format(self.root_url, image_key, self.client_id)
         headers = {"Authorization": "Bearer {}".format(self.token)}
         request = requests.get(url, headers=headers, stream=True)
-        print(request)
         # Was the request OK?
         if request.status_code != requests.codes.ok:
             # Nope, error handling, skip file etc etc etc
@@ -142,7 +141,6 @@ class Mapillary():
 
             # Write image block to temporary file
             lf.write(block)
-        print(lf)
         return lf
 
     def get_mapillary_user(self):

@@ -733,7 +733,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
             print('image key: ', image.image_key)
 
         print(image_keys)
-        print(image_download)
+        print('image_download')
         if len(image_keys) > 0 and image_download:
             # Create the model you want to save the image to
             for image_key in image_keys:
@@ -753,7 +753,6 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                 if lf:
                     image.mapillary_image.save(image.image_key, files.File(lf))
                     image.save()
-                    print(image.mapillary_image)
 
         if image_insert:
             sequence.is_published = True
