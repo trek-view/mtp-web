@@ -461,7 +461,7 @@ def image_leaderboard(request):
         'form': form,
         'pageName': 'Images',
         'pageTitle': 'Images',
-        'pageDescription': 'This is image learderboard.',
+        'pageDescription': 'This page shows the photos that have been marked as view points the most number of times.',
         'page': page
     }
     return render(request, 'sequence/image_leaderboard.html', content)
