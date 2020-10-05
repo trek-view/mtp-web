@@ -584,6 +584,7 @@ def save_weather(sequence):
                                 if 'time' in hourly_data[h_index].keys():
                                     time_str = hourly_data[h_index]['time']
                                     time_float = float(time_str) / 100
+                                    print(sequence.captured_at)
                                     capture_h = float(sequence.captured_at.strftime('%H'))
                                     capture_m = float(sequence.captured_at.strftime('%M'))
                                     d_time = abs(capture_h + capture_m / 60 - time_float)
@@ -656,6 +657,11 @@ def save_weather(sequence):
     return False
 
 def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, image_download=True, is_weather=True):
+    seqs = Sequence.objects.filter(unique_id=sequence.unique_id)
+    if seqs.count() == 0:
+        print('Sequence is not existing.')
+        return
+    sequence = seqs[0]
     if is_weather and not sequence.getFirstPointLat() is None and not sequence.getFirstPointLng() is None:
         print(save_weather(sequence))
 
