@@ -111,7 +111,7 @@ class ChallengeSearchForm(forms.Form):
         widget=forms.SelectMultiple(
             attrs={'class': 'form-control'}
         ),
-        # choices=getAllCameraMake()
+        label='Camera Make (leave blank for all)',
         queryset=CameraMake.objects.all()
     )
 

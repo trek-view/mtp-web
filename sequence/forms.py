@@ -110,7 +110,8 @@ class SequenceSearchForm(forms.Form):
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            queryset=CameraMake.objects.all()
+            queryset=CameraMake.objects.all(),
+            label='Camera Make (leave blank for all)',
         )
 
         self.fields['transport_type'] = forms.ModelChoiceField(
@@ -149,7 +150,8 @@ class ImageSearchForm(forms.Form):
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            queryset=CameraMake.objects.all()
+            queryset=CameraMake.objects.all(),
+            label='Camera Make (leave blank for all)',
         )
         # self.fields['camera_model'] = forms.ModelMultipleChoiceField(
         #     required=False,
@@ -184,7 +186,7 @@ class SequenceSearchForTourForm(forms.Form):
         )
 
         self.fields['camera_make'] = forms.CharField(
-            label='Camera Make/Model',
+            label='Camera Make (leave blank for all)',
             widget=forms.TextInput(attrs={'class': 'form-control'}),
             required=False
         )

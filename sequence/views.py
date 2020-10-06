@@ -1010,7 +1010,7 @@ def import_sequence_list(request):
                 response = requests.get(url)
                 data = response.json()
                 features = data['features']
-                features.sort(key=sort_by_captured_at)
+                # features.sort(key=sort_by_captured_at)
                 request.session['sequences'] = features
 
                 page = 1
