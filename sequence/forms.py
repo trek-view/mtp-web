@@ -62,13 +62,13 @@ class AddSequeceForm(forms.ModelForm):
                            required=False)
 
         self.fields['description'] = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation': 'required'}),
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation-optional': 'true'}),
         required=False)
 
         self.fields['transport_type'] = forms.ModelChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'form-control'}),
+                attrs={'class': 'form-control', 'data-validation': 'required'}),
             queryset=TransType.objects.filter(parent__isnull=False),
             empty_label=None
         )
