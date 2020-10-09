@@ -199,7 +199,7 @@
         var username = $(this).attr('data-username');
         var challenge_id = "{{ challenge.unique_id }}";
 
-        var url = "{% url 'sequence.image_leaderboard' %}?username=" + username + "&challenge_id=" + challenge_id;
+        var url = "{% url 'sequence.image_leaderboard' %}?username=" + username + "&filter_type=label_count&challenge_id=" + challenge_id;
         location.assign(url);
     });
 </script>

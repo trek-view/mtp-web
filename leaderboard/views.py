@@ -63,20 +63,21 @@ def index(request):
 
     sequences = None
     page = 1
-    form = LeaderboardSearchForm()
+
     y = None
     m = None
     time_type = None
     if request.method == "GET":
+        filter_time = request.GET.get('time')
+        page = request.GET.get('page')
+        transport_type = request.GET.get('transport_type')
+        time_type = request.GET.get('time_type')
         form = LeaderboardSearchForm(request.GET)
         if form.is_valid():
             page = request.GET.get('page')
             if not page or page is None:
                 page = 1
-            filter_time = request.GET.get('time')
-            page = request.GET.get('page')
-            transport_type = request.GET.get('transport_type')
-            time_type = request.GET.get('time_type')
+
             camera_makes = form.cleaned_data['camera_make']
 
             if time_type is None or not time_type or time_type == 'all_time':
@@ -127,7 +128,7 @@ def index(request):
                 form.set_camera_makes(camera_makes)
 
     if sequences == None:
-
+        form = LeaderboardSearchForm()
         sequences = Sequence.objects.all().exclude(image_count=0)
 
     filter_type = request.GET.get('filter_type')

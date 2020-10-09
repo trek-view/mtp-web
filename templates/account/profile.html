@@ -150,8 +150,8 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users h-100 d-flex flex-column justify-content-between">
-                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="/guidebook/list?username={{ current_user.username }}"><i class="fas fa-map-marked-alt"></i> <span class="ml-2">Guidebooks created({{ guidebooks_count }})</span></a>
-                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="/guidebook/list?username={{ current_user.username }}&like=true"><i class="fas fa-thumbs-up"></i> <span class="ml-2">Guidebooks liked({{ guide_like_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="{% url 'guidebook.guidebook_list' %}?username={{ current_user.username }}"><i class="fas fa-map-marked-alt"></i> <span class="ml-2">Guidebooks created({{ guidebooks_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="{% url 'guidebook.guidebook_list' %}?username={{ current_user.username }}&like=true"><i class="fas fa-thumbs-up"></i> <span class="ml-2">Guidebooks liked({{ guide_like_count }})</span></a>
                     </div>
                 </div>
             </div>
@@ -159,8 +159,8 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users h-100 d-flex flex-column justify-content-between">
-                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="/tour/list?username={{ current_user.username }}"><i class="fas fa-clipboard-list"></i> <span class="ml-2">Tours created({{ tours_count }})</span></a>
-                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="/tour/list?username={{ current_user.username }}&like=true"><i class="fas fa-thumbs-up"></i> <span class="ml-2">Tours liked({{ tour_like_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="{% url 'tour.tour_list' %}?username={{ current_user.username }}"><i class="fas fa-clipboard-list"></i> <span class="ml-2">Tours created({{ tours_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="{% url 'tour.tour_list' %}?username={{ current_user.username }}&like=true"><i class="fas fa-thumbs-up"></i> <span class="ml-2">Tours liked({{ tour_like_count }})</span></a>
                     </div>
                 </div>
             </div>
@@ -168,8 +168,8 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users h-100 d-flex flex-column justify-content-between">
-                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="/sequence/list?username={{ current_user.username }}"><i class="fas fa-images"></i> <span class="ml-2">Sequences Created({{ sequences_count }})</span></a>
-                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="/sequence/list?username={{ current_user.username }}&like=true"><i class="fas fa-thumbs-up"></i> <span class="ml-2">Sequences liked({{ seq_like_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="{% url 'sequence.sequence_list' %}?username={{ current_user.username }}"><i class="fas fa-images"></i> <span class="ml-2">Sequences Created({{ sequences_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="{% url 'sequence.sequence_list' %}?username={{ current_user.username }}&like=true"><i class="fas fa-thumbs-up"></i> <span class="ml-2">Sequences liked({{ seq_like_count }})</span></a>
                     </div>
                 </div>
             </div>
@@ -177,8 +177,8 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users h-100 d-flex flex-column justify-content-between">
-                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="/sequence/image?username={{ current_user.username }}&type=received"><i class="fas fa-binoculars"></i> <span class="ml-2">Viewpoints received({{ view_point_count }})</span></a>
-                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="/sequence/image?username={{ current_user.username }}&type=marked"><i class="fas fa-bookmark"></i> <span class="ml-2">Viewpoints marked({{ marked_point_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="{% url 'sequence.image_leaderboard' %}?username={{ current_user.username }}&type=received"><i class="fas fa-binoculars"></i> <span class="ml-2">Viewpoints received({{ view_point_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="{% url 'sequence.image_leaderboard' %}?username={{ current_user.username }}&type=marked"><i class="fas fa-bookmark"></i> <span class="ml-2">Viewpoints marked({{ marked_point_count }})</span></a>
                     </div>
                 </div>
             </div>

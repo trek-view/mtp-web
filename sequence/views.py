@@ -150,7 +150,6 @@ def sequence_list(request):
                     challenge = challenges[0]
                     sequences = sequences.filter(geometry_coordinates__intersects=challenge.multipolygon)
 
-
     if sequences == None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
@@ -295,6 +294,7 @@ def image_leaderboard(request):
     page = 1
     m_type = None
     image_view_points = ImageViewPoint.objects.filter()
+    filter_type = None
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
@@ -326,30 +326,75 @@ def image_leaderboard(request):
                 images = images.filter(sequence__in=sequences)
 
             m_type = request.GET.get('type')
+            users = None
             if username and username != '':
+                users = CustomUser.objects.filter(username__contains=username)
                 if m_type is None or m_type == 'received':
-                    users = CustomUser.objects.filter(username__contains=username)
                     images = images.filter(user__in=users)
                 elif m_type == 'marked':
-                    users = CustomUser.objects.filter(username__contains=username)
                     image_view_points = image_view_points.filter(user__in=users)
 
-            challenge_id = request.GET.get('challenge_id')
-            if not challenge_id is None and challenge_id != '':
-                label_challenges = LabelChallenge.objects.filter(unique_id=challenge_id)
-                if label_challenges.count() > 0:
-                    label_challenge = label_challenges[0]
-                    images = images.filter(point__intersects=label_challenge.multipolygon)
+            filter_type = request.GET.get('filter_type')
+            if not filter_type is None and filter_type != '':
+                if not users is None:
+                    images = images.filter(user__in=users)
+                if filter_type == 'label_count':
+                    challenge_id = request.GET.get('challenge_id')
+                    if not challenge_id is None and challenge_id != '':
+                        label_challenges = LabelChallenge.objects.filter(unique_id=challenge_id)
+                        if label_challenges.count() > 0:
+                            label_challenge = label_challenges[0]
+                            images = images.filter(point__intersects=label_challenge.multipolygon)
+
+                if filter_type == 'view_point':
+
+                    filter_time = request.GET.get('time')
+                    time_type = request.GET.get('time_type')
+
+                    if time_type is None or not time_type or time_type == 'all_time':
+                        images = images
+                    else:
+                        if time_type == 'monthly':
+                            if filter_time is None or filter_time == '':
+                                now = datetime.now()
+                                y = now.year
+                                m = now.month
+                            else:
+                                y = filter_time.split('-')[0]
+                                m = filter_time.split('-')[1]
+                            print(m)
+                            print(y)
+                            images = images.filter(
+                                captured_at__month=m,
+                                captured_at__year=y
+                            )
+
+                        elif time_type == 'yearly':
+                            print(filter_time)
+                            if filter_time is None or filter_time == '':
+                                now = datetime.now()
+                                y = now.year
+                            else:
+                                y = filter_time
+                            images = images.filter(
+                                captured_at__year=y
+                            )
 
     if images == None:
         images = Image.objects.all()
 
     images = images.exclude(sequence=None)
 
-    image_view_points_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
-        rank=Window(expression=RowNumber()))
+    if filter_type == 'label_count':
+        image_label_json = ImageLabel.objects.filter(image__in=images).values('image').annotate(
+            image_count=Count('image')).order_by('-image_count').annotate(
+            rank=Window(expression=RowNumber()))
+        paginator = Paginator(image_label_json, 10)
+    else:
+        image_view_points_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
+            rank=Window(expression=RowNumber()))
+        paginator = Paginator(image_view_points_json, 10)
 
-    paginator = Paginator(image_view_points_json, 10)
     page = 1
     page = request.GET.get('page')
     if not page or page is None:
@@ -386,6 +431,16 @@ def image_leaderboard(request):
         img = {}
         img['unique_id'] = image.unique_id
         img['image_key'] = image.image_key
+
+        try:
+            img['image_view_point_count'] = ImageViewPoint.objects.filter(image=image).count()
+        except:
+            img['image_view_point_count'] = 0
+
+        try:
+            img['image_label_count'] = image.image_label.all().count()
+        except:
+            img['image_label_count'] = 0
 
         if image.camera_make is None:
             img['camera_make'] = ''

@@ -172,11 +172,10 @@
         {% if not request.GET.filter_type is None and request.GET.filter_type != '' %}
         order_type = "{{ request.GET.filter_type }}"
         {% endif %}
-        var url = "{% url 'sequence.sequence_list' %}?username=" + username + "&time_type=" + time_type + "&time=" + filter_time;
-        {#if (order_type != '2')#}
-        {#    var url = "{% url 'sequence.sequence_list' %}?username=" + username + "&time_type=" + time_type + "&time=" + filter_time;#}
-        {#else if (order_type == '2')#}
-        {#    var url = "{% url 'sequence.sequence_list' %}?username=" + username + "&time_type=" + time_type + "&time=" + filter_time;#}
+        if (order_type != '2')
+            var url = "{% url 'sequence.sequence_list' %}?username=" + username + "&time_type=" + time_type + "&time=" + filter_time;
+        else if (order_type == '2')
+            var url = "{% url 'sequence.image_leaderboard' %}?username=" + username + "&filter_type=view_point&time_type=" + time_type + "&time=" + filter_time;
         location.assign(url);
     });
 
