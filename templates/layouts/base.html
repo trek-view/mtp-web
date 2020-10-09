@@ -304,6 +304,10 @@
                     mapboxgl: mapboxgl
                 }), 'top-left'
             );
+            map.addControl(new mapboxgl.NavigationControl({
+                showCompass: false,
+                showZoom: true
+            }), 'bottom-right');
         }
 
 
