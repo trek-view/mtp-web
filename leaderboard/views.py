@@ -68,62 +68,63 @@ def index(request):
     m = None
     time_type = None
     if request.method == "GET":
-        page = request.GET.get('page')
-        if not page or page is None:
-            page = 1
-        filter_time = request.GET.get('time')
-        page = request.GET.get('page')
-        transport_type = request.GET.get('transport_type')
-        time_type = request.GET.get('time_type')
-        camera_makes = request.GET.get('camera_make')
+        form = LeaderboardSearchForm(request.GET)
+        if form.is_valid():
+            page = request.GET.get('page')
+            if not page or page is None:
+                page = 1
+            filter_time = request.GET.get('time')
+            page = request.GET.get('page')
+            transport_type = request.GET.get('transport_type')
+            time_type = request.GET.get('time_type')
+            camera_makes = form.cleaned_data['camera_make']
 
-        if time_type is None or not time_type or time_type == 'all_time':
-            sequences = Sequence.objects.all().exclude(image_count=0)
-        else:
-            if time_type == 'monthly':
-                if filter_time is None:
-                    now = datetime.now()
-                    y = now.year
-                    m = now.month
-                    form.set_timely('YYYY-MM', str(y) + '-' + str(m))
-                else:
-                    form.set_timely('YYYY-MM', filter_time)
-                    y = filter_time.split('-')[0]
-                    m = filter_time.split('-')[1]
-                sequences = Sequence.objects.filter(
-                    captured_at__month=m,
-                    captured_at__year=y
-                ).exclude(image_count=0)
-                time_type = 'monthly'
-            elif time_type == 'yearly':
-                if filter_time is None:
-                    now = datetime.now()
-                    y = now.year
-                    form.set_timely('YYYY', str(y))
-                else:
-                    form.set_timely('YYYY', filter_time)
-                    y = filter_time
-                sequences = Sequence.objects.filter(
-                    captured_at__year=y
-                ).exclude(image_count=0)
-                time_type = 'yearly'
-
-        if not transport_type is None and transport_type != 0 and transport_type != '':
-            children_trans_type = TransType.objects.filter(parent_id=transport_type)
-            if children_trans_type.count() > 0:
-                types = []
-                types.append(transport_type)
-                for t in children_trans_type:
-                    types.append(t.pk)
-                sequences = sequences.filter(transport_type_id__in=types)
+            if time_type is None or not time_type or time_type == 'all_time':
+                sequences = Sequence.objects.all().exclude(image_count=0)
             else:
-                sequences = sequences.filter(transport_type_id=transport_type)
+                if time_type == 'monthly':
+                    if filter_time is None:
+                        now = datetime.now()
+                        y = now.year
+                        m = now.month
+                        form.set_timely('YYYY-MM', str(y) + '-' + str(m))
+                    else:
+                        form.set_timely('YYYY-MM', filter_time)
+                        y = filter_time.split('-')[0]
+                        m = filter_time.split('-')[1]
+                    sequences = Sequence.objects.filter(
+                        captured_at__month=m,
+                        captured_at__year=y
+                    ).exclude(image_count=0)
+                    time_type = 'monthly'
+                elif time_type == 'yearly':
+                    if filter_time is None:
+                        now = datetime.now()
+                        y = now.year
+                        form.set_timely('YYYY', str(y))
+                    else:
+                        form.set_timely('YYYY', filter_time)
+                        y = filter_time
+                    sequences = Sequence.objects.filter(
+                        captured_at__year=y
+                    ).exclude(image_count=0)
+                    time_type = 'yearly'
 
-            form.set_transport_type(transport_type)
+            if not transport_type is None and transport_type != 0 and transport_type != '':
+                children_trans_type = TransType.objects.filter(parent_id=transport_type)
+                if children_trans_type.count() > 0:
+                    types = []
+                    types.append(transport_type)
+                    for t in children_trans_type:
+                        types.append(t.pk)
+                    sequences = sequences.filter(transport_type_id__in=types)
+                else:
+                    sequences = sequences.filter(transport_type_id=transport_type)
 
-        if not camera_makes is None and len(camera_makes) > 0:
-            sequences = sequences.filter(camera_make__in=camera_makes)
-            form.set_camera_makes(camera_makes)
+                form.set_transport_type(transport_type)
+            if not camera_makes is None and len(camera_makes) > 0:
+                sequences = sequences.filter(camera_make__in=camera_makes)
+                form.set_camera_makes(camera_makes)
 
     if sequences == None:
 
