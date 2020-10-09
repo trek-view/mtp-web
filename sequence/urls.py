@@ -6,7 +6,7 @@ urlpatterns = [
     path('list', views.sequence_list, name='sequence.sequence_list'),
     path('my-sequence-list', views.my_sequence_list, name='sequence.my_sequence_list'),
 
-    path('image', views.image_leaderboard, name='sequence.image_leaderboard'),
+    path('photo', views.image_leaderboard, name='sequence.image_leaderboard'),
     path('ajax_add_label_type', views.ajax_add_label_type, name='sequence.ajax_add_label_type'),
 
     path('<str:unique_id>/detail', views.sequence_detail, name='sequence.sequence_detail'),

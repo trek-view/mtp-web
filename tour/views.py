@@ -214,7 +214,6 @@ def tour_add_sequence(request, unique_id):
         sequences = []
         for t_s in t_sequence_ary:
             seq = Sequence.objects.filter(unique_id=t_s).first()
-            print(seq)
             if not seq is None and seq:
                 sequences.append(seq)
         content = {
