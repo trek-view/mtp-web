@@ -155,7 +155,7 @@ def tour_add_sequence(request, unique_id):
     sequences = sequences.order_by('-captured_at')
 
     sequence_ary = []
-    tour_sequences = TourSequence.objects.filter(tour=tour)
+    tour_sequences = TourSequence.objects.filter(tour=tour).order_by('sort')
     t_sequence_ary = []
     if tour_sequences.count() > 0:
         for t_s in tour_sequences:
@@ -211,7 +211,12 @@ def tour_add_sequence(request, unique_id):
         }
         return render(request, 'tour/add_seq.html', content)
     else:
-        sequences = sequences.filter(unique_id__in=t_sequence_ary)
+        sequences = []
+        for t_s in t_sequence_ary:
+            seq = Sequence.objects.filter(unique_id=t_s).first()
+            print(seq)
+            if not seq is None and seq:
+                sequences.append(seq)
         content = {
             'sequences': sequences,
             'sequence_count': len(sequences),
