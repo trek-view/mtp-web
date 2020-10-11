@@ -803,7 +803,7 @@
 
     function refresh_poi_list(show = false) {
         $('.TagVertex').each(function (i) {
-            $(this).html('<i class="fas fa-info-circle" style="font-size: 50px"></i>')
+            $(this).html('<i class="fas fa-info-circle text-success" style="font-size: 50px"></i>')
         });
         $('.card.poi .collapse-button').off('click');
         $('.card.poi .collapse-button').click(function () {
@@ -829,7 +829,7 @@
     }
     var add_poi_icon = function() {
         $('.TagVertex').each(function (i) {
-            $(this).html('<i class="fas fa-info-circle" style="font-size: 50px"></i>')
+            $(this).html('<i class="fas fa-info-circle text-success" style="font-size: 50px"></i>')
         });
     }
     mapillaryViewer.on("mousemove", add_poi_icon);
