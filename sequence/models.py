@@ -348,7 +348,7 @@ class SequenceWeather(models.Model):
     location_localtime_epoch = models.IntegerField(default=0)
     location_utc_offset = models.CharField(max_length=100, null=True, blank=True)
 
-    current_observation_time = models.CharField(max_length=10, null=True, blank=True)
+    current_observation_time = models.CharField(max_length=50, null=True, blank=True)
     current_temperature = models.IntegerField(default=0)
     current_weather_code = models.IntegerField(default=0)
     current_weather_icons = ArrayField(models.TextField(default=''), null=True, blank=True)
@@ -367,10 +367,10 @@ class SequenceWeather(models.Model):
 
     his_date = models.DateField(null=True, blank=True)
     his_date_epoch = models.IntegerField(default=0)
-    his_astro_sunrise = models.CharField(max_length=10, null=True, blank=True)
-    his_astro_sunset = models.CharField(max_length=10, null=True, blank=True)
-    his_astro_moonrise = models.CharField(max_length=10, null=True, blank=True)
-    his_astro_moonset = models.CharField(max_length=10, null=True, blank=True)
+    his_astro_sunrise = models.CharField(max_length=50, null=True, blank=True)
+    his_astro_sunset = models.CharField(max_length=50, null=True, blank=True)
+    his_astro_moonrise = models.CharField(max_length=50, null=True, blank=True)
+    his_astro_moonset = models.CharField(max_length=50, null=True, blank=True)
     his_astro_moon_phase = models.CharField(max_length=50, null=True, blank=True)
 
     his_mintemp = models.IntegerField(default=0)
