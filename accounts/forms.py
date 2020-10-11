@@ -9,6 +9,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 ## App Packages
 from .models import CustomUser
+from django.utils.html import mark_safe
 
 UserModel = get_user_model()
 
@@ -116,7 +117,16 @@ class UserSignUpForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': ''})
     )
 
-    is_maillist = forms.BooleanField(widget=forms.CheckboxInput(attrs={'checked': 'checked'}),label='Email me about imagery capture competitions', required=False)
+    is_maillist = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={'checked': 'checked'}),
+        label='Email me about imagery capture competitions',
+        required=False
+    )
+
+    is_term = forms.ChoiceField(
+        widget=forms.CheckboxInput(),
+        label=mark_safe('<a href="#">I agree to the Trek View terms of service</a>')
+    )
 
     class Meta:
         model = CustomUser

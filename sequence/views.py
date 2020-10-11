@@ -794,8 +794,9 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
             print('image key: ', image.image_key)
 
         print(image_keys)
-        print('image_download')
+
         if len(image_keys) > 0 and image_download:
+            print('image_download')
             # Create the model you want to save the image to
             for image_key in image_keys:
                 images = Image.objects.filter(image_key=image_key)
