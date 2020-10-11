@@ -11,3 +11,8 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        print(self.name)
+        super().save(*args, **kwargs)
