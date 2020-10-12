@@ -416,11 +416,18 @@ i.fas, i.far {
   background-size: 65px 20px;
 }
 
-.mapboxgl-ctrl-bottom-right .mapboxgl-ctrl {
-    margin: 0 10px 25px 0;
-    float: right;
-}
+
 
 .mapboxgl-ctrl-bottom-left .mapboxgl-ctrl-logo {
     display: none;
+}
+
+.min-map-box .mapboxgl-control-container .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl.mapboxgl-ctrl-group button {
+    width: 19px !important;
+    height: 19px !important;
+}
+
+.min-map-box .mapboxgl-control-container .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl.mapboxgl-ctrl-group {
+    margin-bottom: 0;
+    margin-right: 12px;
 }

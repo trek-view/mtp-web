@@ -212,11 +212,7 @@
             </div>
         </div>
         <div class="d-none" id="map">
-            <div class="mapbox-attribution-container">
-                <a href="https://www.mapbox.com/about/maps/">© Mapbox | </a>
-                <a href="http://www.openstreetmap.org/copyright">© OpenStreetMap | </a>
-                <a href="https://www.mapbox.com/map-feedback/" target="_blank"><strong>Improve this map</strong></a>
-            </div>
+
         </div>
     </div>
 
@@ -298,7 +294,6 @@
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: first_point, // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         else {
@@ -307,7 +302,6 @@
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: [-87.622088, 41.878781], // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         map.on('load', function() {

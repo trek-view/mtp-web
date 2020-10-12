@@ -310,6 +310,14 @@
             }), 'bottom-right');
         }
 
+        if (typeof map_ary != 'undefined') {
+            for (var l=0; l < map_ary.length; l++) {
+                map_ary[l].addControl(new mapboxgl.NavigationControl({
+                    showCompass: false,
+                    showZoom: true
+                }), 'bottom-right');
+            }
+        }
 
         var is_mobile = window.mobileAndTabletCheck();
 

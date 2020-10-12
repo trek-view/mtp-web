@@ -104,7 +104,7 @@
                                 <div class="col-md-5 col-lg-4">
                                     <div class="row align-items-center">
                                         <div class="col-md-6 pl-2 pr-2">
-                                            <div class="map-box" id="map-{{ guidebook.unique_id }}">
+                                            <div class="min-map-box" id="map-{{ guidebook.unique_id }}">
                                             </div>
                                         </div>
 
@@ -216,11 +216,7 @@
             </div>
         </div>
         <div class="d-none" id="map">
-            <div class="mapbox-attribution-container">
-                <a href="https://www.mapbox.com/about/maps/">© Mapbox | </a>
-                <a href="http://www.openstreetmap.org/copyright">© OpenStreetMap | </a>
-                <a href="https://www.mapbox.com/map-feedback/" target="_blank"><strong>Improve this map</strong></a>
-            </div>
+
         </div>
     </div>
 
@@ -272,9 +268,8 @@
     console.log(positions)
     var map_ary = [];
 
-
     function draw_map(data) {
-        var obj = $('.map-box').eq(i);
+        var obj = $('.min-map-box').eq(i);
         var obj_id = obj.attr('id');
         var sceneData = [];
         var item = {};
@@ -305,7 +300,6 @@
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: first_point, // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         else {
@@ -314,7 +308,6 @@
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: [-87.622088, 41.878781], // starting position
                 zoom: -2, // starting zoom
-                attributionControl: false
             });
         }
         map.on('load', function() {
@@ -344,7 +337,7 @@
         container: 'map', // container id
         style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
         center: [-74.5, 40], // starting position
-        zoom: 1 // starting zoom
+        zoom: 1, // starting zoom,
     });
 
     for (i = 0; i < positions.length; i++)
@@ -437,7 +430,6 @@
             }
         });
     }
-
 
     function gotoDetail(id) {
         var url = "{% url 'guidebook.guidebook_detail' unique_id='unique_id' %}";

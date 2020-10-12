@@ -188,11 +188,7 @@
             </div>
         </div>
         <div class="d-none" id="map">
-            <div class="mapbox-attribution-container">
-                <a href="https://www.mapbox.com/about/maps/">© Mapbox | </a>
-                <a href="http://www.openstreetmap.org/copyright">© OpenStreetMap | </a>
-                <a href="https://www.mapbox.com/map-feedback/" target="_blank"><strong>Improve this map</strong></a>
-            </div>
+
         </div>
     </div>
 
@@ -536,7 +532,6 @@
             style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
             center: centerPoint, // starting position
             zoom: 3, // starting zoom
-            attributionControl: false
         });
 
         map.on('load', function() {
