@@ -53,6 +53,16 @@
         zoom: 3 // starting zoom
     });
 
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
+
     var draw = new MapboxDraw({
         displayControlsDefault: false,
         controls: {

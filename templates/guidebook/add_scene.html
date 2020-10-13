@@ -534,6 +534,16 @@
         zoom: zoom, // starting zoom
     });
 
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
+
     map.on("load", function() {
         // Add Mapillary sequence layer.
         // https://www.mapillary.com/developer/tiles-documentation/#sequence-layer

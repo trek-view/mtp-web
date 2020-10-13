@@ -334,6 +334,16 @@
         zoom: 1 // starting zoom
     });
 
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
+
 
 
     for (i = 0; i < positions.length; i++)

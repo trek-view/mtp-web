@@ -27,7 +27,7 @@ body {
 
 .item-detail-box {
     /*width: calc(100% - 480px);*/
-    height: 100%;
+    /*height: 100%;*/
 }
 
 .item-detail label {
@@ -171,11 +171,33 @@ body {
     color: white;
     border-radius: 4px;
     text-align: center;
-    background: rgba(0,0,0,.5);
+    background: #28a745 !important;
     z-index: 300;
     position: absolute;
-    left: 15px;
+    right: 15px;
     padding: 5px;
+}
+
+.right-board .btn-add-to-guidebook {
+    font-size: 14px;
+    top: 55px;
+    color: white;
+    border-radius: 4px;
+    text-align: center;
+    z-index: 300;
+    position: absolute;
+    right: 15px;
+}
+
+.right-board .btn-add-to-guidebook button, .right-board .btn-add-to-guidebook div {
+    font-size: 14px;
+    color: white;
+    padding: 3px;
+    border-radius: 4px;
+}
+
+.right-board .image-view-point i {
+    font-size: 14px;
 }
 
 .right-board .image-view-point img {
@@ -185,4 +207,46 @@ body {
 .small-screen .image-view-point {
     padding-top: 0px;
     padding-bottom: 0px;
+}
+
+.small-screen .btn-add-to-guidebook {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    top: 40px;
+}
+
+.small-screen .btn-add-to-guidebook button, .right-board .btn-add-to-guidebook div {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.detection-tag {
+    margin: 3px;
+    white-space: nowrap;
+    padding: 1px;
+}
+
+.switch-detection > div {
+    width: 100px !important;
+}
+
+.switch-detection-auto > div {
+    width: 120px !important;
+}
+
+.image-detection .detections > div:first-child {
+    margin-top: 20px;
+
+}
+
+.image-detection .detection-tag {
+    cursor: pointer;
+}
+
+.image-detection .detection-tag.selected {
+    /*border-color: green !important;*/
+}
+
+.image-detection .detections > div.selected {
+    background: #d6dad7;
 }

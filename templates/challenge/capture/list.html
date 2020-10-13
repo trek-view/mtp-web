@@ -293,6 +293,16 @@
         zoom: 1 // starting zoom
     });
 
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
+
     var challengeGeometryElements = $('.challenge-geometry');
     var polygonData = [];
     var centerPointerData = [];

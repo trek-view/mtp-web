@@ -64,6 +64,15 @@
         }
     });
     map.addControl(draw);
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
 
     map.on('draw.create', updateArea);
     map.on('draw.delete', updateArea);
