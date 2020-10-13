@@ -8,7 +8,7 @@
     <div class="left-side p-3 d-flex flex-column justify-content-between">
         <div>
             <div class="text-right mt-2 mb-2">
-                <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
+                <a class="btn btn-info" href="{% url 'tour.tour_list' %}">Go to Tour List</a>
             </div>
             {% if messages %}
                 {% for message in messages %}
