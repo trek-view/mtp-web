@@ -286,20 +286,6 @@
                     <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
                 {% endif %}
             </div>
-
-            {% if not guidebooks is None %}
-                <div class="btn-group">
-                    <button type="button" style="height: 35px" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Add to Guidebook
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        {% for guidebook in guidebooks %}
-                            <a class="dropdown-item" href="javascript:addToGuidebook('{{ guidebook.unique_id }}');">{{ guidebook.name }}</a>
-                        {% endfor %}
-                    </div>
-                </div>
-
-            {% endif %}
         </div>
 
         <div class="image-detail {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' %}d-none{% endif %}">
@@ -370,14 +356,27 @@
                 </div>
                 <div class="switch-cover"></div>
 
-                    <div class="image-view-point" style="cursor: pointer;" onclick="mark_view_point()" style="">
-                        <div class="view_point text-center">
-                            <i class="fas fa-binoculars"></i>
-                            <span class="text-center m-0 disabled">
-                                {{ view_points }} Viewpoints
-                            </span>
+                <div class="image-view-point" style="cursor: pointer;" onclick="mark_view_point()" style="">
+                    <div class="view_point text-center">
+                        <i class="fas fa-binoculars"></i>
+                        <span class="text-center m-0 disabled">
+                            {{ view_points }} Viewpoints
+                        </span>
+                    </div>
+                </div>
+
+                {% if not guidebooks is None %}
+                    <div class=" btn-add-to-guidebook">
+                        <button type="button" class="btn btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Add to Guidebook
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            {% for guidebook in guidebooks %}
+                                <a class="dropdown-item" href="javascript:addToGuidebook('{{ guidebook.unique_id }}');">{{ guidebook.name }}</a>
+                            {% endfor %}
                         </div>
                     </div>
+                {% endif %}
 
                 <div id='sequence_viewer' class="image-box display"></div>
             </div>
@@ -1479,7 +1478,7 @@
         function addToGuidebook(guidebook_unique_id) {
             var url = "{% url 'guidebook.add_scene' unique_id='guidebook_unique_id' %}?image_key=" + current_node_key;
             url = url.replace('guidebook_unique_id', guidebook_unique_id);
-            location.assign(url);
+            window.open(url, '_blank');;
         }
 
         $('#add_label').change(function () {

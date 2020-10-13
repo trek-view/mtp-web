@@ -178,6 +178,24 @@ body {
     padding: 5px;
 }
 
+.right-board .btn-add-to-guidebook {
+    font-size: 14px;
+    top: 55px;
+    color: white;
+    border-radius: 4px;
+    text-align: center;
+    z-index: 300;
+    position: absolute;
+    right: 15px;
+}
+
+.right-board .btn-add-to-guidebook button, .right-board .btn-add-to-guidebook div {
+    font-size: 14px;
+    color: white;
+    padding: 3px;
+    border-radius: 4px;
+}
+
 .right-board .image-view-point i {
     font-size: 14px;
 }
@@ -187,6 +205,17 @@ body {
 }
 
 .small-screen .image-view-point {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.small-screen .btn-add-to-guidebook {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    top: 40px;
+}
+
+.small-screen .btn-add-to-guidebook button, .right-board .btn-add-to-guidebook div {
     padding-top: 0px;
     padding-bottom: 0px;
 }
