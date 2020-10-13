@@ -456,6 +456,10 @@
         $('.minimize-button').removeClass('d-none');
     }
 
+    {% if not request.GET.image_key is None and request.GET.image_key != '' %}
+        init_node = "{{ request.GET.image_key }}";
+    {% endif %}
+
     function enable_scene_form(id) {
         var $form = $('#add_scene_form_' + id);
         $form.find('input').each(function (index) {
@@ -627,6 +631,12 @@
     mapillaryViewer.on(Mapillary.Viewer.nodechanged, function (node) {
         current_node_point = [node.latLon.lat, node.latLon.lon];
         current_node_key = node.key;
+
+        var href = location.protocol + '//' + location.host + location.pathname ;
+        history.pushState({
+            id: 'Guidebook Edit'
+        }, "{{ pageTitle }}", href + '?image_key=' + current_node_key);
+
         current_order_number = key_list.indexOf(current_node_key);
         $.ajax({
             url: "{% url 'guidebook.ajax_get_edit_scene' unique_id=guidebook.unique_id %}",

@@ -412,7 +412,7 @@
         var description = $(this).find('.scene-description').find('span').text();
         history.pushState({
             id: 'Guidebook Detail'
-        }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
+        }, "{{ pageTitle }}", href + '?image_key=' + image_key);
         var $this = $(this);
         mapillaryViewer.moveToKey(image_key).then(function () {
             $('.left-side.poi-box').removeClass('d-none');
@@ -652,12 +652,11 @@
         if (key_list.length < 2 || current_order_number == 0)
             return false;
         var index = current_order_number - 1;
+        var image_key = key_list[index];
         var href = location.protocol + '//' + location.host + location.pathname ;
         history.pushState({
             id: 'Guidebook Detail'
-        }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
-
-        var image_key = key_list[index];
+        }, "{{ pageTitle }}", href + '?image_key=' + image_key);
         var title = $('.scene-box').eq(index).find('.scene-title').find('h6').text();
         var description = $('.scene-box').eq(index).find('.scene-description').find('span').text();
         mapillaryViewer.moveToKey(image_key).then(function () {
@@ -679,10 +678,11 @@
             return false;
         var index = current_order_number + 1;
         var href = location.protocol + '//' + location.host + location.pathname ;
+
+        var image_key = key_list[index];
         history.pushState({
             id: 'Guidebook Detail'
-        }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
-        var image_key = key_list[index];
+        }, "{{ pageTitle }}", href + '?image_key=' + image_key);
         var title = $('.scene-box').eq(index).find('.scene-title').find('h6').text();
         var description = $('.scene-box').eq(index).find('.scene-description').find('span').text();
         mapillaryViewer.moveToKey(image_key).then(function () {

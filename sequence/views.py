@@ -894,10 +894,15 @@ def sequence_detail(request, unique_id):
     else:
         firstImageKey = sequence.getFirstImageKey()
 
-
+    guidebooks = None
+    if request.user.is_authenticated:
+        guidebooks = Guidebook.objects.filter(user=request.user)
+        if guidebooks.count() == 0:
+            guidebooks = None
 
     content = {
         'sequence': sequence,
+        'guidebooks': guidebooks,
         'pageName': 'Sequence Detail',
         'pageTitle': sequence.name + ' - Sequence',
         'pageDescription': sequence.description,

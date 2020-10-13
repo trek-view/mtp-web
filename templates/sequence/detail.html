@@ -278,11 +278,27 @@
             </button>
         </div>
 
-        <div class="switch-detection mt-2 ml-auto">
-            {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' %}
-                <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary" checked>
-            {% else %}
-                <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
+        <div class="d-flex flex-row justify-content-between align-items-center mt-3">
+            <div class="switch-detection">
+                {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' %}
+                    <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary" checked>
+                {% else %}
+                    <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
+                {% endif %}
+            </div>
+
+            {% if not guidebooks is None %}
+                <div class="btn-group">
+                    <button type="button" style="height: 35px" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Add to Guidebook
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        {% for guidebook in guidebooks %}
+                            <a class="dropdown-item" href="javascript:addToGuidebook('{{ guidebook.unique_id }}');">{{ guidebook.name }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+
             {% endif %}
         </div>
 
@@ -1459,6 +1475,12 @@
     var onTagGeometryChanged = function(tag) { console.log(tag.id, tag.geometry); };
 
     {% if request.user.is_authenticated %}
+
+        function addToGuidebook(guidebook_unique_id) {
+            var url = "{% url 'guidebook.add_scene' unique_id='guidebook_unique_id' %}?image_key=" + current_node_key;
+            url = url.replace('guidebook_unique_id', guidebook_unique_id);
+            location.assign(url);
+        }
 
         $('#add_label').change(function () {
             var label_type = $(this).val();
