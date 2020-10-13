@@ -659,6 +659,19 @@ def ajax_tour_check_like(request, unique_id):
 
     tour_like = TourLike.objects.filter(tour=tour, user=request.user)
     if tour_like:
+        if request.user.is_liked_email:
+            # confirm email
+            try:
+                # send email to creator
+                subject = 'Tour Liked'
+                html_message = render_to_string(
+                    'emails/tour/like.html',
+                    {'subject': subject, 'like': 'unliked', 'tour': tour},
+                    request
+                )
+                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         for g in tour_like:
             g.delete()
         liked_tour = TourLike.objects.filter(tour=tour)
@@ -673,6 +686,19 @@ def ajax_tour_check_like(request, unique_id):
             'liked_count': liked_count
         })
     else:
+        if request.user.is_liked_email:
+            # confirm email
+            try:
+                # send email to creator
+                subject = 'Tour Liked'
+                html_message = render_to_string(
+                    'emails/tour/like.html',
+                    {'subject': subject, 'like': 'liked', 'tour': tour},
+                    request
+                )
+                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         tour_like = TourLike()
         tour_like.tour = tour
         tour_like.user = request.user

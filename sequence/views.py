@@ -1307,6 +1307,19 @@ def ajax_sequence_check_like(request, unique_id):
 
     sequence_like = SequenceLike.objects.filter(sequence=sequence, user=request.user)
     if sequence_like:
+        if request.user.is_liked_email:
+            # confirm email
+            try:
+                # send email to creator
+                subject = 'Sequence Liked'
+                html_message = render_to_string(
+                    'emails/sequence/like.html',
+                    {'subject': subject, 'like': 'unliked', 'sequence': sequence},
+                    request
+                )
+                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         for g in sequence_like:
             g.delete()
         liked_sequence = SequenceLike.objects.filter(sequence=sequence)
@@ -1321,6 +1334,19 @@ def ajax_sequence_check_like(request, unique_id):
             'liked_count': liked_count
         })
     else:
+        if request.user.is_liked_email:
+            # confirm email
+            try:
+                # send email to creator
+                subject = 'Sequence Liked'
+                html_message = render_to_string(
+                    'emails/sequence/like.html',
+                    {'subject': subject, 'like': 'liked', 'sequence': sequence},
+                    request
+                )
+                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         sequence_like = SequenceLike()
         sequence_like.sequence = sequence
         sequence_like.user = request.user
@@ -1758,6 +1784,19 @@ def ajax_image_mark_view(request, unique_id, image_key):
 
     image_view_points = ImageViewPoint.objects.filter(image=image, user=request.user)
     if image_view_points.count() > 0:
+        if request.user.is_liked_email:
+            # confirm email
+            try:
+                # send email to creator
+                subject = 'Image View Point'
+                html_message = render_to_string(
+                    'emails/sequence/image_view_point.html',
+                    {'subject': subject, 'like': 'unviewed', 'sequence': sequence, 'image_key': image.image_key},
+                    request
+                )
+                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         for v in image_view_points:
             v.delete()
         marked_images = ImageViewPoint.objects.filter(image=image)
@@ -1772,6 +1811,19 @@ def ajax_image_mark_view(request, unique_id, image_key):
             'view_points': view_points
         })
     else:
+        if request.user.is_liked_email:
+            # confirm email
+            try:
+                # send email to creator
+                subject = 'Image View Point'
+                html_message = render_to_string(
+                    'emails/sequence/image_view_point.html',
+                    {'subject': subject, 'like': 'viewed', 'sequence': sequence, 'image_key': image.image_key},
+                    request
+                )
+                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         image_view_point = ImageViewPoint()
         image_view_point.image = image
         image_view_point.user = request.user
