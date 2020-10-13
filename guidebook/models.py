@@ -134,6 +134,13 @@ class Guidebook(models.Model):
         else:
             return None
 
+    def getCoverImageUserOnMapillary(self):
+        scenes = Scene.objects.filter(guidebook=self)
+        if scenes.count() > 0:
+            return scenes[0].username
+        else:
+            return ''
+
 class GuidebookLike(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     guidebook = models.ForeignKey(Guidebook, on_delete=models.CASCADE)
@@ -161,6 +168,7 @@ class Scene(models.Model):
     start_y = models.FloatField(default=0.5)
     sort = models.IntegerField(default=1, null=True)
     image_url = models.CharField(max_length=100, null=True)
+    username = models.CharField(max_length=100, default='', null=True, blank=True, verbose_name="Mapillary Username", )
 
     def getPOICount(self):
         pois = PointOfInterest.objects.filter(scene=self)

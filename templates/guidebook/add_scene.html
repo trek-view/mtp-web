@@ -146,6 +146,7 @@
                                 <input type="text" name="lng" class="form-control d-none" value="{{ scene.lng }}" required="" id="id_lng">
                                 <input type="text" name="start_x" class="form-control d-none" value="{{ scene.start_x }}" required="" id="id_start_x">
                                 <input type="text" name="start_y" class="form-control d-none" value="{{ scene.start_y }}" required="" id="id_start_y">
+                                <input type="text" name="username" class="form-control d-none" value="{{ scene.username }}" required="" id="id_username">
                                 <div class="text-right">
                                     <button type="button" class="btn btn-sm btn-info point_list" onclick="showPOIList('{{ scene.pk }}')" data-scene-id="{{ scene.pk }}">Edit POI's ({{ scene.getPOICount }})</button>
                                     <button type="button" id="change_scene_button" class="save btn btn-sm btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Edit Scene</button>
@@ -185,6 +186,7 @@
                             <input type="text" name="lng" class="form-control d-none" disabled  required="" id="id_new_lng">
                             <input type="text" name="start_x" class="form-control d-none" disabled  required="" id="id_new_start_x">
                             <input type="text" name="start_y" class="form-control d-none" disabled  required="" id="id_new_start_y">
+                            <input type="text" name="username" class="form-control d-none" disabled  required="" id="id_new_username">
                             <div class="text-right">
                                 <button type="button" id="save_scene_button" class="save btn btn-sm btn-primary save-btn" disabled="" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', 0)">Save New Scene</button>
 {#                                <button type="button" class="cancel btn btn-dark btn-sm">Abandon</button>#}
@@ -293,12 +295,7 @@
                 <div class="switch-full-screen switch_screen" >
                     <img class="w-100" src="{% static 'images/icon/flap.svg' %}">
                 </div>
-                <div class="poi-icon d-none" id="poi_icon">
-                    <img class="w-100 d-none" onclick="add_new_poi()" src="{% static 'images/icon/icons8-love-path-64.png' %}">
-                </div>
-                <div class="delete-icon disabled" id="delete_icon">
-                    <img class="w-100 d-none" src="{% static 'images/icon/icons8-trash-50.png' %}">
-                </div>
+
                 <div id='mapillary_image_box' class="image-box display"></div>
             </div>
             <div class="show-or-hide">
@@ -398,6 +395,7 @@
     var current_scene_id = 0;
     var current_node_point = null;
     var current_node_key = '';
+    var current_node_username = '';
     var current_order_number = 0;
     toastr.options = {
       "closeButton": false,
@@ -641,6 +639,7 @@
     mapillaryViewer.on(Mapillary.Viewer.nodechanged, function (node) {
         current_node_point = [node.latLon.lat, node.latLon.lon];
         current_node_key = node.key;
+        current_node_username = node.username;
 
         var href = location.protocol + '//' + location.host + location.pathname ;
         history.pushState({
@@ -660,6 +659,7 @@
                     $('#id_new_image_key').val(node.key);
                     $('#id_new_lat').val(current_node_point[0]);
                     $('#id_new_lng').val(current_node_point[1]);
+                    $('#id_new_username').val(node.username);
                 }
                 else {
                     current_scene_id = data.scene[0].pk;

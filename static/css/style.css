@@ -430,3 +430,15 @@ i.fas, i.far {
     margin-bottom: 0;
     margin-right: 12px;
 }
+
+.cover-image-box .user-on-mapillary {
+    font-size: 11px;
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    color: wheat;
+}
+
+.cover-image-box img {
+    height: 160px !important;
+}

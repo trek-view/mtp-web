@@ -162,11 +162,6 @@ body {
     background: #79aec8;
 }
 
-.guidebook-list .card.guidebook .cover-image-box  {
-    /*width: 180px;*/
-    height: 140px;
-    /*background: #79aec8;*/
-}
 
 .guidebook-list .card.guidebook .cover-image-box > img {
     width: 100%;

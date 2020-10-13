@@ -103,6 +103,11 @@ class SceneForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
     )
 
+    username = forms.CharField(
+        label='',
+        widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
+    )
+
     start_x = forms.CharField(
         label='',
         widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
@@ -123,7 +128,8 @@ class SceneForm(forms.Form):
             'lat',
             'lng',
             'start_x',
-            'start_y'
+            'start_y',
+            'username'
         )
 
 class PointOfInterestForm(forms.ModelForm):

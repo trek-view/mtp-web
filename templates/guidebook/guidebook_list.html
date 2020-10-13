@@ -108,13 +108,18 @@
                                             </div>
                                         </div>
 
-                                        <div class="cover-image-box col-md-6">
-                                            <div class="row">
-                                                {% if guidebook.getCoverImage is None %}
-                                                    <img class="w-100" style="height: 140px" src="{% static 'images/global/empty-1.png' %}">
-                                                {% else %}
-                                                    <img class="w-100" style="height: 140px" src="https://images.mapillary.com/{{ guidebook.getCoverImage }}/thumb-320.jpg">
-                                                {% endif %}
+                                        <div class=" col-md-6">
+                                            <div class="cover-image-box">
+                                                <div class="row">
+                                                    {% if guidebook.getCoverImage is None %}
+                                                        <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
+                                                    {% else %}
+                                                        <img class="w-100" src="https://images.mapillary.com/{{ guidebook.getCoverImage }}/thumb-320.jpg">
+                                                    {% endif %}
+                                                </div>
+                                                <div class="user-on-mapillary" >
+                                                    image by {{ guidebook.getCoverImageUserOnMapillary }} on mapillary
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

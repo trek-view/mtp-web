@@ -136,13 +136,20 @@ class Tour(models.Model):
         return "%.3f" % distance
 
     def getCoverImage(self):
-
         tour_sequences = TourSequence.objects.filter(tour=self)
         if tour_sequences.count() > 0:
             sequence = tour_sequences[0].sequence
             return sequence.getCoverImage()
         else:
             return None
+
+    def getCoverImageUserOnMapillary(self):
+        tour_sequences = TourSequence.objects.filter(tour=self)
+        if tour_sequences.count() > 0:
+            sequence = tour_sequences[0].sequence
+            return sequence.username
+        else:
+            return ''
 
 
 class TourSequence(models.Model):

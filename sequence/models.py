@@ -234,6 +234,9 @@ class Sequence(models.Model):
         else:
             return ''
 
+    def getMapillaryUsername(self):
+        return self.username
+
     def getLikeCount(self):
         liked_guidebook = SequenceLike.objects.filter(sequence=self)
         if not liked_guidebook:

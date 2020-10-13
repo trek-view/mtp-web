@@ -46,6 +46,17 @@ def home(request):
     return redirect('guidebook.guidebook_list')
 
 def guidebook_list(request):
+
+    from lib.mapillary import Mapillary
+    mapillary = Mapillary()
+    scenes = Scene.objects.filter()
+    if scenes.count() > 0:
+        for scene in scenes:
+            image_json = mapillary.get_images_by_image_key([scene.image_key])
+            feature = image_json['features'][0]
+            scene.username = feature['properties']['username']
+            scene.save()
+
     guidebooks = None
     page = 1
     if request.method == "GET":
@@ -428,6 +439,7 @@ def ajax_add_scene(request, unique_id):
             scene = Scene.objects.filter(image_key=image_key, guidebook=guidebook)
             lat = float(form.cleaned_data['lat'])
             lng = float(form.cleaned_data['lng'])
+            username = form.cleaned_data['username']
 
             if scene:
                 old_scene = scene[0]
@@ -435,6 +447,7 @@ def ajax_add_scene(request, unique_id):
                 old_scene.description = description
                 old_scene.lat = lat
                 old_scene.lng = lng
+                old_scene.username = username
                 old_scene.save()
                 return JsonResponse({
                     'type': 'update',
@@ -452,6 +465,7 @@ def ajax_add_scene(request, unique_id):
                 new_scene.description = description
                 new_scene.lat = lat
                 new_scene.lng = lng
+                new_scene.username = username
                 scenes = guidebook.getScenes()
                 max_sort = 0
                 for s in scenes:
