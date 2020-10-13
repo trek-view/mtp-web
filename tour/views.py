@@ -403,8 +403,11 @@ def tour_detail(request, unique_id):
             sequence_ary.append(t_s.sequence)
 
     first_image_key = ''
+    firstImageKey = ''
     if len(sequence_ary) > 0:
         first_image_key = sequence_ary[0].coordinates_image[0]
+        firstImageKey = sequence_ary[0].getFirstImageKey()
+
     content = {
         'sequences': sequence_ary,
         'sequence_count': len(sequence_ary),
@@ -413,7 +416,8 @@ def tour_detail(request, unique_id):
         'pageDescription': tour.description,
         'tour': tour,
         'first_image_key': first_image_key,
-        't_count_ary': t_count_ary
+        't_count_ary': t_count_ary,
+        'firstImageKey': firstImageKey
     }
     return render(request, 'tour/detail.html', content)
 

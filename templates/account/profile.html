@@ -68,7 +68,7 @@
                                         </div>
                                     </div>
                                     <hr class="p-1">
-                                    Developer
+                                    <div><h5>Developer</h5></div>
                                     <div class="d-flex flex-row mt-2 justify-content-between">
                                         <div class="link-developer text-right">
                                             <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:list' %}">Applications</a>
@@ -121,24 +121,27 @@
                     </div>
                 </div>
                 <div class="">
-                    <div class="hire-profile text-right">
-                    {% if not photographer is None %}
-                        {% if request.user.username != current_user.username %}
-                            <a class="btn btn-info" href="{% url 'photographer.photographer_detail' unique_id=photographer.unique_id %}">
-                                FOR HIRE
-                            </a>
+                    <div class="hire-profile d-flex justify-content-between align-items-center">
+                        <a href="https://guides.trekview.org/mtp-web/user-guide/profile#badges">
+                            How scoring works
+                        </a>
+                        {% if not photographer is None %}
+                            {% if request.user.username != current_user.username %}
+                                <a class="btn btn-info" href="{% url 'photographer.photographer_detail' unique_id=photographer.unique_id %}">
+                                    FOR HIRE
+                                </a>
+                            {% else %}
+                                <a class="btn btn-info" href="{% url 'photographer.my_photographer_edit' unique_id=photographer.unique_id %}">
+                                    Edit Hire Profile
+                                </a>
+                            {% endif %}
                         {% else %}
-                            <a class="btn btn-info" href="{% url 'photographer.my_photographer_edit' unique_id=photographer.unique_id %}">
-                                Edit Hire Profile
-                            </a>
+                            {% if request.user.username == current_user.username %}
+                                <a class="btn btn-info" href="{% url 'photographer.photographer_create' %}">
+                                    Create Hire Profile
+                                </a>
+                            {% endif %}
                         {% endif %}
-                    {% else %}
-                        {% if request.user.username == current_user.username %}
-                            <a class="btn btn-info" href="{% url 'photographer.photographer_create' %}">
-                                Create Hire Profile
-                            </a>
-                        {% endif %}
-                    {% endif %}
                     </div>
                 </div>
             </div>
@@ -174,7 +177,7 @@
                 </div>
             </div>
 
-            <div class="col-md-6 mt-3">
+            <div class="col-md-6 mt-3 mb-3">
                 <div class="card p-2 section w-100">
                     <div class="users h-100 d-flex flex-column justify-content-between">
                         <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="{% url 'sequence.image_leaderboard' %}?username={{ current_user.username }}&type=received"><i class="fas fa-binoculars"></i> <span class="ml-2">Viewpoints received({{ view_point_count }})</span></a>
@@ -183,6 +186,20 @@
                 </div>
             </div>
         </div>
+
+        {% if request.user.is_authenticated and current_user == request.user %}
+            <hr class="mt-1 mb-1" />
+
+            <div class="row">
+                <div class="col-md-12 mt-3">
+                    <div><h5>Settings</h5></div>
+                    <div class="">
+                        <input style="width: 23px" type="checkbox" id="is_liked_email">
+                        <label for="is_liked_email">Do you want to get email when others like your tour, sequence and guidebook?</label>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
 </div>
 

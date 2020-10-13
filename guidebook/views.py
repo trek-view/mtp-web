@@ -236,6 +236,9 @@ def guidebook_detail(request, unique_id):
         is_liked = False
     form = SceneForm()
     poi_form = PointOfInterestForm()
+    firstImageKey = guidebook.getFirstScene()
+    if not firstImageKey is None and firstImageKey != '':
+        firstImageKey = firstImageKey.image_key
     content = {
         'guidebook': guidebook,
         'is_liked': is_liked,
@@ -243,7 +246,8 @@ def guidebook_detail(request, unique_id):
         'poi_form': poi_form,
         'pageTitle': guidebook.name + ' - ' + 'Guidebook',
         'pageDescription': guidebook.description,
-        'pageName': 'Guidebook Detail'
+        'pageName': 'Guidebook Detail',
+        'firstImageKey': firstImageKey
     }
     return render(request, 'guidebook/guidebook_detail.html', content)
 

@@ -888,6 +888,14 @@ def sequence_detail(request, unique_id):
     if sequence_weathers.count() > 0:
         sequence_weather = sequence_weathers[0]
     print(sequence_weather)
+
+    if not image_key is None and image_key != '':
+        firstImageKey = image_key
+    else:
+        firstImageKey = sequence.getFirstImageKey()
+
+
+
     content = {
         'sequence': sequence,
         'pageName': 'Sequence Detail',
@@ -901,7 +909,8 @@ def sequence_detail(request, unique_id):
         'image_key': image_key,
         'tour_count': tour_count,
         'sequence_weather': sequence_weather,
-        'view_mode': view_mode
+        'view_mode': view_mode,
+        'firstImageKey': firstImageKey
     }
     return render(request, 'sequence/detail.html', content)
 
