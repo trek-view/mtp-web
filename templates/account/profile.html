@@ -194,7 +194,7 @@
                 <div class="col-md-12 mt-3">
                     <div><h5>Settings</h5></div>
                     <div class="">
-                        <input style="width: 23px" type="checkbox" id="is_liked_email">
+                        <input style="width: 23px" {% if current_user.is_liked_email %}checked{% endif %} type="checkbox" id="is_liked_email">
                         <label for="is_liked_email">Do you want to get email when others like your tour, sequence and guidebook?</label>
                     </div>
                 </div>
@@ -301,6 +301,26 @@
         var server_image = false;
     {% else %}
         var server_image = true;
+    {% endif %}
+
+    {% if request.user.is_authenticated and current_user == request.user %}
+        $('#is_liked_email').change(function () {
+            var is_liked_email = $(this).prop('checked');
+            $.ajax({
+                url: "{% url 'account.ajax_user_change_liked_email' %}",
+                type: 'POST',
+                data: {'is_liked_email': is_liked_email},
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                        toastr.error(data.message);
+                    else
+                    {
+                        toastr.success(data.message);
+                    }
+                }
+            });
+        });
     {% endif %}
 
     var myDropzone = new Dropzone(".dropzone", {

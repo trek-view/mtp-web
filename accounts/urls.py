@@ -38,6 +38,7 @@ urlpatterns = [
     path('profile/', views.profile_edit, name='profile'),
     path('ajax_upload_file', views.ajax_upload_file, name='account.ajax_upload_file'),
     path('ajax_user_update', views.ajax_user_update, name='account.ajax_user_update'),
+    path('ajax_user_change_liked_email', views.ajax_user_change_liked_email, name='account.ajax_user_change_liked_email'),
 
     path('check-mapillary-oauth', views.check_mapillary_oauth, name='check_mapillary_oauth'),
     path('check-mtpu-mapillary-oauth', views.MapillaryTokenRedirectView.as_view(), name='check_mtpu_mapillary_oauth'),

@@ -1,9 +1,0 @@
-<body>
-    <div>
-        <h2>{{ subject }}</h2>
-    </div>
-    <p>
-        Hi {{ user.username }}, You created a guidebook: <a href="{{ BASE_URL }}{% url 'guidebook.my_guidebook_edit' unique_id=guidebook.unique_id %}">{{ guidebook.name }}</a>. It is currently being reviewed. This process takes no more than 72 hours. You will receive another email when it is approved.
-    </p>
-
-</body>

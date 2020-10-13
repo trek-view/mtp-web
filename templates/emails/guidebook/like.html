@@ -1,0 +1,5 @@
+<body>
+    <p>
+        Hi {{ request.user.username }}! You got {{ like }} for <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">{{ guidebook.name }}</a>.
+    </p>
+</body>

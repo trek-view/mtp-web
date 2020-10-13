@@ -333,6 +333,29 @@ def ajax_user_update(request):
         'message': "You can't access."
     })
 
+@my_login_required
+def ajax_user_change_liked_email(request):
+    user = request.user
+    if request.method == "POST":
+        is_liked_email = request.POST.get('is_liked_email')
+        if is_liked_email is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "is_liked_email is missing."
+            })
+        if is_liked_email == 'true':
+            user.is_liked_email = True
+        else:
+            user.is_liked_email = False
+        user.save()
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Setting information is successfully saved.'
+        })
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
 
 class BaseTokenRedirectView(CustomRedirectView):
     query_string = True
