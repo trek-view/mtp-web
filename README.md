@@ -1,91 +1,37 @@
 # Map the Paths
-This repository is for Map the Paths. 
-The user can create a job by selecting the area where photography is required and anyone can apply for this job.
-Click [Map the Paths](https://map-the-paths.herokuapp.com/) to experience them.
 
+## About
 
-## Install
+Map the Paths is a web application that allows you to share your street-level map imagery.
 
-- git clone https://github.com/trek-view/mtp-web.git
+https://mtp.trekview.org
 
+## Features
 
-### Running on Local
+![alt-text](mtp-screenshot.png "")
 
-Set DJANGO_SETTINGS_MODULE to config.settings.local in manage.py.
-``` python
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
-```
+* Import images from Mapillary or upload directly using [the desktop uploader](https://mtp.trekview.org).
+* Photos: Photos are street-level images that belong to a Sequence
+* Sequences: Sequences are collections of images continuously captured by a user at a give time. Browse those created by others, or import your own from Mapillary.
+* Tours: Tours are collections of sequences that have been curated by their owner. Browse others' tours or create one using your own sequences.
+* Guidebooks: Create a guidebook of street-level photos to show people around a location. View others people have created to help plan your next adventure.
+* Challenges: Help make better maps by contributing to challenges with specific requests for imagery.
+* Leaderboards: See who is topping the leaderboards for Sequences imported and Viewpoints -- both all time and challenge specific -- to see where you place in the rankings.
+* Hire: Find paid help for image collection projects to create fresh street level map data in locations where it's needed for Google Street View, Mapillary, and more...
+* API: Integrate your own app with Map the Paths...
 
-Fill following values in config/setting/local.py
-``` python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '5432'
-    }
-}
+## User guide
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+Need some help getting started? [Go here](https://guides.trekview.org/mtp-web/overview).
 
-```
+## Support
 
-The following command will build Map the Paths.
+Having problems? [Ask a question around the Campfire (our community forum)](https://campfire.trekview.org/c/support/8).
 
-``` python
-pip install -r requirements.txt
-python manage.py migrate
-```
+## Developers
 
-Run following command to create super admin.
-```
-python manage.py createsuperuser
-```
-Run following command to run server.
-```
-python manage.py runserver
-```
+[See the documentation that we've written to help developers understand the logic and function of the Map the Paths](https://guides.trekview.org/mtp-web/developer-docs).
 
+## License
 
-## Deploying with git on Heroku
-
-Create a new app on heroku.
-And connect your git repository to the created app.
-
-Set DJANGO_SETTINGS_MODULE to config.settings_heroku in manage.py and config/wsgi.py.
-``` python
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.heroku')
-```
-
-And then push on git.
-
-Run following command. ([Deploying with Git](https://devcenter.heroku.com/articles/git))
-
-Quick install and run server using cli on heroku:
-```
-heroku git:remote -a your_heroku_app
-git push heroku [git_branch:]master
-heroku run python manage.py migrate [-a your_heroku_app]
-heroku run python manage.py collectstatic --noinput [-a your_heroku_app]
-heroku run python manage.py createsuperuser [-a your_heroku_app]
-```
-
-Run following command to check logs.
-```
-heroku logs --tail [-a your_heroku_app]
-```
-
-If you want to enable two auth for admin users, please add this in config/urls.py
-```
-admin.site.__class__ = AdminSiteOTPRequiredMixinRedirSetup
-```
-
-### Prerequisites
-
-- PostgreSql 10.0+
-- Postgis package
-- Python 3.6+
+[GNU Affero General Public License v3.0](/LICENSE.txt).
