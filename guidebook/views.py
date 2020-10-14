@@ -878,7 +878,7 @@ def check_like(request, unique_id):
             # confirm email
             try:
                 # send email to creator
-                subject = 'Guidebook Liked'
+                subject = 'Your Map the Paths Guidebook Was Liked'
                 html_message = render_to_string(
                     'emails/guidebook/like.html',
                     {'subject': subject, 'like': 'unliked', 'guidebook': guidebook},
@@ -904,7 +904,7 @@ def check_like(request, unique_id):
         if request.user.is_liked_email:
             try:
                 # send email to creator
-                subject = 'Guidebook Liked'
+                subject = 'Your Map the Paths Guidebook Was Liked'
                 html_message = render_to_string(
                     'emails/guidebook/like.html',
                     {'subject': subject, 'like': 'liked', 'guidebook': guidebook},

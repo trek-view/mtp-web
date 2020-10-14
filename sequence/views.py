@@ -1316,7 +1316,7 @@ def ajax_sequence_check_like(request, unique_id):
             # confirm email
             try:
                 # send email to creator
-                subject = 'Sequence Liked'
+                subject = 'Your Map the Paths Sequence Was Liked'
                 html_message = render_to_string(
                     'emails/sequence/like.html',
                     {'subject': subject, 'like': 'unliked', 'sequence': sequence},
@@ -1343,7 +1343,7 @@ def ajax_sequence_check_like(request, unique_id):
             # confirm email
             try:
                 # send email to creator
-                subject = 'Sequence Liked'
+                subject = 'Your Map the Paths Sequence Was Liked'
                 html_message = render_to_string(
                     'emails/sequence/like.html',
                     {'subject': subject, 'like': 'liked', 'sequence': sequence},
@@ -1793,7 +1793,7 @@ def ajax_image_mark_view(request, unique_id, image_key):
             # confirm email
             try:
                 # send email to creator
-                subject = 'Image View Point'
+                subject = 'Your Map the Paths Photo Received a View Point'
                 html_message = render_to_string(
                     'emails/sequence/image_view_point.html',
                     {'subject': subject, 'like': 'unviewed', 'sequence': sequence, 'image_key': image.image_key},
@@ -1820,7 +1820,7 @@ def ajax_image_mark_view(request, unique_id, image_key):
             # confirm email
             try:
                 # send email to creator
-                subject = 'Image View Point'
+                subject = 'Your Map the Paths Photo Received a View Point'
                 html_message = render_to_string(
                     'emails/sequence/image_view_point.html',
                     {'subject': subject, 'like': 'viewed', 'sequence': sequence, 'image_key': image.image_key},
