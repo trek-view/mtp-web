@@ -7,7 +7,6 @@ import os
 
 ## Django Packages
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.http import (
@@ -34,6 +33,7 @@ from accounts.models import CustomUser
 
 # That includes from .models import *
 from .forms import * 
+from django.urls import reverse
 
 ############################################################################
 
@@ -264,6 +264,7 @@ def guidebook_detail(request, unique_id):
 
 @my_login_required
 def guidebook_create(request, unique_id=None):
+    image_key = ''
     if request.method == "POST":
         form = GuidebookForm(request.POST, request.FILES)
 
@@ -293,8 +294,12 @@ def guidebook_create(request, unique_id=None):
                             guidebook.tag.remove(tag)
                 guidebook.save()
 
+            image_key = request.POST.get('image_key', '')
             messages.success(request, 'A guidebook was created successfully.')
-            return redirect('guidebook.add_scene', unique_id=guidebook.unique_id)
+            if image_key == '':
+                return redirect('guidebook.add_scene', unique_id=guidebook.unique_id)
+            else:
+                return redirect(reverse('guidebook.add_scene', kwargs={'unique_id': guidebook.unique_id}) + '?image_key=' + image_key)
         else:
             errors = []
             for field in form:
@@ -311,8 +316,10 @@ def guidebook_create(request, unique_id=None):
             form = GuidebookForm(instance=guidebook)
         else:
             form = GuidebookForm()
+        image_key = request.GET.get('image_key', '')
     content = {
         'form': form,
+        'image_key': image_key,
         'pageName': 'Create Guidebook',
         'pageTitle': 'Create Guidebook',
         'pageDescription': MAIN_PAGE_DESCRIPTION

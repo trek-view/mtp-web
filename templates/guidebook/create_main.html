@@ -21,6 +21,7 @@
                 {% csrf_token %}
                 {{ form.media }}
                 {{ form.as_p }}
+                 <input name="image_key" type="text" class="d-none" value="{{ image_key }}">
                 <div class="form-group d-flex justify-content-between">
                     <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
                     <button type="submit" class="save btn btn-primary save-btn">Continue</button>

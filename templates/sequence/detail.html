@@ -430,18 +430,21 @@
                     </div>
                 </div>
 
-                {% if not guidebooks is None %}
+
                     <div class=" btn-add-to-guidebook">
                         <button type="button" class="btn btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Add to Guidebook
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
-                            {% for guidebook in guidebooks %}
-                                <a class="dropdown-item" href="javascript:addToGuidebook('{{ guidebook.unique_id }}');">{{ guidebook.name }}</a>
-                            {% endfor %}
+                            <a class="dropdown-item" href="javascript:addToGuidebook('new_guidebook');">New Guidebook</a>
+                            {% if not guidebooks is None %}
+                                {% for guidebook in guidebooks %}
+                                    <a class="dropdown-item" href="javascript:addToGuidebook('{{ guidebook.unique_id }}');">{{ guidebook.name }}</a>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
-                {% endif %}
+
 
                 <div id='sequence_viewer' class="image-box display"></div>
             </div>
@@ -1544,7 +1547,11 @@
         function addToGuidebook(guidebook_unique_id) {
             var url = "{% url 'guidebook.add_scene' unique_id='guidebook_unique_id' %}?image_key=" + current_node_key;
             url = url.replace('guidebook_unique_id', guidebook_unique_id);
-            window.open(url, '_blank');;
+            if (guidebook_unique_id == 'new_guidebook') {
+                url = "{% url 'guidebook.create' %}?image_key=" + current_node_key;
+            }
+
+            window.open(url, '_blank');
         }
 
         $('#add_label').change(function () {
