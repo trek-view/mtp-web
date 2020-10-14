@@ -33,13 +33,13 @@
     <script src="{% static 'js/jquery.js' %}"></script>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
-{#    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-136706582-7"></script>#}
-{#    <script>#}
-{#        window.dataLayer = window.dataLayer || [];#}
-{#        function gtag(){dataLayer.push(arguments);}#}
-{#        gtag('js', new Date());#}
-{#        gtag('config', '{{ GOOGLE_ANALYTICS }}');#}
-{#    </script>#}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-136706582-7"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ GOOGLE_ANALYTICS }}');
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-success justify-content-between">

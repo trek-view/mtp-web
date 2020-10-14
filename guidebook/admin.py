@@ -43,19 +43,6 @@ class GuidebookAdmin(tags_input_admin.TagsInputAdmin):
             guidebook.is_approved = True
             guidebook.is_published = True
             guidebook.save()
-
-            # send email to guidebook owner
-            try:
-                subject = 'Your guidebook "%s" is approved.' % guidebook.name
-                html_message = render_to_string(
-                    'emails/guidebook/guidebook/approved.html', 
-                    {'subject': subject, 'guidebook': guidebook},
-                    request
-                )
-                send_mail_with_html(subject, html_message, guidebook.user.email, settings.SMTP_REPLY_TO)
-            except:
-                print('email sending error!')
-            
             
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 

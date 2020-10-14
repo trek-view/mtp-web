@@ -884,7 +884,7 @@ def check_like(request, unique_id):
                     {'subject': subject, 'like': 'unliked', 'guidebook': guidebook},
                     request
                 )
-                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+                send_mail_with_html(subject, html_message, guidebook.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         for g in guidebook_like:
@@ -910,7 +910,7 @@ def check_like(request, unique_id):
                     {'subject': subject, 'like': 'liked', 'guidebook': guidebook},
                     request
                 )
-                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+                send_mail_with_html(subject, html_message, guidebook.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         guidebook_like = GuidebookLike()

@@ -669,7 +669,7 @@ def ajax_tour_check_like(request, unique_id):
                     {'subject': subject, 'like': 'unliked', 'tour': tour},
                     request
                 )
-                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+                send_mail_with_html(subject, html_message, tour.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         for g in tour_like:
@@ -696,7 +696,7 @@ def ajax_tour_check_like(request, unique_id):
                     {'subject': subject, 'like': 'liked', 'tour': tour},
                     request
                 )
-                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+                send_mail_with_html(subject, html_message, tour.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         tour_like = TourLike()

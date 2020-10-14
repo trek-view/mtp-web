@@ -1322,7 +1322,7 @@ def ajax_sequence_check_like(request, unique_id):
                     {'subject': subject, 'like': 'unliked', 'sequence': sequence},
                     request
                 )
-                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         for g in sequence_like:
@@ -1349,7 +1349,7 @@ def ajax_sequence_check_like(request, unique_id):
                     {'subject': subject, 'like': 'liked', 'sequence': sequence},
                     request
                 )
-                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         sequence_like = SequenceLike()
@@ -1799,7 +1799,7 @@ def ajax_image_mark_view(request, unique_id, image_key):
                     {'subject': subject, 'like': 'unviewed', 'sequence': sequence, 'image_key': image.image_key},
                     request
                 )
-                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         for v in image_view_points:
@@ -1826,7 +1826,7 @@ def ajax_image_mark_view(request, unique_id, image_key):
                     {'subject': subject, 'like': 'viewed', 'sequence': sequence, 'image_key': image.image_key},
                     request
                 )
-                send_mail_with_html(subject, html_message, request.user.email, settings.SMTP_REPLY_TO)
+                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         image_view_point = ImageViewPoint()
