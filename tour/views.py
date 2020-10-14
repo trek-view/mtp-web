@@ -663,7 +663,7 @@ def ajax_tour_check_like(request, unique_id):
             # confirm email
             try:
                 # send email to creator
-                subject = 'Tour Liked'
+                subject = 'Your Map the Paths Tour Was Liked'
                 html_message = render_to_string(
                     'emails/tour/like.html',
                     {'subject': subject, 'like': 'unliked', 'tour': tour},
@@ -690,7 +690,7 @@ def ajax_tour_check_like(request, unique_id):
             # confirm email
             try:
                 # send email to creator
-                subject = 'Tour Liked'
+                subject = 'Your Map the Paths Tour Was Liked'
                 html_message = render_to_string(
                     'emails/tour/like.html',
                     {'subject': subject, 'like': 'liked', 'tour': tour},
