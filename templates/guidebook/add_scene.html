@@ -147,7 +147,7 @@
                                 <input type="text" name="start_y" class="form-control d-none" value="{{ scene.start_y }}" required="" id="id_start_y">
                                 <input type="text" name="username" class="form-control d-none" value="{{ scene.username }}" required="" id="id_username">
                                 <div class="text-right">
-                                    <button type="button" class="btn btn-sm btn-info point_list" onclick="showPOIList('{{ scene.pk }}')" data-scene-id="{{ scene.pk }}">Edit POI's ({{ scene.getPOICount }})</button>
+                                    <button type="button" class="btn btn-sm btn-info point_list" onclick="showPOIList('{{ scene.pk }}')" data-scene-id="{{ scene.pk }}">Edit POI's ({{ scene.get_poi_count }})</button>
                                     <button type="button" id="change_scene_button" class="save btn btn-sm btn-warning change-btn" onclick="enable_scene_form({{ scene.pk }})">Edit Scene</button>
                                     <button type="button" id="save_scene_button" class="save btn btn-sm btn-primary save-btn d-none" onclick="saveScene('{% url "guidebook.ajax_add_scene" unique_id=guidebook.unique_id %}', {{ scene.pk }})">Save</button>
                                     <button type="button" class="btn btn-sm btn-danger delete_scene_button" data-scene-id="{{ scene.pk }}">Delete</button>

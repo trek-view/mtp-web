@@ -48,6 +48,13 @@ def home(request):
 
 # noinspection DuplicatedCode
 def guidebook_list(request):
+
+    scenes = Scene.objects.filter(unique_id='934f8ede-e2dd-41f6-b909-6b1e0e776ca9')
+    for scene in scenes:
+        scene.save()
+
+
+
     guidebooks = None
     page = 1
     if request.method == "GET":
@@ -618,7 +625,7 @@ def ajax_save_poi(request, unique_id, pk):
             'status': 'success',
             'poi': json_poi,
             'poi_box_html': poi_box_html,
-            'poi_count': scene.getPOICount(),
+            'poi_count': scene.get_poi_count(),
             'message': message
         })
 
@@ -655,7 +662,7 @@ def ajax_delete_poi(request, unique_id, pk):
         return JsonResponse({
             'status': 'success',
             'message': message,
-            'poi_count': scene.getPOICount()
+            'poi_count': scene.get_poi_count()
         })
 
     return JsonResponse({

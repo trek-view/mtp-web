@@ -1,22 +1,18 @@
 ## Django Packages
-from django.contrib.gis.db import models
-from django.contrib.auth import (
-    REDIRECT_FIELD_NAME, get_user_model, login as auth_login,
-    logout as auth_logout, update_session_auth_hash,
-)
-from datetime import datetime
-from django.conf import settings
-from django.contrib.postgres.fields import ArrayField
-from django.urls import reverse
-from django.core.validators import RegexValidator
-from storages.backends.s3boto3 import S3Boto3Storage
-from django.conf import settings
-from sys_setting.models import Tag
-from lib.mvtManager import CustomMVTManager
 ## Python Packages
 import uuid
+from datetime import datetime
+
+from django.contrib.auth import (
+    get_user_model, )
+from django.contrib.gis.db import models
+from django.urls import reverse
+
+from lib.mvtManager import CustomMVTManager
+from sys_setting.models import Tag
 
 UserModel = get_user_model()
+
 
 def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
@@ -31,6 +27,7 @@ def image_directory_path(instance, filename):
 #     def __str__(self):
 #         return self.name
 
+
 def getAllTags():
     items = Tag.objects.filter(is_actived=True)
     itemsTuple = ()
@@ -38,6 +35,7 @@ def getAllTags():
         itemsTuple = itemsTuple + ((item.pk, item.name),)
     print(itemsTuple)
     return itemsTuple
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -48,7 +46,6 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = 'Categories'
-
 
 
 class Guidebook(models.Model):
@@ -142,11 +139,13 @@ class Guidebook(models.Model):
         else:
             return ''
 
+
 class GuidebookLike(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     guidebook = models.ForeignKey(Guidebook, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=datetime.now, blank=True)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)
+
 
 class POICategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -158,7 +157,9 @@ class POICategory(models.Model):
     class Meta:
         verbose_name_plural = 'POI Categories'
 
+
 class Scene(models.Model):
+    unique_id = models.UUIDField(default=uuid.uuid4)
     guidebook = models.ForeignKey(Guidebook, on_delete=models.CASCADE)
     image_key = models.CharField(max_length=100)
     title = models.CharField(max_length=255)
@@ -180,21 +181,35 @@ class Scene(models.Model):
         source_layer='mtp-images'
     )
 
-    def getPOICount(self):
-        pois = PointOfInterest.objects.filter(scene=self)
-        return pois.count()
+    def save(self, *args, **kwargs):
 
-    def getPOICategories(self):
-        pois = PointOfInterest.objects.filter(scene=self)
+        if self.unique_id is not None and self.pk is not None:
+            while True:
+                scenes = Scene.objects.filter(unique_id=self.unique_id).exclude(pk=self.pk)
+                if scenes.count() > 0:
+                    self.unique_id = uuid.uuid4()
+                else:
+                    break
+
+        super().save(*args, **kwargs)
+
+
+    def get_poi_count(self):
+        points_of_interest = PointOfInterest.objects.filter(scene=self)
+        return points_of_interest.count()
+
+    def get_poi_categories(self):
+        points_of_interest = PointOfInterest.objects.filter(scene=self)
         categories = []
-        if pois.count() > 0:
-            for poi in pois:
-                if not poi.category.name in categories:
+        if points_of_interest.count() > 0:
+            for poi in points_of_interest:
+                if poi.category.name not in categories:
                     categories.append(poi.category.name)
         if len(categories) > 0:
             return ', '.join(categories)
         else:
             return ''
+
 
 class PointOfInterest(models.Model):
     scene = models.ForeignKey(Scene, on_delete=models.CASCADE)

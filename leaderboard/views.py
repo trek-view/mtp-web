@@ -119,7 +119,7 @@ def index(request):
         user_json = ImageViewPoint.objects.filter(image__sequence__in=sequences).values('owner').annotate(
             image_view_count=Count('image')).order_by('-image_view_count')
         form.set_filter_type(filter_type)
-        top_title = 'View Points Leaderboard'
+        top_title = 'Viewpoints Leaderboard'
 
     else:
         user_json = sequences.values('user').annotate(image_count=Sum('image_count')).order_by('-image_count')

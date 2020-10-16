@@ -34,7 +34,7 @@ class LeaderboardSearchForm(forms.Form):
             required=False
         )
 
-        self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'Distance'), (2, 'View Points')), initial=0)
+        self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'Distance'), (2, 'Viewpoints')), initial=0)
 
         self.fields['camera_make'] = forms.ModelMultipleChoiceField(
             required=False,
@@ -72,7 +72,7 @@ class LeaderboardSearchForm(forms.Form):
         )
 
     def set_filter_type(self, filter_type):
-        self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'Distance'), (2, 'View Points')), initial=filter_type)
+        self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'Distance'), (2, 'Viewpoints')), initial=filter_type)
 
     def set_time_type(self, time_type):
         self.fields['time_type'] = forms.CharField(

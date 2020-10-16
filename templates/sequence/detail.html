@@ -436,7 +436,7 @@
                             Add to Guidebook
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="javascript:addToGuidebook('new_guidebook');">New Guidebook</a>
+                            <a class="dropdown-item" style="background: #d0d0d0" href="javascript:addToGuidebook('new_guidebook');">New Guidebook</a>
                             {% if not guidebooks is None %}
                                 {% for guidebook in guidebooks %}
                                     <a class="dropdown-item" href="javascript:addToGuidebook('{{ guidebook.unique_id }}');">{{ guidebook.name }}</a>
@@ -961,8 +961,8 @@
                         toastr.error(data.message)
                     }
                     else {
-                        $('.image-others .view_point span').text(data.view_points + ' View Points');
-                        $('.right-board .image-view-point span').text(data.view_points + ' View Points');
+                        $('.image-others .view_point span').text(data.view_points + ' Viewpoints');
+                        $('.right-board .image-view-point span').text(data.view_points + ' Viewpoints');
                     }
                 }
             });
