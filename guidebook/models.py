@@ -159,7 +159,7 @@ class POICategory(models.Model):
 
 
 class Scene(models.Model):
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    unique_id = models.UUIDField(default=uuid.uuid4)
     guidebook = models.ForeignKey(Guidebook, on_delete=models.CASCADE)
     image_key = models.CharField(max_length=100)
     title = models.CharField(max_length=255)
@@ -180,6 +180,20 @@ class Scene(models.Model):
         is_show_id=False,
         source_layer='mtp-images'
     )
+
+    def save(self, *args, **kwargs):
+
+        print(self.unique_id)
+        if self.unique_id is not None and self.pk is not None:
+            while True:
+                scenes = Scene.objects.filter(unique_id=self.unique_id).exclude(pk=self.pk)
+                if scenes.count() > 0:
+                    self.unique_id = uuid.uuid4()
+                else:
+                    break
+
+        super().save(*args, **kwargs)
+
 
     def get_poi_count(self):
         points_of_interest = PointOfInterest.objects.filter(scene=self)

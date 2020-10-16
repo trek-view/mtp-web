@@ -49,6 +49,12 @@ def home(request):
 # noinspection DuplicatedCode
 def guidebook_list(request):
 
+    scenes = Scene.objects.filter(unique_id='934f8ede-e2dd-41f6-b909-6b1e0e776ca9')
+    for scene in scenes:
+        scene.save()
+
+
+
     guidebooks = None
     page = 1
     if request.method == "GET":
