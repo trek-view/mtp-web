@@ -159,7 +159,7 @@ class POICategory(models.Model):
 
 
 class Scene(models.Model):
-    unique_id = models.UUIDField(default=uuid.uuid4)
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     guidebook = models.ForeignKey(Guidebook, on_delete=models.CASCADE)
     image_key = models.CharField(max_length=100)
     title = models.CharField(max_length=255)
