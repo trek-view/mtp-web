@@ -53,7 +53,13 @@
             <input class="" type="checkbox" id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
         </div>
         <div id="list-view" class="mt-4 mb-2 ml-auto mr-auto">
-            <div class="paginator">
+            <div class="paginator d-flex flex-column align-items-center">
+                {% if items.count > 0 %}
+                    <select name="filter_type" style="width: 210px" class="form-control mb-2" id="id_filter_type">
+                        <option value="view_point" {% if request.GET.filter_type != 'label_count' %}selected{% endif %}>order by Viewpoint</option>
+                        <option value="label_count" {% if request.GET.filter_type == 'label_count' %}selected{% endif %}>order by Label Count</option>
+                    </select>
+                {% endif %}
                 {% if items.has_other_pages %}
                     <ul class="pagination justify-content-center">
                         {% if items.number != 1 %}
@@ -234,6 +240,16 @@
         var url = a[0] + '?' + c.join('&');
         if (!is_changed)
             url += '&page=' + pageNum;
+        location.assign(url);
+    });
+
+    $('#id_filter_type').change(function () {
+        let value = $(this).val();
+        let url = location.href.split('?')[0]
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        urlParams.set('filter_type', value);
+        url = url + '?' + urlParams.toString();
         location.assign(url);
     });
 

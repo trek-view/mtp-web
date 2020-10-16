@@ -283,9 +283,11 @@ def image_leaderboard(request):
     page = 1
     m_type = None
     image_view_points = ImageViewPoint.objects.filter()
+    label_challenges = LabelChallenge.objects.filter()
     filter_type = None
     if request.method == "GET":
         page = request.GET.get('page')
+        filter_type = request.GET.get('filter_type')
         if page is None:
             page = 1
         form = ImageSearchForm(request.GET)
@@ -322,51 +324,44 @@ def image_leaderboard(request):
                 elif m_type == 'marked':
                     image_view_points = image_view_points.filter(user__in=users)
 
-            filter_type = request.GET.get('filter_type')
-            if filter_type is not None and filter_type != '':
-                if users is not None:
-                    images = images.filter(user__in=users)
-                if filter_type == 'label_count':
-                    challenge_id = request.GET.get('challenge_id')
-                    if challenge_id is not None and challenge_id != '':
-                        label_challenges = LabelChallenge.objects.filter(unique_id=challenge_id)
-                        if label_challenges.count() > 0:
-                            label_challenge = label_challenges[0]
-                            images = images.filter(point__intersects=label_challenge.multipolygon)
+            challenge_id = request.GET.get('challenge_id')
+            if challenge_id is not None and challenge_id != '':
+                label_challenges = label_challenges.filter(unique_id=challenge_id)
+                if label_challenges.count() > 0:
+                    label_challenge = label_challenges[0]
+                    images = images.filter(point__intersects=label_challenge.multipolygon)
 
-                if filter_type == 'view_point':
+            filter_time = request.GET.get('time')
+            time_type = request.GET.get('time_type')
 
-                    filter_time = request.GET.get('time')
-                    time_type = request.GET.get('time_type')
-
-                    if time_type is None or not time_type or time_type == 'all_time':
-                        images = images
+            if time_type is None or not time_type or time_type == 'all_time':
+                images = images
+            else:
+                if time_type == 'monthly':
+                    if filter_time is None or filter_time == '':
+                        now = datetime.now()
+                        y = now.year
+                        m = now.month
                     else:
-                        if time_type == 'monthly':
-                            if filter_time is None or filter_time == '':
-                                now = datetime.now()
-                                y = now.year
-                                m = now.month
-                            else:
-                                y = filter_time.split('-')[0]
-                                m = filter_time.split('-')[1]
-                            print(m)
-                            print(y)
-                            images = images.filter(
-                                captured_at__month=m,
-                                captured_at__year=y
-                            )
+                        y = filter_time.split('-')[0]
+                        m = filter_time.split('-')[1]
+                    print(m)
+                    print(y)
+                    images = images.filter(
+                        captured_at__month=m,
+                        captured_at__year=y
+                    )
 
-                        elif time_type == 'yearly':
-                            print(filter_time)
-                            if filter_time is None or filter_time == '':
-                                now = datetime.now()
-                                y = now.year
-                            else:
-                                y = filter_time
-                            images = images.filter(
-                                captured_at__year=y
-                            )
+                elif time_type == 'yearly':
+                    print(filter_time)
+                    if filter_time is None or filter_time == '':
+                        now = datetime.now()
+                        y = now.year
+                    else:
+                        y = filter_time
+                    images = images.filter(
+                        captured_at__year=y
+                    )
 
     if images is None:
         images = Image.objects.all()
@@ -377,6 +372,7 @@ def image_leaderboard(request):
         image_label_json = ImageLabel.objects.filter(image__in=images).values('image').annotate(
             image_count=Count('image')).order_by('-image_count').annotate(
             rank=Window(expression=RowNumber()))
+        print(image_label_json)
         paginator = Paginator(image_label_json, 10)
     else:
         image_view_points_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
