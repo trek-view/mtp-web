@@ -143,7 +143,7 @@ def sequence_list(request):
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
-    paginator = Paginator(sequences.order_by('-captured_at'), 5)
+    paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
     try:
         pSequences = paginator.page(page)
@@ -236,7 +236,7 @@ def my_sequence_list(request):
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
-    paginator = Paginator(sequences.order_by('-captured_at'), 5)
+    paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
     try:
         pSequences = paginator.page(page)
@@ -1090,7 +1090,7 @@ def import_sequence_list(request):
                 if seq_s.count() == 0:
                     sequences_ary.append(seq)
 
-            paginator = Paginator(sequences_ary, 5)
+            paginator = Paginator(sequences_ary, 10)
             try:
                 sequences = paginator.page(page)
             except PageNotAnInteger:

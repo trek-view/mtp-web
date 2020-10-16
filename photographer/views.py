@@ -261,7 +261,7 @@ def photographer_list(request):
         photographers = Photographer.objects.all().filter(is_published=True)
         form = PhotographerSearchForm()
 
-    paginator = Paginator(photographers.order_by('-created_at'), 5)
+    paginator = Paginator(photographers.order_by('-created_at'), 10)
 
     try:
         pPhotographers = paginator.page(page)
@@ -367,7 +367,7 @@ def my_photographer_list(request):
         photographers = Photographer.objects.all().filter(user=request.user)
         form = PhotographerSearchForm()
 
-    paginator = Paginator(photographers.order_by('-created_at'), 5)
+    paginator = Paginator(photographers.order_by('-created_at'), 10)
 
     try:
         pPhotographers = paginator.page(page)

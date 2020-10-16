@@ -48,13 +48,6 @@ def home(request):
 
 # noinspection DuplicatedCode
 def guidebook_list(request):
-
-    scenes = Scene.objects.all()
-    for scene in scenes:
-        scene.save()
-
-
-
     guidebooks = None
     page = 1
     if request.method == "GET":
@@ -105,7 +98,7 @@ def guidebook_list(request):
         guidebooks = Guidebook.objects.all().filter(is_published=True, is_approved=True)
         form = GuidebookSearchForm()
 
-    paginator = Paginator(guidebooks.order_by('-created_at'), 5)
+    paginator = Paginator(guidebooks.order_by('-created_at'), 10)
 
     try:
         p_guidebooks = paginator.page(page)
@@ -195,7 +188,7 @@ def my_guidebook_list(request):
         )
         form = GuidebookSearchForm()
 
-    paginator = Paginator(guidebooks.order_by('-created_at'), 5)
+    paginator = Paginator(guidebooks.order_by('-created_at'), 10)
 
     try:
         p_guidebooks = paginator.page(page)

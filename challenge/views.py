@@ -220,7 +220,7 @@ def challenge_list(request):
         challenges = Challenge.objects.all().filter(is_published=True)
         form = ChallengeSearchForm()
 
-    paginator = Paginator(challenges.order_by('-created_at'), 5)
+    paginator = Paginator(challenges.order_by('-created_at'), 10)
 
     try:
         pChallenges = paginator.page(page)
@@ -297,7 +297,7 @@ def my_challenge_list(request):
         challenges = Challenge.objects.all().filter(user=request.user)
         form = ChallengeSearchForm()
 
-    paginator = Paginator(challenges.order_by('-created_at'), 5)
+    paginator = Paginator(challenges.order_by('-created_at'), 10)
 
     try:
         pChallenges = paginator.page(page)
@@ -659,7 +659,7 @@ def label_challenge_list(request):
         challenges = LabelChallenge.objects.all().filter(is_published=True)
         form = LabelChallengeSearchForm()
 
-    paginator = Paginator(challenges.order_by('-created_at'), 5)
+    paginator = Paginator(challenges.order_by('-created_at'), 10)
 
     try:
         pChallenges = paginator.page(page)
@@ -733,7 +733,7 @@ def my_label_challenge_list(request):
         challenges = Challenge.objects.all().filter(user=request.user)
         form = ChallengeSearchForm()
 
-    paginator = Paginator(challenges.order_by('-created_at'), 5)
+    paginator = Paginator(challenges.order_by('-created_at'), 10)
 
     try:
         pChallenges = paginator.page(page)

@@ -161,7 +161,7 @@ def tour_add_sequence(request, unique_id):
         #
         # paginator = Paginator(sequence_ary, 5)
 
-        paginator = Paginator(sequence_ary, 5)
+        paginator = Paginator(sequence_ary, 10)
         try:
             pSequences = paginator.page(page)
         except PageNotAnInteger:
@@ -269,7 +269,7 @@ def tour_list(request):
         tours = Tour.objects.all().filter(is_published=True)
         form = TourSearchForm()
 
-    paginator = Paginator(tours.order_by('-created_at'), 5)
+    paginator = Paginator(tours.order_by('-created_at'), 10)
 
     try:
         pTours = paginator.page(page)
@@ -339,7 +339,7 @@ def my_tour_list(request):
         tours = Tour.objects.all().filter(is_published=True)
         form = TourSearchForm()
 
-    paginator = Paginator(tours.order_by('-created_at'), 5)
+    paginator = Paginator(tours.order_by('-created_at'), 10)
 
     try:
         pTours = paginator.page(page)
