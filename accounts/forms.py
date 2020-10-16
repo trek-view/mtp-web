@@ -126,9 +126,10 @@ class UserSignUpForm(UserCreationForm):
         required=False
     )
 
-    is_term = forms.ChoiceField(
+    is_term = forms.BooleanField(
         widget=forms.CheckboxInput(),
-        label=mark_safe('<a href="https://www.trekview.org/terms" target="_blank">I agree to the Trek View terms of service</a>')
+        label=mark_safe('<a href="https://www.trekview.org/terms" target="_blank">I agree to the Trek View terms of service</a>'),
+        required=True
     )
 
     class Meta:
