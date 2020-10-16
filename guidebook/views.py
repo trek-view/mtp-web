@@ -1,39 +1,26 @@
-## Python packages
-from datetime import datetime
+# Python packages
 import json
-import re
-from binascii import a2b_base64
 import os
 
-## Django Packages
-from django.shortcuts import get_object_or_404, render
-from django.shortcuts import redirect
-from django.utils import timezone
-from django.http import (
-    Http404, HttpResponse, JsonResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
-)
-from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.contrib import messages
-from django.template import RequestContext
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.template.loader import render_to_string
 from django.contrib.gis.geos import Point
-from django.db.models import Avg, Count, Min, Sum
-from django.db.models.expressions import F, Window
-from django.db.models.functions.window import RowNumber
-# Custom Libs
-from lib.functions import *
+from django.core import serializers
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import (
+    JsonResponse, )
+# Django Packages
+from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
+from django.urls import reverse
 
 # Project packages
 from accounts.models import CustomUser
+# Custom Libs
+from lib.functions import *
+# That includes from .models import *
+from .forms import *
 
 # App packages
-
-# That includes from .models import *
-from .forms import * 
-from django.urls import reverse
 
 ############################################################################
 
@@ -269,7 +256,7 @@ def guidebook_create(request, unique_id=None):
                     for tag in form.cleaned_data['tag']:
                         guidebook.tag.add(tag)
                     for tag in guidebook.tag.all():
-                        if not tag in form.cleaned_data['tag']:
+                        if tag not in form.cleaned_data['tag']:
                             guidebook.tag.remove(tag)
             else:
                 guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
@@ -282,7 +269,7 @@ def guidebook_create(request, unique_id=None):
                     for tag in form.cleaned_data['tag']:
                         guidebook.tag.add(tag)
                     for tag in guidebook.tag.all():
-                        if not tag in form.cleaned_data['tag']:
+                        if tag not in form.cleaned_data['tag']:
                             guidebook.tag.remove(tag)
                 guidebook.save()
 
@@ -339,7 +326,7 @@ def ajax_guidebook_update(request, unique_id = None):
                 for tag in form.cleaned_data['tag']:
                     guidebook.tag.add(tag)
                 for tag in guidebook.tag.all():
-                    if not tag in form.cleaned_data['tag']:
+                    if tag not in form.cleaned_data['tag']:
                         guidebook.tag.remove(tag)
             guidebook.save()
             return JsonResponse({
@@ -841,9 +828,9 @@ def ajax_delete_scene(request, unique_id, pk):
                 'status': 'failed',
                 'message': 'The Scene does not exist or has no access.'
             })
-        pois = PointOfInterest.objects.filter(scene=scene)
-        if pois and pois.count() > 0:
-            for p in pois:
+        points_of_interest = PointOfInterest.objects.filter(scene=scene)
+        if points_of_interest and points_of_interest.count() > 0:
+            for p in points_of_interest:
                 p.delete()
         if scene.image_url:
             os.remove("media/" + scene.image_url)
@@ -1018,5 +1005,26 @@ def ajax_get_detail(request, unique_id):
         data['message'] = "The guidebook id doesn't exist."
     else:
         data['guidebook_html_detail'] = render_to_string('guidebook/modal_detail.html', {'guidebook': guidebook, 'is_mine': is_mine})
+
+    return JsonResponse(data)
+
+
+def ajax_get_detail_by_image_key(request, image_key):
+    print(image_key)
+    scenes = Scene.objects.filter(image_key=image_key)
+    print(scenes.count())
+    if scenes.count() == 0:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "Image key error."
+        })
+
+    guidebooks = []
+    data = {}
+    for scene in scenes:
+        guidebook = scene.guidebook
+        guidebooks.append(guidebook)
+
+    data['guidebook_html_detail'] = render_to_string('guidebook/modal_detail.html', {'guidebooks': guidebooks})
 
     return JsonResponse(data)

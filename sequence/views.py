@@ -1907,8 +1907,8 @@ def ajax_get_detail(request, unique_id):
     return JsonResponse(data)
 
 
-def ajax_get_detail_by_image_unique_id(request, unique_id):
-    images = Image.objects.filter(unique_id=unique_id)
+def ajax_get_detail_by_image_key(request, image_key):
+    images = Image.objects.filter(image_key=image_key)
     if images.count() == 0:
         return JsonResponse({
             'status': 'failed',

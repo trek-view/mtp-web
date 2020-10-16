@@ -28,7 +28,7 @@ urlpatterns = [
     path('<str:unique_id>/ajax_get_image_label/<str:image_key>/', views.ajax_get_image_label, name='sequence.ajax_get_image_label'),
     path('<str:unique_id>/ajax_delete_image_label/<str:image_key>/', views.ajax_delete_image_label, name='sequence.ajax_delete_image_label'),
 
-    path('image/<str:unique_id>/ajax_get_detail_by_image_unique_id/', views.ajax_get_detail_by_image_unique_id, name='sequence.ajax_get_detail_by_image_unique_id'),
+    path('ajax_get_detail_by_image_key/<str:image_key>', views.ajax_get_detail_by_image_key, name='sequence.ajax_get_detail_by_image_key'),
 
     path('import-sequence-list', views.import_sequence_list, name='sequence.import_sequence_list'),
     path('import-sequence', views.import_sequence, name='sequence.import_sequence'),

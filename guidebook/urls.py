@@ -25,4 +25,8 @@ urlpatterns = [
     path('<str:unique_id>/ajax/edit/set_starting_view/', views.ajax_set_start_view, name='guidebook.ajax_set_start_view'),
     path('<str:unique_id>/ajax/get_scene/', views.ajax_get_scene, name='guidebook.ajax_get_scene'),
     path('<str:unique_id>/ajax/get_scene_list/', views.ajax_get_scene_list, name='guidebook.ajax_get_scene_list'),
+
+    path('ajax_get_detail_by_image_key/<str:image_key>', views.ajax_get_detail_by_image_key,
+         name='guidebook.ajax_get_detail_by_image_key'),
+
 ]

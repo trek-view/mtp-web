@@ -261,8 +261,8 @@ i.open-sidebar {
 
 .switch-list-viewer {
     position: absolute;
-    margin-top: 24px;
-    right: 20px;
+    margin-top: 10px;
+    right: 10px;
     z-index: 100;
 }
 
@@ -296,47 +296,7 @@ i.open-sidebar {
 }
 
 
-@media only screen and (max-width: 600px) {
-    .left-side {
-        width: 100vw;
-    }
-    nav.navbar {
-        min-height: 80px !important;
-    }
-    .left-side {
-        height: calc(100vh - 80px);
-    }
 
-    .close-sidebar, .open-sidebar {
-        top: 90px;
-    }
-
-    .full-screen {
-        top: 80px !important;
-        height: calc(100vh - 80px) !important;
-    }
-
-    .detail-box {
-        flex-direction: column;
-        align-content: start;
-    }
-    .detail-box .guidebook-others {
-        flex-direction: row;
-        width: 100%;
-        height: auto;
-    }
-
-    .right-fixed-board {
-        width: 100vw !important;
-        left: 0px !important;
-        top: 80px;
-    }
-
-    .right-board .paginator:first-child {
-        min-height: 38px;
-        margin-top: 70px;
-    }
-}
 
 .right-board > #map.mapboxgl-map {
     height: calc(100vh - 100px) !important;
@@ -441,4 +401,51 @@ i.fas, i.far {
 
 .cover-image-box img {
     height: 160px !important;
+}
+
+
+@media only screen and (max-width: 600px) {
+    .left-side {
+        width: 100vw;
+    }
+    nav.navbar {
+        min-height: 80px !important;
+    }
+    .left-side {
+        height: calc(100vh - 80px);
+    }
+
+    .close-sidebar, .open-sidebar {
+        top: 90px;
+    }
+
+    .full-screen {
+        top: 80px !important;
+        height: calc(100vh - 80px) !important;
+    }
+
+    .detail-box {
+        flex-direction: column;
+        align-content: start;
+    }
+    .detail-box .guidebook-others {
+        flex-direction: row;
+        width: 100%;
+        height: auto;
+    }
+
+    .right-fixed-board {
+        width: 100vw !important;
+        left: 0px !important;
+        top: 80px;
+    }
+
+    .right-board .paginator:first-child {
+        min-height: 38px;
+        margin-top: 70px;
+    }
+
+    .detail-modal {
+        width: 100%;
+    }
 }

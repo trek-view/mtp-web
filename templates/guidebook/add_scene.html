@@ -548,7 +548,7 @@
     );
 
     map.on("load", function() {
-        drawMapByUserkey('');
+        drawMapByUserKey('');
     });
 
     $('.mapboxgl-ctrl-geocoder--icon.mapboxgl-ctrl-geocoder--icon-search').click(function () {
@@ -564,7 +564,7 @@
     $('.username-search-bar input').change(function () {
         var username = $(this).val();
         if (username == '')
-            drawMapByUserkey('');
+            drawMapByUserKey('');
         else
             filterMapByUsername(username);
     });
@@ -622,7 +622,7 @@
                 if (data.length > 0)
                 {
                     var userkey = data[0]['key'];
-                    drawMapByUserkey(userkey);
+                    drawMapByUserKey(userkey);
                 }
                 else {
                     if (map.getLayer('mapillary')) map.removeLayer('mapillary');
@@ -634,7 +634,7 @@
         });
     }
 
-    function drawMapByUserkey(userkey) {
+    function drawMapByUserKey(userkey) {
         console.log('userkey', userkey);
         var filter = ['all',
             ['==', 'userkey', userkey]

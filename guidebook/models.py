@@ -178,22 +178,8 @@ class Scene(models.Model):
         geo_col='point',
         select_columns=['image_key', 'unique_id'],
         is_show_id=False,
-        source_layer='mtp-images'
+        source_layer='mtp-scenes'
     )
-
-    def save(self, *args, **kwargs):
-
-        print(self.unique_id)
-        if self.unique_id is not None and self.pk is not None:
-            while True:
-                scenes = Scene.objects.filter(unique_id=self.unique_id).exclude(pk=self.pk)
-                if scenes.count() > 0:
-                    self.unique_id = uuid.uuid4()
-                else:
-                    break
-
-        super().save(*args, **kwargs)
-
 
     def get_poi_count(self):
         points_of_interest = PointOfInterest.objects.filter(scene=self)
