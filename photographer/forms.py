@@ -1,6 +1,7 @@
 from django import forms
+
 from .models import *
-from django.conf import settings
+
 
 class PhotographerForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
@@ -27,13 +28,11 @@ class PhotographerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-
         self.fields['capture_type'] = forms.ModelMultipleChoiceField(
             required=False,
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            # choices=getAllCameraMake()
             queryset=CaptureType.objects.all()
         )
 
@@ -42,7 +41,6 @@ class PhotographerForm(forms.ModelForm):
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            # choices=getAllCameraMake()
             queryset=CaptureMethod.objects.all()
         )
 
@@ -51,7 +49,6 @@ class PhotographerForm(forms.ModelForm):
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            # choices=getAllCameraMake()
             queryset=ImageQuality.objects.all()
         )
 
@@ -71,6 +68,7 @@ class PhotographerForm(forms.ModelForm):
             'is_published'
         )
 
+
 class PhotographerSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -80,7 +78,6 @@ class PhotographerSearchForm(forms.Form):
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            # choices=getAllCameraMake()
             queryset=CaptureType.objects.all()
         )
 
@@ -89,7 +86,6 @@ class PhotographerSearchForm(forms.Form):
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            # choices=getAllCameraMake()
             queryset=CaptureMethod.objects.all()
         )
 
@@ -98,7 +94,6 @@ class PhotographerSearchForm(forms.Form):
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            # choices=getAllCameraMake()
             queryset=ImageQuality.objects.all()
         )
 

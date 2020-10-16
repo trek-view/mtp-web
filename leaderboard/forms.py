@@ -1,12 +1,13 @@
-## Django Packages
-from django import forms
-from django_select2 import forms as s2forms
-
-## App packages
-from .models import *
+# Django Packages
+# App packages
 from datetime import datetime
-from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
+
+from bootstrap_datepicker_plus import MonthPickerInput
+from django import forms
+
 from sequence.models import TransType, CameraMake
+
+
 ############################################################################
 ############################################################################
 
@@ -18,8 +19,6 @@ class LeaderboardSearchForm(forms.Form):
         now = datetime.now()
         year = now.year
         month = now.month
-
-
 
         self.fields['transport_type'] = forms.ModelChoiceField(
             required=False,

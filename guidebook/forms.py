@@ -1,11 +1,11 @@
-## Django Packages
+# Django Packages
 from django import forms
-from django_select2 import forms as s2forms
 
-## App packages
-from .models import *
-from tags_input import fields
 from lib.classes import CustomTagsInputField
+# App packages
+from .models import *
+
+
 ############################################################################
 ############################################################################
 
@@ -34,18 +34,6 @@ class GuidebookForm(forms.ModelForm):
         help_text='Add for a tag'
     )
 
-
-    # cover_image = forms.FileField(
-    #     widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
-    #     required=False
-    # )
-    # is_published = forms.ChoiceField(
-    #     widget=forms.RadioSelect(attrs={'class': 'd-none', 'disabled': 'disabled'}),
-    #     choices=(('True', 'Published'), ('False', 'Unpublished')),
-    #     required=False,
-    #     label=''
-    # )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -67,6 +55,7 @@ class GuidebookForm(forms.ModelForm):
             # 'is_published',
         )
 
+
 class GuidebookImageForm(forms.ModelForm):
     cover_image = forms.FileField(
         widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
@@ -78,6 +67,7 @@ class GuidebookImageForm(forms.ModelForm):
         fields = (
             'cover_image',
         )
+
 
 class SceneForm(forms.Form):
     image_key = forms.CharField(
@@ -132,6 +122,7 @@ class SceneForm(forms.Form):
             'username'
         )
 
+
 class PointOfInterestForm(forms.ModelForm):
     title = forms.CharField(
         label='',
@@ -158,6 +149,7 @@ class PointOfInterestForm(forms.ModelForm):
             'title',
             'description'
         )
+
 
 class GuidebookSearchForm(forms.Form):
 

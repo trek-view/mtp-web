@@ -48,15 +48,6 @@ def home(request):
 
 # noinspection DuplicatedCode
 def guidebook_list(request):
-
-    scenes = Scene.objects.filter(point__isnull=True)
-    print('scenes count: ', scenes.count())
-    if scenes.count() > 0:
-        for scene in scenes:
-            scene.point = Point(scene.lat, scene.lng)
-            scene.save()
-
-
     guidebooks = None
     page = 1
     if request.method == "GET":
@@ -358,7 +349,7 @@ def ajax_guidebook_update(request, unique_id = None):
                     'title': guidebook.name,
                     'description': guidebook.description,
                     'category': guidebook.category.name,
-                    'tag': guidebook.getTags()
+                    'tag': guidebook.get_tags()
                 }
             })
         else:

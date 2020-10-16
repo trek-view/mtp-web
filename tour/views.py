@@ -1,45 +1,32 @@
-## Python packages
-from datetime import datetime
+# Python packages
 import json
-import re
-from binascii import a2b_base64
-import os
 
+from django.contrib import messages
+from django.core import serializers
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import (
+    JsonResponse, )
 ## Django Packages
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.shortcuts import redirect
-from django.utils import timezone
-from django.http import (
-    Http404, HttpResponse, JsonResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
-)
-from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.contrib import messages
-from django.template import RequestContext
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
-from django.contrib.gis.geos import Point, LineString
-
-## Custom Libs ##
-from lib.functions import *
 
 ## Project packages
 from accounts.models import CustomUser, MapillaryUser
-from tour.models import Tour, TourSequence
+## Custom Libs ##
+from lib.functions import *
+from sequence.forms import SequenceSearchForTourForm
 from sequence.models import TransType, SequenceLike
-## App packages
-
 # That includes from .models import *
 from .forms import *
-from sequence.forms import SequenceSearchForTourForm
+
+# App packages
 
 MAIN_PAGE_DESCRIPTION = "Tours are collections of sequences that have been curated by their owner. Browse others' tours or create one using your own sequences."
 
-# Tour
+
 def index(request):
     return redirect('tour.tour_list')
+
 
 @my_login_required
 def tour_create(request, unique_id=None):
@@ -72,7 +59,7 @@ def tour_create(request, unique_id=None):
                     for tour_tag in form.cleaned_data['tour_tag']:
                         tour.tour_tag.add(tour_tag)
                     for tour_tag in tour.tour_tag.all():
-                        if not tour_tag in form.cleaned_data['tour_tag']:
+                        if tour_tag not in form.cleaned_data['tour_tag']:
                             tour.tour_tag.remove(tour_tag)
                 tour.save()
                 messages.success(request, 'A tour was updated successfully.')
@@ -91,6 +78,7 @@ def tour_create(request, unique_id=None):
         'pageDescription': MAIN_PAGE_DESCRIPTION,
     }
     return render(request, 'tour/create.html', content)
+
 
 @my_login_required
 def tour_add_sequence(request, unique_id):
@@ -126,8 +114,7 @@ def tour_add_sequence(request, unique_id):
             if transport_type and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
-                    types = []
-                    types.append(transport_type)
+                    types = [transport_type]
                     for t in children_trans_type:
                         types.append(t.pk)
                     sequences = sequences.filter(transport_type_id__in=types)
@@ -148,7 +135,7 @@ def tour_add_sequence(request, unique_id):
                 elif like == 'false':
                     sequences = sequences.exclude(pk__in=sequence_ary)
 
-    if sequences == None:
+    if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForTourForm()
 
@@ -214,7 +201,7 @@ def tour_add_sequence(request, unique_id):
         sequences = []
         for t_s in t_sequence_ary:
             seq = Sequence.objects.filter(unique_id=t_s).first()
-            if not seq is None and seq:
+            if seq is not None and seq:
                 sequences.append(seq)
         content = {
             'sequences': sequences,
@@ -230,6 +217,7 @@ def tour_add_sequence(request, unique_id):
             't_sequence_ary': t_sequence_ary
         }
         return render(request, 'tour/add_seq.html', content)
+
 
 def tour_list(request):
     tours = None
@@ -277,7 +265,7 @@ def tour_list(request):
                 elif like == 'false':
                     tours = tours.exclude(pk__in=tour_ary)
 
-    if tours == None:
+    if tours is None:
         tours = Tour.objects.all().filter(is_published=True)
         form = TourSearchForm()
 
@@ -314,6 +302,7 @@ def tour_list(request):
     }
     return render(request, 'tour/list.html', content)
 
+
 @my_login_required
 def my_tour_list(request):
     tours = None
@@ -346,7 +335,7 @@ def my_tour_list(request):
                 elif like == 'false':
                     tours = tours.exclude(pk__in=tour_ary)
 
-    if tours == None:
+    if tours is None:
         tours = Tour.objects.all().filter(is_published=True)
         form = TourSearchForm()
 
@@ -384,6 +373,7 @@ def my_tour_list(request):
     }
     return render(request, 'tour/list.html', content)
 
+
 def tour_detail(request, unique_id):
     tour = get_object_or_404(Tour, unique_id=unique_id)
     if not tour.is_published and request.user != tour.user:
@@ -406,7 +396,7 @@ def tour_detail(request, unique_id):
     firstImageKey = ''
     if len(sequence_ary) > 0:
         first_image_key = sequence_ary[0].coordinates_image[0]
-        firstImageKey = sequence_ary[0].getFirstImageKey()
+        firstImageKey = sequence_ary[0].get_first_image_key()
 
     content = {
         'sequences': sequence_ary,
@@ -420,6 +410,7 @@ def tour_detail(request, unique_id):
         'firstImageKey': firstImageKey
     }
     return render(request, 'tour/detail.html', content)
+
 
 @my_login_required
 def ajax_tour_update(request, unique_id=None):
@@ -449,7 +440,7 @@ def ajax_tour_update(request, unique_id=None):
                 'tour': {
                     'name': tour.name,
                     'description': tour.description,
-                    'tag': tour.getTags()
+                    'tag': tour.get_tags()
                 }
             })
         else:
@@ -497,6 +488,7 @@ def tour_delete(request, unique_id):
 
     messages.error(request, 'The tour does not exist or has no access.')
     return redirect('tour.tour_list')
+
 
 def ajax_change_tour_seq(request, unique_id):
     if not request.user.is_authenticated:
@@ -558,6 +550,7 @@ def ajax_change_tour_seq(request, unique_id):
         'message': 'The Sequence does not exist or has no access.'
     })
 
+
 def ajax_order_sequence(request, unique_id):
     if not request.user.is_authenticated:
         return JsonResponse({
@@ -604,6 +597,7 @@ def ajax_order_sequence(request, unique_id):
         'message': 'It failed to order sequence!'
     })
 
+
 def ajax_tour_check_publish(request, unique_id):
     if not request.user.is_authenticated:
         return JsonResponse({
@@ -636,6 +630,7 @@ def ajax_tour_check_publish(request, unique_id):
         'message': message,
         'is_published': tour.is_published
     })
+
 
 def ajax_tour_check_like(request, unique_id):
     if not request.user.is_authenticated:
@@ -714,6 +709,7 @@ def ajax_tour_check_like(request, unique_id):
             'is_checked': True,
             'liked_count': liked_count
         })
+
 
 def ajax_get_detail(request, unique_id):
     tour = Tour.objects.get(unique_id=unique_id)

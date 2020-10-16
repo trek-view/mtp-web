@@ -111,14 +111,14 @@
                                         <div class=" col-md-6">
                                             <div class="cover-image-box">
                                                 <div class="row">
-                                                    {% if guidebook.getCoverImage is None %}
+                                                    {% if guidebook.get_cover_image is None %}
                                                         <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
                                                     {% else %}
-                                                        <img class="w-100" src="https://images.mapillary.com/{{ guidebook.getCoverImage }}/thumb-320.jpg">
+                                                        <img class="w-100" src="https://images.mapillary.com/{{ guidebook.get_cover_image }}/thumb-320.jpg">
                                                     {% endif %}
                                                 </div>
                                                 <div class="user-on-mapillary" >
-                                                    image by {{ guidebook.getCoverImageUserOnMapillary }} on mapillary
+                                                    image by {{ guidebook.get_cover_imageUserOnMapillary }} on mapillary
                                                 </div>
                                             </div>
                                         </div>
@@ -138,7 +138,7 @@
 
                                                 <div class="item-description">
                                                     <p class="mb-1">
-                                                        {{ guidebook.getShortDescription }}
+                                                        {{ guidebook.get_short_description }}
                                                     </p>
                                                 </div>
 
@@ -157,12 +157,12 @@
                                                      <p class="mb-1 mr-3 text-center">
                                                          <i class="far fa-thumbs-up"></i>
                                                          <br>
-                                                         {{ guidebook.getLikeCount }} Likes
+                                                         {{ guidebook.get_like_count }} Likes
                                                      </p>
                                                  </div>
 
                                                 <div class="guidebook-tag" style="min-height: 24px;">
-                                                    {% for tag_name in guidebook.getTags %}
+                                                    {% for tag_name in guidebook.get_tags %}
                                                         <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                                                             {{ tag_name }}
                                                         </span>

@@ -78,7 +78,7 @@
                     </div>
 
                     <div class="sequence-tag mt-2" id="sequence_tags">
-                        {% for tag in sequence.getTags %}
+                        {% for tag in sequence.get_tags %}
                             <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                                 {{ tag }}
                             </span>
@@ -113,11 +113,11 @@
                     <canvas id="myChart" width="350" height="150"></canvas>
 
                     <div class="mt-2 d-flex flex-row justify-content-center" id="mapillary-view">
-                        <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
+                        <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.get_first_point_lat }}/{{ sequence.get_first_point_lng }}&photo_overlay=mapillary">
                             <img style="width: 32px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}" />
                         </a>
                         {% if sequence.google_street_view %}
-                            <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.getFirstPointLat }},{{ sequence.getFirstPointLng }},14z">
+                            <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.get_first_point_lat }},{{ sequence.get_first_point_lng }},14z">
                                 <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico" />
                             </a>
                         {% endif %}
@@ -126,7 +126,7 @@
                                 <img style="width: 35px" src="https://a4k2d2q5.rocketcdn.me/wp-content/uploads/2018/02/Strava-Running-and-Cycling-GPS.png">
                             </a>
                         {% endif %}
-                        <a target="_blank" class="" href="https://www.mapillary.com/app/?pKey={{ sequence.getFirstImageKey }}&focus=photo">
+                        <a target="_blank" class="" href="https://www.mapillary.com/app/?pKey={{ sequence.get_first_image_key }}&focus=photo">
                             <img style="width: 32px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQiTHrSFBxGdPFbRSCEXLo3IB1IzMS50F_V0Q&usqp=CAU">
                         </a>
                     </div>
@@ -223,23 +223,23 @@
 
                 <div class="sequence-others float-right d-flex flex-row justify-content-between mt-2 align-items-center">
                     <div class="scenes text-center align-items-center d-flex">
-                        {% if sequence.getImageCount == 0 %}
+                        {% if sequence.get_image_count == 0 %}
                             <i class="fas fa-image"></i>
                         {% else %}
                             <i class="fas fa-image"></i>
                         {% endif %}
                         <span class="text-center ml-2 m-0">
-                            {{ sequence.getImageCount }} Photos
+                            {{ sequence.get_image_count }} Photos
                         </span>
                     </div>
                     <div class="like text-center">
-                        {% if sequence.getLikeCount == 0 %}
+                        {% if sequence.get_like_count == 0 %}
                             <i class="far fa-thumbs-up"></i>
                         {% else %}
                             <i class="fas fa-thumbs-up"></i>
                         {% endif %}
                         <span class="text-center m-0">
-                            {{ sequence.getLikeCount }} Likes
+                            {{ sequence.get_like_count }} Likes
                         </span>
                     </div>
                 </div>

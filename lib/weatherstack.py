@@ -1,15 +1,8 @@
-from django.core.mail.message import EmailMultiAlternatives
-from django.conf import settings
-from django.http import (
-    Http404, HttpResponse, JsonResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
-)
-import time
 import requests
-import math
-import tempfile
+from django.conf import settings
 
 
-class Weatherstack():
+class WeatherStack:
     access_key = settings.WEATHERSTACK_API_KEY
     root_url = 'http://api.weatherstack.com/'
 
@@ -29,7 +22,6 @@ class Weatherstack():
             print('Response error')
             return False
         if data is None or ('success' in data.keys() and not data['success']):
-            print(data['error'])
             return False
         else:
             return data

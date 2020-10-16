@@ -1,38 +1,24 @@
-## Python packages
-from datetime import datetime
+# Python packages
 import json
 
-## Django Packages
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.shortcuts import redirect
-from django.utils import timezone
-from django.http import (
-    Http404, HttpResponse, JsonResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
-)
-from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.contrib import messages
-from django.template import RequestContext
+from django.contrib.gis.geos import Point, Polygon, MultiPolygon, LineString
+from django.core import serializers
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Count, Sum
+# Django Packages
+from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
-from django.contrib.gis.geos import Point, Polygon, MultiPolygon, LinearRing, LineString
-from sequence.models import Sequence, Image, ImageLabel
-from django.db.models.expressions import F, Window
-from django.db.models.functions.window import RowNumber
-from django.db.models import Avg, Count, Min, Sum
-from datetime import datetime
-## Custom Libs ##
-from lib.functions import *
 
-## Project packages
+# Project packages
 from accounts.models import CustomUser
-
-## App packages
-
+# Custom Libs ##
+from lib.functions import *
+from sequence.models import Sequence, Image, ImageLabel
 # That includes from .models import *
 from .forms import *
+
+# App packages
 
 ############################################################################
 
@@ -54,8 +40,10 @@ LABEL_CHALLENGE_DESCRIPTION = "Help label images to help researchers identify wh
 
 ############################################################################
 
+
 def index(request):
     return redirect('challenge.challenge_list')
+
 
 @my_login_required
 def challenge_create(request):
@@ -67,24 +55,24 @@ def challenge_create(request):
             challenge.user = request.user
             geometry = json.loads(challenge.geometry)
 
-            multipoly = MultiPolygon()
+            multipolygon = MultiPolygon()
             for geo in geometry:
                 coordinates = geo['geometry']['coordinates'][0]
-                lineString = LineString()
-                firstPoint = None
+                line_string = LineString()
+                first_point = None
                 for i in range(len(coordinates)):
-                    coor = coordinates[i]
+                    coord = coordinates[i]
                     if i == 0:
-                        firstPoint = Point(coor[0], coor[1])
+                        first_point = Point(coord[0], coord[1])
                         continue
-                    point = Point(coor[0], coor[1])
+                    point = Point(coord[0], coord[1])
                     if i == 1:
-                        lineString = LineString(firstPoint.coords, point.coords)
+                        line_string = LineString(first_point.coords, point.coords)
                     else:
-                        lineString.append(point.coords)
-                polygon = Polygon(lineString.coords)
-                multipoly.append(polygon)
-            challenge.multipolygon = multipoly
+                        line_string.append(point.coords)
+                polygon = Polygon(line_string.coords)
+                multipolygon.append(polygon)
+            challenge.multipolygon = multipolygon
 
             for geo in geometry:
                 geo['properties']['challenge_id'] = str(challenge.unique_id)
@@ -115,6 +103,7 @@ def challenge_create(request):
     }
     return render(request, 'challenge/capture/create.html', content)
 
+
 @my_login_required
 def challenge_edit(request, unique_id):
     challenge = get_object_or_404(Challenge, unique_id=unique_id)
@@ -135,24 +124,24 @@ def challenge_edit(request, unique_id):
 
             geometry = json.loads(challenge.geometry)
 
-            multipoly = MultiPolygon()
+            multipolygon = MultiPolygon()
             for geo in geometry:
                 coordinates = geo['geometry']['coordinates'][0]
-                lineString = LineString()
-                firstPoint = None
+                line_string = LineString()
+                first_point = None
                 for i in range(len(coordinates)):
-                    coor = coordinates[i]
+                    coord = coordinates[i]
                     if i == 0:
-                        firstPoint = Point(coor[0], coor[1])
+                        first_point = Point(coord[0], coord[1])
                         continue
-                    point = Point(coor[0], coor[1])
+                    point = Point(coord[0], coord[1])
                     if i == 1:
-                        lineString = LineString(firstPoint.coords, point.coords)
+                        line_string = LineString(first_point.coords, point.coords)
                     else:
-                        lineString.append(point.coords)
-                polygon = Polygon(lineString.coords)
-                multipoly.append(polygon)
-            challenge.multipolygon = multipoly
+                        line_string.append(point.coords)
+                polygon = Polygon(line_string.coords)
+                multipolygon.append(polygon)
+            challenge.multipolygon = multipolygon
 
             for geo in geometry:
                 geo['properties']['challenge_id'] = str(challenge.unique_id)
@@ -160,7 +149,7 @@ def challenge_edit(request, unique_id):
             challenge.save()
             transport_type = form.cleaned_data['transport_type']
             print(transport_type.count())
-            if not transport_type is None:
+            if transport_type is not None:
                 challenge.transport_type.clear()
                 for transport_t in transport_type:
                     challenge.transport_type.add(transport_t)
@@ -176,6 +165,7 @@ def challenge_edit(request, unique_id):
     }
     return render(request, 'challenge/capture/edit.html', content)
 
+
 @my_login_required
 def my_challenge_delete(request, unique_id):
     challenge = get_object_or_404(Challenge, unique_id=unique_id)
@@ -188,6 +178,7 @@ def my_challenge_delete(request, unique_id):
         messages.error(request, "This user hasn't permission")
 
     return redirect('challenge.index')
+
 
 def challenge_list(request):
     challenges = None
@@ -204,16 +195,15 @@ def challenge_list(request):
             camera_makes = form.cleaned_data['camera_make']
             challenge_type = form.cleaned_data['challenge_type']
 
-            if not name is None:
+            if name is not None:
                 challenges = challenges.filter(name__contains=name)
             if not transport_type is None and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
-                    types = []
-                    types.append(transport_type)
+                    transport_types = [transport_type]
                     for t in children_trans_type:
-                        types.append(t.pk)
-                    challenges = challenges.filter(transport_type_id__in=types)
+                        transport_types.append(t.pk)
+                    challenges = challenges.filter(transport_type_id__in=transport_types)
                 else:
                     challenges = challenges.filter(transport_type=transport_type)
 
@@ -226,7 +216,7 @@ def challenge_list(request):
                 cs = Challenge.objects.filter(camera_make__in=camera_makes)
                 challenges = challenges.filter(pk__in=cs)
 
-    if challenges == None:
+    if challenges is None:
         challenges = Challenge.objects.all().filter(is_published=True)
         form = ChallengeSearchForm()
 
@@ -265,6 +255,7 @@ def challenge_list(request):
 
     return render(request, 'challenge/capture/list.html', content)
 
+
 @my_login_required
 def my_challenge_list(request):
     challenges = None
@@ -286,8 +277,7 @@ def my_challenge_list(request):
             if not transport_type is None and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
-                    types = []
-                    types.append(transport_type)
+                    types = [transport_type]
                     for t in children_trans_type:
                         types.append(t)
                     challenges = challenges.filter(transport_type__in=types)
@@ -296,15 +286,14 @@ def my_challenge_list(request):
 
             challenge_type = form.cleaned_data['challenge_type']
             current_time = datetime.now()
-            if not challenge_type is None and challenge_type == 'active':
+            if challenge_type is not None and challenge_type == 'active':
                 challenges = challenges.filter(end_time__gte=current_time)
-            if not challenge_type is None and challenge_type == 'completed':
+            if challenge_type is not None and challenge_type == 'completed':
                 challenges = challenges.filter(end_time__lt=current_time)
-            if not camera_makes is None and len(camera_makes) > 0:
-
+            if camera_makes is not None and len(camera_makes) > 0:
                 challenges = challenges.filter(camera_make__in=camera_makes)
 
-    if challenges == None:
+    if challenges is None:
         challenges = Challenge.objects.all().filter(user=request.user)
         form = ChallengeSearchForm()
 
@@ -341,6 +330,7 @@ def my_challenge_list(request):
     }
     return render(request, 'challenge/capture/list.html', content)
 
+
 def challenge_detail(request, unique_id):
     challenge = get_object_or_404(Challenge, unique_id=unique_id)
 
@@ -359,18 +349,23 @@ def challenge_detail(request, unique_id):
     else:
         is_mine = False
 
-    challenge_html_detail = render_to_string('challenge/capture/modal_detail.html', {'challenge': challenge, 'is_mine': is_mine})
+    challenge_html_detail = render_to_string('challenge/capture/modal_detail.html',
+                                             {'challenge': challenge, 'is_mine': is_mine})
 
-    return render(request, 'challenge/capture/challenge_detail.html',
-          {
-              'challenge': challenge,
-              'challenge_html_detail': challenge_html_detail,
-              'form': form,
-              'geometry': geometry,
-              'pageName': 'Challenge Detail',
-              'pageTitle': challenge.name + ' - Challenge',
-              'page': page
-          })
+    return render(
+        request,
+        'challenge/capture/challenge_detail.html',
+        {
+            'challenge': challenge,
+            'challenge_html_detail': challenge_html_detail,
+            'form': form,
+            'geometry': geometry,
+            'pageName': 'Challenge Detail',
+            'pageTitle': challenge.name + ' - Challenge',
+            'page': page
+        }
+    )
+
 
 def challenge_leaderboard(request, unique_id):
     challenge = get_object_or_404(Challenge, unique_id=unique_id)
@@ -431,11 +426,12 @@ def challenge_leaderboard(request, unique_id):
         u_distance = 0
         if u_sequences.count() > 0:
             for u_s in u_sequences:
-                u_distance += float(u_s.getDistance())
+                u_distance += float(u_s.get_distance())
         pItems[i]['distance'] = "%.3f" % u_distance
 
-
-    return render(request, 'challenge/capture/leaderboard.html',
+    return render(
+        request,
+        'challenge/capture/leaderboard.html',
         {
             'items': pItems,
             'challenge': challenge,
@@ -443,7 +439,9 @@ def challenge_leaderboard(request, unique_id):
             'pageName': 'Challenge Leaderboard',
             'pageTitle': challenge.name + ' - Challenge Leaderboard',
             'page': page
-        })
+        }
+    )
+
 
 def ajax_challenge_detail(request, unique_id):
     challenge = Challenge.objects.get(unique_id=unique_id)
@@ -459,16 +457,10 @@ def ajax_challenge_detail(request, unique_id):
     if not data['challenge']:
         data['error_message'] = "The challenge id doesn't exist."
     else:
-        data['challenge_html_detail'] = render_to_string('challenge/capture/modal_detail.html', {'challenge': challenge, 'is_mine': is_mine})
+        data['challenge_html_detail'] = render_to_string('challenge/capture/modal_detail.html',
+                                                         {'challenge': challenge, 'is_mine': is_mine})
 
     return JsonResponse(data)
-
-
-
-
-
-
-
 
 
 @my_login_required
@@ -482,13 +474,13 @@ def label_challenge_create(request):
             challenge.user = request.user
             geometry = json.loads(challenge.geometry)
 
-            multipoly_ary = []
+            multipolygon_ary = []
             for geo in geometry:
                 coordinates = geo['geometry']['coordinates']
                 print(coordinates)
-                multipoly_ary.append(Polygon(coordinates[0]))
+                multipolygon_ary.append(Polygon(coordinates[0]))
 
-            challenge.multipolygon = MultiPolygon(multipoly_ary)
+            challenge.multipolygon = MultiPolygon(multipolygon_ary)
 
             for geo in geometry:
                 geo['properties']['challenge_id'] = str(challenge.unique_id)
@@ -496,18 +488,18 @@ def label_challenge_create(request):
 
             challenge.save()
             label_type = form.cleaned_data['label_type']
-            if not label_type is None and len(label_type) > 0:
+            if label_type is not None and len(label_type) > 0:
                 challenge.label_type.clear()
                 for lt in label_type:
                     challenge.label_type.add(lt)
 
-            if not new_label_types is None and new_label_types != '':
+            if new_label_types is not None and new_label_types != '':
                 label_types = new_label_types.split(',')
                 if len(label_types) > 0:
                     for label_type in label_types:
                         l_ary = label_type.split('--')
                         index = 0
-                        if (len(l_ary) > 0):
+                        if len(l_ary) > 0:
                             l_type = None
                             for l in l_ary:
                                 if index == 0:
@@ -542,6 +534,7 @@ def label_challenge_create(request):
     }
     return render(request, 'challenge/label/create.html', content)
 
+
 @my_login_required
 def label_challenge_edit(request, unique_id):
     challenge = get_object_or_404(LabelChallenge, unique_id=unique_id)
@@ -557,13 +550,13 @@ def label_challenge_edit(request, unique_id):
 
             geometry = json.loads(challenge.geometry)
 
-            multipoly_ary = []
+            multipolygon_ary = []
             for geo in geometry:
                 coordinates = geo['geometry']['coordinates']
                 print(coordinates)
-                multipoly_ary.append(Polygon(coordinates[0]))
+                multipolygon_ary.append(Polygon(coordinates[0]))
 
-            challenge.multipolygon = MultiPolygon(multipoly_ary)
+            challenge.multipolygon = MultiPolygon(multipolygon_ary)
 
             for geo in geometry:
                 geo['properties']['challenge_id'] = str(challenge.unique_id)
@@ -582,7 +575,7 @@ def label_challenge_edit(request, unique_id):
                     for label_type in label_types:
                         l_ary = label_type.split('--')
                         index = 0
-                        if (len(l_ary) > 0):
+                        if len(l_ary) > 0:
                             l_type = None
                             for l in l_ary:
                                 if index == 0:
@@ -615,6 +608,7 @@ def label_challenge_edit(request, unique_id):
     }
     return render(request, 'challenge/label/edit.html', content)
 
+
 @my_login_required
 def my_label_challenge_delete(request, unique_id):
     challenge = get_object_or_404(LabelChallenge, unique_id=unique_id)
@@ -626,6 +620,7 @@ def my_label_challenge_delete(request, unique_id):
         messages.error(request, "This user hasn't permission")
 
     return redirect('challenge.label_challenge_list')
+
 
 def label_challenge_list(request):
     challenges = None
@@ -641,14 +636,13 @@ def label_challenge_list(request):
             labe_type = form.cleaned_data['label_type']
             challenge_type = form.cleaned_data['challenge_type']
 
-            if not name is None:
+            if name is not None:
                 challenges = challenges.filter(name__contains=name)
             print(labe_type)
-            if not labe_type is None and labe_type != 0 and labe_type != '':
+            if labe_type is not None and labe_type != 0 and labe_type != '':
                 children_label_type = LabelType.objects.filter(parent_id=labe_type)
                 if children_label_type.count() > 0:
-                    types = []
-                    types.append(labe_type)
+                    types = [labe_type]
                     for t in children_label_type:
                         types.append(t.pk)
                     challenges = challenges.filter(label_type_id__in=types)
@@ -656,13 +650,12 @@ def label_challenge_list(request):
                     challenges = challenges.filter(label_type=labe_type)
 
             current_time = datetime.now()
-            if not challenge_type is None and challenge_type == 'active':
+            if challenge_type is not None and challenge_type == 'active':
                 challenges = challenges.filter(end_time__gte=current_time)
-            if not challenge_type is None and challenge_type == 'completed':
+            if challenge_type is not None and challenge_type == 'completed':
                 challenges = challenges.filter(end_time__lt=current_time)
 
-
-    if challenges == None:
+    if challenges is None:
         challenges = LabelChallenge.objects.all().filter(is_published=True)
         form = LabelChallengeSearchForm()
 
@@ -701,6 +694,7 @@ def label_challenge_list(request):
 
     return render(request, 'challenge/label/list.html', content)
 
+
 @my_login_required
 def my_label_challenge_list(request):
     challenges = None
@@ -716,13 +710,12 @@ def my_label_challenge_list(request):
             name = form.cleaned_data['name']
             label_type = form.cleaned_data['label_type']
 
-            if not name is None:
+            if name is not None:
                 challenges = challenges.filter(name__contains=name)
-            if not label_type is None and label_type != 0 and label_type != '':
+            if label_type is not None and label_type != 0 and label_type != '':
                 children_label_type = LabelType.objects.filter(parent_id=label_type)
                 if children_label_type.count() > 0:
-                    types = []
-                    types.append(label_type)
+                    types = [label_type]
                     for t in children_label_type:
                         types.append(t)
                     challenges = challenges.filter(label_type__in=types)
@@ -736,7 +729,7 @@ def my_label_challenge_list(request):
             if not challenge_type is None and challenge_type == 'completed':
                 challenges = challenges.filter(end_time__lt=current_time)
 
-    if challenges == None:
+    if challenges is None:
         challenges = Challenge.objects.all().filter(user=request.user)
         form = ChallengeSearchForm()
 
@@ -773,6 +766,7 @@ def my_label_challenge_list(request):
     }
     return render(request, 'challenge/label/list.html', content)
 
+
 def label_challenge_detail(request, unique_id):
     challenge = get_object_or_404(LabelChallenge, unique_id=unique_id)
 
@@ -791,18 +785,23 @@ def label_challenge_detail(request, unique_id):
     else:
         is_mine = False
 
-    challenge_html_detail = render_to_string('challenge/label/modal_detail.html', {'challenge': challenge, 'is_mine': is_mine})
+    challenge_html_detail = render_to_string('challenge/label/modal_detail.html',
+                                             {'challenge': challenge, 'is_mine': is_mine})
 
-    return render(request, 'challenge/label/challenge_detail.html',
-          {
-              'challenge': challenge,
-              'challenge_html_detail': challenge_html_detail,
-              'form': form,
-              'geometry': geometry,
-              'pageName': 'Label Challenge Detail',
-              'pageTitle': challenge.name + ' - Label Challenge',
-              'page': page
-          })
+    return render(
+        request,
+        'challenge/label/challenge_detail.html',
+        {
+            'challenge': challenge,
+            'challenge_html_detail': challenge_html_detail,
+            'form': form,
+            'geometry': geometry,
+            'pageName': 'Label Challenge Detail',
+            'pageTitle': challenge.name + ' - Label Challenge',
+            'page': page
+        }
+    )
+
 
 def label_challenge_leaderboard(request, unique_id):
     challenge = get_object_or_404(LabelChallenge, unique_id=unique_id)
@@ -851,14 +850,18 @@ def label_challenge_leaderboard(request, unique_id):
         print(u_image_labels)
         pItems[i]['label_type_count'] = u_image_labels.count()
 
-    return render(request, 'challenge/label/leaderboard.html',
+    return render(
+        request,
+        'challenge/label/leaderboard.html',
         {
             'items': pItems,
             'challenge': challenge,
             'pageName': 'Challenge Leaderboard',
             'pageTitle': challenge.name + ' - Challenge Leaderboard',
             'page': page
-        })
+        }
+    )
+
 
 def ajax_label_challenge_detail(request, unique_id):
     challenge = LabelChallenge.objects.get(unique_id=unique_id)
@@ -874,6 +877,7 @@ def ajax_label_challenge_detail(request, unique_id):
     if not data['challenge']:
         data['error_message'] = "The challenge id doesn't exist."
     else:
-        data['challenge_html_detail'] = render_to_string('challenge/label/modal_detail.html', {'challenge': challenge, 'is_mine': is_mine})
+        data['challenge_html_detail'] = render_to_string('challenge/label/modal_detail.html',
+                                                         {'challenge': challenge, 'is_mine': is_mine})
 
     return JsonResponse(data)

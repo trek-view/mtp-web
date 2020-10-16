@@ -1,46 +1,24 @@
-## Python packages
-from datetime import datetime
-import json
-import re
-from binascii import a2b_base64
-import os
+# Python packages
 
-## Django Packages
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.shortcuts import redirect
-from django.utils import timezone
-from django.http import (
-    Http404, HttpResponse, JsonResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
-)
-from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.contrib import messages
-from django.template import RequestContext
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.template.loader import render_to_string
-from django.contrib.gis.geos import Point, LineString
-from django.db.models import Avg, Count, Min, Sum
-from django.db.models.expressions import F, Window
-from django.db.models.functions.window import RowNumber
-## Custom Libs ##
-from lib.functions import *
+from django.db.models import Count, Sum
+# Django Packages
+from django.shortcuts import render
 
-## Project packages
-from accounts.models import CustomUser, MapillaryUser
-from tour.models import Tour, TourSequence
-
-## App packages
-
-from .forms import *
+# Project packages
+from accounts.models import CustomUser
 from sequence.models import Sequence, ImageViewPoint, CameraMake
+from .forms import *
+
+# Custom Libs ##
+# App packages
 
 ############################################################################
 
 MAIN_PAGE_DESCRIPTION = "Leaderboard shows the ranking of users by Monthly and Transport type. One image is counted as 1 point."
 
 ############################################################################
+
 
 def index(request):
 
@@ -56,10 +34,9 @@ def index(request):
     ss = Sequence.objects.filter(distance=None)
     if ss.count() > 0:
         for s in ss:
-            s.distance = s.getDistance()
+            s.distance = s.get_distance()
             s.save()
     ############
-
 
     sequences = None
     page = 1
@@ -111,11 +88,10 @@ def index(request):
                     ).exclude(image_count=0)
                     time_type = 'yearly'
 
-            if not transport_type is None and transport_type != 0 and transport_type != '':
+            if transport_type is not None and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
-                    types = []
-                    types.append(transport_type)
+                    types = [transport_type]
                     for t in children_trans_type:
                         types.append(t.pk)
                     sequences = sequences.filter(transport_type_id__in=types)
@@ -123,23 +99,23 @@ def index(request):
                     sequences = sequences.filter(transport_type_id=transport_type)
 
                 form.set_transport_type(transport_type)
-            if not camera_makes is None and len(camera_makes) > 0:
+            if camera_makes is not None and len(camera_makes) > 0:
                 sequences = sequences.filter(camera_make__in=camera_makes)
                 form.set_camera_makes(camera_makes)
 
-    if sequences == None:
+    if sequences is None:
         form = LeaderboardSearchForm()
         sequences = Sequence.objects.all().exclude(image_count=0)
 
     filter_type = request.GET.get('filter_type')
 
     top_title = 'Uploads Leaderboard'
-    if not filter_type is None and filter_type == '1':
+    if filter_type is not None and filter_type == '1':
         user_json = sequences.values('user').annotate(all_distance=Sum('distance')).order_by('-all_distance')
         form.set_filter_type(filter_type)
         top_title = 'Distance Leaderboard'
 
-    elif not filter_type is None and filter_type == '2':
+    elif filter_type is not None and filter_type == '2':
         user_json = ImageViewPoint.objects.filter(image__sequence__in=sequences).values('owner').annotate(
             image_view_count=Count('image')).order_by('-image_view_count')
         form.set_filter_type(filter_type)
@@ -212,15 +188,14 @@ def index(request):
         u_photo_count = 0
         if u_sequences.count() > 0:
             for u_s in u_sequences:
-                u_distance += float(u_s.getDistance())
-                u_photo_count += u_s.getImageCount()
+                u_distance += float(u_s.get_distance())
+                u_photo_count += u_s.get_image_count()
         pItems[i]['distance'] = "%.3f" % u_distance
         pItems[i]['photo_count'] = u_photo_count
 
         u_viewpoints = ImageViewPoint.objects.filter(image__sequence__in=sequences, owner=user)
         u_view_point = u_viewpoints.count()
         pItems[i]['view_points'] = u_view_point
-
 
     if time_type is None:
         time_type = 'all_time'

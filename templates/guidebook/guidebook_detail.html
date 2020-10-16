@@ -59,7 +59,7 @@
                 </div>
 
                 <div class="guidebook-tag mt-2">
-                    {% for tag_name in guidebook.getTags %}
+                    {% for tag_name in guidebook.get_tags %}
                         <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                             {{ tag_name }}
                         </span>
@@ -88,13 +88,13 @@
                         </span>
                     </div>
                     <div class="like text-center d-flex align-items-center">
-                        {% if guidebook.getLikeCount == 0 %}
+                        {% if guidebook.get_like_count == 0 %}
                             <i class="far fa-thumbs-up"></i>
                         {% else %}
                             <i class="fas fa-thumbs-up"></i>
                         {% endif %}
                         <span class="text-center ml-2 m-0">
-                            {{ guidebook.getLikeCount }} Likes
+                            {{ guidebook.get_like_count }} Likes
                         </span>
                     </div>
                 </div>

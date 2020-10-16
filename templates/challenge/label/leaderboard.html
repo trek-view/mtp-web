@@ -42,7 +42,7 @@
                 </div>
 
                 <div class="item-tag" style="min-height: 24px;">
-                    {% for label_type in challenge.getLabelTypeObjs %}
+                    {% for label_type in challenge.get_label_type_obj %}
                         <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1" style="white-space: nowrap">
                             {{ label_type.getKey }}
                         </span>

@@ -1,15 +1,13 @@
-from django.core.mail.message import EmailMultiAlternatives
-from django.conf import settings
-from django.http import (
-    Http404, HttpResponse, JsonResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
-)
-import time
-import requests
 import math
-from django.urls import reverse
-from django.shortcuts import redirect
 
-def send_mail_with_html(subject, html_message, to_email, reply_to, from_email = None):
+import requests
+from django.conf import settings
+from django.core.mail.message import EmailMultiAlternatives
+from django.shortcuts import redirect
+from django.urls import reverse
+
+
+def send_mail_with_html(subject, html_message, to_email, reply_to, from_email=None):
     if isinstance(to_email, str):
         to = [to_email]
     else:
@@ -25,6 +23,7 @@ def send_mail_with_html(subject, html_message, to_email, reply_to, from_email = 
     )
     msg.attach_alternative(html_message, 'text/html')
     print(msg.send())
+
 
 def my_login_required(function):
     def wrapper(request, *args, **kw):
@@ -43,6 +42,7 @@ def get_mapillary_user(token):
     data = response.json()
     return data
 
+
 def get_sequence_by_key(token, seq_key):
     if seq_key is None:
         return False
@@ -52,10 +52,12 @@ def get_sequence_by_key(token, seq_key):
     data = response.json()
     return data
 
+
 def distance(origin, destination):
     lon1, lat1 = origin
     lon2, lat2 = destination
-    radius = 6371 # km
+    # km
+    radius = 6371
 
     dlat = math.radians(lat2-lat1)
     dlon = math.radians(lon2-lon1)
@@ -66,6 +68,7 @@ def distance(origin, destination):
 
     return d
 
+
 def check_mapillary_token(user, token=None):
     if token is None:
         if user.mapillary_access_token == '' or user.mapillary_access_token is None:
@@ -75,7 +78,6 @@ def check_mapillary_token(user, token=None):
         map_user_data = get_mapillary_user(token)
 
     if map_user_data is None or 'message' in map_user_data.keys():
-        print(map_user_data['message'])
         return False
     else:
         return map_user_data

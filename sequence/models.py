@@ -1,26 +1,19 @@
 ## Django Packages
-from django.contrib.gis.db import models
-from django.contrib.auth import (
-    REDIRECT_FIELD_NAME, get_user_model, login as auth_login,
-    logout as auth_logout, update_session_auth_hash,
-)
-from datetime import datetime
-from django.conf import settings
-from django.contrib.postgres.fields import ArrayField
-
+import random
 ## Python Packages
 import uuid
+from datetime import datetime
+
+from colorful.fields import RGBColorField
+from django.contrib.auth import (
+    get_user_model, )
+from django.contrib.gis.db import models
+from django.contrib.postgres.fields import ArrayField
+from mptt.models import MPTTModel, TreeForeignKey
+
 from lib.functions import *
 from lib.mvtManager import CustomMVTManager
-from django.urls import reverse
-from mptt.models import MPTTModel, TreeForeignKey
-from django.core.files import File
-from urllib.request import urlretrieve
-from colorful.fields import RGBColorField
 from sys_setting.models import Tag
-import random
-
-r = lambda: random.randint(0,255)
 
 UserModel = get_user_model()
 
@@ -95,12 +88,12 @@ class LabelType(MPTTModel):
             if self.parent is None or self.source == 'mapillary':
                 while True:
                     while color is None or color == '#000000':
-                        color = '#%02X%02X%02X' % (r(), r(), r())
+                        color = '#%02X%02X%02X' % (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
                     labelType = LabelType.objects.filter(color=color).exclude(pk=self.pk)
                     if labelType.count() == 0:
                         self.color = color
                         break
-                    color = '#%02X%02X%02X' % (r(), r(), r())
+                    color = '#%02X%02X%02X' % (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
             else:
                 if color is None or color == '#000000':
                     self.color = self.parent.color
@@ -127,12 +120,6 @@ class LabelType(MPTTModel):
     class Meta:
         verbose_name_plural = 'Image Label Type'
 
-def getAllCaptureType():
-    items = TransType.objects.all()
-    itemsTuple = ()
-    for item in items:
-        itemsTuple = itemsTuple + ((item.pk, item.name),)
-    return itemsTuple
 
 class CameraMake(models.Model):
     name = models.CharField(max_length=50, default='')
@@ -140,11 +127,13 @@ class CameraMake(models.Model):
     def __str__(self):
         return self.name
 
+
 class CameraModel(models.Model):
     name = models.CharField(max_length=50, default='')
 
     def __str__(self):
         return self.name
+
 
 class Sequence(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -161,7 +150,7 @@ class Sequence(models.Model):
     coordinates_cas = ArrayField(models.FloatField(default=0), null=True, blank=True)
     coordinates_image = ArrayField(models.CharField(default='', max_length=100), null=True, blank=True)
     is_uploaded = models.BooleanField(default=False)
-    is_privated = models.BooleanField(default=False)
+    is_private = models.BooleanField(default=False)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)
 
     name = models.CharField(max_length=100, default='')
@@ -179,7 +168,6 @@ class Sequence(models.Model):
 
     distance = models.FloatField(null=True, blank=True)
 
-
     objects = models.Manager()
     vector_tiles = CustomMVTManager(
         geo_col='geometry_coordinates',
@@ -192,25 +180,13 @@ class Sequence(models.Model):
         from django.urls import reverse
         return reverse('sequence.sequence_detail', kwargs={'unique_id': str(self.unique_id)})
 
-    def getImageCount(self):
-        if not self.coordinates_image is None:
+    def get_image_count(self):
+        if self.coordinates_image is not None:
             return len(self.coordinates_image)
         else:
             return 0
 
-    def getTransportType(self):
-        captureType = []
-        for t in self.type:
-            cType = TransType.objects.get(pk=t)
-            if cType:
-                captureType.append(cType.name)
-
-        if len(captureType) > 0:
-            return ', '.join(captureType)
-        else:
-            return ''
-
-    def getTagStr(self):
+    def get_tag_str(self):
         tags = []
         if self.tag.all().count() == 0:
             return ''
@@ -223,7 +199,7 @@ class Sequence(models.Model):
         else:
             return ''
 
-    def getTags(self):
+    def get_tags(self):
         tags = []
         if self.tag.all().count() == 0:
             return ''
@@ -232,36 +208,35 @@ class Sequence(models.Model):
                 tags.append(tag.name)
         return tags
 
-    def getShortDescription(self):
+    def get_short_description(self):
         description = self.description
         if len(description) > 100:
             return description[0:100] + '...'
         else:
             return description
 
-    def getFirstImageKey(self):
+    def get_first_image_key(self):
         if len(self.coordinates_image) > 0:
             return self.coordinates_image[0]
         else:
             return ''
 
-    def getMapillaryUsername(self):
+    def get_mapillary_username(self):
         return self.username
 
-    def getLikeCount(self):
+    def get_like_count(self):
         liked_guidebook = SequenceLike.objects.filter(sequence=self)
         if not liked_guidebook:
             return 0
         else:
             return liked_guidebook.count()
 
-    def getDistance(self):
+    def get_distance(self):
         all_distance = 0
         if self.geometry_coordinates_ary is None:
             return all_distance
 
-
-        if (len(self.geometry_coordinates_ary) > 0):
+        if len(self.geometry_coordinates_ary) > 0:
             first_point = self.geometry_coordinates_ary[0]
             for i in range(len(self.geometry_coordinates_ary) - 1):
                 if i == 0:
@@ -273,7 +248,7 @@ class Sequence(models.Model):
             all_distance = "%.3f" % all_distance
         return all_distance
 
-    def getCoverImage(self):
+    def get_cover_image(self):
         image_keys = self.coordinates_image
         if image_keys is None:
             return None
@@ -282,17 +257,18 @@ class Sequence(models.Model):
         else:
             return None
 
-    def getFirstPointLat(self):
+    def get_first_point_lat(self):
         if self.geometry_coordinates_ary is None:
             return None
         lat = self.geometry_coordinates_ary[0][1]
         return lat
 
-    def getFirstPointLng(self):
+    def get_first_point_lng(self):
         if self.geometry_coordinates_ary is None:
             return None
         lng = self.geometry_coordinates_ary[0][0]
         return lng
+
 
 class Image(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -310,7 +286,7 @@ class Image(models.Model):
     username = models.CharField(max_length=100, default='')
     organization_key = models.CharField(max_length=255, null=True)
     is_uploaded = models.BooleanField(default=False)
-    is_privated = models.BooleanField(default=False)
+    is_private = models.BooleanField(default=False)
     is_mapillary = models.BooleanField(default=True)
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)
@@ -331,7 +307,7 @@ class Image(models.Model):
         source_layer='mtp-images'
     )
 
-    def getSequence(self):
+    def get_sequence_by_key(self):
         if self.seq_key != '':
             sequence = Sequence.objects.get(seq_key=self.seq_key)
             if sequence is None or not sequence:
@@ -339,14 +315,17 @@ class Image(models.Model):
             return sequence
         return None
 
+
 class SequenceLike(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE)
+
 
 class ImageViewPoint(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
     owner = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, blank=True, related_name='owner_id')
+
 
 class ImageLabel(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -356,6 +335,7 @@ class ImageLabel(models.Model):
     created_at = models.DateTimeField(default=datetime.now, blank=True)
     point = models.PointField(null=True, blank=True)
     polygon = models.PolygonField(null=True, blank=True)
+
 
 class SequenceWeather(models.Model):
     sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE)

@@ -1,31 +1,19 @@
-## Python packages
-from datetime import datetime
+# Python packages
 import json
 
-## Django Packages
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.shortcuts import redirect
-from django.utils import timezone
-from django.http import (
-    Http404, HttpResponse, JsonResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
-)
-from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.contrib import messages
-from django.template import RequestContext
+from django.contrib.gis.geos import Point, Polygon, MultiPolygon, LineString
+from django.core import serializers
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import (
+    JsonResponse, )
+
+# Django Packages
+from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
-from django.contrib.gis.geos import Point, Polygon, MultiPolygon, LinearRing, LineString
-## Custom Libs ##
+
+# Custom Libs ##
 from lib.functions import *
-
-## Project packages
-from accounts.models import CustomUser
-
-## App packages
-
 # That includes from .models import *
 from .forms import *
 
@@ -47,23 +35,22 @@ MAIN_PAGE_DESCRIPTION = "Find or offer help on image collection projects to crea
 JOB_PAGE_DESCRIPTION = ""
 PHOTOGRAPHER_PAGE_DESCRIPTION = ""
 
-
 ############################################################################
+
 
 def index(request):
     return redirect('photographer.photographer_list')
 
+
 @my_login_required
 def photographer_create(request):
-    photographer = Photographer.objects.filter()
     if request.method == "POST":
         form = PhotographerForm(request.POST)
-
         if form.is_valid():
             photographer = form.save(commit=False)
             photographer.user = request.user
             geometry = json.loads(photographer.geometry)
-            multipoly = MultiPolygon()
+            multipolygon = MultiPolygon()
             for geo in geometry:
                 coordinates = geo['geometry']['coordinates'][0]
                 lineString = LineString()
@@ -79,8 +66,8 @@ def photographer_create(request):
                     else:
                         lineString.append(point.coords)
                 polygon = Polygon(lineString.coords)
-                multipoly.append(polygon)
-            photographer.multipolygon = multipoly
+                multipolygon.append(polygon)
+            photographer.multipolygon = multipolygon
 
             for geo in geometry:
                 geo['properties']['photographer_id'] = str(photographer.unique_id)
@@ -91,15 +78,15 @@ def photographer_create(request):
             capture_types = form.cleaned_data['capture_type']
             capture_method = form.cleaned_data['capture_method']
             image_quality = form.cleaned_data['image_quality']
-            if not capture_types is None:
+            if capture_types is not None:
                 photographer.capture_type.clear()
                 for capture_type in capture_types:
                     photographer.capture_type.add(capture_type)
-            if not capture_method is None:
+            if capture_method is not None:
                 photographer.capture_method.clear()
                 for capture_m in capture_method:
                     photographer.capture_method.add(capture_m)
-            if not image_quality is None:
+            if image_quality is not None:
                 photographer.image_quality.clear()
                 for image_q in image_quality:
                     photographer.image_quality.add(image_q)
@@ -115,6 +102,7 @@ def photographer_create(request):
         'pageTitle': 'Create Photographer'
     }
     return render(request, 'photographer/create.html', content)
+
 
 @my_login_required
 def photographer_hire(request, unique_id):
@@ -166,6 +154,7 @@ def photographer_hire(request, unique_id):
     }
     return render(request, 'photographer/hire.html', content)
 
+
 @my_login_required
 def photographer_edit(request, unique_id):
     photographer = get_object_or_404(Photographer, unique_id=unique_id)
@@ -178,7 +167,7 @@ def photographer_edit(request, unique_id):
             photographer.save()
             geometry = json.loads(photographer.geometry)
 
-            multipoly = MultiPolygon()
+            multipolygon = MultiPolygon()
             for geo in geometry:
                 coordinates = geo['geometry']['coordinates'][0]
                 lineString = LineString()
@@ -194,8 +183,8 @@ def photographer_edit(request, unique_id):
                     else:
                         lineString.append(point.coords)
                 polygon = Polygon(lineString.coords)
-                multipoly.append(polygon)
-            photographer.multipolygon = multipoly
+                multipolygon.append(polygon)
+            photographer.multipolygon = multipolygon
 
             for geo in geometry:
                 geo['properties']['photographer_id'] = str(photographer.unique_id)
@@ -205,15 +194,15 @@ def photographer_edit(request, unique_id):
             capture_types = form.cleaned_data['capture_type']
             capture_method = form.cleaned_data['capture_method']
             image_quality = form.cleaned_data['image_quality']
-            if not capture_types is None:
+            if capture_types is not None:
                 photographer.capture_type.clear()
                 for capture_type in capture_types:
                     photographer.capture_type.add(capture_type)
-            if not capture_method is None:
+            if capture_method is not None:
                 photographer.capture_method.clear()
                 for capture_m in capture_method:
                     photographer.capture_method.add(capture_m)
-            if not image_quality is None:
+            if image_quality is not None:
                 photographer.image_quality.clear()
                 for image_q in image_quality:
                     photographer.image_quality.add(image_q)
@@ -230,6 +219,7 @@ def photographer_edit(request, unique_id):
     }
     return render(request, 'photographer/edit.html', content)
 
+
 @my_login_required
 def my_photographer_delete(request, unique_id):
     photographer = get_object_or_404(Photographer, unique_id=unique_id)
@@ -240,6 +230,7 @@ def my_photographer_delete(request, unique_id):
         messages.error(request, "This user hasn't permission")
 
     return redirect('photographer.index')
+
 
 def photographer_list(request):
     photographers = None
@@ -257,16 +248,16 @@ def photographer_list(request):
 
             photographers = Photographer.objects.all().filter(is_published=True)
 
-            if not image_quality is None and len(image_quality) > 0:
+            if image_quality is not None and len(image_quality) > 0:
                 photographers = photographers.filter(image_quality__in=image_quality)
 
-            if not capture_types is None and len(capture_types) > 0:
+            if capture_types is not None and len(capture_types) > 0:
                 photographers = photographers.filter(capture_type__in=capture_types)
 
-            if not capture_method is None and len(capture_method) > 0:
+            if capture_method is not None and len(capture_method) > 0:
                 photographers = photographers.filter(capture_method__in=capture_method)
 
-    if photographers == None:
+    if photographers is None:
         photographers = Photographer.objects.all().filter(is_published=True)
         form = PhotographerSearchForm()
 
@@ -313,6 +304,7 @@ def photographer_list(request):
 
     return render(request, 'photographer/list.html', content)
 
+
 def photographer_detail(request, unique_id):
     photographer = get_object_or_404(Photographer, unique_id=unique_id)
 
@@ -329,22 +321,26 @@ def photographer_detail(request, unique_id):
     else:
         is_mine = False
 
-    photographer.options = photographer.getCaptureType() + ', ' + photographer.getCaptureMethod()
+    photographer.options = photographer.get_capture_type() + ', ' + photographer.get_capture_method()
     hire_url = reverse('photographer.photographer_hire', kwargs={'unique_id': str(photographer.unique_id)})
     photographer_html_detail = render_to_string('photographer/modal_detail.html',
                                                 {'photographer': photographer, 'hire_url': hire_url,
                                                  'is_mine': is_mine})
 
-    return render(request, 'photographer/photographer_detail.html',
-      {
-          'photographer': photographer,
-          'photographer_html_detail': photographer_html_detail,
-          'form': form,
-          'geometry': geometry,
-          'pageName': 'Photographer Detail',
-          'pageTitle': photographer.name + ' - Photographer',
-          'page': 1
-      })
+    return render(
+        request,
+        'photographer/photographer_detail.html',
+        {
+            'photographer': photographer,
+            'photographer_html_detail': photographer_html_detail,
+            'form': form,
+            'geometry': geometry,
+            'pageName': 'Photographer Detail',
+            'pageTitle': photographer.name + ' - Photographer',
+            'page': 1
+        }
+    )
+
 
 @my_login_required
 def my_photographer_list(request):
@@ -360,14 +356,14 @@ def my_photographer_list(request):
             capture_method = form.cleaned_data['capture_method']
             image_quality = form.cleaned_data['image_quality']
             photographers = Photographer.objects.all().filter(user=request.user)
-            if not capture_type is None and len(capture_type) > 0:
+            if capture_type is not None and len(capture_type) > 0:
                 photographers = photographers.filter(capture_type__in=capture_type)
-            if not capture_method is None and len(capture_method) > 0:
+            if capture_method is not None and len(capture_method) > 0:
                 photographers = photographers.filter(capture_method__in=capture_method)
-            if not image_quality is None and len(image_quality) > 0:
+            if image_quality is not None and len(image_quality) > 0:
                 photographers = photographers.filter(image_quality__in=image_quality)
 
-    if photographers == None:
+    if photographers is None:
         photographers = Photographer.objects.all().filter(user=request.user)
         form = PhotographerSearchForm()
 
@@ -404,6 +400,7 @@ def my_photographer_list(request):
     }
     return render(request, 'photographer/list.html', content)
 
+
 def ajax_photographer_detail(request, unique_id):
     photographer = Photographer.objects.get(unique_id=unique_id)
     if photographer.user == request.user:
@@ -419,7 +416,7 @@ def ajax_photographer_detail(request, unique_id):
     if not data['photographer']:
         data['error_message'] = "The photographer id doesn't exist."
     else:
-        photographer.options = photographer.getCaptureType() + ', ' + photographer.getCaptureMethod()
+        photographer.options = photographer.get_capture_type() + ', ' + photographer.get_capture_method()
         hire_url = reverse('photographer.photographer_hire', kwargs={'unique_id': str(photographer.unique_id)})
         data['photographer_html_detail'] = render_to_string('photographer/modal_detail.html',
                                                             {'photographer': photographer, 'hire_url': hire_url,

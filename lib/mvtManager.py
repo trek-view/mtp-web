@@ -30,7 +30,7 @@ class CustomMVTManager(MVTManager):
 
         return columns
 
-    def _build_query(self, filters={}):
+    def _build_query(self, filters=None):
         """
         Args:
             filters (dict): keys represent column names and values represent column
@@ -41,6 +41,8 @@ class CustomMVTManager(MVTManager):
             parameterized SQL query.  The second element is a list of parameters
             used as inputs to the query's WHERE clause.
         """
+        if filters is None:
+            filters = {}
         table = self.model._meta.db_table.replace('"', "")
         select_statement = self._create_select_statement()
         (

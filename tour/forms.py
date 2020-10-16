@@ -1,27 +1,27 @@
-## Django Packages
+# Django Packages
 from django import forms
-from django_select2 import forms as s2forms
 
+from lib.classes import CustomTagsInputField
 ## App packages
 from .models import *
-from datetime import datetime
-from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
-from tags_input import fields
-from lib.classes import CustomTagsInputField
+
 ############################################################################
 ############################################################################
+
 
 class TourForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['name'] = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
-                           required=False)
+        self.fields['name'] = forms.CharField(
+            widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
+            required=False
+        )
 
         self.fields['description'] = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation': 'required'}),
-        required=False)
-
+            widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation': 'required'}),
+            required=False
+        )
 
         self.fields['tour_tag'] = CustomTagsInputField(
             TourTag.objects.filter(is_actived=True),
@@ -30,8 +30,6 @@ class TourForm(forms.ModelForm):
         )
 
         self.fields['tour_tag'].help_text = 'Add a tag'
-    #
-
 
     class Meta:
         model = Tour
@@ -40,6 +38,7 @@ class TourForm(forms.ModelForm):
             'description',
             'tour_tag'
         )
+
 
 class TourSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):

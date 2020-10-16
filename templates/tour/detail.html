@@ -31,7 +31,7 @@
                     {{ tour.description }}
                 </div>
                 <div class="tour-tag">
-                    {% for tag_name in tour.getTags %}
+                    {% for tag_name in tour.get_tags %}
                         <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                             {{ tag_name }}
                         </span>
@@ -53,23 +53,23 @@
 
                 <div class="tour-others float-right d-flex flex-row justify-content-between mt-2">
                     <div class="scenes text-center d-flex align-items-center">
-                        {% if tour.getImageCount == 0 %}
+                        {% if tour.get_image_count == 0 %}
                             <i class="fas fa-image"></i>
                         {% else %}
                             <i class="fas fa-image"></i>
                         {% endif %}
                         <span class="text-center ml-2 m-0">
-                            {{ tour.getImageCount }} Photos
+                            {{ tour.get_image_count }} Photos
                         </span>
                     </div>
                     <div class="like text-center d-flex align-items-center">
-                        {% if tour.getLikeCount == 0 %}
+                        {% if tour.get_like_count == 0 %}
                             <i class="far fa-thumbs-up"></i>
                         {% else %}
                             <i class="fas fa-thumbs-up"></i>
                         {% endif %}
                         <span class="text-center ml-2 m-0">
-                            {{ tour.getLikeCount }} Likes
+                            {{ tour.get_like_count }} Likes
                         </span>
                     </div>
                 </div>
@@ -108,10 +108,10 @@
                                     <div class="col-sm-6">
                                         <div class="cover-image-box">
                                             <div class="row">
-                                                {% if sequence.getCoverImage is None %}
+                                                {% if sequence.get_cover_image is None %}
                                                     <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
                                                 {% else %}
-                                                    <img class="w-100" src="https://images.mapillary.com/{{ sequence.getCoverImage }}/thumb-320.jpg">
+                                                    <img class="w-100" src="https://images.mapillary.com/{{ sequence.get_cover_image }}/thumb-320.jpg">
                                                 {% endif %}
                                             </div>
                                             <div class="user-on-mapillary" >
@@ -134,7 +134,7 @@
 
                                         <div class="item-description">
                                             <p class="mb-1">
-                                                {{ sequence.getShortDescription }}
+                                                {{ sequence.get_short_description }}
                                             </p>
                                         </div>
 
@@ -152,12 +152,12 @@
                                             <p class="mb-1 mr-3 item-image-count text-center">
                                                 <i class="transport-type-icon fas fa-image"></i>
                                                 <br>
-                                                {{ sequence.getImageCount }} Photos
+                                                {{ sequence.get_image_count }} Photos
                                             </p>
                                             <p class="mb-1 mr-3 item-distance text-center">
                                                 <i class="transport-type-icon fas fa-ruler-horizontal"></i>
                                                 <br>
-                                                {{ sequence.getDistance }} Km
+                                                {{ sequence.get_distance }} Km
                                             </p>
                                             <p class="mb-1 mr-3 item-tour-count text-center">
                                                 <i class="transport-type-icon fas fa-clipboard-list"></i>
@@ -167,7 +167,7 @@
                                         </div>
 
                                         <div class="item-tag" style="min-height: 24px;">
-                                            {% for tag_name in sequence.getTags %}
+                                            {% for tag_name in sequence.get_tags %}
                                                 <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                                                     {{ tag_name }}
                                                 </span>
@@ -184,11 +184,11 @@
                                 </div>
                                 <div class="pl-3 pr-3 mt-3 " style="font-size: 13px;">
                                     <div class="d-flex flex-row justify-content-center  align-items-center text-right">
-                                        <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
+                                        <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.get_first_point_lat }}/{{ sequence.get_first_point_lng }}&photo_overlay=mapillary">
                                             <img style="width: 32px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}" />
                                         </a>
                                         {% if sequence.google_street_view %}
-                                            <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.getFirstPointLat }},{{ sequence.getFirstPointLng }},14z">
+                                            <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.get_first_point_lat }},{{ sequence.get_first_point_lng }},14z">
                                                 <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico" />
                                             </a>
                                         {% endif %}
@@ -197,7 +197,7 @@
                                                 <img style="width: 35px" src="https://a4k2d2q5.rocketcdn.me/wp-content/uploads/2018/02/Strava-Running-and-Cycling-GPS.png">
                                             </a>
                                         {% endif %}
-                                        <a target="_blank" class="" href="https://www.mapillary.com/app/?pKey={{ sequence.getFirstImageKey }}&focus=photo">
+                                        <a target="_blank" class="" href="https://www.mapillary.com/app/?pKey={{ sequence.get_first_image_key }}&focus=photo">
                                             <img style="width: 32px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQiTHrSFBxGdPFbRSCEXLo3IB1IzMS50F_V0Q&usqp=CAU">
                                         </a>
                                     </div>
@@ -315,7 +315,7 @@
     var first_image_keys = [];
     {% if sequence_count > 0 %}
         {% for sequence in sequences %}
-            first_image_keys.push("{{ sequence.getFirstImageKey }}");
+            first_image_keys.push("{{ sequence.get_first_image_key }}");
         {% endfor %}
     {% endif %}
     {% if first_image_key != '' %}

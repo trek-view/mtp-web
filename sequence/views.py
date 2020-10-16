@@ -1,46 +1,33 @@
-## Python packages
-from datetime import datetime
+# Python packages
 import json
-import re
-from binascii import a2b_base64
-import os
-
-## Django Packages
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.shortcuts import redirect
-from django.utils import timezone
-from django.http import (
-    Http404, HttpResponse, JsonResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
-)
-from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.contrib import messages
-from django.template import RequestContext
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.template.loader import render_to_string
-from django.db.models import Avg, Count, Min, Sum
-from django.db.models.expressions import F, Window
-from django.db.models.functions.window import RowNumber
-from django.contrib.gis.geos import Point, Polygon, MultiPolygon, LinearRing, LineString
-from django.db import transaction
-from django.core import files
-## Custom Libs ##
-from lib.functions import *
-from lib.mapillary import Mapillary
-from lib.weatherstack import Weatherstack
 import threading
-from asgiref.sync import sync_to_async
-## Project packages
-from accounts.models import CustomUser, MapillaryUser
-from tour.models import Tour, TourSequence
-from guidebook.models import Guidebook, Scene
-from challenge.models import Challenge, LabelChallenge
-## App packages
 
+from django.contrib import messages
+from django.contrib.gis.geos import Point, Polygon, LineString
+from django.core import files
+from django.core import serializers
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Count
+from django.db.models.expressions import Window
+from django.db.models.functions.window import RowNumber
+from django.http import (
+    JsonResponse, )
+# Django Packages
+from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
+
+# Project packages
+from accounts.models import CustomUser, MapillaryUser
+from challenge.models import Challenge, LabelChallenge
+from guidebook.models import Guidebook, Scene
+from tour.models import TourSequence
+# Custom Libs ##
+from lib.mapillary import Mapillary
+from lib.weatherstack import WeatherStack
 # That includes from .models import *
-from .forms import * 
+from .forms import *
+
+# App packages
 
 ############################################################################
 
@@ -49,8 +36,10 @@ IMPORT_PAGE_DESCRIPTION = "First start by choosing the month your sequences we'r
 
 ############################################################################
 
+
 def index(request):
     return redirect('sequence.sequence_list')
+
 
 @my_login_required
 def import_sequence(request):
@@ -59,6 +48,7 @@ def import_sequence(request):
         return redirect(settings.MAPILLARY_AUTHENTICATION_URL)
     else:
         return redirect('sequence.import_sequence_list')
+
 
 def sequence_list(request):
     sequences = None
@@ -81,13 +71,12 @@ def sequence_list(request):
             ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)
-            if not camera_makes is None and len(camera_makes) > 0:
+            if camera_makes is not None and len(camera_makes) > 0:
                 sequences = sequences.filter(camera_make__in=camera_makes)
             if transport_type and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
-                    types = []
-                    types.append(transport_type)
+                    types = [transport_type]
                     for t in children_trans_type:
                         types.append(t.pk)
                     sequences = sequences.filter(transport_type_id__in=types)
@@ -144,13 +133,13 @@ def sequence_list(request):
                     )
 
             challenge_id = request.GET.get('challenge_id')
-            if not challenge_id is None and challenge_id != '':
+            if challenge_id is not None and challenge_id != '':
                 challenges = Challenge.objects.filter(unique_id=challenge_id)
                 if challenges.count() > 0:
                     challenge = challenges[0]
                     sequences = sequences.filter(geometry_coordinates__intersects=challenge.multipolygon)
 
-    if sequences == None:
+    if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
@@ -185,7 +174,6 @@ def sequence_list(request):
         else:
             pSequences[i].tour_count = tour_sequences.count()
 
-
     content = {
         'sequences': pSequences,
         'form': form,
@@ -195,6 +183,7 @@ def sequence_list(request):
         'page': page
     }
     return render(request, 'sequence/list.html', content)
+
 
 @my_login_required
 def my_sequence_list(request):
@@ -217,13 +206,12 @@ def my_sequence_list(request):
             ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)
-            if not camera_makes is None and len(camera_makes) > 0:
+            if camera_makes is not None and len(camera_makes) > 0:
                 sequences = sequences.filter(camera_make__in=camera_makes)
             if transport_type and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
-                    types = []
-                    types.append(transport_type)
+                    types = [transport_type]
                     for t in children_trans_type:
                         types.append(t.pk)
                     sequences = sequences.filter(transport_type_id__in=types)
@@ -244,7 +232,7 @@ def my_sequence_list(request):
                 elif like == 'false':
                     sequences = sequences.exclude(pk__in=sequence_ary)
 
-    if sequences == None:
+    if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
@@ -289,6 +277,7 @@ def my_sequence_list(request):
     }
     return render(request, 'sequence/list.html', content)
 
+
 def image_leaderboard(request):
     images = None
     page = 1
@@ -315,8 +304,7 @@ def image_leaderboard(request):
             if transport_type and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
-                    types = []
-                    types.append(transport_type)
+                    types = [transport_type]
                     for t in children_trans_type:
                         types.append(t.pk)
                     sequences = Sequence.objects.filter(transport_type_id__in=types)
@@ -335,12 +323,12 @@ def image_leaderboard(request):
                     image_view_points = image_view_points.filter(user__in=users)
 
             filter_type = request.GET.get('filter_type')
-            if not filter_type is None and filter_type != '':
-                if not users is None:
+            if filter_type is not None and filter_type != '':
+                if users is not None:
                     images = images.filter(user__in=users)
                 if filter_type == 'label_count':
                     challenge_id = request.GET.get('challenge_id')
-                    if not challenge_id is None and challenge_id != '':
+                    if challenge_id is not None and challenge_id != '':
                         label_challenges = LabelChallenge.objects.filter(unique_id=challenge_id)
                         if label_challenges.count() > 0:
                             label_challenge = label_challenges[0]
@@ -380,7 +368,7 @@ def image_leaderboard(request):
                                 captured_at__year=y
                             )
 
-    if images == None:
+    if images is None:
         images = Image.objects.all()
 
     images = images.exclude(sequence=None)
@@ -521,12 +509,13 @@ def image_leaderboard(request):
     }
     return render(request, 'sequence/image_leaderboard.html', content)
 
+
 def save_weather(sequence):
     sequence_weathers = SequenceWeather.objects.filter(sequence=sequence)
     if sequence_weathers.count() == 0:
-        weatherstack = Weatherstack()
+        weatherstack = WeatherStack()
 
-        point = [sequence.getFirstPointLat(), sequence.getFirstPointLng()]
+        point = [sequence.get_first_point_lat(), sequence.get_first_point_lng()]
         if isinstance(sequence.captured_at, str):
             historical_date = sequence.captured_at[0:10]
         else:
@@ -711,13 +700,14 @@ def save_weather(sequence):
             return True
     return False
 
+
 def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, image_download=True, is_weather=True):
     seqs = Sequence.objects.filter(unique_id=sequence.unique_id)
     if seqs.count() == 0:
         print('Sequence is not existing.')
         return
     sequence = seqs[0]
-    if is_weather and not sequence.getFirstPointLat() is None and not sequence.getFirstPointLng() is None:
+    if is_weather and not sequence.get_first_point_lat() is None and not sequence.get_first_point_lng() is None:
         print(save_weather(sequence))
 
     if token is None:
@@ -821,6 +811,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
             sequence.save()
     return image_json
 
+
 def set_camera_make(sequence):
     if sequence.camera_make is None or sequence.camera_make == '':
         return False
@@ -832,6 +823,7 @@ def set_camera_make(sequence):
         return True
     else:
         return False
+
 
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
@@ -889,10 +881,10 @@ def sequence_detail(request, unique_id):
         sequence_weather = sequence_weathers[0]
     print(sequence_weather)
 
-    if not image_key is None and image_key != '':
+    if image_key is not None and image_key != '':
         firstImageKey = image_key
     else:
-        firstImageKey = sequence.getFirstImageKey()
+        firstImageKey = sequence.get_first_image_key()
 
     guidebooks = None
     if request.user.is_authenticated:
@@ -918,6 +910,7 @@ def sequence_detail(request, unique_id):
         'firstImageKey': firstImageKey
     }
     return render(request, 'sequence/detail.html', content)
+
 
 @my_login_required
 def sequence_delete(request, unique_id):
@@ -954,6 +947,7 @@ def sequence_delete(request, unique_id):
     messages.error(request, 'The sequence does not exist or has no access.')
     return redirect('sequence.index')
 
+
 def ajax_save_sequence(request, unique_id):
     if not request.user.is_authenticated:
         return JsonResponse({
@@ -979,7 +973,7 @@ def ajax_save_sequence(request, unique_id):
                 for tag in form.cleaned_data['tag']:
                     sequence.tag.add(tag)
                 for tag in sequence.tag.all():
-                    if not tag in form.cleaned_data['tag']:
+                    if tag not in form.cleaned_data['tag']:
                         sequence.tag.remove(tag)
             sequence.save()
 
@@ -1029,8 +1023,10 @@ def ajax_save_sequence(request, unique_id):
         'message': 'The sequence does not exist or has no access.'
     })
 
+
 def sort_by_captured_at(item):
     return str(item['properties']['captured_at'])
+
 
 @my_login_required
 def import_sequence_list(request):
@@ -1127,7 +1123,7 @@ def import_sequence_list(request):
                         sequences[i]['transport_type'] = ''
                     else:
                         sequences[i]['transport_type'] = seq[0].transport_type.parent.name + ' - ' +seq[0].transport_type.name
-                    sequences[i]['tags'] = seq[0].getTags()
+                    sequences[i]['tags'] = seq[0].get_tags()
                 else:
                     sequences[i]['unique_id'] = None
 
@@ -1161,6 +1157,7 @@ def import_sequence_list(request):
         'page': page
     }
     return render(request, 'sequence/import_list.html', content)
+
 
 @my_login_required
 def ajax_import(request, seq_key):
@@ -1218,7 +1215,7 @@ def ajax_import(request, seq_key):
                     sequence.coordinates_cas = properties['coordinateProperties']['cas']
                     sequence.coordinates_image = properties['coordinateProperties']['image_keys']
                     if 'private' in properties:
-                        sequence.is_privated = properties['private']
+                        sequence.is_private = properties['private']
 
                     sequence.name = form.cleaned_data['name']
                     sequence.description = form.cleaned_data['description']
@@ -1226,7 +1223,7 @@ def ajax_import(request, seq_key):
                     sequence.is_published = True
                     sequence.save()
 
-                    sequence.distance = sequence.getDistance()
+                    sequence.distance = sequence.get_distance()
                     sequence.save()
 
                     set_camera_make(sequence)
@@ -1263,6 +1260,7 @@ def ajax_import(request, seq_key):
         'message': 'Sequence was not imported.'
     })
 
+
 def ajax_sequence_check_publish(request, unique_id):
     if not request.user.is_authenticated:
         return JsonResponse({
@@ -1295,6 +1293,7 @@ def ajax_sequence_check_publish(request, unique_id):
         'message': message,
         'is_published': sequence.is_published
     })
+
 
 def ajax_sequence_check_like(request, unique_id):
     if not request.user.is_authenticated:
@@ -1368,6 +1367,7 @@ def ajax_sequence_check_like(request, unique_id):
             'liked_count': liked_count
         })
 
+
 def ajax_get_image_detail(request, unique_id, image_key):
     sequence = Sequence.objects.get(unique_id=unique_id)
     if not sequence:
@@ -1410,6 +1410,7 @@ def ajax_get_image_detail(request, unique_id, image_key):
         'message': "",
         'view_points': view_points.count()
     })
+
 
 def ajax_delete_image_label(request, unique_id, image_key):
     if not request.user.is_authenticated:
@@ -1463,6 +1464,7 @@ def ajax_delete_image_label(request, unique_id, image_key):
         'message': "The image label doesn't exist.",
     })
 
+
 def ajax_get_image_label(request, unique_id, image_key):
     sequence = Sequence.objects.get(unique_id=unique_id)
     if not sequence:
@@ -1498,10 +1500,10 @@ def ajax_get_image_label(request, unique_id, image_key):
                 is_mine = False
             geometry = None
             geo_type = None
-            if not image_label.point is None:
+            if image_label.point is not None:
                 geometry = image_label.point.coords
                 geo_type = 'point'
-            elif not image_label.polygon is None:
+            elif image_label.polygon is not None:
                 geometry = image_label.polygon.coords[0]
                 geo_type = 'polygon'
             image_label_json = {
@@ -1522,6 +1524,7 @@ def ajax_get_image_label(request, unique_id, image_key):
         'message': 'A new label is successfully added.'
     })
 
+
 def ajax_add_label_type(request):
     if not request.user.is_authenticated:
         return JsonResponse({
@@ -1530,30 +1533,30 @@ def ajax_add_label_type(request):
         })
     if request.method == 'POST':
         label_type_keys = request.POST.get('keys')
-        if not label_type_keys is None and label_type_keys != '':
+        if label_type_keys is not None and label_type_keys != '':
             label_types = label_type_keys.split(',')
             if len(label_types) > 0:
                 for label_type in label_types:
                     l_ary = label_type.split('--')
-                    index = 0
-                    if (len(l_ary) > 0):
+                    ind = 0
+                    if len(l_ary) > 0:
                         l_type = None
-                        for l in l_ary:
-                            if index == 0:
-                                types = LabelType.objects.filter(parent__isnull=True, name=l)
+                        for lab in l_ary:
+                            if ind == 0:
+                                types = LabelType.objects.filter(parent__isnull=True, name=lab)
                             else:
-                                types = LabelType.objects.filter(parent=l_type, name=l)
+                                types = LabelType.objects.filter(parent=l_type, name=lab)
                             if types.count() == 0:
                                 l_parent_type = l_type
                                 l_type = LabelType()
-                                l_type.name = l
+                                l_type.name = lab
                                 l_type.source = 'mapillary'
                                 l_type.parent = l_parent_type
                                 print(l_type.name)
                                 l_type.save()
                             else:
                                 l_type = types[0]
-                            index += 1
+                            ind += 1
 
         label_types_json = {}
         label_types = LabelType.objects.filter(source='mapillary')
@@ -1572,6 +1575,7 @@ def ajax_add_label_type(request):
         'status': 'failed',
         'message': 'You are required login.'
     })
+
 
 def ajax_add_image_label(request, unique_id, image_key):
     if not request.user.is_authenticated:
@@ -1639,6 +1643,7 @@ def ajax_add_image_label(request, unique_id, image_key):
             'message': 'Label added successfully'
         })
 
+
 def ajax_get_image_list(request, unique_id):
     sequence = Sequence.objects.get(unique_id=unique_id)
     if not sequence:
@@ -1678,7 +1683,7 @@ def ajax_get_image_list(request, unique_id):
         if page is None:
             page = 1
     image_in_page = None
-    if not image_key is None and len(images) > 0:
+    if image_key is not None and len(images) > 0:
         for index in range(len(images)):
             image = images[index]
             if image_key == image['key']:
@@ -1756,6 +1761,7 @@ def ajax_get_image_list(request, unique_id):
         'status': 'success',
         'message': ''
     })
+
 
 def ajax_image_mark_view(request, unique_id, image_key):
     if not request.user.is_authenticated:
@@ -1847,6 +1853,7 @@ def ajax_image_mark_view(request, unique_id, image_key):
             'view_points': view_points
         })
 
+
 def ajax_get_image_ele(request, unique_id):
     sequence = Sequence.objects.get(unique_id=unique_id)
     if not sequence:
@@ -1879,6 +1886,7 @@ def ajax_get_image_ele(request, unique_id):
         'message': '',
         'eles': ele_ary
     })
+
 
 def ajax_get_detail(request, unique_id):
     sequence = Sequence.objects.get(unique_id=unique_id)

@@ -1,22 +1,8 @@
+from bootstrap_datepicker_plus import DatePickerInput
 from django import forms
-from .models import *
-from django.conf import settings
-from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
-from sequence.models import Sequence, TransType, CameraMake, LabelType
-from django.db.models.expressions import F, Window
-from django.db.models.functions.window import RowNumber
-from django.db.models import Avg, Count, Min, Sum
 
-def getAllCameraMake():
-    camera_makes = CameraMake.objects.all()
-    cm_choice = []
-    if camera_makes.count() > 0:
-        for camera_make in camera_makes:
-            cm_choice.append((camera_make.pk, camera_make.name))
-    cm_choice.append((-1, 'Others'))
-    cm_choice = tuple(cm_choice)
-    print(cm_choice)
-    return cm_choice
+from sequence.models import TransType, CameraMake, LabelType
+from .models import *
 
 
 class ChallengeForm(forms.ModelForm):
@@ -39,7 +25,6 @@ class ChallengeForm(forms.ModelForm):
         widget=forms.SelectMultiple(
             attrs={'class': 'form-control'}
         ),
-        # choices=getAllCameraMake()
         queryset=CameraMake.objects.all()
     )
 
@@ -96,6 +81,7 @@ class ChallengeForm(forms.ModelForm):
             'is_published'
         )
 
+
 class ChallengeSearchForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
                            required=False)
@@ -123,6 +109,7 @@ class ChallengeSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
 
 class LabelChallengeForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
@@ -189,6 +176,7 @@ class LabelChallengeForm(forms.ModelForm):
             'is_published',
             'label_type',
         )
+
 
 class LabelChallengeSearchForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),

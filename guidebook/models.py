@@ -92,21 +92,21 @@ class Guidebook(models.Model):
         scenes = Scene.objects.filter(guidebook=self)
         return scenes.count()
 
-    def getLikeCount(self):
+    def get_like_count(self):
         liked_guidebook = GuidebookLike.objects.filter(guidebook=self)
         if not liked_guidebook:
             return 0
         else:
             return liked_guidebook.count()
 
-    def getShortDescription(self):
+    def get_short_description(self):
         description = self.description
         if len(description) > 100:
             return description[0:100] + '...'
         else:
             return description
 
-    def getTagStr(self):
+    def get_tag_str(self):
         tags = []
         if self.tag is None:
             return ''
@@ -119,7 +119,7 @@ class Guidebook(models.Model):
         else:
             return ''
 
-    def getTags(self):
+    def get_tags(self):
         tags = []
         if self.tag is None:
             return []
@@ -128,14 +128,14 @@ class Guidebook(models.Model):
                 tags.append(tag.name)
         return tags
 
-    def getCoverImage(self):
+    def get_cover_image(self):
         scenes = Scene.objects.filter(guidebook=self)
         if scenes.count() > 0:
             return scenes[0].image_key
         else:
             return None
 
-    def getCoverImageUserOnMapillary(self):
+    def get_cover_imageUserOnMapillary(self):
         scenes = Scene.objects.filter(guidebook=self)
         if scenes.count() > 0:
             return scenes[0].username
