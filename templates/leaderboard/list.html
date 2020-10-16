@@ -59,6 +59,9 @@
     </div>
     <div class="right-board bg-light">
         <div class="main-list-board mt-4 mb-2 ml-auto mr-auto">
+            <div class="table-header mb-2">
+                <h4>{{ top_title }}</h4>
+            </div>
             <div class="paginator">
                 {% if items.has_other_pages %}
                     <ul class="pagination justify-content-center">
@@ -88,7 +91,7 @@
             </div>
             <div class="item-list">
                 {% if items.count > 0 %}
-                    <table class="w-100 table">
+                    <table class="w-100 table list-table">
                         <thead>
                             <tr>
                                 <th>Position</th>
@@ -97,12 +100,12 @@
                                 <th>Transport Used</th>
                                 <th>Distance Mapped(km)</th>
                                 <th>Photos captured</th>
-                                <th>View Points</th>
+                                <th>Viewpoints</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for item in items %}
-                                <tr class="border-top">
+                                <tr class="border-top" data-username="{{ item.username }}">
                                     <td>{{ item.rank }}</td>
                                     <td>{{ item.username }}</td>
                                     <td>{{ item.used_cameras_str }}</td>
@@ -155,6 +158,27 @@
 
 {% block scripts %}
 <script>
+    $('table tr').click(function () {
+        var username = $(this).attr('data-username');
+        var filter_time = '';
+        var time_type = '';
+        {% if not filter_time is None %}
+            filter_time = "{{ filter_time }}"
+        {% endif %}
+        {% if not time_type is None %}
+            time_type = "{{ time_type }}"
+        {% endif %}
+        var order_type = '';
+        {% if not request.GET.filter_type is None and request.GET.filter_type != '' %}
+        order_type = "{{ request.GET.filter_type }}"
+        {% endif %}
+        if (order_type != '2')
+            var url = "{% url 'sequence.sequence_list' %}?username=" + username + "&time_type=" + time_type + "&time=" + filter_time;
+        else if (order_type == '2')
+            var url = "{% url 'sequence.image_leaderboard' %}?username=" + username + "&filter_type=view_point&time_type=" + time_type + "&time=" + filter_time;
+        location.assign(url);
+    });
+
     $('.paginator-btn').click(function() {
         var pageNum = $(this).data('page');
         var current_url = window.location.href;

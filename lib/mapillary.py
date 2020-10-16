@@ -1,15 +1,10 @@
-from django.core.mail.message import EmailMultiAlternatives
-from django.conf import settings
-from django.http import (
-    Http404, HttpResponse, JsonResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
-)
-import time
-import requests
-import math
 import tempfile
 
+import requests
+from django.conf import settings
 
-class Mapillary():
+
+class Mapillary:
     client_id = settings.MAPILLARY_CLIENT_ID
     client_secret = settings.MAPILLARY_CLIENT_SECRET
     root_url = 'https://a.mapillary.com/v3/'
@@ -35,7 +30,6 @@ class Mapillary():
             print('Response error')
             return False
         if data is None or 'message' in data.keys():
-            print(data['message'])
             return False
         else:
             return data
@@ -43,8 +37,7 @@ class Mapillary():
     def get_images_with_ele_by_seq_key(self, seq_keys):
         sequence_str = ','.join(seq_keys)
         per_page = 1000
-        url = '{}images_computed?client_id={}&sequence_keys={}&per_page={}'.format(self.root_url, self.client_id, sequence_str,
-                                                                          per_page)
+        url = '{}images_computed?client_id={}&sequence_keys={}&per_page={}'.format(self.root_url, self.client_id, sequence_str, per_page)
         response = requests.get(url)
         try:
             data = response.json()
@@ -52,7 +45,6 @@ class Mapillary():
             print('Response error')
             return False
         if data is None or 'message' in data.keys():
-            print(data['message'])
             return False
         else:
             return data
@@ -68,7 +60,6 @@ class Mapillary():
             print('Response error')
             return False
         if data is None or 'message' in data.keys():
-            print(data['message'])
             return False
         else:
             return data
@@ -87,7 +78,6 @@ class Mapillary():
             return False
 
         if data is None or 'message' in data.keys():
-            print(data['message'])
             return False
         else:
             return data
@@ -109,7 +99,6 @@ class Mapillary():
             print('Response error')
             return False
         if data is None or 'message' in data.keys():
-            print(data['message'])
             return False
         else:
             return data
@@ -120,7 +109,6 @@ class Mapillary():
         url = '{}images/{}/download_original?client_id={}'.format(self.root_url, image_key, self.client_id)
         headers = {"Authorization": "Bearer {}".format(self.token)}
         request = requests.get(url, headers=headers, stream=True)
-        print(request)
         # Was the request OK?
         if request.status_code != requests.codes.ok:
             # Nope, error handling, skip file etc etc etc
@@ -142,7 +130,6 @@ class Mapillary():
 
             # Write image block to temporary file
             lf.write(block)
-        print(lf)
         return lf
 
     def get_mapillary_user(self):
@@ -157,7 +144,6 @@ class Mapillary():
             print('Response error')
             return False
         if data is None or 'message' in data.keys():
-            print(data['message'])
             return False
         else:
             return data
@@ -174,7 +160,6 @@ class Mapillary():
             print('Response error')
             return False
         if data is None or 'message' in data.keys():
-            print(data['message'])
             return False
         else:
             self.mapillary_user_data = data

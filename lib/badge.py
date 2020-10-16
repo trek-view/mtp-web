@@ -15,6 +15,7 @@ def get_mapper_label(image_count=0):
         return 6
     return 7
 
+
 def get_guidebook_label(guidebook_count=0):
     if guidebook_count == 0:
         return 0
@@ -32,6 +33,7 @@ def get_guidebook_label(guidebook_count=0):
         return 6
     return 7
 
+
 def get_finder_label(image_view_point_count=0):
     if image_view_point_count == 0:
         return 0
@@ -48,6 +50,7 @@ def get_finder_label(image_view_point_count=0):
     if image_view_point_count <= 1000:
         return 6
     return 7
+
 
 def get_spotter_label(image_tag_count=0):
     if image_tag_count == 0:

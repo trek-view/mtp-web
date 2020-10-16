@@ -16,15 +16,18 @@
         </p>
     </div>
     <div class="w-100 mt-5 d-flex justify-content-center">
-        <form method="POST" class="post-form" id="guidebook_create_form" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.media }}
-            {{ form.as_p }}
-            <div class="form-group d-flex justify-content-between">
-                <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
-                <button type="submit" class="save btn btn-primary save-btn">Continue</button>
-            </div>
-        </form>
+        <div class="p-3" style="width: 400px">
+             <form method="POST" class="post-form" id="guidebook_create_form" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.media }}
+                {{ form.as_p }}
+                 <input name="image_key" type="text" class="d-none" value="{{ image_key }}">
+                <div class="form-group d-flex justify-content-between">
+                    <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
+                    <button type="submit" class="save btn btn-primary save-btn">Continue</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -10,7 +10,7 @@
             <div class="p-3">
                 <div class="pt-3 mb-3">
                     <h3>
-                        Images
+                        Photos
                     </h3>
                 </div>
 
@@ -30,7 +30,7 @@
             {% endif %}
 
             <div class="ml-3 mb-2 mr-3">
-                <h4>Filter Images</h4>
+                <h4>Filter Photos</h4>
             </div>
 
             <div class="p-3" style="border-top: 1px solid #dee2e6;">
@@ -95,9 +95,9 @@
                                         <div class="cover-image-box">
                                             <div class="row">
                                                 {% if item.image.image_key is None %}
-                                                    <img class="w-100" style="height: 140px" src="{% static 'images/global/empty-1.png' %}">
+                                                    <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
                                                 {% else %}
-                                                    <img class="w-100" style="height: 140px;" src="https://images.mapillary.com/{{ item.image.image_key }}/thumb-320.jpg">
+                                                    <img class="w-100" src="https://images.mapillary.com/{{ item.image.image_key }}/thumb-320.jpg">
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -142,11 +142,15 @@
                                             </div>
 
                                             <div>
-                                                <span>View Image Count ({{ item.image_count }})</span>
+                                                <span>View Point Count ({{ item.image.image_view_point_count }})</span>
                                             </div>
 
                                             <div>
-                                                <span>{{ item.image.captured_at }}</span>
+                                                <span>Label Count ({{ item.image.image_label_count }})</span>
+                                            </div>
+
+                                            <div>
+                                                <span>Captured at: {{ item.image.captured_at }}</span>
                                             </div>
 
                                         </div>
@@ -189,7 +193,9 @@
                 {% endif %}
             </div>
         </div>
-        <div class="d-none" id="map"></div>
+        <div class="d-none" id="map">
+
+        </div>
     </div>
 
     <div class="detail-modal modal fade" style="padding-top: 140px !important;" id="imageDetailModal">
@@ -233,13 +239,17 @@
 
     mapboxgl.accessToken = mapboxToken;
     var positions = [];
+    var sequence_unique_ids = [];
+    var image_keys = [];
     {% for item in items %}
         positions.push({{ item.image.point }});
+        sequence_unique_ids.push("{{ item.image.sequence_unique_id }}");
+        image_keys.push("{{ item.image.image_key }}");
     {% endfor %}
 
     var map_ary = [];
     console.log(positions);
-    function draw_map(data) {
+    function draw_map(data, sequence_unique_id, image_key) {
         var obj = $('.min-map-box').eq(i);
         var obj_id = obj.attr('id');
         var sceneData = [];
@@ -252,7 +262,7 @@
             scene_positions.push([lng, lat]);
             item = {
                 "type": "Feature",
-                "properties": {},
+                "properties": {'sequence_unique_id': sequence_unique_id, 'image_key': image_key},
                 "geometry": {
                     "coordinates": [lng, lat],
                     "type": "Point"
@@ -273,7 +283,6 @@
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: first_point, // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         else {
@@ -282,7 +291,6 @@
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: [-87.622088, 41.878781], // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         map.on('load', function() {
@@ -315,18 +323,28 @@
         zoom: 1 // starting zoom
     });
 
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
+
     for (i = 0; i < positions.length; i++)
     {
-        draw_map([positions[i]]);
-        drawMapView(i, [positions[i]])
+        draw_map([positions[i]], sequence_unique_ids[i], image_keys[i]);
+        drawMapView(i, [positions[i]], sequence_unique_ids[i], image_keys[i]);
     }
 
-    function drawMapView(l, data) {
+    function drawMapView(l, data, sequence_unique_id, image_key) {
         if (data.length == 0)
             return false;
         var centerItem = {
             "type": "Feature",
-            "properties": {"image_id": $('.sequence').eq(l).data('image-id')},
+            "properties": {'sequence_unique_id': sequence_unique_id, 'image_key': image_key},
             "geometry": {
                 "coordinates": [data[0][0], data[0][1]],
                 "type": "Point"
@@ -369,7 +387,8 @@
 
 
         map.on('click', 'points', function (e) {
-            getImageDetail(e.features[0].properties.image_id);
+            console.log(e.features[0])
+            getImageDetail(e.features[0].properties.sequence_unique_id, e.features[0].properties.image_key);
 
         });
 
@@ -385,8 +404,9 @@
     });
 
 
-    function getImageDetail(id) {
-        var url = 'test'
+    function getImageDetail(sequence_unique_id, image_key) {
+        var url = "{% url 'sequence.sequence_detail' unique_id='sequence_unique_id' %}?image_key=" + image_key;
+        url = url.replace('sequence_unique_id', sequence_unique_id);
         location.assign(url);
     }
 

@@ -8,7 +8,7 @@
     <div class="left-side p-3 d-flex flex-column justify-content-between">
         <div>
             <div class="text-right mt-2 mb-2">
-                <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
+                <a class="btn btn-info" href="{% url 'tour.tour_list' %}">Go to Tour List</a>
             </div>
             {% if messages %}
                 {% for message in messages %}
@@ -31,7 +31,7 @@
                     {{ tour.description }}
                 </div>
                 <div class="tour-tag">
-                    {% for tag_name in tour.getTags %}
+                    {% for tag_name in tour.get_tags %}
                         <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                             {{ tag_name }}
                         </span>
@@ -52,24 +52,24 @@
                 <hr class="mt-3 mb-1">
 
                 <div class="tour-others float-right d-flex flex-row justify-content-between mt-2">
-                    <div class="scenes text-center">
-                        {% if tour.getImageCount == 0 %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                    <div class="scenes text-center d-flex align-items-center">
+                        {% if tour.get_image_count == 0 %}
+                            <i class="fas fa-image"></i>
                         {% else %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                            <i class="fas fa-image"></i>
                         {% endif %}
-                        <span class="text-center m-0">
-                            {{ tour.getImageCount }} Photos
+                        <span class="text-center ml-2 m-0">
+                            {{ tour.get_image_count }} Photos
                         </span>
                     </div>
-                    <div class="like text-center">
-                        {% if tour.getLikeCount == 0 %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
+                    <div class="like text-center d-flex align-items-center">
+                        {% if tour.get_like_count == 0 %}
+                            <i class="far fa-thumbs-up"></i>
                         {% else %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
+                            <i class="fas fa-thumbs-up"></i>
                         {% endif %}
-                        <span class="text-center m-0">
-                            {{ tour.getLikeCount }} Likes
+                        <span class="text-center ml-2 m-0">
+                            {{ tour.get_like_count }} Likes
                         </span>
                     </div>
                 </div>
@@ -93,7 +93,12 @@
         {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board list bg-light">
-        <div class="mt-4 mb-2 ml-auto mr-auto">
+        <div class="switch-list-viewer">
+            <label for="switch-list-viewer"></label><input class="" type="checkbox" id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
+        </div>
+        <div id="list-view" class="mt-4 mb-2 ml-auto mr-auto">
+            <div class="paginator">
+            </div>
             <div class="item-list">
                 {% if sequence_count > 0 %}
                     {% for sequence in sequences %}
@@ -108,11 +113,14 @@
                                     <div class="col-sm-6">
                                         <div class="cover-image-box">
                                             <div class="row">
-                                                {% if sequence.getCoverImage is None %}
-                                                    <img class="w-100" style="height: 140px" src="{% static 'images/global/empty-1.png' %}">
+                                                {% if sequence.get_cover_image is None %}
+                                                    <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
                                                 {% else %}
-                                                    <img class="w-100" style="height: 140px;" src="https://images.mapillary.com/{{ sequence.getCoverImage }}/thumb-320.jpg">
+                                                    <img class="w-100" src="https://images.mapillary.com/{{ sequence.get_cover_image }}/thumb-320.jpg">
                                                 {% endif %}
+                                            </div>
+                                            <div class="user-on-mapillary" >
+                                                image by {{ sequence.username }} on mapillary
                                             </div>
                                         </div>
                                     </div>
@@ -131,13 +139,13 @@
 
                                         <div class="item-description">
                                             <p class="mb-1">
-                                                {{ sequence.getShortDescription }}
+                                                {{ sequence.get_short_description }}
                                             </p>
                                         </div>
 
                                         <div class="w-100 d-flex flex-row align-items-end">
                                             <p class="mb-1 mr-3 item-transport-type text-center">
-                                                <i class=transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
+                                                <i class="transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
                                                 <br>
                                                 {{ sequence.transport_type.parent }}
                                             </p>
@@ -146,19 +154,25 @@
                                                 <br>
                                                 {{ sequence.transport_type.name }}
                                             </p>
-                                            <p class="mb-1 mr-3 item-image-count">
-                                                {{ sequence.getImageCount }} Panos
+                                            <p class="mb-1 mr-3 item-image-count text-center">
+                                                <i class="transport-type-icon fas fa-image"></i>
+                                                <br>
+                                                {{ sequence.get_image_count }} Photos
                                             </p>
-                                            <p class="mb-1 mr-3 item-distance">
-                                                {{ sequence.getDistance }} Km
+                                            <p class="mb-1 mr-3 item-distance text-center">
+                                                <i class="transport-type-icon fas fa-ruler-horizontal"></i>
+                                                <br>
+                                                {{ sequence.get_distance }} Km
                                             </p>
-                                            <p class="mb-1 mr-3 item-tour-count">
+                                            <p class="mb-1 mr-3 item-tour-count text-center">
+                                                <i class="transport-type-icon fas fa-clipboard-list"></i>
+                                                <br>
                                                 {{ sequence.tour_count }} tours
                                             </p>
                                         </div>
 
                                         <div class="item-tag" style="min-height: 24px;">
-                                            {% for tag_name in sequence.getTags %}
+                                            {% for tag_name in sequence.get_tags %}
                                                 <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                                                     {{ tag_name }}
                                                 </span>
@@ -174,17 +188,27 @@
                                     </div>
                                 </div>
                                 <div class="pl-3 pr-3 mt-3 " style="font-size: 13px;">
-                                    <div class="d-flex flex-row align-items-center">
-                                        <a target="_blank" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
-                                            <img style="width: 40px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}">
+                                    <div class="d-flex flex-row justify-content-center  align-items-center text-right">
+                                        <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.get_first_point_lat }}/{{ sequence.get_first_point_lng }}&photo_overlay=mapillary">
+                                            <img style="width: 32px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}" />
                                         </a>
-                                        <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
-                                            <img style="width: 120px" src="{% static "images/icon/mapillary_icon.png" %}">
+                                        {% if sequence.google_street_view %}
+                                            <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.get_first_point_lat }},{{ sequence.get_first_point_lng }},14z">
+                                                <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico" />
+                                            </a>
+                                        {% endif %}
+                                        {% if not sequence.strava is None and sequence.strava != ''  %}
+                                            <a class="mr-2" target="_blank" href="https://www.strava.com/activities/{{ sequence.strava }}">
+                                                <img style="width: 35px" src="https://a4k2d2q5.rocketcdn.me/wp-content/uploads/2018/02/Strava-Running-and-Cycling-GPS.png">
+                                            </a>
+                                        {% endif %}
+                                        <a target="_blank" class="" href="https://www.mapillary.com/app/?pKey={{ sequence.get_first_image_key }}&focus=photo">
+                                            <img style="width: 32px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQiTHrSFBxGdPFbRSCEXLo3IB1IzMS50F_V0Q&usqp=CAU">
                                         </a>
                                     </div>
 
-                                    <p class="mt-3">{{ sequence.captured_at }}</p>
-                                    <p>{{ sequence.created_at }}</p>
+                                    <p class="mt-3">Captured at: {{ sequence.captured_at }}</p>
+                                    <p>Uploaded at: {{ sequence.created_at }}</p>
                                 </div>
                             </div>
                         </div>
@@ -196,6 +220,12 @@
                 {% endif %}
             </div>
         </div>
+        <div class="d-none" id="map">
+
+        </div>
+    </div>
+
+    <div class="detail-modal modal fade" style="padding-top: 140px !important;" id="sequenceDetailModal">
     </div>
 </div>
 
@@ -207,10 +237,35 @@
     $.ajaxSetup({
         data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
     });
+
     $('.paginator-btn').click(function() {
-        var pageNum = $(this).data('page');
-        $('#search_form').find('input[name="page"]').val(pageNum);
-        location.assign("{% url 'tour.tour_add_sequence' unique_id=tour.unique_id %}?" + $('#search_form').serialize());
+        const pageNum = $(this).data('page');
+        let current_url = window.location.href;
+        const a = current_url.split("?");
+        if (a.length < 2)
+        {
+            current_url += '?page=' + pageNum;
+            location.assign(current_url);
+            return;
+        }
+
+        const b = a[1].split("&");
+        let i;
+        const c = [];
+        let is_changed = false;
+        for (i=0;i<b.length;i++) {
+            if (b[i].substr(0, 5) === 'page=') {
+                c.push('page=' + pageNum);
+                is_changed = true;
+            }
+            else {
+                c.push(b[i]);
+            }
+        }
+        let url = a[0] + '?' + c.join('&');
+        if (!is_changed)
+            url += '&page=' + pageNum;
+        location.assign(url);
     });
 
     mapboxgl.accessToken = mapboxToken;
@@ -220,6 +275,8 @@
     {% endfor %}
 
     var map_ary = [];
+    const chart_ary = [];
+    let i;
     function draw_map(data) {
         var obj = $('.min-map-box').eq(i);
         var obj_id = obj.attr('id');
@@ -254,7 +311,6 @@
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: first_point, // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         else {
@@ -263,7 +319,6 @@
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: [-87.622088, 41.878781], // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         map.on('load', function() {
@@ -298,59 +353,257 @@
     var first_image_keys = [];
     {% if sequence_count > 0 %}
         {% for sequence in sequences %}
-            first_image_keys.push("{{ sequence.getFirstImageKey }}");
+            first_image_keys.push("{{ sequence.get_first_image_key }}");
         {% endfor %}
     {% endif %}
     {% if first_image_key != '' %}
         currenct_sequence_id = 0;
     {% endif %}
 
-    $('#publish_swithch_tour').click(function () {
+
+    const centerPointerData = [];
+    const map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+        center: [-74.5, 40], // starting position
+        zoom: 1 // starting zoom
+    });
+
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
+
+    // Create a popup, but don't add it to the map yet.
+    const popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+    });
+
+    map.on('load', function() {
+        drawMapByUserKey('');
+        map.on('mouseenter', 'mtp-images', function(e) {
+          // Change the cursor style as a UI indicator.
+          map.getCanvas().style.cursor = 'pointer';
+
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const key = e.features[0].properties.image_key;
+            const url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+
+            // Ensure that if the map is zoomed out such that multiple
+          // copies of the feature are visible, the popup appears
+          // over the copy being pointed to.
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
+
+          // Populate the popup and set its coordinates
+          // based on the feature found.
+          popup.setLngLat(coordinates)
+          .setHTML('<img src="' + url + '" width="160"  alt=""/>')
+          .addTo(map);
+        });
+
+        map.on('click', 'mtp-images', function (e) {
+            getSequenceDetailByImageKey(e.features[0].properties["image_key"]);
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'mtp-images', function () {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+    });
+
+    function drawMapByUserKey(userkey) {
+        console.log('userkey', userkey);
+        let filter = ['all',
+            ['==', 'userkey', userkey]
+        ];
+        if (typeof userkey == 'undefined' || userkey === '')
+            filter = ['all']
+
+        if (map.getLayer('mtp-sequences')) map.removeLayer('mtp-sequences');
+        if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
+        if (map.getSource('mtp-images')) map.removeSource('mtp-images');
+        if (map.getSource('mtp-sequences')) map.removeSource('mtp-sequences');
+
+        map.addSource('mtp-sequences', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?tile={z}/{x}/{y}"],
+        });
+
+        map.addLayer({
+            "id": "mtp-sequences",
+            "type": "line",
+            "source": 'mtp-sequences',
+            "source-layer": 'mtp-sequences',
+            'filter': filter,
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-opacity": 0.6,
+                "line-color": "#7880bd",
+                "line-width": 2
+            }
+        }, "waterway-label");
+
+        map.addSource('mtp-images', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}"],
+        });
+
+        map.addLayer({
+            "id": "mtp-images",
+            "type": "circle",
+            "source": 'mtp-images',
+            "source-layer": 'mtp-images',
+            'filter': filter,
+            "paint": {
+                "circle-color": "#7880bd",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
+    }
+
+    function getSequenceDetailByUniqueID(id) {
+        let url = "{% url 'sequence.ajax_get_detail' unique_id='unique_id' %}";
+        url = url.replace('unique_id', id);
         $.ajax({
-            url: "{% url 'tour.ajax_tour_check_publish' unique_id=tour.unique_id %}",
-            type: 'POST',
+            url: url,
+            type: 'GET',
             data: {},
             dataType: 'json',
             success: function (data) {
-                if (data.status == 'failed')
+                if (!data.sequence) {
+                    toastr.error(data.message);
+                }
+                else {
+                    const $detailModal = $('#sequenceDetailModal');
+                    $detailModal.html(data['sequence_html_detail'])
+                    $detailModal.modal({
+                        'backdrop': false,
+                        'show': true,
+                    });
+                }
+            }
+        });
+    }
+
+    function getSequenceDetailByImageKey(image_key) {
+        let url = "{% url 'sequence.ajax_get_detail_by_image_key' image_key='init_image_key' %}";
+        url = url.replace('init_image_key', image_key);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (!data.sequence) {
+                    toastr.error(data.message);
+                }
+                else {
+                    const $detailModal = $('#sequenceDetailModal');
+                    $detailModal.html(data['sequence_html_detail'])
+                    $detailModal.modal({
+                        'backdrop': false,
+                        'show': true,
+                    });
+                }
+            }
+        });
+    }
+
+    function gotoDetail(id) {
+        let url = "{% url 'sequence.sequence_detail' unique_id='unique_id' %}";
+        url = url.replace('unique_id', id);
+        location.assign(url);
+    }
+
+    $('#switch-list-viewer').change(function () {
+        if ($(this).prop('checked')) {
+            $('#list-view').addClass('d-none');
+            $('#map').removeClass('d-none');
+        }
+        else {
+            $('#list-view').removeClass('d-none');
+            $('#map').addClass('d-none');
+        }
+        map.resize();
+    })
+
+    function drawChart(sequence_id) {
+        let url = "{% url 'sequence.ajax_get_image_ele' unique_id='unique_id' %}";
+        url = url.replace('unique_id', sequence_id)
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status === 'failed')
                 {
                     toastr.error(data.message)
                 }
                 else {
-                    if (data.is_published)
-                    {
-                        $('#publish_swithch_tour').removeClass('btn-success').addClass('btn-secondary').text('Unpublish');
+                    const num_ary = [];
+                    for (let i=0; i<data.eles.length; i++) {
+                        num_ary.push(i+1)
                     }
-                    else
-                    {
-                        $('#publish_swithch_tour').addClass('btn-success').removeClass('btn-secondary').text('Publish Now');
-                    }
+                    const myLineChart = new Chart(document.getElementById("chart_" + sequence_id), {
+                        type: 'line',
+                        data: {
+                            labels: num_ary,
+                            datasets: [{
+                                data: data['eles'],
+                                borderWidth: 1,
+                                borderColor: "#3e95cd",
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                yAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'mtrs abv sea lvl'
+                                    },
+                                    //ticks: {
+                                    //    beginAtZero:true
+                                    //}
+                                }],
+                                xAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'photo num'
+                                    }
+                                }]
+                            },
+                            'legend': {'display': false}
+                        }
+                    });
                 }
             }
         });
-    });
+    }
 
-    $('#delete_tour').click(function () {
-        if ($(this).hasClass('disabled') || $(this).hasClass('d-none'))
-            return;
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.value) {
-                 $('#delete_tour_form').submit();
-            }
-        })
-    });
+    $('.ele-chart').each(function () {
+        const sequence_id = $(this).attr('data-sequence-id');
+        drawChart(sequence_id)
+    })
 
     {% if not request.user.is_authenticated %}
-        $('.tour-others .like img').css('cursor', 'pointer');
-        $('.tour-others .like img').click(function () {
+        $('.tour-others .like i').css('cursor', 'pointer');
+        $('.tour-others .like i').click(function () {
             Swal.fire({
                 title: 'Need to login!',
                 html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
@@ -359,9 +612,9 @@
                 confirmButtonText: 'OK'
             })
         });
-    {% elif request.user != guidebook.user %}
-        $('.tour-others .like img').css('cursor', 'pointer');
-        $('.tour-others .like img').click(function () {
+    {% else %}
+        $('.tour-others .like i').css('cursor', 'pointer');
+        $('.tour-others .like i').click(function () {
             $.ajax({
                 url: "{% url 'tour.ajax_tour_check_like' unique_id=tour.unique_id %}",
                 type: 'POST',
@@ -373,13 +626,11 @@
                         toastr.error(data.message)
                     }
                     else {
-                        var loved = "{% static 'images/icon/icons8-love-48.png' %}";
-                        var unloved = "{% static 'images/icon/icons8-love-100.png' %}"
                         $('.tour-others .like span').text(data.liked_count + ' Likes');
                         if (data.liked_count == 0)
-                            $('.tour-others .like img').attr('src', unloved);
+                            $('.tour-others .like i').removeClass('fas').addClass('far');
                         else
-                            $('.tour-others .like img').attr('src', loved);
+                            $('.tour-others .like i').addClass('fas').removeClass('far');
                     }
                 }
             });

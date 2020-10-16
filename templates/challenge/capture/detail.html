@@ -1,0 +1,140 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block app_challenge %}active{% endblock %}
+{% block app_style %}<link rel="stylesheet" href="{% static 'css/challenge_style.css' %}">{% endblock %}
+{% block content %}
+
+<div class="main-body">
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="challenge-detail p-5">
+                <h4 class="text-center text-primary">Capture Challenge Detail</h4>
+                <div>
+                    <h6 class="">
+                        Name:
+                    </h6>
+                    <p class="">
+                        {{ challenge.name }}
+                    </p>
+                </div>
+
+                <div>
+                    <h6 class="">
+                        Business Name:
+                    </h6>
+                    <p class="">
+                        {{ challenge.business_name }}
+                    </p>
+                </div>
+
+                <div>
+                    <h6 class="">
+                        Business Website:
+                    </h6>
+                    <p class="">
+                        <a href="{{ challenge.business_website }}" target="_blank">{{ challenge.business_website }}</a>
+                    </p>
+                </div>
+
+                <div>
+                    <h6 class="">
+                        Business Email:
+                    </h6>
+                    <p class="">
+                        {{ challenge.business_email }}
+                    </p>
+                </div>
+
+                <div>
+                    <h6 class="">
+                        Description:
+                    </h6>
+                    <p class="">
+                        {{ challenge.description }}
+                    </p>
+                </div>
+
+                <p class="d-none" id="id_geometry">{{ challenge.geometry }}</p>
+
+                <div>
+                    <h6 class="">
+                        Date Time:
+                    </h6>
+                    <p class="">
+                        {{ challenge.updated_at }}
+                    </p>
+                </div>
+
+            </div>
+        </div>
+        {% include 'components/copyrite.html' %}
+    </div>
+    <div class="right-board bg-light">
+        <div id="map">
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    // TO MAKE THE MAP APPEAR YOU MUST
+	// ADD YOUR ACCESS TOKEN FROM
+	// https://account.mapbox.com
+	mapboxgl.accessToken = mapboxToken;
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+        center: [-74.5, 40], // starting position
+        zoom: {{ challenge.zoom }} // starting zoom
+    });
+
+    var geometryData = $('#id_geometry').text();
+    console.log(geometryData);
+    var geometryDataJson = JSON.parse(geometryData);
+    console.log(geometryDataJson);
+
+
+
+    map.on('load', function() {
+        map.addSource('states', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': geometryDataJson
+            }
+        });
+        map.addLayer({
+            'id': 'states-layer',
+            'type': 'fill',
+            'source': 'states',
+            'layout': {},
+            'paint': {
+                'fill-color': 'rgba(200, 100, 240, 0.4)',
+                'fill-outline-color': 'rgba(200, 100, 240, 1)'
+            }
+        });
+        // When a click event occurs on a feature in the states layer, open a popup at the
+        // location of the click, with description HTML from its properties.
+        map.on('click', 'states-layer', function (e) {
+            console.log(e);
+            new mapboxgl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML(e.features[0].properties.challenge_id)
+                .addTo(map);
+        });
+
+        // Change the cursor to a pointer when the mouse is over the states layer.
+        map.on('mouseenter', 'states-layer', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'states-layer', function () {
+            map.getCanvas().style.cursor = '';
+        });
+    });
+  </script>
+{% endblock %}

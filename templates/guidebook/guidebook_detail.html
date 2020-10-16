@@ -9,7 +9,6 @@
             width: 50px;
             height: 50px;
             background: unset !important;
-            background: url("{% static 'images/icon/info.png' %}") !important;
             background-repeat: no-repeat;
             background-size: cover !important;
         }
@@ -31,7 +30,7 @@
     <div class="left-side p-3 d-flex flex-column justify-content-between">
         <div>
             <div class="text-right mt-2 mb-2">
-                <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
+                <a class="btn btn-info" href="{% url 'guidebook.guidebook_list' %}">Go to Guidebook List</a>
             </div>
             <div class="page-header">
                 <div class="pt-3 mb-3">
@@ -60,7 +59,7 @@
                 </div>
 
                 <div class="guidebook-tag mt-2">
-                    {% for tag_name in guidebook.getTags %}
+                    {% for tag_name in guidebook.get_tags %}
                         <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                             {{ tag_name }}
                         </span>
@@ -78,24 +77,24 @@
                     </a>
                 </div>
                 <div class="guidebook-others float-right d-flex flex-row justify-content-between mt-2">
-                    <div class="scenes text-center">
+                    <div class="scenes text-center d-flex align-items-center">
                         {% if guidebook.getSceneCount == 0 %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                            <i class="fas fa-image"></i>
                         {% else %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                            <i class="fas fa-image"></i>
                         {% endif %}
-                        <span class="text-center m-0">
+                        <span class="text-center ml-2 m-0">
                             {{ guidebook.getSceneCount }} Photos
                         </span>
                     </div>
-                    <div class="like text-center">
-                        {% if guidebook.getLikeCount == 0 %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
+                    <div class="like text-center d-flex align-items-center">
+                        {% if guidebook.get_like_count == 0 %}
+                            <i class="far fa-thumbs-up"></i>
                         {% else %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
+                            <i class="fas fa-thumbs-up"></i>
                         {% endif %}
-                        <span class="text-center m-0">
-                            {{ guidebook.getLikeCount }} Likes
+                        <span class="text-center ml-2 m-0">
+                            {{ guidebook.get_like_count }} Likes
                         </span>
                     </div>
                 </div>
@@ -149,10 +148,10 @@
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <div class="poi-count">
-                                        <span style="color: blueviolet;">{{ scene.getPOICategories }}</span>
+                                        <span style="color: blueviolet;">{{ scene.get_poi_categories }}</span>
                                     </div>
                                     <div class="poi-category">
-                                        <span>POI: {{ scene.getPOICount }}</span>
+                                        <span>POI: {{ scene.get_poi_count }}</span>
                                     </div>
                                 </div>
                                 <div class="d-none scene-position">
@@ -196,6 +195,7 @@
                 </div>
                 <div class="switch-cover"></div>
                 <div class="map-board w-100 display" id="map">
+
                 </div>
             </div>
             <div class="full-screen board-w-400">
@@ -270,8 +270,8 @@
     }
 
     {% if not request.user.is_authenticated %}
-        $('.guidebook-others .like img').css('cursor', 'pointer');
-        $('.guidebook-others .like img').click(function () {
+        $('.guidebook-others .like i').css('cursor', 'pointer');
+        $('.guidebook-others .like i').click(function () {
             Swal.fire({
                 title: 'Need to login!',
                 html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
@@ -280,9 +280,9 @@
                 confirmButtonText: 'OK'
             })
         });
-    {% elif request.user != guidebook.user %}
-        $('.guidebook-others .like img').css('cursor', 'pointer');
-        $('.guidebook-others .like img').click(function () {
+    {% else %}
+        $('.guidebook-others .like i').css('cursor', 'pointer');
+        $('.guidebook-others .like i').click(function () {
             $.ajax({
                 url: "{% url 'guidebook.check_like' unique_id=guidebook.unique_id %}",
                 type: 'POST',
@@ -294,13 +294,11 @@
                         toastr.error(data.message)
                     }
                     else {
-                        var loved = "{% static 'images/icon/icons8-love-48.png' %}";
-                        var unloved = "{% static 'images/icon/icons8-love-100.png' %}"
                         $('.guidebook-others .like span').text(data.liked_count + ' Likes');
                         if (data.liked_count == 0)
-                            $('.guidebook-others .like img').attr('src', unloved)
+                            $('.guidebook-others .like i').removeClass('fas').addClass('far');
                         else
-                            $('.guidebook-others .like img').attr('src', loved)
+                            $('.guidebook-others .like i').addClass('fas').removeClass('far');
                     }
                 }
             });
@@ -414,7 +412,7 @@
         var description = $(this).find('.scene-description').find('span').text();
         history.pushState({
             id: 'Guidebook Detail'
-        }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
+        }, "{{ pageTitle }}", href + '?image_key=' + image_key);
         var $this = $(this);
         mapillaryViewer.moveToKey(image_key).then(function () {
             $('.left-side.poi-box').removeClass('d-none');
@@ -423,6 +421,7 @@
             var start_x = $this.find('.start_x').text();
             var start_y = $this.find('.start_y').text();
             mapillaryViewer.setCenter([start_x, start_y]);
+            add_poi_icon();
         });
     });
 
@@ -435,7 +434,6 @@
             style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
             center: first_point, // starting position
             zoom: 14, // starting zoom
-            attributionControl: false
         });
     }
 
@@ -446,11 +444,9 @@
             container: 'map', // container id
             style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
             zoom: -2, // starting zoom
-            attributionControl: false
         });
     }
 
-    map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
     map.on('load', function() {
 
         map.addSource('points', {
@@ -656,12 +652,11 @@
         if (key_list.length < 2 || current_order_number == 0)
             return false;
         var index = current_order_number - 1;
+        var image_key = key_list[index];
         var href = location.protocol + '//' + location.host + location.pathname ;
         history.pushState({
             id: 'Guidebook Detail'
-        }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
-
-        var image_key = key_list[index];
+        }, "{{ pageTitle }}", href + '?image_key=' + image_key);
         var title = $('.scene-box').eq(index).find('.scene-title').find('h6').text();
         var description = $('.scene-box').eq(index).find('.scene-description').find('span').text();
         mapillaryViewer.moveToKey(image_key).then(function () {
@@ -672,6 +667,7 @@
             var start_x = $('.scene-box').eq(index).find('.start_x').text();
             var start_y = $('.scene-box').eq(index).find('.start_y').text();
             mapillaryViewer.setCenter([start_x, start_y]);
+            add_poi_icon();
         });
     });
 
@@ -682,10 +678,11 @@
             return false;
         var index = current_order_number + 1;
         var href = location.protocol + '//' + location.host + location.pathname ;
+
+        var image_key = key_list[index];
         history.pushState({
             id: 'Guidebook Detail'
-        }, "{{ pageTitle }}", href + '?scene=' + (index + 1));
-        var image_key = key_list[index];
+        }, "{{ pageTitle }}", href + '?image_key=' + image_key);
         var title = $('.scene-box').eq(index).find('.scene-title').find('h6').text();
         var description = $('.scene-box').eq(index).find('.scene-description').find('span').text();
         mapillaryViewer.moveToKey(image_key).then(function () {
@@ -696,6 +693,7 @@
             var start_x = $('.scene-box').eq(index).find('.start_x').text();
             var start_y = $('.scene-box').eq(index).find('.start_y').text();
             mapillaryViewer.setCenter([start_x, start_y]);
+            add_poi_icon();
         });
     });
 
@@ -802,6 +800,9 @@
     }
 
     function refresh_poi_list(show = false) {
+        $('.TagVertex').each(function (i) {
+            $(this).html('<i class="fas fa-info-circle text-success" style="font-size: 50px"></i>')
+        });
         $('.card.poi .collapse-button').off('click');
         $('.card.poi .collapse-button').click(function () {
             selected_poi_id = $(this).data('poi-id');
@@ -818,11 +819,21 @@
             }
             var position_x = $('#poi_body_' + selected_poi_id).find('.position-x').text();
             var position_y = $('#poi_body_' + selected_poi_id).find('.position-y').text();
-            mapillaryViewer.setCenter([position_x, position_y])
+            mapillaryViewer.setCenter([position_x, position_y]);
+            add_poi_icon();
         });
         if (show)
             $('#poi_list').find('.card-header').eq(0).find('button').trigger('click');
     }
+    var add_poi_icon = function() {
+        $('.TagVertex').each(function (i) {
+            $(this).html('<i class="fas fa-info-circle text-success" style="font-size: 50px"></i>')
+        });
+    }
+    mapillaryViewer.on("mousemove", add_poi_icon);
+    mapillaryViewer.on("mouseover", add_poi_icon);
+    mapillaryViewer.on("mousedown", add_poi_icon);
+    mapillaryViewer.on("mouseup", add_poi_icon);
 
     function refresh_mapillery_classes() {
 

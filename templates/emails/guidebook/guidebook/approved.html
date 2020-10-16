@@ -1,8 +1,0 @@
-<body>
-    <div>
-        <h2>{{ subject }}</h2>
-    </div>
-    <p>
-        <a href="{{ BASE_URL }}{% url 'marketplace.my_job_edit' unique_id=guidebook.unique_id %}">{{ guidebook.name }}</a> is approved. You can see the guidebook <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">here</a>.
-    </p>
-</body>

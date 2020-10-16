@@ -1,57 +1,34 @@
-## Python packages
-from datetime import datetime
-import json
-import re
-from binascii import a2b_base64
-import os
+# Python packages
 
-## Django Packages
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.shortcuts import redirect
-from django.utils import timezone
-from django.http import (
-    Http404, HttpResponse, JsonResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
-)
-from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.contrib import messages
-from django.template import RequestContext
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.template.loader import render_to_string
-from django.contrib.gis.geos import Point
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+import threading
+
+# Django Packages
+from django.contrib.gis.geos import Point, LineString
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.contrib.gis.geos import Point, Polygon, MultiPolygon, LinearRing, LineString
-## Custom Libs ##
+from rest_framework.views import APIView
+
+from accounts.models import MapillaryUser
+# Custom Libs ##
 from lib.functions import *
-
-## Project packages
-from accounts.models import CustomUser
+from lib.mapillary import Mapillary
+from sequence.models import CameraMake
+from sequence.models import Sequence, TransType
+from sequence.views import get_images_by_sequence
+from sys_setting.models import Tag as SeqTag
+# Project packages
 from tour.models import TourSequence
-## App packages
 
+
+# App packages
 # That includes from .models import *
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-
-from sequence.models import Sequence, TransType, Tag as SeqTag
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.views import APIView
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
-import threading
-from accounts.models import MapillaryUser
-from sequence.views import get_images_by_sequence
-from lib.mapillary import Mapillary
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
         return  # To not perform the csrf check previously happening
+
 
 class SequenceCreate(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication, )
@@ -107,6 +84,7 @@ class SequenceCreate(APIView):
             'unique_id': str(sequence.unique_id)
         })
 
+
 class SequenceImport(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication, )
     permission_classes = [IsAuthenticated]
@@ -118,9 +96,6 @@ class SequenceImport(APIView):
 
         data = request.data
         message = ''
-
-
-
 
         if 'google_street_view' in data.keys():
             google_street_view = data['google_street_view']
@@ -182,10 +157,16 @@ class SequenceImport(APIView):
                         t_s.delete()
                 seq.delete()
 
-
         sequence.user = request.user
         if 'camera_make' in properties:
-            sequence.camera_make = properties['camera_make']
+            camera_makes = CameraMake.objects.filter(name=properties['camera_make'])
+            if camera_makes.count() > 0:
+                c = camera_makes[0]
+            else:
+                c = CameraMake()
+                c.name = properties['camera_make']
+                c.save()
+            sequence.camera_make = c
         sequence.captured_at = properties['captured_at']
         if 'created_at' in properties:
             sequence.created_at = properties['created_at']
@@ -201,7 +182,7 @@ class SequenceImport(APIView):
         sequence.coordinates_cas = properties['coordinateProperties']['cas']
         sequence.coordinates_image = properties['coordinateProperties']['image_keys']
         if 'private' in properties:
-            sequence.is_privated = properties['private']
+            sequence.is_private = properties['private']
 
         lineString = LineString()
         firstPoint = None
@@ -224,6 +205,9 @@ class SequenceImport(APIView):
 
 
         sequence.is_published = True
+        sequence.save()
+
+        sequence.distance = sequence.get_distance()
         sequence.save()
 
         print('1')
@@ -256,7 +240,7 @@ class MapillaryTokenVerify(APIView):
             return Response({'error': 'Mapillary token is invalid', 'status': False})
 
         data = MapillaryUser.objects.filter(key=map_user_data['key'], user=request.user)
-        if data.count() == 0:
+        if 0 == data.count():
             map_user = MapillaryUser()
         else:
             map_user = data[0]

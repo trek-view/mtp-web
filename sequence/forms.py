@@ -1,15 +1,15 @@
-## Django Packages
+# Django Packages
 from django import forms
 from django_select2 import forms as s2forms
 
-## App packages
+# App packages
 from .models import *
 from datetime import datetime
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
-from tags_input import fields
 from lib.classes import CustomTagsInputField
 ############################################################################
 ############################################################################
+
 
 class TransportSearchForm(forms.Form):
 
@@ -19,7 +19,6 @@ class TransportSearchForm(forms.Form):
         now = datetime.now()
         year = now.year
         month = now.month
-
 
         self.fields['month'] = forms.DateField(
             widget=MonthPickerInput(
@@ -54,6 +53,7 @@ class TransportSearchForm(forms.Form):
             required=False
         )
 
+
 class AddSequeceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -62,13 +62,14 @@ class AddSequeceForm(forms.ModelForm):
                            required=False)
 
         self.fields['description'] = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation': 'required'}),
-        required=False)
+            widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation-optional': 'true'}),
+            required=False
+        )
 
         self.fields['transport_type'] = forms.ModelChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'form-control'}),
+                attrs={'class': 'form-control', 'data-validation': 'required'}),
             queryset=TransType.objects.filter(parent__isnull=False),
             empty_label=None
         )
@@ -77,6 +78,7 @@ class AddSequeceForm(forms.ModelForm):
             Tag.objects.filter(is_actived=True),
             create_missing=True,
             required=False,
+            help_text='Add a tag'
         )
 
     class Meta:
@@ -87,6 +89,7 @@ class AddSequeceForm(forms.ModelForm):
             'transport_type',
             'tag'
         )
+
 
 class SequenceSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -104,10 +107,13 @@ class SequenceSearchForm(forms.Form):
             required=False
         )
 
-        self.fields['camera_make'] = forms.CharField(
-            label='Camera Make/Model',
-            widget=forms.TextInput(attrs={'class': 'form-control'}),
-            required=False
+        self.fields['camera_make'] = forms.ModelMultipleChoiceField(
+            required=False,
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            queryset=CameraMake.objects.all(),
+            label='Camera Make (leave blank for all)',
         )
 
         self.fields['transport_type'] = forms.ModelChoiceField(
@@ -122,6 +128,7 @@ class SequenceSearchForm(forms.Form):
             create_missing=False,
             required=False,
         )
+        self.fields['tag'].help_text = 'Search for a tag'
         self.fields['like'] = forms.ChoiceField(
             label='Like',
             widget=forms.RadioSelect(),
@@ -136,6 +143,7 @@ class SequenceSearchForm(forms.Form):
             required=False
         )
 
+
 class ImageSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -145,15 +153,16 @@ class ImageSearchForm(forms.Form):
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            queryset=CameraMake.objects.all()
+            queryset=CameraMake.objects.all(),
+            label='Camera Make (leave blank for all)',
         )
-        self.fields['camera_model'] = forms.ModelMultipleChoiceField(
-            required=False,
-            widget=forms.SelectMultiple(
-                attrs={'class': 'form-control'}
-            ),
-            queryset=CameraModel.objects.all()
-        )
+        # self.fields['camera_model'] = forms.ModelMultipleChoiceField(
+        #     required=False,
+        #     widget=forms.SelectMultiple(
+        #         attrs={'class': 'form-control'}
+        #     ),
+        #     queryset=CameraModel.objects.all()
+        # )
 
         self.fields['username'] = forms.CharField(
             label='Username',
@@ -169,6 +178,7 @@ class ImageSearchForm(forms.Form):
             empty_label='All Types'
         )
 
+
 class SequenceSearchForTourForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -180,7 +190,7 @@ class SequenceSearchForTourForm(forms.Form):
         )
 
         self.fields['camera_make'] = forms.CharField(
-            label='Camera Make/Model',
+            label='Camera Make (leave blank for all)',
             widget=forms.TextInput(attrs={'class': 'form-control'}),
             required=False
         )
@@ -197,6 +207,7 @@ class SequenceSearchForTourForm(forms.Form):
             create_missing=False,
             required=False,
         )
+        self.fields['tag'].help_text = 'Search for a tag'
         self.fields['like'] = forms.ChoiceField(
             label='Like',
             widget=forms.RadioSelect(),

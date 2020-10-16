@@ -1,0 +1,5 @@
+<body>
+    <p>
+        Hi {{ tour.user.username }}! You received a like for your tour: <a href="{{ BASE_URL }}{% url 'tour.tour_detail' unique_id=tour.unique_id %}">{{ tour.name }}</a>.
+    </p>
+</body>

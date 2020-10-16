@@ -1,5 +1,6 @@
 import os
 import datetime
+from django.conf import global_settings
 from datetime import timedelta
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -26,6 +27,7 @@ INSTALLED_APPS = [
     'sequence.apps.SequenceConfig',
     'tour.apps.TourConfig',
     'leaderboard.apps.LeaderboardConfig',
+    'sys_setting.apps.SysSettingConfig',
     # ========================
     'oauth2_provider',
     'corsheaders',
@@ -56,9 +58,9 @@ REST_FRAMEWORK = {
 }
 
 TAGS_INPUT_MAPPINGS = {
-    'guidebook.Tag': {'field': 'name'},
-    'sequence.Tag': {'field': 'name'},
-    'tour.TourTag': {'field': 'name'}
+    # 'guidebook.Tag': {'field': 'name'},
+    'sys_setting.Tag': {'field': 'name'},
+    # 'tour.TourTag': {'field': 'name'}
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -67,11 +69,13 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend'
 )
 
+MTPU_SCHEME = 'app.mtp.desktop'
+
 OAUTH2_PROVIDER = {
     "AUTHORIZATION_CODE_EXPIRE_SECONDS": 600000000,
     "ACCESS_TOKEN_EXPIRE_SECONDS": 600000000,
     "RESOURCE_SERVER_TOKEN_CACHING_SECONDS": 600000000,
-    "ALLOWED_REDIRECT_URI_SCHEMES": ["app.mtp.desktop"],
+    "ALLOWED_REDIRECT_URI_SCHEMES": [MTPU_SCHEME],
 }
 
 MIDDLEWARE = [

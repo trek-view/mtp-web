@@ -26,7 +26,13 @@
                     <form method="post" class="mb-3">
                         {% csrf_token %}
                         {{ form.as_p }}
-                        <input type="hidden" name="next" value="{{ next }}" />
+                        {% if not next is None and next != ''  %}
+                            <input type="hidden" name="next" value="{{ next }}" />
+                        {% elif not request.GET.next is None and request.GET.next != '' %}
+                            <input type="hidden" name="next" value="{{ next }}" />
+                        {% else %}
+                            <input type="hidden" name="next" value="" />
+                        {% endif %}
                         <div class="d-flex flex-row justify-content-between align-items-center">
                             <a href="{% url 'signup' %}">Sign Up</a>
                             <button type="submit" class="btn btn-primary">Login</button>

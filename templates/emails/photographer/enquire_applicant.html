@@ -1,5 +1,5 @@
 <body>
     <p>
-        Hi {{ request.user.username }} You contacted "{{ photographer.name }}" about a job. We have sent your message to them ({{ photographer.email }}). Please contact them directly for more information.
+        Hi {{ request.user.username }}! You contacted {{ photographer.user.username }} about a job. We have sent your message to them. Please give them some time to respond. If needed, you can also contact them directly for more information by replying to this email.
     </p>
 </body>

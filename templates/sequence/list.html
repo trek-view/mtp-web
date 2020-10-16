@@ -1,7 +1,8 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 {% block app_sequence %}active{% endblock %}
-{% block app_style %}<link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">{% endblock %}
+{% block app_style %}<!--suppress JSUnresolvedFunction -->
+    <link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">{% endblock %}
 {% block content %}
 
 <div class="main-body">
@@ -30,9 +31,18 @@
                 {% endfor %}
             {% endif %}
 
-            <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
-                <a class="btn btn-outline-primary" href="{% url 'sequence.import_sequence' %}">
+            <div class="w-100 mb-3 pr-3 pl-3">
+                <span>If you've already uploaded imagery to Mapillary</span>
+                <a class="btn btn-outline-primary mt-2" href="{% url 'sequence.import_sequence' %}">
                     Import from Mapillary
+                </a>
+            </div>
+
+            <div class="w-100 mb-3 pr-3 pl-3">
+                <span>Or upload your images now</span>
+                <br />
+                <a class="btn btn-outline-primary mt-2" href="{% url 'app_download' %}">
+                    Upload new imagery
                 </a>
             </div>
 
@@ -53,7 +63,9 @@
             <div class="p-3" style="border-top: 1px solid #dee2e6;">
                 <div class="search-form">
                     <form method="GET" class="post-form" id="search_form">
-                        <input type="number" class="d-none" name="page" value="{{ page }}">
+                        <label>
+                            <input type="number" class="d-none" name="page" value="{{ page }}">
+                        </label>
                         {{ form.media }}
                         {{ form.as_p }}
                         <div class="form-group text-right mt-3">
@@ -67,7 +79,7 @@
     </div>
     <div class="right-board list bg-light">
         <div class="switch-list-viewer">
-            <input class="" type="checkbox" id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
+            <label for="switch-list-viewer"></label><input class="" type="checkbox" id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
         </div>
         <div id="list-view" class="mt-4 mb-2 ml-auto mr-auto">
             <div class="paginator">
@@ -111,11 +123,14 @@
                                     <div class="col-sm-6">
                                         <div class="cover-image-box">
                                             <div class="row">
-                                                {% if sequence.getCoverImage is None %}
-                                                    <img class="w-100" style="height: 140px" src="{% static 'images/global/empty-1.png' %}">
+                                                {% if sequence.get_cover_image is None %}
+                                                    <img class="w-100" src="{% static 'images/global/empty-1.png' %}" alt="Empty Image">
                                                 {% else %}
-                                                    <img class="w-100" style="height: 140px;" src="https://images.mapillary.com/{{ sequence.getCoverImage }}/thumb-320.jpg">
+                                                    <img class="w-100" src="https://images.mapillary.com/{{ sequence.get_cover_image }}/thumb-320.jpg" alt="Sequence Cover Image (first image)">
                                                 {% endif %}
+                                            </div>
+                                            <div class="user-on-mapillary" >
+                                                image by {{ sequence.username }} on mapillary
                                             </div>
                                         </div>
                                     </div>
@@ -123,7 +138,7 @@
                             </div>
 
                             <div class="detail-box col-lg-8">
-                                <div class="row w-100">
+                                <div class="row" style="width: calc(100% + 30px)">
                                     <div class="col-md-6 item-detail-box p-2">
                                         <div class="item-main w-100 float-left">
                                             <div class="item-title text-info d-flex flex-row justify-content-between">
@@ -134,7 +149,7 @@
 
                                             <div class="item-description">
                                                 <p class="mb-1">
-                                                    {{ sequence.getShortDescription }}
+                                                    {{ sequence.get_short_description }}
                                                 </p>
                                             </div>
 
@@ -149,19 +164,25 @@
                                                     <br>
                                                     {{ sequence.transport_type.name }}
                                                 </p>
-                                                <p class="mb-1 mr-3 item-image-count">
-                                                    {{ sequence.getImageCount }} Panos
+                                                <p class="mb-1 mr-3 item-image-count text-center">
+                                                    <i class="fas fa-image"></i>
+                                                    <br>
+                                                    {{ sequence.get_image_count }} Photos
                                                 </p>
-                                                <p class="mb-1 mr-3 item-distance">
-                                                    {{ sequence.getDistance }} Km
+                                                <p class="mb-1 mr-3 item-distance text-center">
+                                                    <i class="fas fa-ruler-horizontal "></i>
+                                                    <br>
+                                                    {{ sequence.get_distance }} Km
                                                 </p>
-                                                <p class="mb-1 mr-3 item-tour-count">
+                                                <p class="mb-1 mr-3 item-tour-count text-center">
+                                                    <i class="fas fa-clipboard-list"></i>
+                                                    <br>
                                                     {{ sequence.tour_count }} tours
                                                 </p>
                                             </div>
 
                                             <div class="item-tag" style="min-height: 24px;">
-                                                {% for tag_name in sequence.getTags %}
+                                                {% for tag_name in sequence.get_tags %}
                                                     <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                                                         {{ tag_name }}
                                                     </span>
@@ -180,18 +201,28 @@
                                     <div class="col-md-3">
                                         <canvas id="chart_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}" class="ele-chart" width="250" height="190"></canvas>
                                     </div>
-                                    <div class="col-md-3 p-2 " style="font-size: 13px;">
-                                        <div class="d-flex flex-row align-items-center">
-                                            <a target="_blank" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
-                                                <img style="width: 40px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}">
+                                    <div class="col-md-3 p-2 text-center d-flex flex-column align-items-center justify-content-center" style="font-size: 13px;">
+                                        <div class="d-flex flex-row justify-content-center  align-items-center text-right">
+                                            <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.get_first_point_lat }}/{{ sequence.get_first_point_lng }}&photo_overlay=mapillary">
+                                                <img style="width: 32px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}"  alt=""/>
                                             </a>
-                                            <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
-                                                <img style="width: 120px" src="{% static "images/icon/mapillary_icon.png" %}">
+                                            {% if sequence.google_street_view %}
+                                                <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.get_first_point_lat }},{{ sequence.get_first_point_lng }},14z">
+                                                    <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico"  alt=""/>
+                                                </a>
+                                            {% endif %}
+                                            {% if not sequence.strava is None and sequence.strava != ''  %}
+                                                <a class="mr-2" target="_blank" href="https://www.strava.com/activities/{{ sequence.strava }}">
+                                                    <img style="width: 35px" src="https://a4k2d2q5.rocketcdn.me/wp-content/uploads/2018/02/Strava-Running-and-Cycling-GPS.png" alt="">
+                                                </a>
+                                            {% endif %}
+                                            <a target="_blank" class="" href="https://www.mapillary.com/app/?pKey={{ sequence.get_first_image_key }}&focus=photo">
+                                                <img style="width: 32px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQiTHrSFBxGdPFbRSCEXLo3IB1IzMS50F_V0Q&usqp=CAU" alt="">
                                             </a>
                                         </div>
 
-                                        <p class="mt-3">{{ sequence.captured_at }}</p>
-                                        <p>{{ sequence.created_at }}</p>
+                                        <p class="mt-3">Captured at: {{ sequence.captured_at }}</p>
+                                        <p>Uploaded at: {{ sequence.created_at }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -231,7 +262,9 @@
                 {% endif %}
             </div>
         </div>
-        <div class="d-none" id="map"></div>
+        <div class="d-none" id="map">
+
+        </div>
     </div>
 
     <div class="detail-modal modal fade" style="padding-top: 140px !important;" id="sequenceDetailModal">
@@ -245,9 +278,9 @@
     {% if pageName == 'my-sequence-list' %}active{% endif %}
 <script>
     $('.paginator-btn').click(function() {
-        var pageNum = $(this).data('page');
-        var current_url = window.location.href;
-        var a = current_url.split("?");
+        const pageNum = $(this).data('page');
+        let current_url = window.location.href;
+        const a = current_url.split("?");
         if (a.length < 2)
         {
             current_url += '?page=' + pageNum;
@@ -255,12 +288,12 @@
             return;
         }
 
-        var b = a[1].split("&");
-        var i = 0;
-        var c = [];
-        var is_changed = false;
+        const b = a[1].split("&");
+        let i;
+        const c = [];
+        let is_changed = false;
         for (i=0;i<b.length;i++) {
-            if (b[i].substr(0, 5) == 'page=') {
+            if (b[i].substr(0, 5) === 'page=') {
                 c.push('page=' + pageNum);
                 is_changed = true;
             }
@@ -268,31 +301,34 @@
                 c.push(b[i]);
             }
         }
-        var url = a[0] + '?' + c.join('&');
+        let url = a[0] + '?' + c.join('&');
         if (!is_changed)
             url += '&page=' + pageNum;
         location.assign(url);
     });
 
     mapboxgl.accessToken = mapboxToken;
-    var positions = [];
+    const positions = [];
     {% for sequence in sequences %}
         positions.push({{ sequence.geometry_coordinates_ary }});
     {% endfor %}
 
-    var map_ary = [];
-    var chart_ary = [];
-    console.log(positions);
+    const map_ary = [];
+    const chart_ary = [];
+    let i;
+
     function draw_map(data) {
-        var obj = $('.min-map-box').eq(i);
-        var obj_id = obj.attr('id');
-        var sceneData = [];
-        var item = {};
-        var scene_positions = [];
-        for (var j = 0; j < data.length; j++)
+        let first_point;
+        let map;
+        const obj = $('.min-map-box').eq(i);
+        const obj_id = obj.attr('id');
+        const sceneData = [];
+        let item = {};
+        const scene_positions = [];
+        for (let j = 0; j < data.length; j++)
         {
-            var lat = data[j][1];
-            var lng = data[j][0];
+            const lat = data[j][1];
+            const lng = data[j][0];
             scene_positions.push([lng, lat]);
             item = {
                 "type": "Feature",
@@ -306,27 +342,29 @@
         }
 
         if (scene_positions.length > 0)
-            var first_point = scene_positions[0];
+            {
+                first_point = scene_positions[0];
+            }
         else
-            var first_point = null;
+            {
+                first_point = null;
+            }
 
         console.log('positions', sceneData)
         if (first_point != null) {
-            var map = new mapboxgl.Map({
+            map = new mapboxgl.Map({
                 container: obj_id, // container id
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: first_point, // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         else {
-            var map = new mapboxgl.Map({
+            map = new mapboxgl.Map({
                 container: obj_id, // container id
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: [-87.622088, 41.878781], // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         map.on('load', function() {
@@ -351,13 +389,23 @@
         map.resize();
     }
 
-    var centerPointerData = [];
-    var map = new mapboxgl.Map({
+    const centerPointerData = [];
+    const map = new mapboxgl.Map({
         container: 'map', // container id
         style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
         center: [-74.5, 40], // starting position
         zoom: 1 // starting zoom
     });
+
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
 
     for (i = 0; i < positions.length; i++)
     {
@@ -366,9 +414,9 @@
     }
 
     function drawMapView(l, data) {
-        if (data.length == 0)
+        if (data.length === 0)
             return false;
-        var centerItem = {
+        const centerItem = {
             "type": "Feature",
             "properties": {"sequence_id": $('.sequence').eq(l).data('sequence-id')},
             "geometry": {
@@ -379,57 +427,102 @@
         centerPointerData.push(centerItem);
     }
 
+    // Create a popup, but don't add it to the map yet.
+    const popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+    });
+
     map.on('load', function() {
-        map.loadImage(
-            'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
-            function(error, image) {
-                if (error) throw error;
-                map.addImage('custom-marker', image);
-                map.addSource('points', {
-                    'type': 'geojson',
-                    'data': {
-                        'type': 'FeatureCollection',
-                        'features': centerPointerData
-                    }
-                });
-                map.addLayer({
-                    'id': 'points',
-                    'type': 'symbol',
-                    'source': 'points',
-                    'layout': {
-                        'icon-image': 'custom-marker',
-                        // get the title name from the source's "title" property
-                        // 'text-field': ['get', 'title'],
-                        'text-font': [
-                            'Open Sans Semibold',
-                            'Arial Unicode MS Bold'
-                        ],
-                        'text-offset': [0, 1.25],
-                        'text-anchor': 'top'
-                    }
-                });
-            }
-        )
+        drawMapByUserKey('');
+        map.on('mouseenter', 'mtp-images', function(e) {
+          // Change the cursor style as a UI indicator.
+          map.getCanvas().style.cursor = 'pointer';
 
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const key = e.features[0].properties.image_key;
+            const url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
 
-        map.on('click', 'points', function (e) {
-            getSequenceDetail(e.features[0].properties.sequence_id);
+            // Ensure that if the map is zoomed out such that multiple
+          // copies of the feature are visible, the popup appears
+          // over the copy being pointed to.
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
 
+          // Populate the popup and set its coordinates
+          // based on the feature found.
+          popup.setLngLat(coordinates)
+          .setHTML('<img src="' + url + '" width="160"  alt=""/>')
+          .addTo(map);
         });
 
-        // Change the cursor to a pointer when the mouse is over the states layer.
-        map.on('mouseenter', 'points', function () {
-            map.getCanvas().style.cursor = 'pointer';
+        map.on('click', 'mtp-images', function (e) {
+            getSequenceDetailByImageKey(e.features[0].properties["image_key"]);
         });
 
         // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'points', function () {
+        map.on('mouseleave', 'mtp-images', function () {
             map.getCanvas().style.cursor = '';
+            popup.remove();
         });
     });
 
-    function getSequenceDetail(id) {
-        var url = "{% url 'sequence.ajax_get_detail' unique_id='unique_id' %}";
+    function drawMapByUserKey(userkey) {
+        console.log('userkey', userkey);
+        let filter = ['all',
+            ['==', 'userkey', userkey]
+        ];
+        if (typeof userkey == 'undefined' || userkey === '')
+            filter = ['all']
+
+        if (map.getLayer('mtp-sequences')) map.removeLayer('mtp-sequences');
+        if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
+        if (map.getSource('mtp-images')) map.removeSource('mtp-images');
+        if (map.getSource('mtp-sequences')) map.removeSource('mtp-sequences');
+
+        map.addSource('mtp-sequences', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?tile={z}/{x}/{y}"],
+        });
+
+        map.addLayer({
+            "id": "mtp-sequences",
+            "type": "line",
+            "source": 'mtp-sequences',
+            "source-layer": 'mtp-sequences',
+            'filter': filter,
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-opacity": 0.6,
+                "line-color": "#7880bd",
+                "line-width": 2
+            }
+        }, "waterway-label");
+
+        map.addSource('mtp-images', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}"],
+        });
+
+        map.addLayer({
+            "id": "mtp-images",
+            "type": "circle",
+            "source": 'mtp-images',
+            "source-layer": 'mtp-images',
+            'filter': filter,
+            "paint": {
+                "circle-color": "#7880bd",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
+    }
+
+    function getSequenceDetailByUniqueID(id) {
+        let url = "{% url 'sequence.ajax_get_detail' unique_id='unique_id' %}";
         url = url.replace('unique_id', id);
         $.ajax({
             url: url,
@@ -441,8 +534,9 @@
                     toastr.error(data.message);
                 }
                 else {
-                    $('#sequenceDetailModal').html(data.sequence_html_detail)
-                    $('#sequenceDetailModal').modal({
+                    const $detailModal = $('#sequenceDetailModal');
+                    $detailModal.html(data['sequence_html_detail'])
+                    $detailModal.modal({
                         'backdrop': false,
                         'show': true,
                     });
@@ -451,9 +545,32 @@
         });
     }
 
+    function getSequenceDetailByImageKey(image_key) {
+        let url = "{% url 'sequence.ajax_get_detail_by_image_key' image_key='init_image_key' %}";
+        url = url.replace('init_image_key', image_key);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (!data.sequence) {
+                    toastr.error(data.message);
+                }
+                else {
+                    const $detailModal = $('#sequenceDetailModal');
+                    $detailModal.html(data['sequence_html_detail'])
+                    $detailModal.modal({
+                        'backdrop': false,
+                        'show': true,
+                    });
+                }
+            }
+        });
+    }
 
     function gotoDetail(id) {
-        var url = "{% url 'sequence.sequence_detail' unique_id='unique_id' %}";
+        let url = "{% url 'sequence.sequence_detail' unique_id='unique_id' %}";
         url = url.replace('unique_id', id);
         location.assign(url);
     }
@@ -471,7 +588,7 @@
     })
 
     function drawChart(sequence_id) {
-        var url = "{% url 'sequence.ajax_get_image_ele' unique_id='unique_id' %}";
+        let url = "{% url 'sequence.ajax_get_image_ele' unique_id='unique_id' %}";
         url = url.replace('unique_id', sequence_id)
         $.ajax({
             url: url,
@@ -479,21 +596,21 @@
             data: {},
             dataType: 'json',
             success: function (data) {
-                if (data.status == 'failed')
+                if (data.status === 'failed')
                 {
                     toastr.error(data.message)
                 }
                 else {
-                    var num_ary = []
-                    for (var i=0; i<data.eles.length;i++) {
+                    const num_ary = [];
+                    for (let i=0; i<data.eles.length; i++) {
                         num_ary.push(i+1)
                     }
-                    var myLineChart = new Chart(document.getElementById("chart_" + sequence_id), {
+                    const myLineChart = new Chart(document.getElementById("chart_" + sequence_id), {
                         type: 'line',
                         data: {
                             labels: num_ary,
                             datasets: [{
-                                data: data.eles,
+                                data: data['eles'],
                                 borderWidth: 1,
                                 borderColor: "#3e95cd",
                                 fill: false
@@ -519,17 +636,16 @@
                                     }
                                 }]
                             },
-                            'legend': { 'display': false }
+                            'legend': {'display': false}
                         }
                     });
                 }
             }
         });
-
     }
 
-    $('.ele-chart').each(function (index) {
-        var sequence_id = $(this).attr('data-sequence-id');
+    $('.ele-chart').each(function () {
+        const sequence_id = $(this).attr('data-sequence-id');
         drawChart(sequence_id)
     })
 

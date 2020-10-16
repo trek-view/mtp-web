@@ -1,4 +1,4 @@
-## Django Packages
+# Django Packages
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django import forms
 from django.utils.text import capfirst
@@ -7,12 +7,14 @@ from django.contrib.auth import (
 )
 from django.utils.translation import gettext, gettext_lazy as _
 
-## App Packages
+# App Packages
 from .models import CustomUser
+from django.utils.html import mark_safe
 
 UserModel = get_user_model()
 
 ############################################################################
+
 
 class AuthenticationForm(forms.Form):
     """
@@ -92,9 +94,11 @@ class AuthenticationForm(forms.Form):
             params={'email': self.email_field.verbose_name},
         )
 
+
 class UserLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super(UserLoginForm, self).__init__(*args, **kwargs)
+
 
 class UserSignUpForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
@@ -116,11 +120,22 @@ class UserSignUpForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': ''})
     )
 
-    is_maillist = forms.BooleanField(widget=forms.CheckboxInput(attrs={'checked': 'checked'}),label='Email me about imagery capture competitions', required=False)
+    is_maillist = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={'checked': 'checked'}),
+        label='Email me about imagery capture competitions',
+        required=False
+    )
+
+    is_term = forms.BooleanField(
+        widget=forms.CheckboxInput(),
+        label=mark_safe('<a href="https://www.trekview.org/terms" target="_blank">I agree to the Trek View terms of service</a>'),
+        required=True
+    )
 
     class Meta:
         model = CustomUser
         fields = ("email", "username", "password1", "password2", "is_maillist")
+
 
 class UserUpdateForm(forms.ModelForm):
     username = forms.CharField(widget=forms.TextInput(
@@ -148,11 +163,12 @@ class UserUpdateForm(forms.ModelForm):
     )
 
     website_url = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'style': 'resize: none;', 'data-validation': 'url'}), required=False)
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'style': 'resize: none;', 'data-validation': 'url', 'data-validation-optional': 'true'}), required=False)
 
     class Meta:
         model = CustomUser
         fields = ("username", "email", "first_name", "last_name", "description", "website_url")
+
 
 class UserProfileForm(forms.ModelForm):
     username = forms.CharField(widget=forms.TextInput(
@@ -166,6 +182,7 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ("username", "email", "is_maillist")
+
 
 class UserPasswordChangeForm(PasswordChangeForm):
 
@@ -185,6 +202,7 @@ class UserPasswordChangeForm(PasswordChangeForm):
         strip=False,
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password'}),
     )
+
 
 class UserAvatarForm(forms.ModelForm):
     avatar = forms.FileField(

@@ -100,7 +100,9 @@
         {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board bg-light">
-        <div id="map"></div>
+        <div id="map">
+
+        </div>
     </div>
 </div>
 
@@ -117,7 +119,7 @@
         center: [-74.5, 40], // starting position
         zoom: 0 // starting zoom
     });
-    map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
     map.on('load', function() {
     });
 

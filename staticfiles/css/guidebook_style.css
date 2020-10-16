@@ -17,7 +17,7 @@
 .main-body .board {
     position: absolute;
     bottom: 0px;
-    width: 100%;
+    /*width: 100%;*/
 }
 
 .image-box {
@@ -149,7 +149,7 @@ body {
 }
 
 .TagVertex {
-    opacity: .6;
+    opacity: .7;
 }
 
 .guidebook-box {
@@ -162,11 +162,6 @@ body {
     background: #79aec8;
 }
 
-.guidebook-list .card.guidebook .cover-image-box  {
-    /*width: 180px;*/
-    height: 140px;
-    /*background: #79aec8;*/
-}
 
 .guidebook-list .card.guidebook .cover-image-box > img {
     width: 100%;
@@ -315,3 +310,4 @@ body {
         height: auto;
     }
 }
+

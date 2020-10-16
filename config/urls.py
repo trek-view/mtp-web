@@ -4,7 +4,8 @@ from django.views.generic import RedirectView
 from django_email_verification import urls as mail_urls
 from django.conf import settings
 from django.conf.urls.static import static
-from two_factor.urls import urlpatterns as tf_urls
+# from two_factor.urls import urlpatterns as tf_urls
+from .two_factor_urls import urlpatterns as tf_urls
 from two_factor.admin import AdminSiteOTPRequired, AdminSiteOTPRequiredMixin
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.urls import reverse
@@ -17,17 +18,34 @@ from django.contrib.sitemaps.views import sitemap
 from django.contrib.sitemaps import GenericSitemap
 from photographer.models import Photographer
 from guidebook.models import Guidebook
+from accounts.models import CustomUser
+from challenge.models import Challenge
+from sequence.models import Sequence, Image
+from tour.models import Tour
+from rest_framework_mvt.views import mvt_view_factory
 from django.contrib import admin as admin_tmp
 from accounts import views as account_views
 from . import views
 
 sitemaps = {
     'static': StaticViewSitemap,
-    'photographer': GenericSitemap({
-        'queryset': Photographer.objects.filter(is_published=True),
+    'profile': GenericSitemap({
+        'queryset': CustomUser.objects.filter(is_active=True)
+    }, priority=0.9),
+    'challenge': GenericSitemap({
+        'queryset': Challenge.objects.filter(is_published=True)
     }, priority=0.9),
     'guidebook': GenericSitemap({
-        'queryset': Guidebook.objects.filter(is_published=True, is_approved=True),
+        'queryset': Guidebook.objects.filter(is_published=True)
+    }, priority=0.9),
+    'photographer': GenericSitemap({
+        'queryset': Photographer.objects.filter(is_published=True)
+    }, priority=0.9),
+    'sequence': GenericSitemap({
+        'queryset': Sequence.objects.filter(is_published=True)
+    }, priority=0.9),
+    'tour': GenericSitemap({
+        'queryset': Tour.objects.filter(is_published=True)
     }, priority=0.9),
 }
 
@@ -68,6 +86,8 @@ class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
 urlpatterns = [
     # path('', views.index, name='home'),
     path('', views.index, name='home'),
+    path('sequence.mvt', mvt_view_factory(model_class=Image, geom_col='point')),
+    path('uploader', views.app_download, name='app_download'),
     # path('', RedirectView.as_view(url='marketplace', permanent=False), name='home'),
     path('accounts/', include('accounts.urls')),
     path('email/', include(mail_urls)),
@@ -83,6 +103,7 @@ urlpatterns = [
     re_path(r'', include(tf_urls)),
     path('mission-control/', admin.site.urls, name='admin'),
     path('api/', include('api.urls')),
+    path('exchange_token', include('accounts.strava_url')),
 ]
 
 # This part is for deploying this project as a production(DEBUG=True) on heroku.

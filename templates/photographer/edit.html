@@ -34,7 +34,9 @@
         {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board bg-light">
-        <div id="map"></div>
+        <div id="map">
+
+        </div>
     </div>
 </div>
 
@@ -57,6 +59,16 @@
         center: [-74.5, 40], // starting position
         zoom: 1 // starting zoom
     });
+
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
 
     var photographerGeometryElements = $('.photographer-geometry');
     var polygonData = [];

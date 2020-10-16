@@ -1,13 +1,13 @@
-## Django Packages
+# Django Packages
 from django import forms
-from django_select2 import forms as s2forms
 
-## App packages
-from .models import *
-from tags_input import fields
 from lib.classes import CustomTagsInputField
+# App packages
+from .models import *
+
 ############################################################################
 ############################################################################
+
 
 class GuidebookForm(forms.ModelForm):
     name = forms.CharField(
@@ -31,18 +31,8 @@ class GuidebookForm(forms.ModelForm):
         Tag.objects.filter(is_actived=True),
         create_missing=True,
         required=False,
+        help_text='Add for a tag'
     )
-
-    # cover_image = forms.FileField(
-    #     widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
-    #     required=False
-    # )
-    # is_published = forms.ChoiceField(
-    #     widget=forms.RadioSelect(attrs={'class': 'd-none', 'disabled': 'disabled'}),
-    #     choices=(('True', 'Published'), ('False', 'Unpublished')),
-    #     required=False,
-    #     label=''
-    # )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -51,6 +41,7 @@ class GuidebookForm(forms.ModelForm):
             Tag.objects.filter(is_actived=True),
             create_missing=True,
             required=False,
+            help_text='Add for a tag'
         )
 
     class Meta:
@@ -64,6 +55,7 @@ class GuidebookForm(forms.ModelForm):
             # 'is_published',
         )
 
+
 class GuidebookImageForm(forms.ModelForm):
     cover_image = forms.FileField(
         widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
@@ -75,6 +67,7 @@ class GuidebookImageForm(forms.ModelForm):
         fields = (
             'cover_image',
         )
+
 
 class SceneForm(forms.Form):
     image_key = forms.CharField(
@@ -100,6 +93,11 @@ class SceneForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
     )
 
+    username = forms.CharField(
+        label='',
+        widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
+    )
+
     start_x = forms.CharField(
         label='',
         widget=forms.TextInput(attrs={'class': 'form-control d-none'}),
@@ -120,8 +118,10 @@ class SceneForm(forms.Form):
             'lat',
             'lng',
             'start_x',
-            'start_y'
+            'start_y',
+            'username'
         )
+
 
 class PointOfInterestForm(forms.ModelForm):
     title = forms.CharField(
@@ -149,6 +149,7 @@ class PointOfInterestForm(forms.ModelForm):
             'title',
             'description'
         )
+
 
 class GuidebookSearchForm(forms.Form):
 
@@ -179,6 +180,7 @@ class GuidebookSearchForm(forms.Form):
             create_missing=False,
             required=False,
         )
+        self.fields['tag'].help_text = 'Search for a tag'
 
         self.fields['username'] = forms.CharField(
             label='Username',

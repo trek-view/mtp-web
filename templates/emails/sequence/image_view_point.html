@@ -1,0 +1,5 @@
+<body>
+    <p>
+        Hi {{ sequence.user.username }}! You received a view point for your photo: <a href="{{ BASE_URL }}{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}?image_key={{ image_key }}">{{ image_key }}</a>.
+    </p>
+</body>

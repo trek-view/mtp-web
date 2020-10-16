@@ -18,13 +18,13 @@
 
                     <div class="photographer-description">
                         <p>
-                            {{ photographer.getShortDescription }}
+                            {{ photographer.get_short_description }}
                         </p>
                     </div>
 
                     <div class="photographer-options">
                         <p>
-                            {{ photographer.getCaptureType }}, {{ photographer.getCaptureMethod }}
+                            {{ photographer.get_capture_type }}, {{ photographer.get_capture_method }}
                         </p>
                     </div>
 
@@ -55,7 +55,9 @@
         {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board bg-light">
-        <div id="map"></div>
+        <div id="map">
+
+        </div>
     </div>
 </div>
 

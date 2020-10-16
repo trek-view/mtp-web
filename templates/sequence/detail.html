@@ -1,7 +1,21 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 {% block app_sequence %}active{% endblock %}
-{% block app_style %}<link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">{% endblock %}
+{% block app_style %}
+    <link rel="stylesheet" href="{% static 'css/sequence_style.css' %}">
+    <style>
+    #label_popup {
+        position: fixed;
+        background: black;
+        color: white;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 1px;
+        padding-bottom: 1px;
+        border-radius: 4px;
+    }
+    </style>
+{% endblock %}
 {% block content %}
 
 <link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
@@ -9,7 +23,7 @@
     <div class="left-side p-3 d-flex flex-column justify-content-between">
         <div>
             <div class="text-right mt-2 mb-2">
-                <button type="button" class="btn btn-info" onclick="window.history.back()">Back</button>
+                <a type="button" class="btn btn-info" href="{% url 'sequence.sequence_list' %}">Go to Sequence List</a>
             </div>
             <div class="page-header">
                 <div class="pt-3 mb-3">
@@ -64,36 +78,122 @@
                     </div>
 
                     <div class="sequence-tag mt-2" id="sequence_tags">
-                        {% for tag in sequence.getTags %}
+                        {% for tag in sequence.get_tags %}
                             <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
                                 {{ tag }}
                             </span>
                         {% endfor %}
                     </div>
 
-                    <div class="guidebook-created-at d-flex flex-row align-items-center justify-content-between mt-2">
-                        <div class="text-secondary">
-                            <p >
-                            {{ sequence.captured_at }}
-                            </p>
-                            <p class="">
-                                {{ sequence.created_at }}
-                            </p>
-                        </div>
-                        <a href="{% url 'account.profile' username=sequence.user.username %}">
-                            <span class="" style="color: brown;">{{ sequence.user.username }}</span>
+                    <div class="sequence-tour-count" id="sequence_tour_count">
+                        <a href="{% url 'tour.tour_list' %}?sequence_key={{ sequence.seq_key }}">
+                            Tours ({{ tour_count }})
                         </a>
+                    </div>
+
+                    <div class="guidebook-created-at d-flex flex-row align-items-center justify-content-between mt-2">
+                        <div class="text-secondary w-100">
+                            <div class="w-100 p-1 ">
+                                <label class="" style="width: 40%">Capture at: </label>
+                                <span class="" style="font-size: 13px; width: 60%">{{ sequence.captured_at }}</span>
+                            </div>
+
+                            <div class="w-100 p-1 ">
+                                <label class="" style="width: 40%">Uploaded at: </label>
+                                <span class="" style="font-size: 13px; width: 60%">{{ sequence.created_at }}</span>
+                            </div>
+
+                            <a href="{% url 'account.profile' username=sequence.user.username %}">
+                                <span class="" style="color: brown;">{{ sequence.user.username }}</span>
+                            </a>
+                        </div>
+
                     </div>
 
                     <canvas id="myChart" width="350" height="150"></canvas>
 
-                    <div class="mt-2 d-flex flex-row justify-content-between" id="mapillary-view">
-                         <a target="_blank" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.getFirstPointLat }}/{{ sequence.getFirstPointLng }}&photo_overlay=mapillary">
-                             <img style="width: 40px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}">
-                         </a>
-                         <a target="_blank" href="https://www.mapillary.com/map/s/{{ sequence.seq_key }}">
-                             <img style="width: 170px" src="{% static "images/icon/mapillary_icon.png" %}">
-                         </a>
+                    <div class="mt-2 d-flex flex-row justify-content-center" id="mapillary-view">
+                        <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.get_first_point_lat }}/{{ sequence.get_first_point_lng }}&photo_overlay=mapillary">
+                            <img style="width: 32px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}" />
+                        </a>
+                        {% if sequence.google_street_view %}
+                            <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.get_first_point_lat }},{{ sequence.get_first_point_lng }},14z">
+                                <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico" />
+                            </a>
+                        {% endif %}
+                        {% if not sequence.strava is None and sequence.strava != ''  %}
+                            <a class="mr-2" target="_blank" href="https://www.strava.com/activities/{{ sequence.strava }}">
+                                <img style="width: 35px" src="https://a4k2d2q5.rocketcdn.me/wp-content/uploads/2018/02/Strava-Running-and-Cycling-GPS.png">
+                            </a>
+                        {% endif %}
+                        <a target="_blank" class="" href="https://www.mapillary.com/app/?pKey={{ sequence.get_first_image_key }}&focus=photo">
+                            <img style="width: 32px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQiTHrSFBxGdPFbRSCEXLo3IB1IzMS50F_V0Q&usqp=CAU">
+                        </a>
+                    </div>
+
+                    <div id="accordion" class="mt-2">
+                        <div class="card">
+                            <div class="card-header p-0" id="headingOne">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        Weather
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body">
+                                    <div class="sequence-weather pt-2" id="sequence_weather">
+                                        <h6>Location Weather: </h6>
+                                        <div class="mt-2">
+                                            <label class="col-6">Min Temp: </label>
+                                            <span class="col-6">{{ sequence_weather.his_mintemp }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Max Temp: </label>
+                                            <span class="col-6">{{ sequence_weather.his_maxtemp }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Sunrise: </label>
+                                            <span class="col-6">{{ sequence_weather.his_astro_sunrise }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Sunset: </label>
+                                            <span class="col-6">{{ sequence_weather.his_astro_sunset }}</span>
+                                        </div>
+                                        <h6 class="mt-3">Conditions at time of sequence:</h6>
+                                        <div class="mt-2">
+                                            <label class="col-6">Temperature: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_temperature }} °C</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Wind Speed: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_wind_speed }} Km/h</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Wind direction: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_wind_dir }}</span>
+                                        </div>
+                {#                        <div class="mt-2">#}
+                {#                            <label class="col-4">Weather: </label>#}
+                {#                            <span class="col-8">{{ imagesequence_weather.his_astro_sunrise }}</span>#}
+                {#                        </div>#}
+                                        <div class="mt-2">
+                                            <label class="col-6">Precip: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_precip }} mm</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Cloud Cover: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_cloudcover }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Visibility: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_visibility }} Km</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mt-2" id="mapillary-view">
@@ -121,25 +221,25 @@
 
                 <hr class="mt-3 mb-1">
 
-                <div class="sequence-others float-right d-flex flex-row justify-content-between mt-2">
-                    <div class="scenes text-center">
-                        {% if sequence.getImageCount == 0 %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
+                <div class="sequence-others float-right d-flex flex-row justify-content-between mt-2 align-items-center">
+                    <div class="scenes text-center align-items-center d-flex">
+                        {% if sequence.get_image_count == 0 %}
+                            <i class="fas fa-image"></i>
                         {% else %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
+                            <i class="fas fa-image"></i>
                         {% endif %}
-                        <span class="text-center m-0">
-                            {{ sequence.getImageCount }} Photos
+                        <span class="text-center ml-2 m-0">
+                            {{ sequence.get_image_count }} Photos
                         </span>
                     </div>
                     <div class="like text-center">
-                        {% if sequence.getLikeCount == 0 %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-100.png' %}" />
+                        {% if sequence.get_like_count == 0 %}
+                            <i class="far fa-thumbs-up"></i>
                         {% else %}
-                            <img style="width: 40px" src="{% static 'images/icon/icons8-love-48.png' %}" />
+                            <i class="fas fa-thumbs-up"></i>
                         {% endif %}
                         <span class="text-center m-0">
-                            {{ sequence.getLikeCount }} Likes
+                            {{ sequence.get_like_count }} Likes
                         </span>
                     </div>
                 </div>
@@ -178,46 +278,56 @@
             </button>
         </div>
 
-        <div class="switch-detection mt-2 ml-auto">
-            <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
+        <div class="d-flex flex-row justify-content-between align-items-center mt-3">
+            <div class="switch-detection">
+                {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' %}
+                    <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary" checked>
+                {% else %}
+                    <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
+                {% endif %}
+            </div>
         </div>
 
-        <div class="image-detail">
+        <div class="image-detail {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' %}d-none{% endif %}">
             <div class="" id="image_detail_box">
             </div>
         </div>
 
-        <div class="image-detection mt-3 d-none">
+        <div class="image-detection mt-3 {% if view_mode != 'mtpw_label' and view_mode != 'autodetected_label' %}d-none{% endif %}">
             <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
-                    <li class="nav-item mtpw-label-tab active" style="width: 50%;">
-                        <a class="nav-link active" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>
+                    <li class="nav-item mtpw-label-tab " style="width: 50%;">
+                        <a class="nav-link {% if view_mode != 'autodetected_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>
                     </li>
-                    <li class="nav-item mapillary-label-tab border-bottom" style="width: 50%">
-                        <a class="nav-link" href="javascript: switchMpaillaryLable('mapillary');">Mapillary Labels</a>
+                    <li class="nav-item mapillary-label-tab border-bottom {% if view_mode != 'autodetected_label' %}active{% endif %}" style="width: 50%">
+                        <a class="nav-link {% if view_mode == 'autodetected_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mapillary');">Autodetected Labels</a>
                     </li>
                 </ul>
             <div class="card" style="border-radius: 0">
                 <div class="p-2">
                     <div class=" actions text-right">
                         {% if request.user.is_authenticated %}
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <label class="input-group-text" for="add_label">Add Label</label>
-                                </div>
-                                <select class="custom-select" id="add_label">
-                                    <option selected value="0">Please select label type</option>
-                                    {% for label_type in label_types %}
-                                        <option value="{{ label_type.pk }}" data-color="{{ label_type.color }}" data-type="{{ label_type.type }}">{{ label_type }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="d-flex flex-row justify-content-between">
-                                <button class="btn btn-secondary" id="lbl_reset" onclick="labelReset()">
-                                    Reset
+                            <div class="add-label-button w-100 d-flex justify-content-between">
+                                <button class="btn btn-primary" id="add_label_button">
+                                    Add Label
                                 </button>
-                                <button class="btn btn-danger" id="lbl_delete" onclick="labelDelete()">
+
+                                <button class="btn btn-secondary d-none" id="lbl_reset" onclick="labelReset()">
+                                    Cancel
+                                </button>
+
+                                <button class="btn btn-danger d-none" id="lbl_delete" onclick="labelDelete()">
                                     Delete
                                 </button>
+                            </div>
+                            <div class="add-label-group d-none input-group mb-3">
+                                <div class="w-100 mt-2">
+                                    <select class="custom-select" id="add_label">
+                                        <option selected value="0">First select a label classification</option>
+                                        {% for label_type in label_types %}
+                                            <option value="{{ label_type.pk }}" data-color="{{ label_type.color }}" data-type="{{ label_type.type }}">{{ label_type }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
                         {% endif %}
                     </div>
@@ -227,6 +337,71 @@
                 </div>
             </div>
         </div>
+
+        <div id="accordion" class="mt-2">
+                        <div class="card">
+                            <div class="card-header p-0" id="headingOne">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        Weather
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body">
+                                    <div class="sequence-weather pt-2" id="sequence_weather">
+                                        <h6>Location Weather: </h6>
+                                        <div class="mt-2">
+                                            <label class="col-6">Min Temp: </label>
+                                            <span class="col-6">{{ sequence_weather.his_mintemp }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Max Temp: </label>
+                                            <span class="col-6">{{ sequence_weather.his_maxtemp }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Sunrise: </label>
+                                            <span class="col-6">{{ sequence_weather.his_astro_sunrise }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Sunset: </label>
+                                            <span class="col-6">{{ sequence_weather.his_astro_sunset }}</span>
+                                        </div>
+                                        <h6 class="mt-3">Conditions at time of sequence:</h6>
+                                        <div class="mt-2">
+                                            <label class="col-6">Temperature: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_temperature }} °C</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Wind Speed: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_wind_speed }} Km/h</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Wind direction: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_wind_dir }}</span>
+                                        </div>
+                {#                        <div class="mt-2">#}
+                {#                            <label class="col-4">Weather: </label>#}
+                {#                            <span class="col-8">{{ imagesequence_weather.his_astro_sunrise }}</span>#}
+                {#                        </div>#}
+                                        <div class="mt-2">
+                                            <label class="col-6">Precip: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_precip }} mm</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Cloud Cover: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_cloudcover }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Visibility: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_visibility }} Km</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
     </div>
 
     <div class="right-board bg-light">
@@ -237,6 +412,7 @@
                 </div>
                 <div class="switch-cover"></div>
                 <div class="map-board w-100 display" id="map">
+
                 </div>
             </div>
             <div class="full-screen board-w-400">
@@ -244,23 +420,31 @@
                     <img class="w-100" src="{% static 'images/icon/flap.svg' %}">
                 </div>
                 <div class="switch-cover"></div>
-                {% if request.user.is_authenticated and request.user == sequence.user %}
-                    <div class="image-view-point" >
-                        <div class="view_point text-center">
-                            <span class="text-center m-0">
-                                {{ view_points }} View Points
-                            </span>
+
+                <div class="image-view-point" style="cursor: pointer;" onclick="mark_view_point()" style="">
+                    <div class="view_point text-center">
+                        <i class="fas fa-binoculars"></i>
+                        <span class="text-center m-0 disabled">
+                            {{ view_points }} Viewpoints
+                        </span>
+                    </div>
+                </div>
+
+
+                    <div class=" btn-add-to-guidebook">
+                        <button type="button" class="btn btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Add to Guidebook
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" style="background: #d0d0d0" href="javascript:addToGuidebook('new_guidebook');">New Guidebook</a>
+                            {% if not guidebooks is None %}
+                                {% for guidebook in guidebooks %}
+                                    <a class="dropdown-item" href="javascript:addToGuidebook('{{ guidebook.unique_id }}');">{{ guidebook.name }}</a>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
-                {% else %}
-                    <div class="image-view-point" style="cursor: pointer;" onclick="mark_view_point()" style="">
-                        <div class="view_point text-center">
-                            <span class="text-center m-0 disabled">
-                                {{ view_points }} View Points
-                            </span>
-                        </div>
-                    </div>
-                {% endif %}
+
 
                 <div id='sequence_viewer' class="image-box display"></div>
             </div>
@@ -275,6 +459,7 @@
         </div>
     </div>
 </div>
+    <div title="regular tooltip" id="label_popup">Hover me</div>
 {% endblock %}
 
 {% block scripts %}
@@ -309,32 +494,7 @@
 
     var current_page = '0';
 
-    function goto_page(pageNum, image_key='') {
-        $.ajax({
-            url: '{% url "sequence.ajax_get_image_list" unique_id=sequence.unique_id %}',
-            type: 'GET',
-            data: {'page': pageNum, 'image_key': image_key},
-            dataType: 'json',
-            success: function (data) {
-                if (data.status == 'failed')
-                    toastr.error(data.message);
-                else
-                {
-                    current_page = data.page;
-                    var href = location.protocol + '//' + location.host + location.pathname ;
-                    history.pushState({
-                        id: 'Sequence Detail'
-                    }, "{{ pageTitle }}", href + '?page=' + data.page);
-                    $('#image_list').html(data.image_list_box_html);
-                    if (data.image_key != null) {
-                        show_image_detail(data.image_key)
-                    }
-                }
-            }
-        });
-    }
 
-    goto_page("{{ page }}", "{{ image_key }}");
 
     mapboxgl.accessToken = mapboxToken;
     // Create a popup, but don't add it to the map yet.
@@ -366,10 +526,19 @@
         sceneData.push(item);
     }
 
+    var first_image_key = "{{ first_image.key }}";
+
+    {% if not image_key is None and image_key != ''  %}
+        first_image_key = "{{ image_key }}";
+    {% endif %}
+
+    var first_image_index = image_keys.indexOf(first_image_key);
     if (scene_positions.length > 0)
-        var first_point = scene_positions[0];
+        var first_point = scene_positions[first_image_index];
     else
         var first_point = null;
+
+
 
     if (first_point != null) {
         var map = new mapboxgl.Map({
@@ -377,7 +546,6 @@
             style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
             center: first_point, // starting position
             zoom: 14, // starting zoom
-            attributionControl: false
         });
     }
     else {
@@ -386,9 +554,9 @@
             style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
             center: [-87.622088, 41.878781], // starting position
             zoom: 14, // starting zoom
-            attributionControl: false
         });
     }
+
     map.on('load', function() {
         map.addSource('points', {
             'type': 'geojson',
@@ -509,7 +677,7 @@
     var mapillaryViewer = new Mapillary.Viewer(
         'sequence_viewer',
         mapillaryClientId,
-        "{{ first_image.key }}",
+        first_image_key,
         {
             component: {
                 cover: false,
@@ -552,9 +720,9 @@
 
         map.flyTo({center: [current_node_point[1], current_node_point[0]]});
         allClear();
-        if (state == 'detection_mtpu')
+        if (view_mode == 'mtpw_label')
             getImageLables();
-        else if (state == 'detection_mapillary')
+        else if (view_mode == 'autodetected_label')
             getDetection(node.key);
         if (first_move) {
             first_move = false;
@@ -563,6 +731,33 @@
             show_image_detail(node.key)
     });
     window.addEventListener('resize', function() { mapillaryViewer.resize(); });
+
+    function goto_page(pageNum, image_key='') {
+        $.ajax({
+            url: '{% url "sequence.ajax_get_image_list" unique_id=sequence.unique_id %}',
+            type: 'GET',
+            data: {'page': pageNum, 'image_key': image_key},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else
+                {
+                    current_page = data.page;
+                    var href = location.protocol + '//' + location.host + location.pathname ;
+                    history.pushState({
+                        id: 'Sequence Detail'
+                    }, "{{ pageTitle }}", href + '?page=' + data.page);
+                    $('#image_list').html(data.image_list_box_html);
+                    if (data.image_key != null) {
+                        show_image_detail(data.image_key)
+                    }
+                }
+            }
+        });
+    }
+
+
 
     $('.btn-save').click(function () {
         if (!$('#edit_form').isValid())
@@ -651,19 +846,18 @@
     });
 
     {% if not request.user.is_authenticated %}
-        $('.sequence-others .like img').css('cursor', 'pointer');
-        $('.sequence-others .like img').click(function () {
+        function mark_view_point(image_key) {
             Swal.fire({
                 title: 'Need to login!',
-                html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
+                html: 'Please click <a href="{% url 'login' %}?next='+window.location.href +'">here</a> to login. <br>' +
                         "If you don't have your account, please <a href=\"{% url 'signup' %}\">sign up</a>",
                 showCancelButton: false,
                 confirmButtonText: 'OK'
             })
-        });
-    {% elif request.user != sequence.user %}
-        $('.sequence-others .like img').css('cursor', 'pointer');
-        $('.sequence-others .like img').click(function () {
+        }
+    {% else %}
+        $('.sequence-others .like i').css('cursor', 'pointer');
+        $('.sequence-others .like i').click(function () {
             $.ajax({
                 url: "{% url 'sequence.ajax_sequence_check_like' unique_id=sequence.unique_id %}",
                 type: 'POST',
@@ -675,13 +869,11 @@
                         toastr.error(data.message)
                     }
                     else {
-                        var loved = "{% static 'images/icon/icons8-love-48.png' %}";
-                        var unloved = "{% static 'images/icon/icons8-love-100.png' %}"
                         $('.sequence-others .like span').text(data.liked_count + ' Likes');
                         if (data.liked_count == 0)
-                            $('.sequence-others .like img').attr('src', unloved);
+                            $('.sequence-others .like i').removeClass('fas').addClass('far');
                         else
-                            $('.sequence-others .like img').attr('src', loved);
+                            $('.sequence-others .like i').addClass('fas').removeClass('far');
                     }
                 }
             });
@@ -692,12 +884,7 @@
         var url = "{% url 'sequence.ajax_get_image_detail' unique_id=sequence.unique_id image_key='image_key' %}";
         url = url.replace('image_key', image_key);
 
-        var href = location.protocol + '//' + location.host + location.pathname ;
-        var page = current_page;
-        console.log(href)
-        history.pushState({
-            id: 'Image Detail'
-        }, "{{ pageTitle }}", href + '?page=' + page + '&image_key=' + image_key);
+        image_url_reset(image_key);
 
         $.ajax({
             url: url,
@@ -713,10 +900,24 @@
                     if (is_opened_side_bar)
                         $('.image-detail-box').removeClass('d-none');
                     $('#image_detail_box').html(data.image_detail_box_html);
-                    $('.right-board .image-view-point span').text(data.view_points + ' View Points');
-
+                    $('.right-board .image-view-point span').text(data.view_points + ' Viewpoints');
+                    var image_index = image_keys.indexOf(image_key);
+                    if (image_index >= 0)
+                    {
+                        for (var i=0; i<myLineChart.data.datasets[0].pointBackgroundColor.length; i++) {
+                            myLineChart.data.datasets[0].pointBackgroundColor[i] = '#28a74578';
+                            if (i == image_index)
+                                myLineChart.data.datasets[0].pointBackgroundColor[i] = 'red';
+                        }
+                        myLineChart.update();
+                    }
+                    if (view_mode == 'mtpw_label') {
+                        getImageLables();
+                    }
+                    else if (view_mode == 'autodeteced_label') {
+                        getDetection(current_node_key)
+                    }
                 }
-
             }
         });
     }
@@ -732,20 +933,19 @@
         $('.image-detail-box').addClass('d-none');
         goto_page(current_page);
         allClear();
-        state = 'original';
     }
 
     {% if not request.user.is_authenticated %}
         function mark_view_point(image_key) {
             Swal.fire({
                 title: 'Need to login!',
-                html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
+                html: 'Please click <a href="{% url 'login' %}?next='+window.location.href +'">here</a> to login. <br>' +
                         "If you don't have your account, please <a href=\"{% url 'signup' %}\">sign up</a>",
                 showCancelButton: false,
                 confirmButtonText: 'OK'
             })
         }
-    {% elif request.user != sequence.user %}
+    {% else %}
         function mark_view_point() {
             image_key = current_node_key
             var url = "{% url 'sequence.ajax_image_mark_view' unique_id=sequence.unique_id image_key='image_key' %}";
@@ -761,15 +961,11 @@
                         toastr.error(data.message)
                     }
                     else {
-                        $('.image-others .view_point span').text(data.view_points + ' View Points');
-                        $('.right-board .image-view-point span').text(data.view_points + ' View Points');
+                        $('.image-others .view_point span').text(data.view_points + ' Viewpoints');
+                        $('.right-board .image-view-point span').text(data.view_points + ' Viewpoints');
                     }
                 }
             });
-        }
-    {% else %}
-        function mark_view_point() {
-            toastr.error('This sequense and image are imported by you.')
         }
     {% endif %}
 
@@ -803,7 +999,7 @@
         }
 
     }
-
+    var myLineChart = null;
     function drawChart() {
         var url = "{% url 'sequence.ajax_get_image_ele' unique_id=sequence.unique_id %}"
         $.ajax({
@@ -817,11 +1013,13 @@
                     toastr.error(data.message)
                 }
                 else {
-                    var num_ary = []
+                    var num_ary = [];
+                    var backgroud_color_ary = [];
                     for (var i=0; i<data.eles.length;i++) {
-                        num_ary.push(i+1)
+                        num_ary.push(i+1);
+                        backgroud_color_ary.push('#28a74578');
                     }
-                    var myLineChart = new Chart(document.getElementById("myChart"), {
+                    myLineChart = new Chart(document.getElementById("myChart"), {
                         type: 'line',
                         data: {
                             labels: num_ary,
@@ -829,7 +1027,8 @@
                                 data: data.eles,
                                 borderWidth: 1,
                                 borderColor: "#3e95cd",
-                                fill: false
+                                fill: false,
+                                pointBackgroundColor: backgroud_color_ary
                             }]
                         },
                         options: {
@@ -849,7 +1048,16 @@
                                         labelString: 'photo num'
                                     }
                                 }]
-                            }
+                            },
+                            onClick: function(evt) {
+                                var element = myLineChart.getElementAtEvent(evt);
+                                if(element.length > 0)
+                                    {
+                                        var ind = element[0]._index;
+                                        move_image(image_keys[ind]);
+                                    }
+                            },
+
                         }
                     });
                 }
@@ -871,7 +1079,7 @@
     var is_drawing = false;
     var label_tags = {};
     var createdIndex = 0;
-    var state = 'original';
+    var view_mode = "{{ view_mode }}";
 
     var allClear = function () {
         label_type_ary = {};
@@ -921,47 +1129,164 @@
         var html = '';
         var detection_ary = sortByKey(label_type_ary);
         jQuery.each(detection_ary, function(key, val) {
-            html += '<div class="border detection-tag" id="label_' + key + '" data-label-key="' + key + '" data-is-mine="' + val['is_mine'] + '"><span>' + key + ' <span style="color: #2F96B4">' + val['count'] + '</span></span></div>';
+            html += '<div class="border detection-tag" id="label_' + key + '" data-label-key="' + key + '" data-is-mine="' + val['is_mine'] + '" onclick="show_label_group(\''+ key +'\')"><span>' + key + ' <span style="color: #2F96B4">' + val['count'] + '</span></span></div>';
         });
         $('.image-detection .detections').html(html)
+    }
+
+    var current_selected_label_type_key = '';
+    var disabled_label_ids = [];
+    var resetLabelGroup = function () {
+        Object.keys(label_type_ary).forEach(function(key){
+            var label_ids = label_type_ary[key]['label_ids'];
+            var lb = null;
+            for (var i = 0; i<label_ids.length; i++) {
+                lb = label_tags[label_ids[i]]
+                if (lb == undefined)
+                    continue;
+                if (lb['tag'] == undefined)
+                    continue;
+                if (current_clicked_label_id == label_ids[i])
+                    continue;
+                var color = label_type_ary[lb['label_type_key']['label_type_color']];
+                var linecolor = color;
+                if (lb['is_mine'])
+                    linecolor = 'blue';
+                lb['tag'].fillOpacity = 0;
+                lb['tag'].lineOpacity = 0;
+                if (disabled_label_ids.indexOf(lb['id']) == -1)
+                    disabled_label_ids.push(lb['id']);
+            }
+
+            $('#label_' + key).removeClass('selected');
+        });
+        current_selected_label_type_key = '';
+    }
+
+    var allLabelGroup = function () {
+        Object.keys(label_type_ary).forEach(function(key){
+            var label_ids = label_type_ary[key]['label_ids'];
+            var lb = null;
+            for (var i = 0; i<label_ids.length; i++) {
+                lb = label_tags[label_ids[i]]
+                if (lb == undefined)
+                    continue;
+                if (lb['tag'] == undefined)
+                    continue;
+                if (current_clicked_label_id == label_ids[i])
+                    continue;
+                var color = label_type_ary[lb['label_type_key']['label_type_color']];
+                var linecolor = color;
+                if (lb['is_mine'])
+                    linecolor = 'blue';
+                lb['tag'].fillOpacity = 0.3;
+                lb['tag'].lineOpacity = 1;
+                disabled_label_ids = [];
+            }
+        });
+        current_selected_label_type_key = '';
+    }
+
+    function show_label_group(key) {
+        var label_ids = label_type_ary[key]['label_ids'];
+        var lb = null;
+        if ($('#label_' + key).hasClass('selected'))
+        {
+            $('#label_' + key).removeClass('selected');
+            allLabelGroup();
+            return;
+        }
+        resetLabelGroup();
+        for (var i = 0; i<label_ids.length; i++) {
+            lb = label_tags[label_ids[i]]
+            if (lb == undefined)
+                continue;
+            if (lb['tag'] == undefined)
+                continue;
+            if (current_clicked_label_id == label_ids[i])
+                continue;
+
+            var color = label_type_ary[lb['label_type_key']['label_type_color']];
+            var linecolor = color;
+            if (lb['is_mine'])
+                linecolor = 'blue';
+            lb['tag'].lineOpacity = 1;
+            lb['tag'].fillOpacity = 0.5;
+
+            if (disabled_label_ids.indexOf(lb['id']) >= 0) {
+                disabled_label_ids.splice(disabled_label_ids.indexOf(lb['id']), 1);
+            }
+        }
+        current_selected_label_type_key = key;
+        $('#label_' + key).addClass('selected');
     }
 
     function drawDetection(image_key, type) {
         $.ajax({
             url: "https://a.mapillary.com/v3/object_detections/" + type + "?client_id=" + mapillaryClientId + "&image_keys=" + image_key,
             success: function(data){
-                if (state == 'detection_mapillary') {
+                if (view_mode == 'autodetected_label') {
                     var features = data.features;
-                    var polygon_ary = [];
-                    var image_label = null;
-                    var color = '#99e694';
+                    var key_ary = [];
                     for (var i=0; i<features.length; i++) {
                         var properties = features[i].properties;
-                        var polygon = properties.shape.coordinates[0];
-                        var value = properties.value;
-                        polygon_ary.push(polygon);
-                        addLabelTypeAry(properties.key, properties.value, color);
-                        addNewTag(properties.key, 'polygon', properties.shape.coordinates[0], properties.value, false);
-
+                        if (key_ary.indexOf(properties.value) < 0)
+                            key_ary.push(properties.value)
                     }
-                    updateDetectionInSidebar();
+                    $.ajax({
+                        url: "{% url 'sequence.ajax_add_label_type' %}",
+                        type: 'POST',
+                        data: {'keys': key_ary.join(',')},
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.status == 'failed')
+                            {
+                                console.log(data.message)
+                            }
+                            else {
+                                var color = '#99e694';
+                                var label_types_json = data.data.label_types_json
+
+                                for (var i=0; i<features.length; i++) {
+                                    var properties = features[i].properties;
+                                    if (label_types_json.hasOwnProperty(properties.value)) {
+                                        color = label_types_json[properties.value];
+                                    }
+                                    addLabelTypeAry(properties.key, properties.value, color);
+                                    addNewTag(properties.key, 'polygon', properties.shape.coordinates[0], properties.value, false);
+                                }
+                                updateDetectionInSidebar();
+                            }
+                        }
+                    });
+
                 }
             }
         });
     }
 
+    var image_url_reset = function(image_key) {
+        var href = location.protocol + '//' + location.host + location.pathname ;
+        history.pushState({
+            id: 'Image Detail'
+        }, "{{ pageTitle }}", href + '?image_key=' + image_key + '&view_mode=' + view_mode);
+    }
+
     $('#switch_detection').change(function () {
         allClear();
+        var image_key = current_node_key;
         if ($(this).prop('checked')) {
             $('.image-detection').removeClass('d-none');
             $('.image-detail').addClass('d-none');
-            state = 'detection_mtpu';
+            view_mode = 'mtpw_label';
+            image_url_reset(image_key)
             getImageLables();
         }
         else {
             $('.image-detection').addClass('d-none');
             $('.image-detail').removeClass('d-none');
-            state = 'original';
+            view_mode = 'original';
+            image_url_reset(image_key)
         }
     })
 
@@ -978,7 +1303,7 @@
                 if (resp.status == 'failed')
                     toastr.error(resp.message);
                 else {
-                    if (state == 'detection_mtpu') {
+                    if (view_mode == 'mtpw_label') {
                         var image_label = null;
                         for (var i=0; i<resp.data.image_labels.length; i++) {
                             image_label = resp.data.image_labels[i];
@@ -1023,8 +1348,9 @@
             editable: true,
             text: id,
             fillColor: color,
-            fillOpacity: 0.4,
+            fillOpacity: 0.3,
             lineColor: linecolor,
+            lineOpacity: 1,
         }
         if (type == 'rect') {
             geometry = new Mapillary.TagComponent.RectGeometry(geo_data);
@@ -1063,7 +1389,7 @@
             linecolor = 'blue';
         label['tag'].setOptions({
             fillColor: color,
-            fillOpacity: 0.6,
+            fillOpacity: 0.7,
             lineColor: linecolor,
             text: label['id']
         });
@@ -1075,6 +1401,8 @@
             .then(function(tagIds) {
                 if (tagIds.length > 0) {
                     var hoveredTagId = tagIds[0];
+                    if (disabled_label_ids.indexOf(hoveredTagId) > -1)
+                        return;
                     if (hoveredTagId == current_clicked_label_id) {
                         current_hover_label_id = hoveredTagId;
                         return;
@@ -1089,6 +1417,7 @@
                         setHoverEvent(label_tags[hoveredTagId]);
                     }
                 } else {
+                    $tooltipSpan.addClass('d-none');
                     if (current_hover_label_id != '') {
                         resetLabel(label_tags[current_hover_label_id], 'hover');
                     }
@@ -1100,10 +1429,42 @@
     // Listen to mousemove, mouseover and mouseup (which occurs
     // just before a moveend) to set hovered tag and to keep
     // track of last position.
+    var $tooltipSpan = $('#label_popup');
     var onMouseEvent = function(event) {
         lastPos = event.pixelPoint;
         setHoveredTag(event.pixelPoint);
     }
+    window.onmousemove = function (e) {
+        var x = e.clientX,
+            y = e.clientY,
+            w = window.innerWidth,
+            h = window.innerHeight;
+        var start_x = 0;
+        if (is_opened_side_bar) {
+            start_x = 400;
+        }
+        if (current_hover_label_id != '')
+        {
+            $tooltipSpan.css('top', y + 'px');
+            $tooltipSpan.css('left', x + 'px');
+
+            if (x < start_x + 250) {
+                $tooltipSpan.css('left', (x + 20) + 'px');
+                $tooltipSpan.css('right', 'unset');
+            }
+            else if (x > w - 250) {
+                $tooltipSpan.css('left', 'unset');
+                $tooltipSpan.css('right', (w - x + 20) + 'px');
+            }
+            else {
+                $tooltipSpan.css('left', (x + 20) + 'px');
+                $tooltipSpan.css('right', 'unset');
+            }
+            $tooltipSpan.css('margin-top', '-15px');
+            $tooltipSpan.text(label_tags[current_hover_label_id]['label_type_key']);
+            $tooltipSpan.removeClass('d-none');
+        }
+    };
 
     mapillaryViewer.on("mousemove", onMouseEvent);
     mapillaryViewer.on("mouseover", onMouseEvent);
@@ -1115,6 +1476,7 @@
             resetLabel(label_tags[current_hover_label_id], 'hover');
             current_hover_label_id = '';
         }
+        $tooltipSpan.addClass('d-none');
     });
 
     // Change hovered tag on mouse end if last position is
@@ -1125,20 +1487,25 @@
         }
     });
 
+
+
     var switchMpaillaryLable = function(type) {
         allClear();
+        var image_key = current_node_key;
         if (type == 'mtpw') {
             $('li.mtpw-label-tab a').addClass('active');
             $('li.mapillary-label-tab a').removeClass('active');
             $('.image-detection .actions').removeClass('d-none');
-            state = 'detection_mtpu';
+            view_mode = 'mtpw_label';
+            image_url_reset(image_key);
             getImageLables();
         }
         else {
             $('li.mtpw-label-tab a').removeClass('active');
             $('li.mapillary-label-tab a').addClass('active');
             $('.image-detection .actions').addClass('d-none');
-            state = 'detection_mapillary';
+            view_mode = 'autodetected_label';
+            image_url_reset(image_key);
             getDetection(current_node_key);
         }
     }
@@ -1154,27 +1521,38 @@
         }
 
         var color = label_type_ary[label['label_type_key']][['label_type_color']];
+        var fillOpacity = 0.3;
+        if (label['label_type_key'] == current_selected_label_type_key)
+            fillOpacity = 0.5;
         var linecolor = color;
         if (label['is_mine'])
             linecolor = 'blue';
         label['tag'].setOptions({
             fillColor: color,
-            fillOpacity: 0.4,
+            fillOpacity: fillOpacity,
             lineColor: linecolor,
             text: label['id']
         });
         if (type == 'click')
         {
-            console.log('current_hover_label_id', current_hover_label_id)
-            console.log('current_clicked_label_id', current_clicked_label_id)
-            console.log(label['id'])
             current_clicked_label_id = '';
         }
         else
             current_hover_label_id = '';
     }
+    var onTagGeometryChanged = function(tag) { console.log(tag.id, tag.geometry); };
 
     {% if request.user.is_authenticated %}
+
+        function addToGuidebook(guidebook_unique_id) {
+            var url = "{% url 'guidebook.add_scene' unique_id='guidebook_unique_id' %}?image_key=" + current_node_key;
+            url = url.replace('guidebook_unique_id', guidebook_unique_id);
+            if (guidebook_unique_id == 'new_guidebook') {
+                url = "{% url 'guidebook.create' %}?image_key=" + current_node_key;
+            }
+
+            window.open(url, '_blank');
+        }
 
         $('#add_label').change(function () {
             var label_type = $(this).val();
@@ -1183,12 +1561,13 @@
                 return;
             }
             is_drawing = true;
+            toastr.info('Now draw the outline of this object in the image to label it');
             var geo_type = $(this).find('option[value="'+label_type+'"]').attr('data-type');
             if (geo_type == 'polygon') {
                  changeMode(Mapillary.TagComponent.TagMode.CreatePolygon);
             }
             else if (geo_type == 'point') {
-                changeMode(Mapillary.TagComponent.TagMode.CreatePoint)
+                changeMode(Mapillary.TagComponent.TagMode.CreatePoint);
             }
         })
 
@@ -1197,8 +1576,6 @@
         }
 
         // Create and add editable tags based on created geometry type
-
-        var onTagGeometryChanged = function(tag) { console.log(tag.id, tag.geometry); };
         tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
             var geo_data = null;
             var geo_type = null;
@@ -1215,7 +1592,6 @@
             } else {
                 throw new Error("Unsupported geometry type");
             }
-
 
             var url = "{% url 'sequence.ajax_add_image_label' unique_id=sequence.unique_id image_key='image_key' %}";
             url = url.replace('image_key', current_node_key);
@@ -1246,9 +1622,7 @@
                     }
                 });
             }
-
         });
-
 
         var setUpEvent = function(label) {
             if (label == undefined)
@@ -1262,11 +1636,12 @@
             var color = label_type_ary[label['label_type_key']['label_type_color']];
             label['tag'].setOptions({
                 fillColor: color,
-                fillOpacity: 0.8,
+                fillOpacity: 0.9,
                 lineColor: 'red',
                 text: label['id']
             });
             current_clicked_label_id = label['id'];
+            $('#lbl_delete').removeClass('d-none');
         }
 
         mapillaryViewer.on("mouseup", function (event) {
@@ -1277,7 +1652,7 @@
                         var label = null;
                         for (var i = 0; i < tagIds.length; i++) {
                             label = label_tags[tagIds[i]];
-                            if (label['is_mine'])
+                            if (label['is_mine'] && disabled_label_ids.indexOf(tagIds[i]) == -1)
                                 tag_id_ary.push(tagIds[i])
                         }
                     }
@@ -1294,11 +1669,10 @@
                             if (c == tag_id_ary.length) {
                                 if (current_clicked_label_index < tag_id_ary.length)
                                     current_clicked_label_index++;
-                                if (current_clicked_label_index == tag_id_ary.length)
-                                    current_clicked_label_index = 0;
-                                if (tag_id_ary.length == 1) {
+                                if (current_clicked_label_index == tag_id_ary.length || tag_id_ary.length == 1) {
                                     resetLabel(label_tags[current_clicked_label_id], 'click');
                                     current_clicked_label_ary = [];
+                                    $('#lbl_delete').addClass('d-none');
                                     return;
                                 }
                                 current_clicked_label_ary = [];
@@ -1326,7 +1700,9 @@
         var labelReset = function () {
             changeMode(Mapillary.TagComponent.TagMode.Default);
             $('#add_label').val('0');
-            resetLabel(label_tags[current_clicked_label_id], 'click');
+            is_drawing = false;
+            // resetLabel(label_tags[current_clicked_label_id], 'click');
+            disable_label_draw();
         }
 
         var labelDelete = function () {
@@ -1361,12 +1737,26 @@
                         }
                         updateDetectionInSidebar();
                         current_clicked_label_id = '';
+                        $('#lbl_delete').addClass('d-none');
                     }
                 }
             });
         }
+
+        $('#add_label_button').click(function () {
+            $('.add-label-group').removeClass('d-none');
+            $('#add_label_button').addClass('d-none');
+            $('#lbl_reset').removeClass('d-none')
+        })
+
+        function disable_label_draw() {
+            $('.add-label-group').addClass('d-none');
+            $('#add_label_button').removeClass('d-none');
+            $('#lbl_reset').addClass('d-none')
+        }
     {% endif %}
 
+    goto_page("{{ page }}", "{{ image_key }}");
 
 </script>
 {% endblock %}

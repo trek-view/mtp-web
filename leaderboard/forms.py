@@ -1,12 +1,13 @@
-## Django Packages
-from django import forms
-from django_select2 import forms as s2forms
-
-## App packages
-from .models import *
+# Django Packages
+# App packages
 from datetime import datetime
-from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
-from sequence.models import TransType
+
+from bootstrap_datepicker_plus import MonthPickerInput
+from django import forms
+
+from sequence.models import TransType, CameraMake
+
+
 ############################################################################
 ############################################################################
 
@@ -18,8 +19,6 @@ class LeaderboardSearchForm(forms.Form):
         now = datetime.now()
         year = now.year
         month = now.month
-
-
 
         self.fields['transport_type'] = forms.ModelChoiceField(
             required=False,
@@ -35,8 +34,15 @@ class LeaderboardSearchForm(forms.Form):
             required=False
         )
 
-        self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'View Points')), initial=0)
+        self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'Distance'), (2, 'Viewpoints')), initial=0)
 
+        self.fields['camera_make'] = forms.ModelMultipleChoiceField(
+            required=False,
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            queryset=CameraMake.objects.all()
+        )
 
     def set_timely(self, type, value):
         self.fields['time'] = forms.DateField(
@@ -66,11 +72,21 @@ class LeaderboardSearchForm(forms.Form):
         )
 
     def set_filter_type(self, filter_type):
-        self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'View Points')), initial=filter_type)
+        self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'Distance'), (2, 'Viewpoints')), initial=filter_type)
 
-    def sef_time_type(self, time_type):
+    def set_time_type(self, time_type):
         self.fields['time_type'] = forms.CharField(
             label='',
             widget=forms.TextInput(attrs={'class': 'form-control d-none', 'value': time_type}),
             required=False
+        )
+
+    def set_camera_makes(self, camera_makes):
+        self.fields['camera_make'] = forms.ModelMultipleChoiceField(
+            required=False,
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            queryset=CameraMake.objects.all(),
+            initial=camera_makes
         )

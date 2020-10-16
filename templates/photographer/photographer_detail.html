@@ -33,6 +33,13 @@
             <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
                 <a href="{% url 'photographer.photographer_create' %}" class="btn btn-outline-primary">Create Photographer</a>
             </div>
+            <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
+                {% if request.user.is_authenticated and request.user == photographer.user %}
+                    <a href="{% url 'photographer.my_photographer_edit' unique_id=photographer.unique_id %}" class="btn btn-outline-primary">Edit Photographer</a>
+                {% else %}
+                    <a href="{% url 'photographer.photographer_create' %}" class="btn btn-outline-primary">Create Photographer</a>
+                {% endif %}
+            </div>
             {% if user.is_authenticated %}
                 <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
                     <li class="nav-item" style="width: 30%;">
@@ -81,13 +88,13 @@
 
                             <div class="photographer-description">
                                 <p>
-                                    {{ photographer.getShortDescription }}
+                                    {{ photographer.get_short_description }}
                                 </p>
                             </div>
 
                             <div class="photographer-options">
                                 <p>
-                                    {{ photographer.getCaptureType }}, {{ photographer.getCaptureMethod }}
+                                    {{ photographer.get_capture_type }}, {{ photographer.get_capture_method }}
                                 </p>
                             </div>
 
@@ -106,7 +113,9 @@
         {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board bg-light">
-        <div id="map"></div>
+        <div id="map">
+
+        </div>
     </div>
 
 

@@ -1,33 +1,26 @@
 
+import secrets
+from datetime import datetime
+
+from django.contrib import messages
+from django.contrib.auth import (
+    authenticate, get_user_model, )
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
-from django.contrib.auth import login, authenticate
-from django.conf import settings
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.db.models import Avg, Count, Min, Sum
-from django.db.models.expressions import F, Window
-from django.db.models.functions.window import RowNumber
-
-
-from datetime import datetime
 from mailerlite import MailerLiteApi
-import secrets
-from django.contrib.auth import (
-    authenticate, get_user_model, password_validation,
-)
-from lib.functions import *
-from lib.badge import get_finder_label, get_guidebook_label, get_mapper_label, get_spotter_label
 
-from .models import CustomUser, MapillaryUser
-from .forms import UserSignUpForm, UserProfileForm, UserAvatarForm, UserUpdateForm
-from sequence.models import Sequence, ImageViewPoint, SequenceLike, ImageLabel, Image
-from tour.models import Tour, TourLike
 from guidebook.models import Guidebook, GuidebookLike
+from lib.badge import get_finder_label, get_guidebook_label, get_mapper_label, get_spotter_label
+from lib.functions import *
+from photographer.models import Photographer
+from sequence.models import Sequence, ImageViewPoint, SequenceLike, ImageLabel
+from tour.models import Tour, TourLike
+from .core import CustomRedirectView
+from .forms import UserSignUpForm, UserProfileForm, UserAvatarForm, UserUpdateForm
+from .models import CustomUser, MapillaryUser
+
 UserModel = get_user_model()
-import requests
+
 
 def signup(request):
     if request.method == "POST":
@@ -47,11 +40,11 @@ def signup(request):
                     # send email to creator
                     subject = 'Please confirm your email'
                     html_message = render_to_string(
-                        'emails/account/signup_email_confirm.html', 
-                        { 'subject': subject, 'url': '/accounts/email-verify/' + user.verify_email_key}, 
+                        'emails/account/signup_email_confirm.html',
+                        {'subject': subject, 'url': '/accounts/email-verify/' + user.verify_email_key},
                         request
                     )
-                    send_mail_with_html(subject, html_message, email)
+                    send_mail_with_html(subject, html_message, email, settings.SMTP_REPLY_TO)
                 except:
                     print('email sending error!')
 
@@ -73,6 +66,7 @@ def signup(request):
         form = UserSignUpForm()
     return render(request, 'signup.html', {'form': form})
 
+
 def email_verify(request, key):
     user = CustomUser.objects.get(verify_email_key=key)
     if user:
@@ -88,7 +82,7 @@ def email_verify(request, key):
                 { 'subject': subject}, 
                 request
             )
-            send_mail_with_html(subject, html_message, user.email)
+            send_mail_with_html(subject, html_message, user.email, settings.SMTP_REPLY_TO)
         except:
             print('email sending error!')
         messages.success(request, 'Your account is confirmed. You can now login.')
@@ -96,6 +90,7 @@ def email_verify(request, key):
         messages.error(request, 'Error, invalid token!')
     return redirect('login')
     # return render(request, 'registration/confirm_template.html', {'success': False})
+
 
 @my_login_required
 def profile_edit(request):
@@ -112,9 +107,11 @@ def profile_edit(request):
 
     return render(request, 'account/index.html', {'form': form, 'pageName': 'Profile'})
 
+
 def change_password_success(request):
     messages.success(request, 'Your password is updated successfully.')
     return redirect('change_password')
+
 
 @my_login_required
 def check_mapillary_oauth(request):
@@ -157,6 +154,11 @@ def check_mapillary_oauth(request):
     else:
         messages.error(request, 'Error, mapillary invalid token!')
         return redirect('home')
+
+
+def check_mtpu_mapillary_oauth(request):
+    return redirect()
+
 
 def profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
@@ -207,7 +209,10 @@ def profile(request, username):
     finder_label = get_finder_label(imageViewPointCount)
     spotter_label = get_spotter_label(imageLabelCount)
 
-
+    photographers = Photographer.objects.filter(user=user)
+    photographer = None
+    if photographers.count() > 0:
+        photographer = photographers[0]
 
     content = {
         'current_user': user,
@@ -226,10 +231,12 @@ def profile(request, username):
         'view_point_count': imageViewPointCount,
         'marked_point_count': markedImageViewPointCount,
         'pageName': 'Profile',
-        'pageTitle': 'Profile'
+        'pageTitle': 'Profile',
+        'photographer': photographer
     }
 
     return render(request, 'account/profile.html', content)
+
 
 @my_login_required
 def ajax_upload_file(request):
@@ -259,6 +266,7 @@ def ajax_upload_file(request):
         'status': 'failed',
         'message': "You can't access."
     })
+
 
 @my_login_required
 def ajax_user_update(request):
@@ -317,8 +325,54 @@ def ajax_user_update(request):
             }
         })
 
-
     return JsonResponse({
         'status': 'failed',
         'message': "You can't access."
     })
+
+
+@my_login_required
+def ajax_user_change_liked_email(request):
+    user = request.user
+    if request.method == "POST":
+        is_liked_email = request.POST.get('is_liked_email')
+        if is_liked_email is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "is_liked_email is missing."
+            })
+        if is_liked_email == 'true':
+            user.is_liked_email = True
+        else:
+            user.is_liked_email = False
+        user.save()
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Setting information is successfully saved.'
+        })
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+class BaseTokenRedirectView(CustomRedirectView):
+    query_string = True
+    name = ''
+
+    def __init__(self, *args, **kwargs):
+        self.url = '{}://{}'.format(settings.MTPU_SCHEME, self.name)
+
+        super(BaseTokenRedirectView, self).__init__(**kwargs)
+
+
+class MapillaryTokenRedirectView(BaseTokenRedirectView):
+    name = 'mapillary'
+
+
+class GoogleTokenRedirectView(BaseTokenRedirectView):
+    name = 'google'
+
+
+class StravaTokenRedirectView(BaseTokenRedirectView):
+    name = 'strava'

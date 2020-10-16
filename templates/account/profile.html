@@ -14,7 +14,7 @@
                         <div class="col-lg-4" id="user_avatar">
                             <div class="dz-image-cover text-center">
                                 {% if current_user.avatar != '' and current_user.avatar != None %}
-                                    <img style="width: 120px; height: 120px; border-radius: 50%;"  src="{{ MEDIA_URL }}{{ current_user.avatar }}">
+                                    <img style="width: 120px; height: 120px; border-radius: 50%;"  src="{{ STATIC_URL }}{{ current_user.avatar }}">
                                 {% else %}
                                     <img style="width: 120px; height: 120px; border-radius: 50%;" src="{% static 'images/icon/avatar1.png' %}">
                                 {% endif %}
@@ -26,59 +26,55 @@
                                     <h3>
                                         {{ current_user.username }}
                                     </h3>
-
                                 </div>
 
                                 {% if request.user.is_authenticated and request.user == current_user %}
                                     <div class="user-email">
-                                        <h5 class="mb-1">{{ current_user.email }} (only visible to you)</h5>
+                                        <h5 class="mb-1">{{ current_user.email }} </h5>
+                                        <span>(only visible to you)</span>
                                     </div>
                                 {% endif %}
 
-                                {% if current_user.first_name == '' or current_user.last_name == '' %}
-                                    <div class="user-name">
-                                        <p class="mb-1">
-                                            Name field is empty.
-                                        </p>
-                                    </div>
-                                {% else %}
+                                {% if not current_user.first_name is None and not current_user.last_name is None and not current_user.first_name == '' and not current_user.last_name == '' %}
                                     <div class="user-name">
                                         <p class="mb-1">{{ current_user.first_name }} {{ current_user.last_name }}</p>
                                     </div>
                                 {% endif %}
 
-                                {% if current_user.description is None or current_user.description == '' %}
-                                    <div class="user-description mt-2" >
-                                        <p class="mb-1">
-                                            Description field is empty.
-                                        </p>
-                                    </div>
-                                {% else %}
+                                {% if not current_user.description is None and not current_user.description == '' %}
                                     <div class="user-description mt-2" >
                                         <p class="mb-1">{{ current_user.description }}</p>
                                     </div>
                                 {% endif %}
 
-                                {% if current_user.website_url == '' or current_user.website_url is None %}
+                                {% if not current_user.website_url == '' and not current_user.website_url is None %}
                                     <div class="user-website mt-2">
-                                       Website Url field is empty.
-                                    </div>
-                                {% else %}
-                                    <div class="user-website mt-2">
-                                        <a class="" href="{{ current_user.website_url }}">{{ current_user.getShortWebURL }}</a>
+                                        <a class="" href="{{ current_user.website_url }}">{{ current_user.get_short_web_url }}</a>
                                     </div>
                                 {% endif %}
 
                                 {% if request.user.is_authenticated and current_user == request.user %}
                                     <div class="actions d-flex flex-row mt-2 justify-content-between">
-                                        <div class="text-right ml-2">
+                                        <div class="text-right">
                                             <button type="button" data-toggle="modal" data-target="#uploadPictureModal" class="btn btn-sm btn-warning" id="change_file">Change Picture</button>
                                         </div>
-                                        <div class="link-developer text-right">
-                                            <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:list' %}">Developer</a>
+
+                                        <div class="text-right">
+                                            <a type="button" href="{% url 'change_password' %}" class="btn btn-sm btn-warning" id="change_file">Change Password</a>
                                         </div>
+
                                         <div class="action text-right">
                                             <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#userDetailModal" id="edit_button">Edit</button>
+                                        </div>
+                                    </div>
+                                    <hr class="p-1">
+                                    <div><h5>Developer</h5></div>
+                                    <div class="d-flex flex-row mt-2 justify-content-between">
+                                        <div class="link-developer text-right">
+                                            <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:list' %}">Applications</a>
+                                        </div>
+                                         <div class="link-developer text-right">
+                                            <a class="btn btn-sm btn-outline-primary" href="{% url 'oauth2_provider:authorized-token-list' %}">Authorized Tokens</a>
                                         </div>
                                     </div>
                                 {% endif %}
@@ -124,7 +120,30 @@
                         </div>
                     </div>
                 </div>
-
+                <div class="">
+                    <div class="hire-profile d-flex justify-content-between align-items-center">
+                        <a href="https://guides.trekview.org/mtp-web/user-guide/profile#badges" target="_blank">
+                            Learn how scoring works.
+                        </a>
+                        {% if not photographer is None %}
+                            {% if request.user.username != current_user.username %}
+                                <a class="btn btn-info" href="{% url 'photographer.photographer_detail' unique_id=photographer.unique_id %}">
+                                    FOR HIRE
+                                </a>
+                            {% else %}
+                                <a class="btn btn-info" href="{% url 'photographer.my_photographer_edit' unique_id=photographer.unique_id %}">
+                                    Edit Hire Profile
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            {% if request.user.username == current_user.username %}
+                                <a class="btn btn-info" href="{% url 'photographer.photographer_create' %}">
+                                    Create Hire Profile
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -134,8 +153,8 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users h-100 d-flex flex-column justify-content-between">
-                        <a class="btn btn-outline-info" href="/guidebook/list?username={{ current_user.username }}">Guidebooks created({{ guidebooks_count }})</a>
-                        <a class="btn btn-outline-info" href="/guidebook/list?username={{ current_user.username }}&like=true">Guidebooks liked({{ guide_like_count }})</a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="{% url 'guidebook.guidebook_list' %}?username={{ current_user.username }}"><i class="fas fa-map-marked-alt"></i> <span class="ml-2">Guidebooks created({{ guidebooks_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="{% url 'guidebook.guidebook_list' %}?username={{ current_user.username }}&like=true"><i class="fas fa-thumbs-up"></i> <span class="ml-2">Guidebooks liked({{ guide_like_count }})</span></a>
                     </div>
                 </div>
             </div>
@@ -143,8 +162,8 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users h-100 d-flex flex-column justify-content-between">
-                        <a class="btn btn-outline-info" href="/tour/list?username={{ current_user.username }}">Tours created({{ tours_count }})</a>
-                        <a class="btn btn-outline-info" href="/tour/list?username={{ current_user.username }}&like=true">Tours liked({{ tour_like_count }})</a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="{% url 'tour.tour_list' %}?username={{ current_user.username }}"><i class="fas fa-clipboard-list"></i> <span class="ml-2">Tours created({{ tours_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="{% url 'tour.tour_list' %}?username={{ current_user.username }}&like=true"><i class="fas fa-thumbs-up"></i> <span class="ml-2">Tours liked({{ tour_like_count }})</span></a>
                     </div>
                 </div>
             </div>
@@ -152,24 +171,36 @@
             <div class="col-md-6 mt-3">
                 <div class="card p-2 section w-100">
                     <div class="users h-100 d-flex flex-column justify-content-between">
-                        <a class="btn btn-outline-info" href="/sequence/list?username={{ current_user.username }}">Sequences Created({{ sequences_count }})</a>
-                        <a class="btn btn-outline-info" href="/sequence/list?username={{ current_user.username }}&like=true">Sequences liked({{ seq_like_count }})</a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="{% url 'sequence.sequence_list' %}?username={{ current_user.username }}"><i class="fas fa-images"></i> <span class="ml-2">Sequences Created({{ sequences_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="{% url 'sequence.sequence_list' %}?username={{ current_user.username }}&like=true"><i class="fas fa-thumbs-up"></i> <span class="ml-2">Sequences liked({{ seq_like_count }})</span></a>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6 mt-3">
+            <div class="col-md-6 mt-3 mb-3">
                 <div class="card p-2 section w-100">
                     <div class="users h-100 d-flex flex-column justify-content-between">
-                        <a class="btn btn-outline-info" href="/sequence/image-leaderboard?username={{ current_user.username }}&type=received">Viewpoints received({{ view_point_count }})</a>
-                        <a class="btn btn-outline-info" href="/sequence/image-leaderboard?username={{ current_user.username }}&type=marked">Viewpoints marked({{ marked_point_count }})</a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center" href="{% url 'sequence.image_leaderboard' %}?username={{ current_user.username }}&type=received"><i class="fas fa-binoculars"></i> <span class="ml-2">Viewpoints received({{ view_point_count }})</span></a>
+                        <a class="btn btn-outline-info d-flex align-items-center justify-content-center mt-3" href="{% url 'sequence.image_leaderboard' %}?username={{ current_user.username }}&type=marked"><i class="fas fa-bookmark"></i> <span class="ml-2">Viewpoints marked({{ marked_point_count }})</span></a>
                     </div>
                 </div>
             </div>
-
         </div>
-    </div>
 
+        {% if request.user.is_authenticated and current_user == request.user %}
+            <hr class="mt-1 mb-1" />
+
+            <div class="row">
+                <div class="col-md-12 mt-3">
+                    <div><h5>Settings</h5></div>
+                    <div class="">
+                        <input style="width: 23px" {% if current_user.is_liked_email %}checked{% endif %} type="checkbox" id="is_liked_email">
+                        <label for="is_liked_email">Do you want to get email when others like your tour, sequence and guidebook?</label>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 </div>
 
 <!-- Modal -->
@@ -270,6 +301,26 @@
         var server_image = false;
     {% else %}
         var server_image = true;
+    {% endif %}
+
+    {% if request.user.is_authenticated and current_user == request.user %}
+        $('#is_liked_email').change(function () {
+            var is_liked_email = $(this).prop('checked');
+            $.ajax({
+                url: "{% url 'account.ajax_user_change_liked_email' %}",
+                type: 'POST',
+                data: {'is_liked_email': is_liked_email},
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                        toastr.error(data.message);
+                    else
+                    {
+                        toastr.success(data.message);
+                    }
+                }
+            });
+        });
     {% endif %}
 
     var myDropzone = new Dropzone(".dropzone", {

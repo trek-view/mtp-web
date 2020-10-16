@@ -131,7 +131,7 @@
                                                 Import
                                             </button>
                                         </div>
-                                        <div class="added-form d-none">
+                                        <div class="added-form w-100 d-none">
                                             <div class="sequence-name">
                                                 <p class="w-25 mb-0" style="color: #FF9800;">Name: </p>
                                                 <p class="w-75 contents">Test Name</p>
@@ -334,7 +334,6 @@
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: first_point, // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         else {
@@ -343,7 +342,6 @@
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: [-87.622088, 41.878781], // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         map.on('load', function() {

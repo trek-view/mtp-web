@@ -30,21 +30,25 @@
                 {% endfor %}
             {% endif %}
             <div class="w-100 d-flex justify-content-end mt-3 mb-3 pr-3">
-                <a href="{% url 'photographer.photographer_create' %}" class="btn btn-outline-primary">Create Photographer</a>
+                {% if photographer is None %}
+                    <a href="{% url 'photographer.photographer_create' %}" class="btn btn-outline-primary">Create Photographer</a>
+                {% else %}
+                    <a href="{% url 'photographer.my_photographer_edit' unique_id=photographer.unique_id %}" class="btn btn-outline-primary">Edit Photographer</a>
+                {% endif %}
             </div>
             <div class="ml-3 mb-2 mr-3">
                 <h4>Filter Photographer</h4>
             </div>
-            {% if user.is_authenticated %}
-                <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
-                    <li class="nav-item" style="width: 30%;">
-                        <a class="nav-link {% if pageName == 'Photographers' %}active{% endif %}" href="{% url 'photographer.photographer_list' %}">All</a>
-                    </li>
-                    <li class="nav-item" style="width: 50%;">
-                        <a class="nav-link {% if pageName == 'My Photographers' %}active{% endif %}" href="{% url 'photographer.my_photographer_list'  %}">My Photographers</a>
-                    </li>
-                </ul>
-            {% endif %}
+{#            {% if user.is_authenticated %}#}
+{#                <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">#}
+{#                    <li class="nav-item" style="width: 30%;">#}
+{#                        <a class="nav-link {% if pageName == 'Photographers' %}active{% endif %}" href="{% url 'photographer.photographer_list' %}">All</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item" style="width: 50%;">#}
+{#                        <a class="nav-link {% if pageName == 'My Photographers' %}active{% endif %}" href="{% url 'photographer.my_photographer_list'  %}">My Photographers</a>#}
+{#                    </li>#}
+{#                </ul>#}
+{#            {% endif %}#}
 
             <div class="p-3" style="border-top: 1px solid #dee2e6;">
                 <div class="search-form">
@@ -96,7 +100,7 @@
             <div class="item-list">
                 {% if photographers.count > 0 %}
                     {% for photographer in photographers %}
-                        <div class="card row photographer p-3 m-3 d-flex flex-row align-items-center" id="photographer_{{ photographer.unique_id }}" data-photographer-id="{{ photographer.unique_id }}" onclick="getSequenceDetail('{{ photographer.unique_id }}')">
+                        <div class="card row photographer p-3 m-3 d-flex flex-row align-items-center" id="photographer_{{ photographer.unique_id }}" data-photographer-id="{{ photographer.unique_id }}" onclick="getSequenceDetailByUniqueID('{{ photographer.unique_id }}')">
                             <div class="col-sm-5 col-md-4 col-lg-3">
                                 <div class="row">
                                     <div class="w-100 min-map-box" id="map-{{ photographer.unique_id }}">
@@ -115,13 +119,13 @@
 
                                         <div class="item-description">
                                             <p class="mb-1">
-                                                {{ photographer.getShortDescription }}
+                                                {{ photographer.get_short_description }}
                                             </p>
                                         </div>
 
                                         <div class="item-description">
                                             <p class="mb-1">
-                                                {{ photographer.getCaptureType }}, {{ photographer.getCaptureMethod }}
+                                                {{ photographer.get_capture_type }}, {{ photographer.get_capture_method }}
                                             </p>
                                         </div>
 
@@ -183,7 +187,9 @@
                 {% endif %}
             </div>
         </div>
-        <div class="d-none" id="map"></div>
+        <div class="d-none" id="map">
+
+        </div>
     </div>
 
 
@@ -251,6 +257,16 @@
         center: [-74.5, 40], // starting position
         zoom: 1 // starting zoom
     });
+
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
 
     var photographerGeometryElements = $('.photographer-geometry');
     var polygonData = [];
@@ -526,7 +542,6 @@
             style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
             center: centerPoint, // starting position
             zoom: 3, // starting zoom
-            attributionControl: false
         });
 
         map.on('load', function() {

@@ -16,8 +16,14 @@ SECURE_SSL_REDIRECT = True
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+if not os.environ.get('HEROKU_POSTGRESQL_SILVER_URL') is None:
+    DATABASE_VARIABLE = 'HEROKU_POSTGRESQL_SILVER_URL'
+elif not os.environ.get('HEROKU_POSTGRESQL_AQUA_URL') is None:
+    DATABASE_VARIABLE = 'HEROKU_POSTGRESQL_AQUA_URL'
+else:
+    DATABASE_VARIABLE = 'DATABASE_URL'
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+    'default': dj_database_url.config(env=DATABASE_VARIABLE, conn_max_age=600, ssl_require=True)
 }
 DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
@@ -69,7 +75,7 @@ AWS_QUERYSTRING_AUTH = False # This will make sure that the file URL does not ha
 AWS_S3_CUSTOM_DOMAIN = AWS_STORAGE_BUCKET_NAME
 AWS_S3_MAPILLARY_BUCKET = os.environ.get("AWS_S3_MAPILLARY_BUCKET")
 # Static media settings
-STATIC_URL = 'https://' + AWS_S3_BUCKET_CNAME + '/'
+STATIC_URL = 'https://' + AWS_STORAGE_BUCKET_NAME + '/'
 MEDIA_URL = 'https://' + AWS_S3_MAPILLARY_BUCKET + '/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), )
 STATIC_ROOT = 'staticfiles'
@@ -115,4 +121,6 @@ MTP_DESKTOP_UPLOADER_CLIENT_SECRET = os.environ.get('MTP_DESKTOP_UPLOADER_CLIENT
 SITE_ID = os.environ.get('SITE_ID')
 
 FONT_AWESOME_KIT = os.environ.get('FONT_AWESOME_KIT')
+
+WEATHERSTACK_API_KEY = os.environ.get('WEATHERSTACK_API_KEY')
 

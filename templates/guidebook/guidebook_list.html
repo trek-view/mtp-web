@@ -51,7 +51,9 @@
             <div class="p-3" style="border-top: 1px solid #dee2e6;">
                 <div class="search-form">
                     <form method="GET" class="post-form" id="search_form">
-                        <input type="number" class="d-none" name="page" value="{{ page }}">
+                        <label>
+                            <input type="number" class="d-none" name="page" value="{{ page }}">
+                        </label>
                         {{ form.media }}
                         {{ form.as_p }}
                         <div class="form-group text-right mt-3">
@@ -66,7 +68,7 @@
     </div>
     <div class="right-board list bg-light">
         <div class="switch-list-viewer">
-            <input class="" type="checkbox" id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
+            <label for="switch-list-viewer"></label><input class="" type="checkbox" id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
         </div>
         <div id="list-view" class="list-view mt-4 mb-2 ml-auto mr-auto">
             <div class="paginator">
@@ -100,89 +102,86 @@
                 {% if guidebooks.count > 0 %}
                     {% for guidebook in guidebooks %}
                         <div class="card guidebook p-3 m-3" id="guidebook_{{ guidebook.unique_id }}" data-guidebook-id="{{ guidebook.unique_id }}">
-                            <div class="row">
+                            <div class="row align-items-center">
                                 <div class="col-md-5 col-lg-4">
                                     <div class="row align-items-center">
                                         <div class="col-md-6 pl-2 pr-2">
-                                            <div class="map-box" id="map-{{ guidebook.unique_id }}">
+                                            <div class="min-map-box" id="map-{{ guidebook.unique_id }}">
                                             </div>
                                         </div>
 
-                                        <div class="cover-image-box col-md-6">
-                                            <div class="row">
-                                                {% if guidebook.getCoverImage is None %}
-                                                    <img class="w-100" style="height: 140px" src="{% static 'images/global/empty-1.png' %}">
-                                                {% else %}
-                                                    <img class="w-100" style="height: 140px" src="https://images.mapillary.com/{{ guidebook.getCoverImage }}/thumb-320.jpg">
-                                                {% endif %}
+                                        <div class=" col-md-6">
+                                            <div class="cover-image-box">
+                                                <div class="row">
+                                                    {% if guidebook.get_cover_image is None %}
+                                                        <img class="w-100" src="{% static 'images/global/empty-1.png' %}" alt="">
+                                                    {% else %}
+                                                        <img class="w-100" src="https://images.mapillary.com/{{ guidebook.get_cover_image }}/thumb-320.jpg" alt="">
+                                                    {% endif %}
+                                                </div>
+                                                <div class="user-on-mapillary" >
+                                                    image by {{ guidebook.get_cover_imageUserOnMapillary }} on mapillary
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="detail-box col-md-7 col-lg-8">
-                                    <div class="guidebook-main ">
-                                        <div class="guidebook-title text-info">
-                                            <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
-                                                <h5>
-                                                    {{ guidebook.name }}
-                                                </h5>
-                                            </a>
+                                    <div class="row w-100">
+                                        <div class="col-md-8 item-detail-box p-2">
+                                            <div class="guidebook-main ">
+                                                <div class="item-title text-info d-flex flex-row justify-content-between">
+                                                    <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
+                                                        <h5>
+                                                            {{ guidebook.name }}
+                                                        </h5>
+                                                    </a>
+                                                </div>
+
+                                                <div class="item-description">
+                                                    <p class="mb-1">
+                                                        {{ guidebook.get_short_description }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="guidebook-cetegory">
+                                                    <p class="mb-1">
+                                                        {{ guidebook.category }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="w-100 d-flex flex-row">
+                                                     <p class="mb-1 mr-3 text-center">
+                                                         <i class="fas fa-image"></i>
+                                                         <br>
+                                                         {{ guidebook.getSceneCount }} Photos
+                                                     </p>
+                                                     <p class="mb-1 mr-3 text-center">
+                                                         <i class="far fa-thumbs-up"></i>
+                                                         <br>
+                                                         {{ guidebook.get_like_count }} Likes
+                                                     </p>
+                                                 </div>
+
+                                                <div class="guidebook-tag" style="min-height: 24px;">
+                                                    {% for tag_name in guidebook.get_tags %}
+                                                        <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                                                            {{ tag_name }}
+                                                        </span>
+                                                    {% endfor %}
+                                                </div>
+
+                                                <div class="item-user">
+                                                    <a href="{% url 'account.profile' username=guidebook.user.username %}">
+                                                        <span class="user">{{ guidebook.user.username }}</span>
+                                                    </a>
+                                                </div>
+
+                                            </div>
                                         </div>
 
-                                        <div class="guidebook-description">
-                                            <p class="mb-1">
-                                                {{ guidebook.getShortDescription }}
-                                            </p>
-                                        </div>
-
-                                        <div class="guidebook-cetegory" style="color: blueviolet;">
-                                            <p class="mb-1">
-                                                {{ guidebook.category }}
-                                            </p>
-                                        </div>
-
-                                        <div class="guidebook-tag" style="min-height: 24px;">
-                                            {% for tag_name in guidebook.getTags %}
-                                                <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
-                                                    {{ tag_name }}
-                                                </span>
-                                            {% endfor %}
-                                        </div>
-
-                                        <div class="guidebook-created-at text-secondary d-flex flex-row justify-content-between">
-                                            <span class="">
-                                                {{ guidebook.created_at }}
-                                            </span>
-
-                                            <a href="{% url 'account.profile' username=guidebook.user.username %}">
-                                                <span class="" style="color: brown;">
-                                                    {{ guidebook.user }}
-                                                </span>
-                                            </a>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="guidebook-others">
-                                        <div class="scenes text-center">
-                                            {% if guidebook.getSceneCount == 0 %}
-                                                <img src="{% static 'images/icon/icons8-photo-gallery-100 (1).png' %}" />
-                                            {% else %}
-                                                <img src="{% static 'images/icon/icons8-photo-gallery-100.png' %}" />
-                                            {% endif %}
-                                            <p class="text-center m-0">
-                                                {{ guidebook.getSceneCount }} Photos
-                                            </p>
-                                        </div>
-                                        <div class="like text-center">
-                                            {% if guidebook.getLikeCount == 0 %}
-                                                <img src="{% static 'images/icon/icons8-love-100.png' %}" />
-                                            {% else %}
-                                                <img src="{% static 'images/icon/icons8-love-48.png' %}" />
-                                            {% endif %}
-                                            <p class="text-center m-0">
-                                                {{ guidebook.getLikeCount }} Likes
-                                            </p>
+                                        <div class="col-md-4 p-2 d-flex text-center flex-row align-items-center" style="font-size: 13px;">
+                                            <p class="mt-3">{{ guidebook.created_at }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -223,7 +222,9 @@
                 {% endif %}
             </div>
         </div>
-        <div class="d-none" id="map"></div>
+        <div class="d-none" id="map">
+
+        </div>
     </div>
 
     <div class="detail-modal modal fade" style="padding-top: 140px !important;" id="guidebookDetailModal">
@@ -236,9 +237,9 @@
 {% block scripts %}
 <script>
     $('.paginator-btn').click(function() {
-        var pageNum = $(this).data('page');
-        var current_url = window.location.href;
-        var a = current_url.split("?");
+        let pageNum = $(this).data('page');
+        let current_url = window.location.href;
+        let a = current_url.split("?");
         if (a.length < 2)
         {
             current_url += '?page=' + pageNum;
@@ -246,12 +247,12 @@
             return;
         }
 
-        var b = a[1].split("&");
-        var i = 0;
-        var c = [];
-        var is_changed = false;
+        let b = a[1].split("&");
+        let i;
+        let c = [];
+        let is_changed = false;
         for (i=0;i<b.length;i++) {
-            if (b[i].substr(0, 5) == 'page=') {
+            if (b[i].substr(0, 5) === 'page=') {
                 c.push('page=' + pageNum);
                 is_changed = true;
             }
@@ -259,32 +260,33 @@
                 c.push(b[i]);
             }
         }
-        var url = a[0] + '?' + c.join('&');
+        let url = a[0] + '?' + c.join('&');
         if (!is_changed)
             url += '&page=' + pageNum;
         location.assign(url);
     });
 
     mapboxgl.accessToken = mapboxToken;
-    var positions = [];
+    let positions = [];
     {% for guidebook in guidebooks %}
         positions.push({{ guidebook.getScenePositions }});
     {% endfor %}
 
     console.log(positions)
-    var map_ary = [];
+    let map_ary = [];
 
+    let i;
 
     function draw_map(data) {
-        var obj = $('.map-box').eq(i);
-        var obj_id = obj.attr('id');
-        var sceneData = [];
-        var item = {};
-        var scene_positions = [];
-        for (var j = 0; j < data.length; j++)
+        let obj = $('.min-map-box').eq(i);
+        let obj_id = obj.attr('id');
+        let sceneData = [];
+        let item = {};
+        let scene_positions = [];
+        for (let j = 0; j < data.length; j++)
         {
-            var lat = data[j][0];
-            var lng = data[j][1];
+            let lat = data[j][0];
+            let lng = data[j][1];
             scene_positions.push([lng, lat]);
             item = {
                 "type": "Feature",
@@ -296,27 +298,26 @@
             };
             sceneData.push(item);
         }
-
+        let first_point;
+        let map;
         if (scene_positions.length > 0)
-            var first_point = scene_positions[0];
+            first_point = scene_positions[0];
         else
-            var first_point = null;
+            first_point = null;
         if (first_point != null) {
-            var map = new mapboxgl.Map({
+            map = new mapboxgl.Map({
                 container: obj_id, // container id
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: first_point, // starting position
                 zoom: 12, // starting zoom
-                attributionControl: false
             });
         }
         else {
-            var map = new mapboxgl.Map({
+            map = new mapboxgl.Map({
                 container: obj_id, // container id
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: [-87.622088, 41.878781], // starting position
                 zoom: -2, // starting zoom
-                attributionControl: false
             });
         }
         map.on('load', function() {
@@ -341,13 +342,23 @@
         window.addEventListener('resize', function() { map_ary[map_ary.length - 1].resize(); });
     }
 
-    var centerPointerData = [];
-    var map = new mapboxgl.Map({
+    let centerPointerData = [];
+    let map = new mapboxgl.Map({
         container: 'map', // container id
         style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
         center: [-74.5, 40], // starting position
-        zoom: 1 // starting zoom
+        zoom: 1, // starting zoom,
     });
+
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
 
     for (i = 0; i < positions.length; i++)
     {
@@ -356,9 +367,9 @@
     }
 
     function drawMapView(l, data) {
-        if (data.length == 0)
+        if (data.length === 0)
             return false;
-        var centerItem = {
+        let centerItem = {
             "type": "Feature",
             "properties": {"guidebook_id": $('.guidebook').eq(l).data('guidebook-id')},
             "geometry": {
@@ -369,55 +380,77 @@
         centerPointerData.push(centerItem);
     }
 
-    map.on('load', function() {
-        map.loadImage(
-            'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
-            function(error, image) {
-                if (error) throw error;
-                map.addImage('custom-marker', image);
-                map.addSource('points', {
-                    'type': 'geojson',
-                    'data': {
-                        'type': 'FeatureCollection',
-                        'features': centerPointerData
-                    }
-                });
-                map.addLayer({
-                    'id': 'points',
-                    'type': 'symbol',
-                    'source': 'points',
-                    'layout': {
-                        'icon-image': 'custom-marker',
-                        // get the title name from the source's "title" property
-                        // 'text-field': ['get', 'title'],
-                        'text-font': [
-                            'Open Sans Semibold',
-                            'Arial Unicode MS Bold'
-                        ],
-                        'text-offset': [0, 1.25],
-                        'text-anchor': 'top'
-                    }
-                });
-            }
-        );
+    // Create a popup, but don't add it to the map yet.
+    const popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+    });
 
-        map.on('click', 'points', function (e) {
-            getGuidebookDetail(e.features[0].properties.guidebook_id);
+    map.on('load', function() {
+        drawMapByUserKey('');
+        map.on('mouseenter', 'mtp-scenes', function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            let coordinates = e.features[0].geometry.coordinates.slice();
+            let key = e.features[0].properties.image_key;
+            let url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup.setLngLat(coordinates)
+            .setHTML('<img src="' + url + '" width="160"  alt=""/>')
+            .addTo(map);
         });
 
-        // Change the cursor to a pointer when the mouse is over the states layer.
-        map.on('mouseenter', 'points', function () {
-            map.getCanvas().style.cursor = 'pointer';
+        map.on('click', 'mtp-scenes', function (e) {
+            getGuidebookDetailByImageKey(e.features[0].properties["image_key"]);
         });
 
         // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'points', function () {
+        map.on('mouseleave', 'mtp-scenes', function () {
             map.getCanvas().style.cursor = '';
+            popup.remove();
         });
     });
 
-    function getGuidebookDetail(id) {
-        var url = "{% url 'guidebook.ajax_get_detail' unique_id='unique_id' %}";
+    function drawMapByUserKey(user_key) {
+        let filter = ['all',
+            ['==', 'userkey', user_key]
+        ]
+        if (typeof user_key == 'undefined' || user_key === '')
+            filter = ['all']
+
+        if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
+        if (map.getSource('mtp-images')) map.removeSource('mtp-images');
+
+        map.addSource('mtp-scenes', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.guidebook.scene_mvt' version='v1' %}?tile={z}/{x}/{y}"],
+        });
+
+        map.addLayer({
+            "id": "mtp-scenes",
+            "type": "circle",
+            "source": 'mtp-scenes',
+            "source-layer": 'mtp-scenes',
+            'filter': filter,
+            "paint": {
+                "circle-color": "#7880bd",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
+    }
+
+    function getGuidebookDetailByUniqueId(id) {
+        let url = "{% url 'guidebook.ajax_get_detail' unique_id='unique_id' %}";
         url = url.replace('unique_id', id);
         $.ajax({
             url: url,
@@ -425,13 +458,13 @@
             data: {},
             dataType: 'json',
             success: function (data) {
-                if (!data.guidebook) {
+                if (!data['guidebook']) {
                     toastr.error(data.message);
                 }
                 else {
-                    console.log(data)
-                    $('#guidebookDetailModal').html(data.guidebook_html_detail)
-                    $('#guidebookDetailModal').modal({
+                    const $detailModal = $('#guidebookDetailModal');
+                    $detailModal.html(data['guidebook_html_detail'])
+                    $detailModal.modal({
                         'backdrop': false,
                         'show': true,
                     });
@@ -440,9 +473,32 @@
         });
     }
 
+    function getGuidebookDetailByImageKey(image_key) {
+        let url = "{% url 'guidebook.ajax_get_detail_by_image_key' image_key='init_image_key' %}";
+        url = url.replace('init_image_key', image_key);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (!data['guidebook_html_detail']) {
+                    toastr.error(data.message);
+                }
+                else {
+                    const $detailModal = $('#guidebookDetailModal');
+                    $detailModal.html(data['guidebook_html_detail'])
+                    $detailModal.modal({
+                        'backdrop': false,
+                        'show': true,
+                    });
+                }
+            }
+        });
+    }
 
     function gotoDetail(id) {
-        var url = "{% url 'guidebook.guidebook_detail' unique_id='unique_id' %}";
+        let url = "{% url 'guidebook.guidebook_detail' unique_id='unique_id' %}";
         url = url.replace('unique_id', id);
         location.assign(url);
     }

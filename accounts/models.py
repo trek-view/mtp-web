@@ -1,11 +1,14 @@
+from django.contrib.auth import password_validation
 from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.validators import RegexValidator
+from storages.backends.s3boto3 import S3Boto3Storage
 from datetime import datetime
 # Create your models here.
+
 
 class CustomUserManager(BaseUserManager):
     """
@@ -38,9 +41,11 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
 
+
 def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'user/{}/{}'.format(instance.username, filename)
+    return 'user/avatar/{}'.format(instance.username)
+
 
 class CustomUser(AbstractUser):
     # username = None
@@ -50,10 +55,11 @@ class CustomUser(AbstractUser):
     username = models.CharField(max_length=100, unique=True, validators=[alphanumeric])
     is_active = models.BooleanField(default=False)
     is_maillist = models.BooleanField(default=False)
+    is_liked_email = models.BooleanField(default=True)
     mapillary_access_token = models.TextField(default='', null=True, blank=True)
     verify_email_key = models.CharField(max_length=100, default='')
 
-    avatar = models.ImageField(upload_to=image_directory_path, null=True, blank=True)
+    avatar = models.ImageField(upload_to=image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
     first_name = models.CharField(max_length=30, null=True, blank=True, validators=[alpha])
     last_name = models.CharField(max_length=30, null=True, blank=True, validators=[alpha])
     website_url = models.TextField(null=True, blank=True)
@@ -68,18 +74,23 @@ class CustomUser(AbstractUser):
         return self.username
         # return self.email
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('account.profile', kwargs={'username': self.username})
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None
 
-    def getShortWebURL(self):
+    def get_short_web_url(self):
         website_url = self.website_url
         if len(website_url) > 30:
             return website_url[0:30] + '...'
         else:
             return website_url
+
 
 class MapillaryUser(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

@@ -1,45 +1,33 @@
-## Python packages
-from datetime import datetime
+# Python packages
 import json
-import re
-from binascii import a2b_base64
-import os
-
-## Django Packages
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.shortcuts import redirect
-from django.utils import timezone
-from django.http import (
-    Http404, HttpResponse, JsonResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
-)
-from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.contrib import messages
-from django.template import RequestContext
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.template.loader import render_to_string
-from django.db.models import Avg, Count, Min, Sum
-from django.db.models.expressions import F, Window
-from django.db.models.functions.window import RowNumber
-from django.contrib.gis.geos import Point, Polygon, MultiPolygon, LinearRing, LineString
-from django.db import transaction
-from django.core import files
-## Custom Libs ##
-from lib.functions import *
-from lib.mapillary import Mapillary
 import threading
-from asgiref.sync import sync_to_async
-## Project packages
+
+from django.contrib import messages
+from django.contrib.gis.geos import Point, Polygon, LineString
+from django.core import files
+from django.core import serializers
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Count
+from django.db.models.expressions import Window
+from django.db.models.functions.window import RowNumber
+from django.http import (
+    JsonResponse, )
+# Django Packages
+from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
+
+# Project packages
 from accounts.models import CustomUser, MapillaryUser
-from tour.models import Tour, TourSequence
+from challenge.models import Challenge, LabelChallenge
 from guidebook.models import Guidebook, Scene
-
-## App packages
-
+from tour.models import TourSequence
+# Custom Libs ##
+from lib.mapillary import Mapillary
+from lib.weatherstack import WeatherStack
 # That includes from .models import *
-from .forms import * 
+from .forms import *
+
+# App packages
 
 ############################################################################
 
@@ -48,15 +36,19 @@ IMPORT_PAGE_DESCRIPTION = "First start by choosing the month your sequences we'r
 
 ############################################################################
 
+
 def index(request):
     return redirect('sequence.sequence_list')
 
+
+@my_login_required
 def import_sequence(request):
     map_user_data = check_mapillary_token(request.user)
     if not map_user_data:
         return redirect(settings.MAPILLARY_AUTHENTICATION_URL)
     else:
         return redirect('sequence.import_sequence_list')
+
 
 def sequence_list(request):
     sequences = None
@@ -68,7 +60,7 @@ def sequence_list(request):
         form = SequenceSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
-            camera_make = form.cleaned_data['camera_make']
+            camera_makes = form.cleaned_data['camera_make']
             tags = form.cleaned_data['tag']
             transport_type = form.cleaned_data['transport_type']
             username = form.cleaned_data['username']
@@ -79,13 +71,12 @@ def sequence_list(request):
             ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)
-            if camera_make and camera_make != '':
-                sequences = sequences.filter(camera_make__contains=camera_make)
+            if camera_makes is not None and len(camera_makes) > 0:
+                sequences = sequences.filter(camera_make__in=camera_makes)
             if transport_type and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
-                    types = []
-                    types.append(transport_type)
+                    types = [transport_type]
                     for t in children_trans_type:
                         types.append(t.pk)
                     sequences = sequences.filter(transport_type_id__in=types)
@@ -109,11 +100,50 @@ def sequence_list(request):
                 elif like == 'false':
                     sequences = sequences.exclude(pk__in=sequence_ary)
 
-    if sequences == None:
+            filter_time = request.GET.get('time')
+            time_type = request.GET.get('time_type')
+
+            if time_type is None or not time_type or time_type == 'all_time':
+                sequences = sequences
+            else:
+                if time_type == 'monthly':
+                    if filter_time is None or filter_time == '':
+                        now = datetime.now()
+                        y = now.year
+                        m = now.month
+                    else:
+                        y = filter_time.split('-')[0]
+                        m = filter_time.split('-')[1]
+                    print(m)
+                    print(y)
+                    sequences = sequences.filter(
+                        captured_at__month=m,
+                        captured_at__year=y
+                    )
+
+                elif time_type == 'yearly':
+                    print(filter_time)
+                    if filter_time is None or filter_time == '':
+                        now = datetime.now()
+                        y = now.year
+                    else:
+                        y = filter_time
+                    sequences = sequences.filter(
+                        captured_at__year=y
+                    )
+
+            challenge_id = request.GET.get('challenge_id')
+            if challenge_id is not None and challenge_id != '':
+                challenges = Challenge.objects.filter(unique_id=challenge_id)
+                if challenges.count() > 0:
+                    challenge = challenges[0]
+                    sequences = sequences.filter(geometry_coordinates__intersects=challenge.multipolygon)
+
+    if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
-    paginator = Paginator(sequences.order_by('-created_at'), 5)
+    paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
     try:
         pSequences = paginator.page(page)
@@ -144,7 +174,6 @@ def sequence_list(request):
         else:
             pSequences[i].tour_count = tour_sequences.count()
 
-
     content = {
         'sequences': pSequences,
         'form': form,
@@ -154,6 +183,7 @@ def sequence_list(request):
         'page': page
     }
     return render(request, 'sequence/list.html', content)
+
 
 @my_login_required
 def my_sequence_list(request):
@@ -166,7 +196,7 @@ def my_sequence_list(request):
         form = SequenceSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
-            camera_make = form.cleaned_data['camera_make']
+            camera_makes = form.cleaned_data['camera_make']
             tags = form.cleaned_data['tag']
             transport_type = form.cleaned_data['transport_type']
             like = form.cleaned_data['like']
@@ -176,13 +206,12 @@ def my_sequence_list(request):
             ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__contains=name)
-            if camera_make and camera_make != '':
-                sequences = sequences.filter(camera_make__contains=camera_make)
+            if camera_makes is not None and len(camera_makes) > 0:
+                sequences = sequences.filter(camera_make__in=camera_makes)
             if transport_type and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
-                    types = []
-                    types.append(transport_type)
+                    types = [transport_type]
                     for t in children_trans_type:
                         types.append(t.pk)
                     sequences = sequences.filter(transport_type_id__in=types)
@@ -203,11 +232,11 @@ def my_sequence_list(request):
                 elif like == 'false':
                     sequences = sequences.exclude(pk__in=sequence_ary)
 
-    if sequences == None:
+    if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
-    paginator = Paginator(sequences.order_by('-created_at'), 5)
+    paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
     try:
         pSequences = paginator.page(page)
@@ -248,11 +277,13 @@ def my_sequence_list(request):
     }
     return render(request, 'sequence/list.html', content)
 
+
 def image_leaderboard(request):
     images = None
     page = 1
     m_type = None
     image_view_points = ImageViewPoint.objects.filter()
+    filter_type = None
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
@@ -261,20 +292,19 @@ def image_leaderboard(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             camera_makes = form.cleaned_data['camera_make']
-            camera_models = form.cleaned_data['camera_model']
+            # camera_models = form.cleaned_data['camera_model']
             transport_type = form.cleaned_data['transport_type']
 
             images = Image.objects.all()
             if not camera_makes is None and len(camera_makes) > 0:
                 images = images.filter(camera_make__in=camera_makes)
-            if not camera_models is None and len(camera_models) > 0:
-                images = images.filter(camera_model__in=camera_models)
+            # if not camera_models is None and len(camera_models) > 0:
+            #     images = images.filter(camera_model__in=camera_models)
 
             if transport_type and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
-                    types = []
-                    types.append(transport_type)
+                    types = [transport_type]
                     for t in children_trans_type:
                         types.append(t.pk)
                     sequences = Sequence.objects.filter(transport_type_id__in=types)
@@ -284,23 +314,75 @@ def image_leaderboard(request):
                 images = images.filter(sequence__in=sequences)
 
             m_type = request.GET.get('type')
+            users = None
             if username and username != '':
+                users = CustomUser.objects.filter(username__contains=username)
                 if m_type is None or m_type == 'received':
-                    users = CustomUser.objects.filter(username__contains=username)
                     images = images.filter(user__in=users)
                 elif m_type == 'marked':
-                    users = CustomUser.objects.filter(username__contains=username)
                     image_view_points = image_view_points.filter(user__in=users)
 
-    if images == None:
+            filter_type = request.GET.get('filter_type')
+            if filter_type is not None and filter_type != '':
+                if users is not None:
+                    images = images.filter(user__in=users)
+                if filter_type == 'label_count':
+                    challenge_id = request.GET.get('challenge_id')
+                    if challenge_id is not None and challenge_id != '':
+                        label_challenges = LabelChallenge.objects.filter(unique_id=challenge_id)
+                        if label_challenges.count() > 0:
+                            label_challenge = label_challenges[0]
+                            images = images.filter(point__intersects=label_challenge.multipolygon)
+
+                if filter_type == 'view_point':
+
+                    filter_time = request.GET.get('time')
+                    time_type = request.GET.get('time_type')
+
+                    if time_type is None or not time_type or time_type == 'all_time':
+                        images = images
+                    else:
+                        if time_type == 'monthly':
+                            if filter_time is None or filter_time == '':
+                                now = datetime.now()
+                                y = now.year
+                                m = now.month
+                            else:
+                                y = filter_time.split('-')[0]
+                                m = filter_time.split('-')[1]
+                            print(m)
+                            print(y)
+                            images = images.filter(
+                                captured_at__month=m,
+                                captured_at__year=y
+                            )
+
+                        elif time_type == 'yearly':
+                            print(filter_time)
+                            if filter_time is None or filter_time == '':
+                                now = datetime.now()
+                                y = now.year
+                            else:
+                                y = filter_time
+                            images = images.filter(
+                                captured_at__year=y
+                            )
+
+    if images is None:
         images = Image.objects.all()
 
     images = images.exclude(sequence=None)
 
-    image_view_points_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
-        rank=Window(expression=RowNumber()))
+    if filter_type == 'label_count':
+        image_label_json = ImageLabel.objects.filter(image__in=images).values('image').annotate(
+            image_count=Count('image')).order_by('-image_count').annotate(
+            rank=Window(expression=RowNumber()))
+        paginator = Paginator(image_label_json, 10)
+    else:
+        image_view_points_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
+            rank=Window(expression=RowNumber()))
+        paginator = Paginator(image_view_points_json, 10)
 
-    paginator = Paginator(image_view_points_json, 10)
     page = 1
     page = request.GET.get('page')
     if not page or page is None:
@@ -337,6 +419,16 @@ def image_leaderboard(request):
         img = {}
         img['unique_id'] = image.unique_id
         img['image_key'] = image.image_key
+
+        try:
+            img['image_view_point_count'] = ImageViewPoint.objects.filter(image=image).count()
+        except:
+            img['image_view_point_count'] = 0
+
+        try:
+            img['image_label_count'] = image.image_label.all().count()
+        except:
+            img['image_label_count'] = 0
 
         if image.camera_make is None:
             img['camera_make'] = ''
@@ -412,14 +504,212 @@ def image_leaderboard(request):
         'form': form,
         'pageName': 'Images',
         'pageTitle': 'Images',
-        'pageDescription': 'This is image learderboard.',
+        'pageDescription': 'This page shows the photos that have been marked as view points the most number of times.',
         'page': page
     }
     return render(request, 'sequence/image_leaderboard.html', content)
 
 
+def save_weather(sequence):
+    sequence_weathers = SequenceWeather.objects.filter(sequence=sequence)
+    if sequence_weathers.count() == 0:
+        weatherstack = WeatherStack()
 
-def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, detection_insert=False, mf_insert=True, image_download=True):
+        point = [sequence.get_first_point_lat(), sequence.get_first_point_lng()]
+        if isinstance(sequence.captured_at, str):
+            historical_date = sequence.captured_at[0:10]
+        else:
+            historical_date = sequence.captured_at.strftime('%Y-%m-%d')
+        print(point)
+        print('historical_date: ', historical_date)
+        weather_json = weatherstack.get_historical_data(point=point, historical_date=historical_date)
+        print(weather_json)
+
+        if weather_json:
+            sequence_weather = SequenceWeather()
+
+            sequence_weather.sequence = sequence
+
+            if 'location' in weather_json.keys():
+                location = weather_json['location']
+                if 'name' in location.keys():
+                    sequence_weather.location_name = location['name']
+                if 'country' in location.keys():
+                    sequence_weather.location_country = location['country']
+                if 'region' in location.keys():
+                    sequence_weather.location_region = location['region']
+                if 'lat' in location.keys():
+                    sequence_weather.location_lat = float(location['lat'])
+                if 'lon' in location.keys():
+                    sequence_weather.location_lon = float(location['lon'])
+                if 'timezone_id' in location.keys():
+                    sequence_weather.location_timezone_id = location['timezone_id']
+                if 'localtime' in location.keys():
+                    sequence_weather.location_localtime = location['localtime']
+                if 'localtime_epoch' in location.keys():
+                    sequence_weather.location_localtime_epoch = location['localtime_epoch']
+                if 'utc_offset' in location.keys():
+                    sequence_weather.location_utc_offset = location['utc_offset']
+
+            if 'current' in weather_json.keys():
+                current = weather_json['current']
+                if 'observation_time' in current.keys():
+                    sequence_weather.current_observation_time = current['observation_time']
+                if 'temperature' in current.keys():
+                    sequence_weather.current_temperature = current['temperature']
+                if 'weather_code' in current.keys():
+                    sequence_weather.current_weather_code = current['weather_code']
+                if 'weather_icons' in current.keys():
+                    sequence_weather.current_weather_icons = current['weather_icons']
+                if 'weather_descriptions' in current.keys():
+                    sequence_weather.current_weather_descriptions = current['weather_descriptions']
+                if 'wind_speed' in current.keys():
+                    sequence_weather.current_wind_speed = current['wind_speed']
+                if 'wind_degree' in current.keys():
+                    sequence_weather.current_wind_degree = current['wind_degree']
+                if 'wind_dir' in current.keys():
+                    sequence_weather.current_wind_dir = current['wind_dir']
+                if 'pressure' in current.keys():
+                    sequence_weather.current_pressure = current['pressure']
+                if 'precip' in current.keys():
+                    sequence_weather.current_precip = current['precip']
+                if 'humidity' in current.keys():
+                    sequence_weather.current_humidity = current['humidity']
+                if 'cloudcover' in current.keys():
+                    sequence_weather.current_cloudcover = current['cloudcover']
+                if 'feelslike' in current.keys():
+                    sequence_weather.current_feelslike = current['feelslike']
+                if 'uv_index' in current.keys():
+                    sequence_weather.current_uv_index = current['uv_index']
+                if 'is_day' in current.keys():
+                    sequence_weather.current_is_day = current['is_day']
+
+            if 'historical' in weather_json.keys():
+                historical = weather_json['historical']
+                if historical_date in historical.keys():
+                    historical_data = historical[historical_date]
+                    if 'date' in historical_data.keys():
+                        sequence_weather.his_date = historical_data['date']
+                    if 'date_epoch' in historical_data.keys():
+                        sequence_weather.his_date_epoch = historical_data['date_epoch']
+                    if 'astro' in historical_data.keys():
+                        astro = historical_data['astro']
+                        if 'sunrise' in astro.keys():
+                            sequence_weather.his_astro_sunrise = astro['sunrise']
+                        if 'sunset' in astro.keys():
+                            sequence_weather.his_astro_sunset = astro['sunset']
+                        if 'moonrise' in astro.keys():
+                            sequence_weather.his_astro_moonrise = astro['moonrise']
+                        if 'moonset' in astro.keys():
+                            sequence_weather.his_astro_moonset = astro['moonset']
+                        if 'moon_phase' in astro.keys():
+                            sequence_weather.his_astro_moon_phase = astro['moon_phase']
+                        if 'moon_illumination' in astro.keys():
+                            sequence_weather.his_astro_moon_illumination = astro['moon_illumination']
+
+                    if 'mintemp' in historical_data.keys():
+                        sequence_weather.his_mintemp = historical_data['mintemp']
+                    if 'maxtemp' in historical_data.keys():
+                        sequence_weather.his_maxtemp = historical_data['maxtemp']
+                    if 'avgtemp' in historical_data.keys():
+                        sequence_weather.his_avgtemp = historical_data['avgtemp']
+                    if 'totalsnow' in historical_data.keys():
+                        sequence_weather.his_totalsnow = historical_data['totalsnow']
+                    if 'sunhour' in historical_data.keys():
+                        sequence_weather.his_sunhour = historical_data['sunhour']
+                    if 'uv_index' in historical_data.keys():
+                        sequence_weather.his_uv_index = historical_data['uv_index']
+                    if 'hourly' in historical_data.keys():
+                        hourly_data = historical_data['hourly']
+                        if len(hourly_data) > 0:
+                            different_time = 24
+                            d_index = 0
+                            for h_index in range(len(hourly_data)):
+                                if 'time' in hourly_data[h_index].keys():
+                                    time_str = hourly_data[h_index]['time']
+                                    time_float = float(time_str) / 100
+                                    print(sequence.captured_at)
+                                    capture_h = float(sequence.captured_at.strftime('%H'))
+                                    capture_m = float(sequence.captured_at.strftime('%M'))
+                                    d_time = abs(capture_h + capture_m / 60 - time_float)
+                                    if d_time < different_time:
+                                        d_index = h_index
+                                        different_time = d_time
+
+                            h_data = hourly_data[d_index]
+                            if 'time' in h_data.keys():
+                                sequence_weather.his_hourly_time = h_data['time']
+                            if 'temperature' in h_data.keys():
+                                sequence_weather.his_hourly_temperature = h_data['temperature']
+                            if 'wind_speed' in h_data.keys():
+                                sequence_weather.his_hourly_wind_speed = h_data['wind_speed']
+                            if 'wind_degree' in h_data.keys():
+                                sequence_weather.his_hourly_wind_degree = h_data['wind_degree']
+                            if 'wind_dir' in h_data.keys():
+                                sequence_weather.his_hourly_wind_dir = h_data['wind_dir']
+                            if 'weather_code' in h_data.keys():
+                                sequence_weather.his_hourly_weather_code = h_data['weather_code']
+                            if 'weather_icons' in h_data.keys():
+                                sequence_weather.his_hourly_weather_icons = h_data['weather_icons']
+                            if 'weather_descriptions' in h_data.keys():
+                                sequence_weather.his_hourly_weather_descriptions = h_data['weather_descriptions']
+                            if 'precip' in h_data.keys():
+                                sequence_weather.his_hourly_precip = h_data['precip']
+                            if 'humidity' in h_data.keys():
+                                sequence_weather.his_hourly_humidity = h_data['humidity']
+                            if 'visibility' in h_data.keys():
+                                sequence_weather.his_hourly_visibility = h_data['visibility']
+                            if 'pressure' in h_data.keys():
+                                sequence_weather.his_hourly_pressure = h_data['pressure']
+                            if 'cloudcover' in h_data.keys():
+                                sequence_weather.his_hourly_cloudcover = h_data['cloudcover']
+                            if 'heatindex' in h_data.keys():
+                                sequence_weather.his_hourly_heatindex = h_data['heatindex']
+                            if 'dewpoint' in h_data.keys():
+                                sequence_weather.his_hourly_dewpoint = h_data['dewpoint']
+                            if 'windchill' in h_data.keys():
+                                sequence_weather.his_hourly_windchill = h_data['windchill']
+                            if 'windgust' in h_data.keys():
+                                sequence_weather.his_hourly_windgust = h_data['windgust']
+                            if 'feelslike' in h_data.keys():
+                                sequence_weather.his_hourly_feelslike = h_data['feelslike']
+                            if 'chanceofrain' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofrain = h_data['chanceofrain']
+                            if 'chanceofremdry' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofremdry = h_data['chanceofremdry']
+                            if 'chanceofwindy' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofwindy = h_data['chanceofwindy']
+                            if 'chanceofovercast' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofovercast = h_data['chanceofovercast']
+                            if 'chanceofsunshine' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofsunshine = h_data['chanceofsunshine']
+                            if 'chanceoffrost' in h_data.keys():
+                                sequence_weather.his_hourly_chanceoffrost = h_data['chanceoffrost']
+                            if 'chanceofhightemp' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofhightemp = h_data['chanceofhightemp']
+                            if 'chanceoffog' in h_data.keys():
+                                sequence_weather.his_hourly_chanceoffog = h_data['chanceoffog']
+                            if 'chanceofsnow' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofsnow = h_data['chanceofsnow']
+                            if 'chanceofthunder' in h_data.keys():
+                                sequence_weather.his_hourly_chanceofthunder = h_data['chanceofthunder']
+                            if 'uv_index' in h_data.keys():
+                                sequence_weather.his_hourly_ = h_data['uv_index']
+
+            sequence_weather.save()
+            return True
+    return False
+
+
+def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, image_download=True, is_weather=True):
+    seqs = Sequence.objects.filter(unique_id=sequence.unique_id)
+    if seqs.count() == 0:
+        print('Sequence is not existing.')
+        return
+    sequence = seqs[0]
+    if is_weather and not sequence.get_first_point_lat() is None and not sequence.get_first_point_lng() is None:
+        print(save_weather(sequence))
+
     if token is None:
         token = sequence.user.mapillary_access_token
     mapillary = Mapillary(token, source=source)
@@ -449,7 +739,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                 image.cas = image_feature['properties']['ca']
             if 'altitude' in image_feature['properties'].keys():
                 image.ele = image_feature['properties']['altitude']
-            if 'camera_make' in image_feature['properties'].keys():
+            if 'camera_make' in image_feature['properties'].keys() and image_feature['properties']['camera_make'] != '':
                 camera_make_str = image_feature['properties']['camera_make']
                 camera_makes = CameraMake.objects.filter(name=camera_make_str)
                 if camera_makes.count() == 0:
@@ -459,7 +749,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                 else:
                     camera_make = camera_makes[0]
                 image.camera_make = camera_make
-            if 'camera_model' in image_feature['properties'].keys():
+            if 'camera_model' in image_feature['properties'].keys() and image_feature['properties']['camera_model'] != '':
                 camera_model_str = image_feature['properties']['camera_model']
                 camera_models = CameraModel.objects.filter(name=camera_model_str)
                 if camera_models.count() == 0:
@@ -493,148 +783,34 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
             image.save()
             print('image key: ', image.image_key)
 
-        # if len(image_keys) > 0 and image_download:
-        #     # Create the model you want to save the image to
-        #     for image_key in image_keys:
-        #         images = Image.objects.filter(image_key=image_key)
-        #         if images.count() == 0:
-        #             continue
-        #         if not images[0].mapillary_image is None:
-        #             continue
-        #         image = images[0]
-        #
-        #         lf = mapillary.download_mapillary_image(image.image_key)
-        #         # Save the temporary image to the model#
-        #         # This saves the model so be sure that is it valid
-        #         if lf:
-        #             image.mapillary_image.save(image.image_key, files.File(lf))
-        #             image.save()
-        #             print(image.mapillary_image)
-        #
-        # if len(image_keys) > 0 and detection_insert:
-        #     detection_types = ['trafficsigns', 'segmentations', 'instances']
-        #     for detection_type in detection_types:
-        #         image_keys_t = []
-        #         image_num = 0
-        #         for image_k in image_keys:
-        #             image_keys_t.append(image_k)
-        #             image_num += 1
-        #             if (len(image_keys_t) == 10 or image_num == len(image_keys)) and len(image_keys_t) > 0:
-        #                 print(image_keys_t)
-        #                 image_detection_json = mapillary.get_detection_by_image_key(image_keys_t, detection_type)
-        #                 if image_detection_json:
-        #                     image_detection_features = image_detection_json['features']
-        #                     for image_detection_feature in image_detection_features:
-        #                         properties = image_detection_feature['properties']
-        #                         geometry = image_detection_feature['geometry']
-        #                         image_detection = ImageDetection.objects.filter(image_key=properties['key'])
-        #                         if image_detection.count() > 0:
-        #                             continue
-        #                         image_detection = ImageDetection()
-        #                         images = Image.objects.filter(image_key=properties['image_key'])[:1]
-        #                         if images.count() == 0:
-        #                             continue
-        #
-        #                         if 'area' in properties.keys():
-        #                             image_detection.area = properties['area']
-        #                         if 'captured_at' in properties.keys():
-        #                             image_detection.captured_at = properties['captured_at']
-        #                         if 'image_ca' in properties.keys():
-        #                             image_detection.image_ca = properties['image_ca']
-        #                         if 'image_key' in properties.keys():
-        #                             image_detection.image_key = properties['image_key']
-        #                         if 'image_pano' in properties.keys():
-        #                             image_detection.image_pano = properties['image_pano']
-        #                         if 'key' in properties.keys():
-        #                             image_detection.det_key = properties['key']
-        #                         if 'score' in properties.keys():
-        #                             image_detection.score = properties['score']
-        #                         if 'shape' in properties.keys():
-        #                             image_detection.shape_type = properties['shape']['type']
-        #                         if 'shape' in properties.keys():
-        #                             coordinates = properties['shape']['coordinates']
-        #                             multiPolygon = MultiPolygon()
-        #                             for coordinate in coordinates:
-        #                                 polygon = Polygon(coordinate)
-        #                                 multiPolygon.append(polygon)
-        #                             image_detection.shape_multipolygon = multiPolygon
-        #                         if 'value' in properties.keys():
-        #                             image_detection.value = properties['value']
-        #
-        #                         image_detection.geometry_type = geometry['type']
-        #                         image_detection.geometry_point = Point(geometry['coordinates'])
-        #                         image_detection.type = detection_type
-        #                         image_detection.save()
-        #                         print('image detection: ', image_detection.det_key)
-        #                 image_keys_t = []
-        #                 continue
-        #
-        # if len(image_position_ary) > 0 and mf_insert:
-        #     print('Image len: ', len(image_position_ary))
-        #     mm = 0
-        #     for image_position in image_position_ary:
-        #         mm += 1
-        #         print('===== {} ====='.format(mm))
-        #         map_feature_json = mapillary.get_map_feature_by_close_to(image_position)
-        #         if map_feature_json:
-        #             map_features = map_feature_json['features']
-        #             print('map_features len: ', len(map_features))
-        #             tt = 0
-        #             for map_feature in map_features:
-        #                 tt += 1
-        #                 print('---- {} -----'.format(tt))
-        #                 mf_properties = map_feature['properties']
-        #                 mf_geometry = map_feature['geometry']
-        #                 mf_item = MapFeature.objects.filter(mf_key=mf_properties['key'])[:1]
-        #                 if mf_item.count() > 0:
-        #                     continue
-        #
-        #                 mf_item = MapFeature()
-        #                 if 'accuracy' in mf_properties.keys():
-        #                     mf_item.accuracy = mf_properties['accuracy']
-        #                 if 'altitude' in mf_properties.keys():
-        #                     mf_item.altitude = mf_properties['altitude']
-        #                 if 'direction' in mf_properties.keys():
-        #                     mf_item.direction = mf_properties['direction']
-        #                 if 'first_seen_at' in mf_properties.keys():
-        #                     mf_item.first_seen_at = mf_properties['first_seen_at']
-        #                 if 'key' in mf_properties.keys():
-        #                     mf_item.mf_key = mf_properties['key']
-        #                 if 'last_seen_at' in mf_properties.keys():
-        #                     mf_item.last_seen_at = mf_properties['last_seen_at']
-        #                 if 'layer' in mf_properties.keys():
-        #                     mf_item.layer = mf_properties['layer']
-        #                 if 'value' in mf_properties.keys():
-        #                     mf_item.value = mf_properties['value']
-        #
-        #                 mf_item.geometry_type = mf_geometry['type']
-        #                 mf_item.geometry_point = Point(mf_geometry['coordinates'])
-        #
-        #                 mf_item.save()
-        #
-        #                 if 'detections' in mf_properties.keys():
-        #                     for detection in mf_properties['detections']:
-        #                         detection_key = detection['detection_key']
-        #                         image_key = detection['image_key']
-        #                         user_key = detection['user_key']
-        #                         mf_key = mf_item.mf_key
-        #                         print(detection)
-        #                         mf_detection = MapFeatureDetection.objects.filter(mf_key=mf_key, detection_key=detection_key, image_key=image_key, user_key=user_key)
-        #                         if mf_detection.count() > 0:
-        #                             continue
-        #                         else:
-        #                             mf_detection = MapFeatureDetection()
-        #                             mf_detection.mf_key = mf_key
-        #                             mf_detection.detection_key = detection_key
-        #                             mf_detection.image_key = image_key
-        #                             mf_detection.user_key = user_key
-        #                             mf_detection.save()
+        print(image_keys)
+
+        if len(image_keys) > 0 and image_download:
+            print('image_download')
+            # Create the model you want to save the image to
+            for image_key in image_keys:
+                images = Image.objects.filter(image_key=image_key)
+                if images.count() == 0:
+                    print('image_count: ', images.count())
+                    continue
+                if not images[0].mapillary_image is None and images[0].mapillary_image != '':
+                    print(images[0].mapillary_image)
+                    print('mapillary_image is not none')
+                    continue
+                image = images[0]
+
+                lf = mapillary.download_mapillary_image(image.image_key)
+                # Save the temporary image to the model#
+                # This saves the model so be sure that is it valid
+                if lf:
+                    image.mapillary_image.save(image.image_key, files.File(lf))
+                    image.save()
 
         if image_insert:
             sequence.is_published = True
             sequence.save()
-
     return image_json
+
 
 def set_camera_make(sequence):
     if sequence.camera_make is None or sequence.camera_make == '':
@@ -648,16 +824,29 @@ def set_camera_make(sequence):
     else:
         return False
 
+
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
-
+    if not sequence.is_published and request.user != sequence.user:
+        messages.error(request, 'The sequence is not published.')
+        return redirect('sequence.index')
+    print('1')
+    p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
+    p.start()
+    print('2')
     set_camera_make(sequence)
+
     page = 1
     if request.method == "GET":
         page = request.GET.get('page')
         image_key = request.GET.get('image_key')
         if page is None:
             page = 1
+
+        view_mode = request.GET.get('view_mode')
+        if view_mode is None:
+            view_mode = 'original'
+
 
     geometry_coordinates_ary = sequence.geometry_coordinates_ary
     coordinates_image = sequence.coordinates_image
@@ -683,10 +872,29 @@ def sequence_detail(request, unique_id):
 
     addSequenceForm = AddSequeceForm(instance=sequence)
 
-    label_types = LabelType.objects.all()
+    label_types = LabelType.objects.filter(parent__isnull=False)
+    tours = TourSequence.objects.filter(sequence=sequence)
+    tour_count = tours.count()
+    sequence_weathers = SequenceWeather.objects.filter(sequence=sequence)
+    sequence_weather = None
+    if sequence_weathers.count() > 0:
+        sequence_weather = sequence_weathers[0]
+    print(sequence_weather)
+
+    if image_key is not None and image_key != '':
+        firstImageKey = image_key
+    else:
+        firstImageKey = sequence.get_first_image_key()
+
+    guidebooks = None
+    if request.user.is_authenticated:
+        guidebooks = Guidebook.objects.filter(user=request.user)
+        if guidebooks.count() == 0:
+            guidebooks = None
 
     content = {
         'sequence': sequence,
+        'guidebooks': guidebooks,
         'pageName': 'Sequence Detail',
         'pageTitle': sequence.name + ' - Sequence',
         'pageDescription': sequence.description,
@@ -695,9 +903,14 @@ def sequence_detail(request, unique_id):
         'view_points': view_points,
         'addSequenceForm': addSequenceForm,
         'label_types': label_types,
-        'image_key': image_key
+        'image_key': image_key,
+        'tour_count': tour_count,
+        'sequence_weather': sequence_weather,
+        'view_mode': view_mode,
+        'firstImageKey': firstImageKey
     }
     return render(request, 'sequence/detail.html', content)
+
 
 @my_login_required
 def sequence_delete(request, unique_id):
@@ -734,6 +947,7 @@ def sequence_delete(request, unique_id):
     messages.error(request, 'The sequence does not exist or has no access.')
     return redirect('sequence.index')
 
+
 def ajax_save_sequence(request, unique_id):
     if not request.user.is_authenticated:
         return JsonResponse({
@@ -759,7 +973,7 @@ def ajax_save_sequence(request, unique_id):
                 for tag in form.cleaned_data['tag']:
                     sequence.tag.add(tag)
                 for tag in sequence.tag.all():
-                    if not tag in form.cleaned_data['tag']:
+                    if tag not in form.cleaned_data['tag']:
                         sequence.tag.remove(tag)
             sequence.save()
 
@@ -809,8 +1023,10 @@ def ajax_save_sequence(request, unique_id):
         'message': 'The sequence does not exist or has no access.'
     })
 
+
 def sort_by_captured_at(item):
     return str(item['properties']['captured_at'])
+
 
 @my_login_required
 def import_sequence_list(request):
@@ -830,9 +1046,11 @@ def import_sequence_list(request):
             y = month.split('-')[0]
             m = month.split('-')[1]
 
-            map_user = MapillaryUser.objects.get(user=request.user)
-            if map_user is None:
+            map_users = MapillaryUser.objects.filter(user=request.user)
+            if map_users.count() == 0:
                 return redirect('home')
+            else:
+                map_user = map_users[0]
 
             if page is None:
                 start_time = month + '-01'
@@ -858,7 +1076,7 @@ def import_sequence_list(request):
                 response = requests.get(url)
                 data = response.json()
                 features = data['features']
-                features.sort(key=sort_by_captured_at)
+                # features.sort(key=sort_by_captured_at)
                 request.session['sequences'] = features
 
                 page = 1
@@ -872,7 +1090,7 @@ def import_sequence_list(request):
                 if seq_s.count() == 0:
                     sequences_ary.append(seq)
 
-            paginator = Paginator(sequences_ary, 5)
+            paginator = Paginator(sequences_ary, 10)
             try:
                 sequences = paginator.page(page)
             except PageNotAnInteger:
@@ -905,7 +1123,7 @@ def import_sequence_list(request):
                         sequences[i]['transport_type'] = ''
                     else:
                         sequences[i]['transport_type'] = seq[0].transport_type.parent.name + ' - ' +seq[0].transport_type.name
-                    sequences[i]['tags'] = seq[0].getTags()
+                    sequences[i]['tags'] = seq[0].get_tags()
                 else:
                     sequences[i]['unique_id'] = None
 
@@ -940,6 +1158,7 @@ def import_sequence_list(request):
     }
     return render(request, 'sequence/import_list.html', content)
 
+
 @my_login_required
 def ajax_import(request, seq_key):
     if request.method == 'POST':
@@ -968,8 +1187,16 @@ def ajax_import(request, seq_key):
                     else:
                         sequence = Sequence()
                     sequence.user = request.user
-                    if 'camera_make' in properties:
-                        sequence.camera_make = properties['camera_make']
+                    if 'camera_make' in properties and properties['camera_make'] != '':
+                        camera_makes = CameraMake.objects.filter(name=properties['camera_make'])
+                        if camera_makes.count() > 0:
+                            c = camera_makes[0]
+                        else:
+                            c = CameraMake()
+                            c.name = properties['camera_make']
+                            c.save()
+                        sequence.camera_make = c
+
                     sequence.captured_at = properties['captured_at']
                     if 'created_at' in properties:
                         sequence.created_at = properties['created_at']
@@ -983,34 +1210,20 @@ def ajax_import(request, seq_key):
                     sequence.geometry_coordinates_ary = geometry['coordinates']
                     sequence.image_count = len(geometry['coordinates'])
 
-                    lineString = LineString()
-                    firstPoint = None
-                    if sequence.image_count == 0:
-                        firstPoint = Point(sequence.geometry_coordinates_ary[0][0], sequence.geometry_coordinates_ary[0][1])
-                        lineString = LineString(firstPoint.coords, firstPoint.coords)
-                    else:
-                        for i in range(len(sequence.geometry_coordinates_ary)):
-                            coor = sequence.geometry_coordinates_ary[i]
-                            if i == 0:
-                                firstPoint = Point(coor[0], coor[1])
-                                continue
-                            point = Point(coor[0], coor[1])
-                            if i == 1:
-                                lineString = LineString(firstPoint.coords, point.coords)
-                            else:
-                                lineString.append(point.coords)
-
-                    sequence.geometry_coordinates = lineString
+                    sequence.geometry_coordinates = LineString(sequence.geometry_coordinates_ary)
 
                     sequence.coordinates_cas = properties['coordinateProperties']['cas']
                     sequence.coordinates_image = properties['coordinateProperties']['image_keys']
                     if 'private' in properties:
-                        sequence.is_privated = properties['private']
+                        sequence.is_private = properties['private']
 
                     sequence.name = form.cleaned_data['name']
                     sequence.description = form.cleaned_data['description']
                     sequence.transport_type = form.cleaned_data['transport_type']
                     sequence.is_published = True
+                    sequence.save()
+
+                    sequence.distance = sequence.get_distance()
                     sequence.save()
 
                     set_camera_make(sequence)
@@ -1047,6 +1260,7 @@ def ajax_import(request, seq_key):
         'message': 'Sequence was not imported.'
     })
 
+
 def ajax_sequence_check_publish(request, unique_id):
     if not request.user.is_authenticated:
         return JsonResponse({
@@ -1080,6 +1294,7 @@ def ajax_sequence_check_publish(request, unique_id):
         'is_published': sequence.is_published
     })
 
+
 def ajax_sequence_check_like(request, unique_id):
     if not request.user.is_authenticated:
         return JsonResponse({
@@ -1094,14 +1309,21 @@ def ajax_sequence_check_like(request, unique_id):
             'message': 'The sequence does not exist.'
         })
 
-    if sequence.user == request.user:
-        return JsonResponse({
-            'status': 'failed',
-            'message': 'This sequence is created by you.'
-        })
-
     sequence_like = SequenceLike.objects.filter(sequence=sequence, user=request.user)
     if sequence_like:
+        if request.user.is_liked_email:
+            # confirm email
+            try:
+                # send email to creator
+                subject = 'Your Map the Paths Sequence Was Liked'
+                html_message = render_to_string(
+                    'emails/sequence/like.html',
+                    {'subject': subject, 'like': 'unliked', 'sequence': sequence},
+                    request
+                )
+                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         for g in sequence_like:
             g.delete()
         liked_sequence = SequenceLike.objects.filter(sequence=sequence)
@@ -1116,6 +1338,19 @@ def ajax_sequence_check_like(request, unique_id):
             'liked_count': liked_count
         })
     else:
+        if request.user.is_liked_email:
+            # confirm email
+            try:
+                # send email to creator
+                subject = 'Your Map the Paths Sequence Was Liked'
+                html_message = render_to_string(
+                    'emails/sequence/like.html',
+                    {'subject': subject, 'like': 'liked', 'sequence': sequence},
+                    request
+                )
+                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         sequence_like = SequenceLike()
         sequence_like.sequence = sequence
         sequence_like.user = request.user
@@ -1131,6 +1366,7 @@ def ajax_sequence_check_like(request, unique_id):
             'is_checked': True,
             'liked_count': liked_count
         })
+
 
 def ajax_get_image_detail(request, unique_id, image_key):
     sequence = Sequence.objects.get(unique_id=unique_id)
@@ -1160,7 +1396,8 @@ def ajax_get_image_detail(request, unique_id, image_key):
     content = {
         'image': image,
         'view_points': view_points.count(),
-        'guidebook_count': scenes.count()
+        'guidebook_count': scenes.count(),
+        'sequence': sequence
     }
     image_detail_box_html = render_to_string(
         'sequence/image_detail_box.html',
@@ -1173,6 +1410,7 @@ def ajax_get_image_detail(request, unique_id, image_key):
         'message': "",
         'view_points': view_points.count()
     })
+
 
 def ajax_delete_image_label(request, unique_id, image_key):
     if not request.user.is_authenticated:
@@ -1262,10 +1500,10 @@ def ajax_get_image_label(request, unique_id, image_key):
                 is_mine = False
             geometry = None
             geo_type = None
-            if not image_label.point is None:
+            if image_label.point is not None:
                 geometry = image_label.point.coords
                 geo_type = 'point'
-            elif not image_label.polygon is None:
+            elif image_label.polygon is not None:
                 geometry = image_label.polygon.coords[0]
                 geo_type = 'polygon'
             image_label_json = {
@@ -1285,6 +1523,59 @@ def ajax_get_image_label(request, unique_id, image_key):
         },
         'message': 'A new label is successfully added.'
     })
+
+
+def ajax_add_label_type(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'You are required login.'
+        })
+    if request.method == 'POST':
+        label_type_keys = request.POST.get('keys')
+        if label_type_keys is not None and label_type_keys != '':
+            label_types = label_type_keys.split(',')
+            if len(label_types) > 0:
+                for label_type in label_types:
+                    l_ary = label_type.split('--')
+                    ind = 0
+                    if len(l_ary) > 0:
+                        l_type = None
+                        for lab in l_ary:
+                            if ind == 0:
+                                types = LabelType.objects.filter(parent__isnull=True, name=lab)
+                            else:
+                                types = LabelType.objects.filter(parent=l_type, name=lab)
+                            if types.count() == 0:
+                                l_parent_type = l_type
+                                l_type = LabelType()
+                                l_type.name = lab
+                                l_type.source = 'mapillary'
+                                l_type.parent = l_parent_type
+                                print(l_type.name)
+                                l_type.save()
+                            else:
+                                l_type = types[0]
+                            ind += 1
+
+        label_types_json = {}
+        label_types = LabelType.objects.filter(source='mapillary')
+        if label_types.count() > 0:
+            for label_type in label_types:
+                label_types_json[label_type.getKey()] = label_type.color
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'label types updated.',
+            'data': {
+                'label_types_json': label_types_json
+            }
+        })
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'You are required login.'
+    })
+
 
 def ajax_add_image_label(request, unique_id, image_key):
     if not request.user.is_authenticated:
@@ -1349,8 +1640,9 @@ def ajax_add_image_label(request, unique_id, image_key):
                 'label_type_key': image_label.label_type.getKey(),
                 'label_type_color': image_label.label_type.color
             },
-            'message': 'A new label is successfully added.'
+            'message': 'Label added successfully'
         })
+
 
 def ajax_get_image_list(request, unique_id):
     sequence = Sequence.objects.get(unique_id=unique_id)
@@ -1391,11 +1683,11 @@ def ajax_get_image_list(request, unique_id):
         if page is None:
             page = 1
     image_in_page = None
-    if not image_key is None and len(images) > 0:
+    if image_key is not None and len(images) > 0:
         for index in range(len(images)):
             image = images[index]
             if image_key == image['key']:
-                image_in_page = int(len(images) / 20) + 1
+                image_in_page = int(index / 20) + 1
                 print('image_in_page: ', image_in_page)
                 break
 
@@ -1403,7 +1695,7 @@ def ajax_get_image_list(request, unique_id):
         page = image_in_page
     else:
         image_key = None
-
+    print('page: ', page)
     paginator = Paginator(images, 20)
 
 
@@ -1470,6 +1762,7 @@ def ajax_get_image_list(request, unique_id):
         'message': ''
     })
 
+
 def ajax_image_mark_view(request, unique_id, image_key):
     if not request.user.is_authenticated:
         return JsonResponse({
@@ -1484,18 +1777,11 @@ def ajax_image_mark_view(request, unique_id, image_key):
             'message': 'The Sequence does not exist.'
         })
 
-    if sequence.user == request.user:
+    if not sequence.is_published:
         return JsonResponse({
             'status': 'failed',
-            'message': 'The sequence and image are imported by you.'
+            'message': "This sequence is not published."
         })
-
-    if not sequence.is_published:
-        if not request.user.is_authenticated or request.user != sequence.user:
-            return JsonResponse({
-                'status': 'failed',
-                'message': "You can't access this sequence."
-            })
 
     images = Image.objects.filter(seq_key=sequence.seq_key, image_key=image_key)
 
@@ -1509,6 +1795,19 @@ def ajax_image_mark_view(request, unique_id, image_key):
 
     image_view_points = ImageViewPoint.objects.filter(image=image, user=request.user)
     if image_view_points.count() > 0:
+        if request.user.is_liked_email:
+            # confirm email
+            try:
+                # send email to creator
+                subject = 'Your Map the Paths Photo Received a View Point'
+                html_message = render_to_string(
+                    'emails/sequence/image_view_point.html',
+                    {'subject': subject, 'like': 'unviewed', 'sequence': sequence, 'image_key': image.image_key},
+                    request
+                )
+                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         for v in image_view_points:
             v.delete()
         marked_images = ImageViewPoint.objects.filter(image=image)
@@ -1523,9 +1822,23 @@ def ajax_image_mark_view(request, unique_id, image_key):
             'view_points': view_points
         })
     else:
+        if request.user.is_liked_email:
+            # confirm email
+            try:
+                # send email to creator
+                subject = 'Your Map the Paths Photo Received a View Point'
+                html_message = render_to_string(
+                    'emails/sequence/image_view_point.html',
+                    {'subject': subject, 'like': 'viewed', 'sequence': sequence, 'image_key': image.image_key},
+                    request
+                )
+                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         image_view_point = ImageViewPoint()
         image_view_point.image = image
         image_view_point.user = request.user
+        image_view_point.owner = image.sequence.user
         image_view_point.save()
         marked_images = ImageViewPoint.objects.filter(image=image)
         if not marked_images:
@@ -1539,6 +1852,7 @@ def ajax_image_mark_view(request, unique_id, image_key):
             'is_marked': True,
             'view_points': view_points
         })
+
 
 def ajax_get_image_ele(request, unique_id):
     sequence = Sequence.objects.get(unique_id=unique_id)
@@ -1577,6 +1891,32 @@ def ajax_get_image_ele(request, unique_id):
 def ajax_get_detail(request, unique_id):
     sequence = Sequence.objects.get(unique_id=unique_id)
     if sequence.user == request.user:
+        is_mine = True
+    else:
+        is_mine = False
+    serialized_obj = serializers.serialize('json', [sequence, ])
+    data = {
+        'sequence': json.loads(serialized_obj)
+    }
+
+    if not data['sequence']:
+        data['message'] = "The sequence id doesn't exist."
+    else:
+        data['sequence_html_detail'] = render_to_string('sequence/modal_detail.html', {'sequence': sequence, 'is_mine': is_mine})
+
+    return JsonResponse(data)
+
+
+def ajax_get_detail_by_image_key(request, image_key):
+    images = Image.objects.filter(image_key=image_key)
+    if images.count() == 0:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "Image key error."
+        })
+    image = images[0]
+    sequence = image.sequence
+    if request.user == sequence.user:
         is_mine = True
     else:
         is_mine = False

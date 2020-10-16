@@ -1,0 +1,507 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block app_label_challenge %}active{% endblock %}
+{% block app_style %}<link rel="stylesheet" href="{% static 'css/challenge_style.css' %}">{% endblock %}
+{% block content %}
+
+<div class="main-body">
+    <div class="left-side d-flex flex-column justify-content-between">
+        <div>
+            <div class="p-4">
+                <h4 class="text-center text-primary">Edit Challenge</h4>
+
+                <p>Draw the areas you need to capture street-level imagery of:</p>
+
+                <div class="mapbox-actions d-flex justify-content-between mb-3">
+                    <div class="col-6 pl-0 pr-1">
+                        <button class="btn btn-primary w-100" id="draw_polygon">Draw Polygon</button>
+                    </div>
+
+                    <div class="col-6 pr-0 pl-1">
+                        <button class="btn btn-danger w-100" id="delete_polygon">Delete Polygon</button>
+                    </div>
+                </div>
+
+                <form method="POST" class="post-form">
+                    {% csrf_token %}
+                    {% load bootstrap4 %}
+                    {% bootstrap_css %}
+                    {{ form.media }}
+                    {{ form.as_p }}
+                    <textarea class="d-none" name="new_label_types" id="new_label_types" ></textarea>
+                    <div>
+                        <span>You can add your own label type.</span>
+                        <label>Your own label types: </label>
+                        <div id="new_label_types_box">
+                        </div>
+
+
+                        <div class="d-flex justify-content-between mt-2 mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="showModal()">Add a label type</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger d-none" id="deleteLabelTypeBtn" onclick="deleteLabelType()">Delete a label type</button>
+                        </div>
+                    </div>
+                    <div class="form-group text-right">
+                        <button type="submit" class="save btn btn-primary save-btn">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% include 'components/copyrite.html' %}
+    </div>
+    <div class="right-board bg-light">
+        <div id="map">
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="newLabelTypeModal" tabindex="-1" role="dialog" aria-labelledby="newLabelTypeModalHeader" aria-hidden="true">
+    <div class="modal-dialog ml-auto mr-auto" style="margin-top: 130px !important;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newLabelTypeModalHeader">Add a label type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <input type="radio" id="exist_name" name="add_type" value="exist_name" checked>
+                            <label for="exist_name">Use existing parent</label>
+                        </div>
+
+                        <div>
+                            <input type="radio" id="full_name" name="add_type" value="full_name">
+                            <label for="full_name">Use full type</label>
+                        </div>
+                    </div>
+                    <form class="" id="add_new_label_form">
+                        <p>
+                            <label>Parent Label:</label>
+                            <select class="form-control" id="parent_key">
+                                <option value="">---</option>
+                                {% for label_type in label_types %}
+                                    <option value="{{ label_type }}">{{ label_type }}</option>
+                                {% endfor %}
+                            </select>
+                        </p>
+
+                        <p id="input_name_p">
+                            <label for="new_label_type">Child Label:</label>
+                            <input class="form-control" data-validation="alphanumeric required" data-validation-allowing=" " id="new_label_type" />
+                        </p>
+                    </form>
+
+                    <form class="d-none" id="add_new_label_form_full_name">
+                        <p id="input_full_name_parent_p">
+                            <label for="new_full_label_parent_type">Parent Label:</label>
+                            <input class="form-control" data-validation="alphanumeric" data-validation-optional="true" data-validation-allowing="-"  id="new_full_label_parent_type" />
+                        </p>
+
+                        <p id="input_full_name_p">
+                            <label for="new_full_label_type">Child Label:</label>
+                            <input class="form-control" data-validation="alphanumeric" data-validation-allowing="-" id="new_full_label_type" />
+
+                        </p>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary mr-2" id="add_label_type_btn">Add</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script>
+  var add_type = 'exist_name';
+      var own_types = [];
+    var showModal = function() {
+        $('#newLabelTypeModal').modal('show');
+    }
+
+    $('input[name="add_type"]').change(function () {
+        add_type = $(this).val();
+        if($(this).val() == 'full_name')
+        {
+            $('#add_new_label_form_full_name').removeClass('d-none');
+            $('#add_new_label_form').addClass('d-none');
+        }
+        else {
+            $('#add_new_label_form_full_name').addClass('d-none');
+            $('#add_new_label_form').removeClass('d-none');
+        }
+    });
+    var current_selected_tag = ''
+    var clickLabelTag = function(key) {
+        var $spanObj = $('span.tag[data-key=' + key + ']');
+        if ($spanObj.text() == key && $('span.tag.selected').hasClass('selected')) {
+            $('span.tag.selected').removeClass('selected');
+            $('#deleteLabelTypeBtn').addClass('d-none');
+            return;
+        }
+        $('span.tag.selected').removeClass('selected')
+        $spanObj.addClass('selected');
+        $('#deleteLabelTypeBtn').removeClass('d-none')
+    }
+
+    var deleteLabelType = function() {
+        var key = $('span.tag.selected').text();
+        if (own_types.indexOf(key) > -1) {
+            own_types.splice(own_types.indexOf(key), 1);
+        }
+        $('span.tag.selected').remove();
+        $('#deleteLabelTypeBtn').addClass('d-none');
+    }
+
+    $('#add_label_type_btn').click(function () {
+        var label = '';
+        var parent_label = '';
+        if (add_type == 'exist_name' && $('#add_new_label_form').isValid()) {
+            parent_label = $('#parent_key').val();
+            var new_label_type = $('#new_label_type').val();
+            var str_ary = new_label_type.split(' ');
+
+
+            console.log(str_ary.length);
+            if (str_ary.length > 0) {
+                for (var i=0; i<str_ary.length; i++) {
+                    if (str_ary[i] != '') {
+                        if (label == '')
+                            label = str_ary[i]
+                        else
+                            label += '-' + str_ary[i]
+                    }
+                }
+
+                if (new_label_type.length > 0 && label == '') {
+                    $('#add_new_label_form #input_name_p').addClass('has-error');
+                    $('#add_new_label_form #input_name_p').removeClass('has-success');
+                    $('#new_label_type').addClass('error');
+                    $('#add_new_label_form #input_name_p').append('<span class="help-block form-error">At least one character must be alphabetnumic.</span>')
+                    return;
+                }
+            }
+            else
+                label = new_label_type;
+        }
+        if (add_type == 'full_name' && $('#add_new_label_form_full_name').isValid())
+        {
+            label = $('#new_full_label_type').val();
+            parent_label = $('#new_full_label_parent_type').val();
+            if (label.search('--') >= 0) {
+                $('#input_full_name_p').addClass('has-error');
+                $('#input_full_name_p').removeClass('has-success');
+                $('#new_full_label_type').addClass('error');
+                $('#input_full_name_p').append('<span class="help-block form-error">The input value can\'t contain "--".</span>')
+                return;
+            }
+
+            if (parent_label.search('--') >= 0) {
+                $('#input_full_name_parent_p').addClass('has-error');
+                $('#input_full_name_parent_p').removeClass('has-success');
+                $('#new_full_label_parent_type').addClass('error');
+                $('#input_full_name_parent_p').append('<span class="help-block form-error">The input value can\'t contain "--".</span>')
+                return;
+            }
+        }
+        if (label == '') return;
+
+        if (own_types.indexOf(label) > -1) {
+            toastr.info('The value already exist in your own label type list.')
+            return;
+        }
+        if (parent_label != '')
+            label = parent_label + '--' + label
+        own_types.push(label);
+        var html_label_type = '<span class="tag d-inline-block" style="font-size: 16px; cursor: pointer" onclick="clickLabelTag(\'' + label + '\')" data-key="' + label + '">' + label + '</span>';
+        $('#new_label_types_box').append(html_label_type);
+        $('#newLabelTypeModal').modal('hide');
+    });
+
+    var geometryData = $('#id_geometry').text();
+    console.log(geometryData);
+    var geometryDataJson = JSON.parse(geometryData);
+    console.log(geometryDataJson);
+
+    // TO MAKE THE MAP APPEAR YOU MUST
+	// ADD YOUR ACCESS TOKEN FROM
+	// https://account.mapbox.com
+	mapboxgl.accessToken = mapboxToken;
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+        center: [-74.5, 40], // starting position
+        zoom: {{ challenge.zoom }} // starting zoom
+    });
+
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            localGeocoder: coordinatesGeocoder,
+            zoom: 1,
+            placeholder: '',
+            mapboxgl: mapboxgl
+        }), 'top-left'
+    );
+
+    var challengeGeometryElements = $('.challenge-geometry');
+    var polygonData = [];
+    var centerPointerData = [];
+    for (i = 0; i < challengeGeometryElements.length; i++)
+    {
+        var item = challengeGeometryElements.eq(i);
+        var geometryData = item.text();
+        var geometryDataJson = JSON.parse(geometryData);
+        geometryDataJson.forEach(function (item, index) {
+            polygonData.push(item);
+
+            var minX = 0;
+            var maxX = 0;
+            var minY = 0;
+            var maxY = 0;
+            var coorXSum = 0;
+            var coorYSum = 0;
+            var countSum = 0;
+
+            var coordinates = item.geometry.coordinates;
+            for (j = 0; j < coordinates[0].length; j++)
+            {
+                coorXSum += coordinates[0][j][0];
+                coorYSum += coordinates[0][j][1];
+                countSum++;
+                if (coordinates[0][j][0] < minX)
+                    minX = coordinates[0][j][0];
+                if (coordinates[0][j][0] > maxX)
+                    maxX = coordinates[0][j][0];
+                if (coordinates[0][j][1] < minY)
+                    minY = coordinates[0][j][1];
+                if (coordinates[0][j][1] > maxY)
+                    maxY = coordinates[0][j][1];
+            }
+            var centerItem = {
+                "type": "Feature",
+                "properties": {"challenge_id": item.properties.challenge_id},
+                "geometry": {
+                    "coordinates": [coorXSum / countSum, coorYSum / countSum],
+                    "type": "Point"
+                }
+            };
+            centerPointerData.push(centerItem);
+        });
+    }
+
+    map.on('load', function() {
+        map.loadImage(
+            'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
+            function(error, image) {
+                if (error) throw error;
+                map.addImage('custom-marker', image);
+                map.addSource('points', {
+                    'type': 'geojson',
+                    'data': {
+                        'type': 'FeatureCollection',
+                        'features': centerPointerData
+                    }
+                });
+                map.addLayer({
+                    'id': 'points',
+                    'type': 'symbol',
+                    'source': 'points',
+                    'maxzoom': 6,
+                    'layout': {
+                        'icon-image': 'custom-marker',
+                        // get the title name from the source's "title" property
+                        // 'text-field': ['get', 'title'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold'
+                        ],
+                        'text-offset': [0, 1.25],
+                        'text-anchor': 'top'
+                    }
+                });
+            }
+        )
+        map.addSource('states', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': polygonData
+            }
+        });
+        map.addLayer({
+            'id': 'states-layer',
+            'type': 'fill',
+            'source': 'states',
+            'minzoom': 6,
+            'layout': {},
+            'paint': {
+                'fill-color': 'rgba(200, 100, 240, 0.2)',
+                'fill-outline-color': 'rgba(200, 100, 240, 0.8)'
+            }
+        });
+        // When a click event occurs on a feature in the states layer, open a popup at the
+        // location of the click, with description HTML from its properties.
+        map.on('click', 'states-layer', function (e) {
+            getChallengeDetail(e.features[0].properties.challenge_id);
+
+        });
+
+        // Change the cursor to a pointer when the mouse is over the states layer.
+        map.on('mouseenter', 'states-layer', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'states-layer', function () {
+            map.getCanvas().style.cursor = '';
+        });
+
+        map.on('click', 'points', function (e) {
+            getChallengeDetail(e.features[0].properties.challenge_id);
+
+        });
+
+        // Change the cursor to a pointer when the mouse is over the states layer.
+        map.on('mouseenter', 'points', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'points', function () {
+            map.getCanvas().style.cursor = '';
+        });
+        getChallengeDetail();
+    });
+
+    var draw = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: {
+            polygon: true,
+            trash: true
+        },
+    });
+    map.addControl(draw);
+
+    map.on('draw.create', updateArea);
+    map.on('draw.delete', updateArea);
+    map.on('draw.update', updateArea);
+
+    function updateArea(e) {
+
+        var data = draw.getAll();
+        var zoom = map.getZoom();
+        console.log(zoom);
+        console.log(data);
+        var geometryData = [];
+        data.features.forEach(function (item, index) {
+            geometryData.push(item);
+        });
+        var geometryDataStr = JSON.stringify(geometryData);
+        $('#id_geometry').val(geometryDataStr);
+        $('#id_zoom').val(zoom);
+        console.log(zoom)
+    }
+
+    map.on('zoom', function() {
+        var zoom = map.getZoom();
+        $('#id_zoom').val(zoom);
+    });
+
+    var feature = {
+        'type': 'FeatureCollection',
+        'features': geometryDataJson
+    }
+
+    $('#draw_polygon').click(function() {
+        $('.mapbox-gl-draw_polygon').trigger('click');
+    })
+
+    $('#delete_polygon').click(function() {
+        $('.mapbox-gl-draw_trash').trigger('click');
+    })
+
+    var featureIds = draw.add(feature);
+
+    var featureIds = draw.add(feature);
+
+    function checkForm() {
+        if ($('#id_geometry').val() == '')
+        {
+            alert('Please select one or more area');
+            return false;
+        }
+        return true;
+    }
+
+    $('.save-btn').click(function() {
+        if ($('#id_geometry').val() == '' || $('#id_geometry').val() == '[]')
+        {
+            Swal.fire({
+                title: 'Required One or More Area.',
+                icon: 'error',
+                showCloseButton: true,
+            })
+            return false;
+        }
+        if (own_types.length > 0) {
+            var own_types_str = own_types.join(',');
+            $('#new_label_types').val(own_types_str)
+        }
+        $('#job_create_form').submit()
+        return true;
+    })
+
+    function getChallengeDetail() {
+        var geometry = $('#id_geometry').val();
+        var geometryDataJson = JSON.parse(geometry);
+        var zoom = {{ challenge.zoom }};
+        var coorXSum = 0;
+        var coorYSum = 0;
+        var countSum = 0;
+        var minX = 0;
+        var maxX = 0;
+        var minY = 0;
+        var maxY = 0;
+        for(j = 0; j < geometryDataJson.length; j++)
+        {
+            var coordinates = geometryDataJson[j].geometry.coordinates;
+
+            for (i = 0; i < coordinates[0].length; i++)
+            {
+                coorXSum += coordinates[0][i][0];
+                coorYSum += coordinates[0][i][1];
+                countSum++;
+                if (coordinates[0][i][0] < minX)
+                    minX = coordinates[0][i][0];
+                if (coordinates[0][i][0] > maxX)
+                    maxX = coordinates[0][i][0];
+                if (coordinates[0][i][1] < minY)
+                    minY = coordinates[0][i][0];
+                if (coordinates[0][i][1] > maxY)
+                    maxY = coordinates[0][i][1];
+            }
+        }
+
+        var coorX = coorXSum / countSum;
+        var coorY = coorYSum / countSum;
+        map.flyTo({ center: [coorX, coorY], zoom: zoom});
+
+        $('#delete_form').html(getCSRFTokenValue())
+        $('#challengeDetailModal').modal({
+            'backdrop': false,
+            'show': true,
+        });
+    }
+
+
+  </script>
+{% endblock %}
