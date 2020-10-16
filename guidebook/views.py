@@ -23,13 +23,13 @@ from django.contrib.gis.geos import Point
 from django.db.models import Avg, Count, Min, Sum
 from django.db.models.expressions import F, Window
 from django.db.models.functions.window import RowNumber
-## Custom Libs ##
+# Custom Libs
 from lib.functions import *
 
-## Project packages
+# Project packages
 from accounts.models import CustomUser
 
-## App packages
+# App packages
 
 # That includes from .models import *
 from .forms import * 
@@ -37,25 +37,25 @@ from django.urls import reverse
 
 ############################################################################
 
-MAIN_PAGE_DESCRIPTION = 'Create a guidebook of street-level photos to show people around a location. View others people have created to help plan your next adventure.'
-
+MAIN_PAGE_DESCRIPTION = """Create a guidebook of street-level photos to show people around a location. View others people have created to help plan your next adventure."""
 
 ############################################################################
+
 
 def home(request):
     return redirect('guidebook.guidebook_list')
 
+
+# noinspection DuplicatedCode
 def guidebook_list(request):
 
-    from lib.mapillary import Mapillary
-    mapillary = Mapillary()
-    scenes = Scene.objects.filter()
+    scenes = Scene.objects.filter(point__isnull=True)
+    print('scenes count: ', scenes.count())
     if scenes.count() > 0:
         for scene in scenes:
-            image_json = mapillary.get_images_by_image_key([scene.image_key])
-            feature = image_json['features'][0]
-            scene.username = feature['properties']['username']
+            scene.point = Point(scene.lat, scene.lng)
             scene.save()
+
 
     guidebooks = None
     page = 1
@@ -71,7 +71,6 @@ def guidebook_list(request):
             username = form.cleaned_data['username']
             image_key = form.cleaned_data['image_key']
             like = form.cleaned_data['like']
-
             guidebooks = Guidebook.objects.all().filter(
                 is_published=True,
                 is_approved=True
@@ -88,7 +87,6 @@ def guidebook_list(request):
                     guidebooks = guidebooks.filter(tag=tag)
             if like and like != 'all':
                 guidebook_likes = GuidebookLike.objects.all().values('guidebook').annotate()
-                print(guidebook_likes)
                 guidebook_ary = []
                 if guidebook_likes.count() > 0:
                     for guidebook_like in guidebook_likes:
@@ -97,7 +95,6 @@ def guidebook_list(request):
                     guidebooks = guidebooks.filter(pk__in=guidebook_ary)
                 elif like == 'false':
                     guidebooks = guidebooks.exclude(pk__in=guidebook_ary)
-
             if image_key:
                 scenes = Scene.objects.filter(image_key__contains=image_key)
                 guidebook_id_ary = []
@@ -106,35 +103,35 @@ def guidebook_list(request):
                         guidebook_id_ary.append(s.guidebook_id)
                 guidebooks = guidebooks.filter(pk__in=guidebook_id_ary)
 
-    if guidebooks == None:
+    if guidebooks is None:
         guidebooks = Guidebook.objects.all().filter(is_published=True, is_approved=True)
         form = GuidebookSearchForm()
 
     paginator = Paginator(guidebooks.order_by('-created_at'), 5)
 
     try:
-        pGuidebooks = paginator.page(page)
+        p_guidebooks = paginator.page(page)
     except PageNotAnInteger:
-        pGuidebooks = paginator.page(1)
+        p_guidebooks = paginator.page(1)
     except EmptyPage:
-        pGuidebooks = paginator.page(paginator.num_pages)
+        p_guidebooks = paginator.page(paginator.num_pages)
 
     first_num = 1
     last_num = paginator.num_pages
     if paginator.num_pages > 7:
-        if pGuidebooks.number < 4:
+        if p_guidebooks.number < 4:
             first_num = 1
             last_num = 7
-        elif pGuidebooks.number > paginator.num_pages - 3:
+        elif p_guidebooks.number > paginator.num_pages - 3:
             first_num = paginator.num_pages - 6
             last_num = paginator.num_pages
         else:
-            first_num = pGuidebooks.number - 3
-            last_num = pGuidebooks.number + 3
-    pGuidebooks.paginator.pages = range(first_num, last_num + 1)
-    pGuidebooks.count = len(pGuidebooks)
+            first_num = p_guidebooks.number - 3
+            last_num = p_guidebooks.number + 3
+    p_guidebooks.paginator.pages = range(first_num, last_num + 1)
+    p_guidebooks.count = len(p_guidebooks)
     content = {
-        'guidebooks': pGuidebooks,
+        'guidebooks': p_guidebooks,
         'form': form,
         'pageName': 'Guidebooks',
         'pageTitle': 'Guidebooks',
@@ -143,8 +140,11 @@ def guidebook_list(request):
     }
     return render(request, 'guidebook/guidebook_list.html', content)
 
+
+# noinspection DuplicatedCode,PyProtectedMember
 @my_login_required
 def my_guidebook_list(request):
+    global form
     guidebooks = None
     page = 1
     if request.method == "GET":
@@ -191,8 +191,7 @@ def my_guidebook_list(request):
                         guidebook_id_ary.append(s.guidebook_id)
                 guidebooks = guidebooks.filter(pk__in=guidebook_id_ary)
 
-
-    if guidebooks == None:
+    if guidebooks is None:
         guidebooks = Guidebook.objects.all().filter(
             user=request.user
         )
@@ -201,29 +200,29 @@ def my_guidebook_list(request):
     paginator = Paginator(guidebooks.order_by('-created_at'), 5)
 
     try:
-        pGuidebooks = paginator.page(page)
+        p_guidebooks = paginator.page(page)
     except PageNotAnInteger:
-        pGuidebooks = paginator.page(1)
+        p_guidebooks = paginator.page(1)
     except EmptyPage:
-        pGuidebooks = paginator.page(paginator.num_pages)
+        p_guidebooks = paginator.page(paginator.num_pages)
 
     first_num = 1
     last_num = paginator.num_pages
     if paginator.num_pages > 7:
-        if pGuidebooks.number < 4:
+        if p_guidebooks.number < 4:
             first_num = 1
             last_num = 7
-        elif pGuidebooks.number > paginator.num_pages - 3:
+        elif p_guidebooks.number > paginator.num_pages - 3:
             first_num = paginator.num_pages - 6
             last_num = paginator.num_pages
         else:
-            first_num = pGuidebooks.number - 3
-            last_num = pGuidebooks.number + 3
-    pGuidebooks.paginator.pages = range(first_num, last_num + 1)
-    pGuidebooks.count = len(pGuidebooks)
+            first_num = p_guidebooks.number - 3
+            last_num = p_guidebooks.number + 3
+    p_guidebooks.paginator.pages = range(first_num, last_num + 1)
+    p_guidebooks.count = len(p_guidebooks)
     form._my(request.user.username)
     content = {
-        'guidebooks': pGuidebooks,
+        'guidebooks': p_guidebooks,
         'form': form,
         'pageName': 'My Guidebooks',
         'pageTitle': 'My Guidebooks',
@@ -231,6 +230,7 @@ def my_guidebook_list(request):
         'page': page
     }
     return render(request, 'guidebook/guidebook_list.html', content)
+
 
 def guidebook_detail(request, unique_id):
     guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
@@ -261,6 +261,7 @@ def guidebook_detail(request, unique_id):
         'firstImageKey': firstImageKey
     }
     return render(request, 'guidebook/guidebook_detail.html', content)
+
 
 @my_login_required
 def guidebook_create(request, unique_id=None):
@@ -326,6 +327,7 @@ def guidebook_create(request, unique_id=None):
     }
     return render(request, 'guidebook/create_main.html', content)
 
+
 @my_login_required
 def ajax_guidebook_update(request, unique_id = None):
     if request.method == "POST":
@@ -374,6 +376,7 @@ def ajax_guidebook_update(request, unique_id = None):
         'message': 'The Guidebook does not exist or has no access.'
     })
 
+
 @my_login_required
 def add_scene(request, unique_id):
     guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
@@ -393,6 +396,7 @@ def add_scene(request, unique_id):
         'pageDescription': MAIN_PAGE_DESCRIPTION
     }
     return render(request, 'guidebook/add_scene.html', content)
+
 
 @my_login_required
 def ajax_upload_file(request, unique_id):
@@ -428,6 +432,7 @@ def ajax_upload_file(request, unique_id):
         'message': 'The Guidebook does not exist or has no access.'
     })
 
+
 @my_login_required
 def ajax_add_scene(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
@@ -454,6 +459,7 @@ def ajax_add_scene(request, unique_id):
                 old_scene.description = description
                 old_scene.lat = lat
                 old_scene.lng = lng
+                old_scene.point = Point(lat, lng)
                 old_scene.username = username
                 old_scene.save()
                 return JsonResponse({
@@ -472,6 +478,7 @@ def ajax_add_scene(request, unique_id):
                 new_scene.description = description
                 new_scene.lat = lat
                 new_scene.lng = lng
+                new_scene.point = Point(lat, lng)
                 new_scene.username = username
                 scenes = guidebook.getScenes()
                 max_sort = 0
@@ -515,6 +522,7 @@ def ajax_add_scene(request, unique_id):
         'message': 'It failed to save Scene!'
     })
 
+
 @my_login_required
 def ajax_order_scene(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
@@ -549,6 +557,7 @@ def ajax_order_scene(request, unique_id):
         'status': 'failed',
         'message': 'It failed to save Scene!'
     })
+
 
 @my_login_required
 def ajax_save_poi(request, unique_id, pk):
@@ -627,6 +636,7 @@ def ajax_save_poi(request, unique_id, pk):
         'message': 'It failed to save Point of Interest!'
     })
 
+
 @my_login_required
 def ajax_delete_poi(request, unique_id, pk):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
@@ -661,6 +671,7 @@ def ajax_delete_poi(request, unique_id, pk):
         'status': 'failed',
         'message': 'It failed to delete Point of Interest!'
     })
+
 
 def ajax_get_scene(request, unique_id):
     image_key = request.GET['image_key']
@@ -704,6 +715,7 @@ def ajax_get_scene(request, unique_id):
             'scene': json_scene,
             'poi_list': poi_list
         })
+
 
 @my_login_required
 def ajax_get_edit_scene(request, unique_id):
@@ -749,6 +761,7 @@ def ajax_get_edit_scene(request, unique_id):
             'scene': json_scene,
             'poi_list': poi_list
         })
+
 
 @my_login_required
 def ajax_set_start_view(request, unique_id):
@@ -798,6 +811,7 @@ def ajax_set_start_view(request, unique_id):
         'message': 'Bad request'
     })
 
+
 @my_login_required
 def ajax_get_scene_list(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
@@ -818,6 +832,7 @@ def ajax_get_scene_list(request, unique_id):
         'status': 'success',
         'scene_list': scenes_json
     })
+
 
 @my_login_required
 def ajax_delete_scene(request, unique_id, pk):
@@ -863,6 +878,7 @@ def ajax_delete_scene(request, unique_id, pk):
         'status': 'failed',
         'message': 'It failed to delete Scene!'
     })
+
 
 @my_login_required
 def check_like(request, unique_id):
@@ -936,6 +952,7 @@ def check_like(request, unique_id):
             'liked_count': liked_count
         })
 
+
 @my_login_required
 def check_publish(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
@@ -970,6 +987,7 @@ def check_publish(request, unique_id):
         'is_published': guidebook.is_published
     })
 
+
 @my_login_required
 def guidebook_delete(request, unique_id):
     guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
@@ -992,6 +1010,7 @@ def guidebook_delete(request, unique_id):
     else:
         messages.error(request, "This user hasn't permission")
     return redirect('guidebook.guidebook_list')
+
 
 def ajax_get_detail(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)

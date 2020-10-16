@@ -1897,3 +1897,29 @@ def ajax_get_detail(request, unique_id):
         data['sequence_html_detail'] = render_to_string('sequence/modal_detail.html', {'sequence': sequence, 'is_mine': is_mine})
 
     return JsonResponse(data)
+
+
+def ajax_get_detail_by_image_unique_id(request, unique_id):
+    images = Image.objects.filter(unique_id=unique_id)
+    if images.count() == 0:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "Image key error."
+        })
+    image = images[0]
+    sequence = image.sequence
+    if request.user == sequence.user:
+        is_mine = True
+    else:
+        is_mine = False
+    serialized_obj = serializers.serialize('json', [sequence, ])
+    data = {
+        'sequence': json.loads(serialized_obj)
+    }
+
+    if not data['sequence']:
+        data['message'] = "The sequence id doesn't exist."
+    else:
+        data['sequence_html_detail'] = render_to_string('sequence/modal_detail.html', {'sequence': sequence, 'is_mine': is_mine})
+
+    return JsonResponse(data)

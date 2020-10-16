@@ -18,6 +18,7 @@ urlpatterns = [
     path('<str:unique_id>/ajax_get_image_list/', views.ajax_get_image_list, name='sequence.ajax_get_image_list'),
     path('<str:unique_id>/ajax_get_image_ele/', views.ajax_get_image_ele, name='sequence.ajax_get_image_ele'),
     path('<str:unique_id>/ajax/get_detail/', views.ajax_get_detail, name='sequence.ajax_get_detail'),
+
     path('<str:seq_key>/ajax_import/', views.ajax_import, name='sequence.ajax_import'),
 
     path('<str:unique_id>/ajax_image_mark_view/<str:image_key>/', views.ajax_image_mark_view, name='sequence.ajax_image_mark_view'),
@@ -25,6 +26,8 @@ urlpatterns = [
     path('<str:unique_id>/ajax_add_image_label/<str:image_key>/', views.ajax_add_image_label, name='sequence.ajax_add_image_label'),
     path('<str:unique_id>/ajax_get_image_label/<str:image_key>/', views.ajax_get_image_label, name='sequence.ajax_get_image_label'),
     path('<str:unique_id>/ajax_delete_image_label/<str:image_key>/', views.ajax_delete_image_label, name='sequence.ajax_delete_image_label'),
+
+    path('image/<str:unique_id>/ajax_get_detail_by_image_unique_id/', views.ajax_get_detail_by_image_unique_id, name='sequence.ajax_get_detail_by_image_unique_id'),
 
     path('import-sequence-list', views.import_sequence_list, name='sequence.import_sequence_list'),
     path('import-sequence', views.import_sequence, name='sequence.import_sequence'),

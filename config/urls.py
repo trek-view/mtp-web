@@ -22,6 +22,7 @@ from accounts.models import CustomUser
 from challenge.models import Challenge
 from sequence.models import Sequence, Image
 from tour.models import Tour
+from rest_framework_mvt.views import mvt_view_factory
 from django.contrib import admin as admin_tmp
 from accounts import views as account_views
 from . import views
@@ -85,6 +86,7 @@ class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
 urlpatterns = [
     # path('', views.index, name='home'),
     path('', views.index, name='home'),
+    path('sequence.mvt', mvt_view_factory(model_class=Image, geom_col='point')),
     path('uploader', views.app_download, name='app_download'),
     # path('', RedirectView.as_view(url='marketplace', permanent=False), name='home'),
     path('accounts/', include('accounts.urls')),
@@ -102,8 +104,6 @@ urlpatterns = [
     path('mission-control/', admin.site.urls, name='admin'),
     path('api/', include('api.urls')),
     path('exchange_token', include('accounts.strava_url')),
-
-
 ]
 
 # This part is for deploying this project as a production(DEBUG=True) on heroku.

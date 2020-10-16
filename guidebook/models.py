@@ -12,6 +12,7 @@ from django.core.validators import RegexValidator
 from storages.backends.s3boto3 import S3Boto3Storage
 from django.conf import settings
 from sys_setting.models import Tag
+from lib.mvtManager import CustomMVTManager
 ## Python Packages
 import uuid
 
@@ -164,11 +165,20 @@ class Scene(models.Model):
     description = models.TextField(null=True)
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)
+    point = models.PointField(null=True, blank=True)
     start_x = models.FloatField(default=0.5)
     start_y = models.FloatField(default=0.5)
     sort = models.IntegerField(default=1, null=True)
     image_url = models.CharField(max_length=100, null=True)
     username = models.CharField(max_length=100, default='', null=True, blank=True, verbose_name="Mapillary Username", )
+
+    objects = models.Manager()
+    vector_tiles = CustomMVTManager(
+        geo_col='point',
+        select_columns=['image_key', 'unique_id'],
+        is_show_id=False,
+        source_layer='mtp-images'
+    )
 
     def getPOICount(self):
         pois = PointOfInterest.objects.filter(scene=self)

@@ -11,6 +11,7 @@ from django.contrib.postgres.fields import ArrayField
 ## Python Packages
 import uuid
 from lib.functions import *
+from lib.mvtManager import CustomMVTManager
 from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from django.core.files import File
@@ -18,6 +19,7 @@ from urllib.request import urlretrieve
 from colorful.fields import RGBColorField
 from sys_setting.models import Tag
 import random
+
 r = lambda: random.randint(0,255)
 
 UserModel = get_user_model()
@@ -154,7 +156,7 @@ class Sequence(models.Model):
     pano = models.BooleanField(default=False)
     user_key = models.CharField(max_length=100, null=True, blank=True, verbose_name="Mapillary User Key",)
     username = models.CharField(max_length=100, null=True, blank=True, verbose_name="Mapillary Username",)
-    geometry_coordinates = models.LineStringField(null=True, blank=True)
+    geometry_coordinates = models.LineStringField(null=True, blank=True, srid=4326)
     geometry_coordinates_ary = ArrayField(ArrayField(models.FloatField(default=1)), null=True, blank=True)
     coordinates_cas = ArrayField(models.FloatField(default=0), null=True, blank=True)
     coordinates_image = ArrayField(models.CharField(default='', max_length=100), null=True, blank=True)
@@ -176,6 +178,15 @@ class Sequence(models.Model):
     strava = models.CharField(max_length=50, null=True, blank=True)
 
     distance = models.FloatField(null=True, blank=True)
+
+
+    objects = models.Manager()
+    vector_tiles = CustomMVTManager(
+        geo_col='geometry_coordinates',
+        select_columns=['seq_key', 'unique_id'],
+        is_show_id=False,
+        source_layer='mtp-sequences'
+    )
 
     def get_absolute_url(self):
         from django.urls import reverse
@@ -311,6 +322,14 @@ class Image(models.Model):
     mapillary_image = models.ImageField(upload_to=image_directory_path, null=True, blank=True)
 
     image_label = models.ManyToManyField(LabelType, through='ImageLabel')
+
+    objects = models.Manager()
+    vector_tiles = CustomMVTManager(
+        geo_col='point',
+        select_columns=['image_key', 'unique_id'],
+        is_show_id=False,
+        source_layer='mtp-images'
+    )
 
     def getSequence(self):
         if self.seq_key != '':
