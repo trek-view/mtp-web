@@ -68,9 +68,9 @@
     </div>
     <div class="right-board list bg-light">
         <div class="switch-list-viewer">
-            <label for="switch-list-viewer"></label><input class="" type="checkbox" id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
+            <label for="switch-list-viewer"></label><input class="" type="checkbox" {% if request.GET.view_type is not None and request.GET.view_type == 'map-view' %}checked{% endif %} id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
         </div>
-        <div id="list-view" class="list-view mt-4 mb-2 ml-auto mr-auto">
+        <div id="list-view" class="{% if request.GET.view_type is not None and request.GET.view_type == 'map-view' %}d-none{% endif %} list-view mt-4 mb-2 ml-auto mr-auto">
             <div class="paginator">
                 {% if guidebooks.has_other_pages %}
                     <ul class="pagination justify-content-center">
@@ -222,7 +222,7 @@
                 {% endif %}
             </div>
         </div>
-        <div class="d-none" id="map">
+        <div class="{% if request.GET.view_type is None or request.GET.view_type != 'map-view' %}d-none{% endif %}" id="map">
 
         </div>
     </div>
@@ -238,31 +238,7 @@
 <script>
     $('.paginator-btn').click(function() {
         let pageNum = $(this).data('page');
-        let current_url = window.location.href;
-        let a = current_url.split("?");
-        if (a.length < 2)
-        {
-            current_url += '?page=' + pageNum;
-            location.assign(current_url);
-            return;
-        }
-
-        let b = a[1].split("&");
-        let i;
-        let c = [];
-        let is_changed = false;
-        for (i=0;i<b.length;i++) {
-            if (b[i].substr(0, 5) === 'page=') {
-                c.push('page=' + pageNum);
-                is_changed = true;
-            }
-            else {
-                c.push(b[i]);
-            }
-        }
-        let url = a[0] + '?' + c.join('&');
-        if (!is_changed)
-            url += '&page=' + pageNum;
+        let url = setParamInURL('page', pageNum);
         location.assign(url);
     });
 
@@ -504,14 +480,20 @@
     }
 
     $('#switch-list-viewer').change(function () {
+        let url;
         if ($(this).prop('checked')) {
             $('#list-view').addClass('d-none');
             $('#map').removeClass('d-none');
+            url = setParamInURL('view_type', 'map-view');
         }
         else {
             $('#list-view').removeClass('d-none');
             $('#map').addClass('d-none');
+            url = setParamInURL('view_type', 'list-view');
         }
+        history.pushState({
+            id: 'Image Leaderboard List'
+        }, "{{ pageTitle }}", url);
         map.resize();
     })
 

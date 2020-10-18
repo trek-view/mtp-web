@@ -43,3 +43,12 @@ var coordinatesGeocoder = function(query) {
 
     return geocodes;
 };
+
+function setParamInURL(key, val) {
+    let url = location.href.split('?')[0]
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    urlParams.set(key, val);
+    url = url + '?' + urlParams.toString();
+    return url;
+}
