@@ -134,6 +134,19 @@ class CameraModel(models.Model):
     def __str__(self):
         return self.name
 
+class CustomSequenceMVTManager(CustomMVTManager):
+    def get_additional_where(self, kwargs):
+        from tour.models import Tour
+        additional_where = ''
+        if 'tour_unique_id' in kwargs.keys():
+            tours = Tour.objects.filter(unique_id=kwargs['tour_unique_id'])[:1]
+            if tours.count() > 0:
+                tour_id = tours[0].pk
+                table_name = 'tour_toursequence'
+                additional_where += f"""
+                and id in (Select sequence_id From {table_name} Where tour_id = '{tour_id}')  
+                """
+        return additional_where
 
 class Sequence(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -169,7 +182,7 @@ class Sequence(models.Model):
     distance = models.FloatField(null=True, blank=True)
 
     objects = models.Manager()
-    vector_tiles = CustomMVTManager(
+    vector_tiles = CustomSequenceMVTManager(
         geo_col='geometry_coordinates',
         select_columns=['seq_key', 'unique_id'],
         is_show_id=False,
@@ -269,6 +282,20 @@ class Sequence(models.Model):
         lng = self.geometry_coordinates_ary[0][0]
         return lng
 
+class CustomImageMVTManager(CustomMVTManager):
+    def get_additional_where(self, kwargs):
+        from tour.models import Tour
+        additional_where = ''
+        if 'tour_unique_id' in kwargs.keys():
+            tours = Tour.objects.filter(unique_id=kwargs['tour_unique_id'])[:1]
+            if tours.count() > 0:
+                tour_id = tours[0].pk
+                table_name = 'tour_toursequence'
+                additional_where += f"""
+                and sequence_id in (Select sequence_id From {table_name} Where tour_id = '{tour_id}')  
+                """
+        return additional_where
+
 
 class Image(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -300,7 +327,7 @@ class Image(models.Model):
     image_label = models.ManyToManyField(LabelType, through='ImageLabel')
 
     objects = models.Manager()
-    vector_tiles = CustomMVTManager(
+    vector_tiles = CustomImageMVTManager(
         geo_col='point',
         select_columns=['image_key', 'unique_id'],
         is_show_id=False,

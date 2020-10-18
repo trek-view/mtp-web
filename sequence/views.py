@@ -1929,5 +1929,6 @@ def ajax_get_detail_by_image_key(request, image_key):
         data['message'] = "The sequence id doesn't exist."
     else:
         data['sequence_html_detail'] = render_to_string('sequence/modal_detail.html', {'sequence': sequence, 'is_mine': is_mine})
+        data['sequence_unique_id'] = sequence.unique_id
 
     return JsonResponse(data)

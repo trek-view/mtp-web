@@ -35,6 +35,10 @@ def home(request):
 
 # noinspection DuplicatedCode
 def guidebook_list(request):
+    scenes = Scene.objects.filter()
+    for scene in scenes:
+        scene.point = Point([scene.lng, scene.lat])
+        scene.save()
     guidebooks = None
     page = 1
     if request.method == "GET":
