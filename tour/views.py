@@ -108,7 +108,7 @@ def tour_add_sequence(request, unique_id):
                 user=request.user
             ).exclude(image_count=0)
             if name and name != '':
-                sequences = sequences.filter(name__contains=name)
+                sequences = sequences.filter(name__icontains=name)
             if camera_make and camera_make != '':
                 sequences = sequences.filter(camera_make__contains=camera_make)
             if transport_type and transport_type != 0 and transport_type != '':
@@ -247,9 +247,9 @@ def tour_list(request):
                 tours = tours.filter(pk__in=t_ids)
 
             if name and name != '':
-                tours = tours.filter(name__contains=name)
+                tours = tours.filter(name__icontains=name)
             if username and username != '':
-                users = CustomUser.objects.filter(username__contains=username)
+                users = CustomUser.objects.filter(username__icontains=username)
                 tours = tours.filter(user__in=users)
             if len(tags) > 0:
                 for tour_tag in tags:
@@ -320,7 +320,7 @@ def my_tour_list(request):
                 user=request.user
             )
             if name and name != '':
-                tours = tours.filter(name__contains=name)
+                tours = tours.filter(name__icontains=name)
             if len(tags) > 0:
                 for tour_tag in tags:
                     tours = tours.filter(tour_tag=tour_tag)

@@ -196,7 +196,7 @@ def challenge_list(request):
             challenge_type = form.cleaned_data['challenge_type']
 
             if name is not None:
-                challenges = challenges.filter(name__contains=name)
+                challenges = challenges.filter(name__icontains=name)
             if not transport_type is None and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
@@ -273,7 +273,7 @@ def my_challenge_list(request):
             camera_makes = form.cleaned_data['camera_make']
 
             if not name is None:
-                challenges = challenges.filter(name__contains=name)
+                challenges = challenges.filter(name__icontains=name)
             if not transport_type is None and transport_type != 0 and transport_type != '':
                 children_trans_type = TransType.objects.filter(parent_id=transport_type)
                 if children_trans_type.count() > 0:
@@ -637,7 +637,7 @@ def label_challenge_list(request):
             challenge_type = form.cleaned_data['challenge_type']
 
             if name is not None:
-                challenges = challenges.filter(name__contains=name)
+                challenges = challenges.filter(name__icontains=name)
             print(labe_type)
             if labe_type is not None and labe_type != 0 and labe_type != '':
                 children_label_type = LabelType.objects.filter(parent_id=labe_type)
@@ -711,7 +711,7 @@ def my_label_challenge_list(request):
             label_type = form.cleaned_data['label_type']
 
             if name is not None:
-                challenges = challenges.filter(name__contains=name)
+                challenges = challenges.filter(name__icontains=name)
             if label_type is not None and label_type != 0 and label_type != '':
                 children_label_type = LabelType.objects.filter(parent_id=label_type)
                 if children_label_type.count() > 0:

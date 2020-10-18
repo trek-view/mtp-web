@@ -53,12 +53,12 @@ def guidebook_list(request):
                 is_published=True,
                 is_approved=True
             )
-            if name:
-                guidebooks = guidebooks.filter(name__contains=name)
+            if name is not None and name != '':
+                guidebooks = guidebooks.filter(name__icontains=name)
             if category:
                 guidebooks = guidebooks.filter(category_id=category)
             if username and username != '':
-                users = CustomUser.objects.filter(username__contains=username)
+                users = CustomUser.objects.filter(username__icontains=username)
                 guidebooks = guidebooks.filter(user__in=users)
             if len(tags) > 0:
                 for tag in tags:
@@ -73,8 +73,8 @@ def guidebook_list(request):
                     guidebooks = guidebooks.filter(pk__in=guidebook_ary)
                 elif like == 'false':
                     guidebooks = guidebooks.exclude(pk__in=guidebook_ary)
-            if image_key:
-                scenes = Scene.objects.filter(image_key__contains=image_key)
+            if image_key is not None and image_key != '':
+                scenes = Scene.objects.filter(image_key__icontains=image_key)
                 guidebook_id_ary = []
                 if scenes.count() > 0:
                     for s in scenes:
@@ -140,8 +140,8 @@ def my_guidebook_list(request):
             guidebooks = Guidebook.objects.all().filter(
                 user=request.user
             )
-            if name:
-                guidebooks = guidebooks.filter(name__contains=name)
+            if name is not None and name != '':
+                guidebooks = guidebooks.filter(name__icontains=name)
             if category:
                 guidebooks = guidebooks.filter(category_id=category)
 
@@ -161,8 +161,8 @@ def my_guidebook_list(request):
                 elif like == 'false':
                     guidebooks = guidebooks.exclude(pk__in=guidebook_ary)
 
-            if image_key:
-                scenes = Scene.objects.filter(image_key__contains=image_key)
+            if image_key is not None and image_key != '':
+                scenes = Scene.objects.filter(image_key__icontains=image_key)
                 guidebook_id_ary = []
                 if scenes.count() > 0:
                     for s in scenes:

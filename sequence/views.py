@@ -70,7 +70,7 @@ def sequence_list(request):
                 is_published=True
             ).exclude(image_count=0)
             if name and name != '':
-                sequences = sequences.filter(name__contains=name)
+                sequences = sequences.filter(name__icontains=name)
             if camera_makes is not None and len(camera_makes) > 0:
                 sequences = sequences.filter(camera_make__in=camera_makes)
             if transport_type and transport_type != 0 and transport_type != '':
@@ -83,7 +83,7 @@ def sequence_list(request):
                 else:
                     sequences = sequences.filter(transport_type_id=transport_type)
             if username and username != '':
-                users = CustomUser.objects.filter(username__contains=username)
+                users = CustomUser.objects.filter(username__icontains=username)
                 sequences = sequences.filter(user__in=users)
             if len(tags) > 0:
                 for tag in tags:
@@ -205,7 +205,7 @@ def my_sequence_list(request):
                 user=request.user
             ).exclude(image_count=0)
             if name and name != '':
-                sequences = sequences.filter(name__contains=name)
+                sequences = sequences.filter(name__icontains=name)
             if camera_makes is not None and len(camera_makes) > 0:
                 sequences = sequences.filter(camera_make__in=camera_makes)
             if transport_type and transport_type != 0 and transport_type != '':
@@ -318,7 +318,7 @@ def image_leaderboard(request):
             m_type = request.GET.get('type')
             users = None
             if username and username != '':
-                users = CustomUser.objects.filter(username__contains=username)
+                users = CustomUser.objects.filter(username__icontains=username)
                 if m_type is None or m_type == 'received':
                     images = images.filter(user__in=users)
                 elif m_type == 'marked':
