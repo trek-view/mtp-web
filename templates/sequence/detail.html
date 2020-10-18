@@ -775,8 +775,8 @@
                     toastr.success(data.message);
                     $('#sequence_name h3').text(data.sequence['name']);
                     $('#sequence_description p').text(data.sequence['description']);
-                    $('.item-transport-type .parent-type').html(data.sequence['transport_parent_html']);
-                    $('.item-transport-type .sub-type').html(data.sequence['transport_html']);
+                    $('.item-transport-type.parent-type').html(data.sequence['transport_parent_html']);
+                    $('.item-transport-type.sub-type').html(data.sequence['transport_html']);
                     var tag_html = '';
                     for (var i = 0; i < data.sequence['tags'].length; i++) {
                         tag_html += '<span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">' + data.sequence['tags'][i] + '</span>';
