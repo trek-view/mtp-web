@@ -22,22 +22,6 @@ MAIN_PAGE_DESCRIPTION = "Leaderboard shows the ranking of users by Monthly and T
 
 def index(request):
 
-    ############
-    # update db
-    image_vs = ImageViewPoint.objects.filter(owner_id=None)
-    print('image_vs: ', image_vs.count())
-    if image_vs.count() > 0:
-        for image_v in image_vs:
-            image_v.owner = image_v.image.sequence.user
-            image_v.save()
-
-    ss = Sequence.objects.filter(distance=None)
-    if ss.count() > 0:
-        for s in ss:
-            s.distance = s.get_distance()
-            s.save()
-    ############
-
     sequences = None
     page = 1
 
@@ -104,7 +88,6 @@ def index(request):
                 form.set_camera_makes(camera_makes)
 
     if sequences is None:
-        form = LeaderboardSearchForm()
         sequences = Sequence.objects.all().exclude(image_count=0)
 
     filter_type = request.GET.get('filter_type')

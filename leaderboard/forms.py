@@ -34,7 +34,12 @@ class LeaderboardSearchForm(forms.Form):
             required=False
         )
 
-        self.fields['filter_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=((0, 'Uploads'), (1, 'Distance'), (2, 'Viewpoints')), initial=0)
+        self.fields['filter_type'] = forms.ChoiceField(
+            widget=forms.RadioSelect,
+            choices=((0, 'Uploads'), (1, 'Distance'), (2, 'Viewpoints')),
+            initial=0,
+            required=False
+        )
 
         self.fields['camera_make'] = forms.ModelMultipleChoiceField(
             required=False,
