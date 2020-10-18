@@ -7,6 +7,7 @@ from django.contrib.auth import (
     authenticate, get_user_model, )
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
+from django.http import Http404, JsonResponse
 from mailerlite import MailerLiteApi
 
 from guidebook.models import Guidebook, GuidebookLike

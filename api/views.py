@@ -4,6 +4,7 @@ import threading
 
 # Django Packages
 from django.contrib.gis.geos import Point, LineString
+from django.http import Http404, JsonResponse
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response

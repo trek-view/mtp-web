@@ -147,18 +147,18 @@ class UserUpdateForm(forms.ModelForm):
     )
 
     first_name = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation-optional': 'true'}),
         required=False
     )
 
     last_name = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation-optional': 'true'}),
         required=False
     )
 
     description = forms.CharField(
         widget=forms.Textarea(
-            attrs={'class': 'form-control', 'rows': 4, 'style': 'resize: none;'}),
+            attrs={'class': 'form-control', 'rows': 4, 'style': 'resize: none;', 'data-validation-optional': 'true'}),
         required=False
     )
 
