@@ -300,6 +300,60 @@ body {
     justify-content: space-between;
 }
 
+.mapboxgl-ctrl-geocoder {
+    min-width: 240px;
+    width: 240px;
+    position: fixed;
+    top: 100px;
+    margin-left: 10px !important;
+}
+
+.right-board.w-100 .mapboxgl-ctrl-geocoder {
+    margin-left: 50px !important;
+}
+
+.right-board.w-100 .username-search-bar {
+    margin-left: 90px !important;
+}
+
+.username-search-bar {
+    margin-left: 50px !important;
+}
+
+.username-search-bar.closed {
+    margin-left: 260px !important;
+}
+
+.right-board.w-100 .username-search-bar.closed {
+    margin-left: 300px !important;
+}
+
+.small-screen .mapboxgl-ctrl-top-left {
+    margin-left: -10px !important;
+}
+
+
+.mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon.mapboxgl-ctrl-geocoder--icon-search {
+    cursor: pointer;
+}
+
+.mapboxgl-ctrl-geocoder.closed {
+    min-width: 30px;
+    width: 30px;
+}
+
+.mapboxgl-ctrl-geocoder--icon-search {
+    position: absolute;
+    top: 8px;
+    left: 5px;
+    width: 23px;
+    height: 23px;
+}
+
+.mapboxgl-ctrl-geocoder--input {
+    height: 36px;
+}
+
 @media only screen and (max-width: 600px) {
     .detail-box {
         flex-direction: column;
@@ -309,5 +363,10 @@ body {
         width: 100%;
         height: auto;
     }
+    .mapboxgl-ctrl-geocoder {
+        top: 80px;
+    }
 }
+
+
 

@@ -345,16 +345,6 @@
         zoom: 1 // starting zoom
     });
 
-    map.addControl(
-        new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            localGeocoder: coordinatesGeocoder,
-            zoom: 1,
-            placeholder: '',
-            mapboxgl: mapboxgl
-        }), 'top-left'
-    );
-
     // Create a popup, but don't add it to the map yet.
     const popup = new mapboxgl.Popup({
         closeButton: false,
