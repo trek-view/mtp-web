@@ -14,7 +14,7 @@ urlpatterns = [
 
     path('<str:unique_id>/scene/', views.add_scene, name='guidebook.add_scene'),
     path('<str:unique_id>/ajax/save_scene/', views.ajax_add_scene, name='guidebook.ajax_add_scene'),
-    path('<str:unique_id>/ajax/get_detail/', views.ajax_get_detail, name='guidebook.ajax_get_detail'),
+    path('<str:unique_id>/ajax_get_detail/', views.ajax_get_detail, name='guidebook.ajax_get_detail'),
     path('<str:unique_id>/ajax/upload_file/', views.ajax_upload_file, name='guidebook.ajax_upload_file'),
     path('<str:unique_id>/ajax/guidebook_update/', views.ajax_guidebook_update, name='guidebook.ajax_guidebook_update'),
     path('<str:unique_id>/ajax/order_scene/', views.ajax_order_scene, name='guidebook.ajax_order_scene'),

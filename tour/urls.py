@@ -14,5 +14,6 @@ urlpatterns = [
     path('<str:unique_id>/ajax_tour_check_publish', views.ajax_tour_check_publish, name='tour.ajax_tour_check_publish'),
     path('<str:unique_id>/ajax_tour_check_like', views.ajax_tour_check_like, name='tour.ajax_tour_check_like'),
     path('<str:unique_id>/ajax_tour_update', views.ajax_tour_update, name='tour.ajax_tour_update'),
-    path('<str:unique_id>/ajax/get_detail/', views.ajax_get_detail, name='tour.ajax_get_detail'),
+    path('<str:unique_id>/ajax_get_detail/', views.ajax_get_detail, name='tour.ajax_get_detail'),
+    # path('<str:unique_id>/ajax_sequence/', views.ajax_get_detail, name='tour.ajax_get_detail'),
 ]
