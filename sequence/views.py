@@ -823,14 +823,14 @@ def set_camera_make(sequence):
 
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
-    if not sequence.is_published and request.user != sequence.user:
-        messages.error(request, 'The sequence is not published.')
-        return redirect('sequence.index')
-    print('1')
-    p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
-    p.start()
-    print('2')
-    set_camera_make(sequence)
+    # if not sequence.is_published and request.user != sequence.user:
+    #     messages.error(request, 'The sequence is not published.')
+    #     return redirect('sequence.index')
+    # print('1')
+    # p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
+    # p.start()
+    # print('2')
+    # set_camera_make(sequence)
 
     page = 1
     if request.method == "GET":
@@ -1132,6 +1132,10 @@ def import_sequence_list(request):
                 sequences[i]['user_key'] = sequences[i]['properties']['user_key']
                 sequences[i]['username'] = sequences[i]['properties']['username']
                 sequences[i]['geometry_coordinates_ary'] = sequences[i]['geometry']['coordinates']
+                if sequences[i]['image_count'] > 0:
+                    sequences[i]['first_image_key'] = sequences[i]['properties']['coordinateProperties']['image_keys'][0]
+                else:
+                    sequences[i]['first_image_key'] = ''
 
 
     addSequenceForm = AddSequeceForm()

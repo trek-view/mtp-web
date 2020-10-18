@@ -127,9 +127,13 @@
                                     </div>
                                     <div class="col d-flex align-items-center">
                                         <div class="transport-btn w-100 text-center">
-                                            <button type="button" class="btn btn-warning " onclick="show_add_modal('{{ sequence.seq_key }}')">
+                                            <button type="button" class="btn btn-warning mb-3" onclick="show_add_modal('{{ sequence.seq_key }}')">
                                                 Import
                                             </button>
+                                            <br>
+                                            <a target="_blank" class="btn btn-info" href="https://www.mapillary.com/app/?pKey={{ sequence.first_image_key }}&focus=photo">
+                                                View on Mapillary
+                                            </a>
                                         </div>
                                         <div class="added-form w-100 d-none">
                                             <div class="sequence-name">
