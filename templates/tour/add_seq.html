@@ -236,7 +236,7 @@
 
                                             <div class="w-100 d-flex flex-row align-items-end">
                                                 <p class="mb-1 mr-3 item-transport-type text-center">
-                                                    <i class=transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
+                                                    <i class="transport-type-icon fas fa-{{ sequence.transport_type.parent.icon.font_awesome }}"></i>
                                                     <br>
                                                     {{ sequence.transport_type.parent }}
                                                 </p>
@@ -381,19 +381,18 @@
                 if (data.status == 'failed')
                     toastr.error(data.message);
                 else {
-                        location.reload();
-{#                        {% if action == 'list' %}#}
-{#                            location.reload();#}
-{#                        {% else %}#}
-{#                            toastr.success(data.message);#}
-{#                            if (data.action == 'added')#}
-{#                            {#}
-{#                                $('#action_' + unique_id).removeClass('btn-warning').addClass('btn-danger').text('Remove from Tour');#}
-{#                            }#}
-{#                            else {#}
-{#                                $('#action_' + unique_id).addClass('btn-warning').removeClass('btn-danger').text('Add in Tour');#}
-{#                            }#}
-{#                        {% endif %}#}
+                        {% if action == 'list' %}
+                            location.reload();
+                        {% else %}
+                            toastr.success(data.message);
+                            if (data.action == 'added')
+                            {
+                                $('#action_' + unique_id).removeClass('btn-warning').addClass('btn-danger').text('Remove from Tour');
+                            }
+                            else {
+                                $('#action_' + unique_id).addClass('btn-warning').removeClass('btn-danger').text('Add in Tour');
+                            }
+                        {% endif %}
                 }
             }
         });
