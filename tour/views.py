@@ -516,7 +516,6 @@ def ajax_change_tour_seq(request, unique_id):
         tour_sequence = TourSequence.objects.filter(tour=tour, sequence=sequence)[:1]
         if tour_sequence.count() > 0:
             tour_sequence[0].delete()
-            messages.success(request, 'Sequence is successfully removed in tour.')
             return JsonResponse({
                 'status': 'success',
                 'message': 'The "{}" was removed from "{}"'.format(sequence.name, tour.name),
@@ -538,7 +537,6 @@ def ajax_change_tour_seq(request, unique_id):
             if TourSequence.objects.filter(tour=tour).count() == 1:
                 tour.is_published = True
                 tour.save()
-            messages.success(request, 'Sequence is successfully added in tour.')
             return JsonResponse({
                 'status': 'success',
                 'message': 'The "{}" was added in "{}"'.format(sequence.name, tour.name),
