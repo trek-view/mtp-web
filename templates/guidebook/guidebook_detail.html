@@ -274,7 +274,7 @@
         $('.guidebook-others .like i').click(function () {
             Swal.fire({
                 title: 'Need to login!',
-                html: 'Please click <a href="{% url 'login' %}">here</a> to login. <br>' +
+                html: 'Please click <a href="{% url 'login' %}?next='+window.location.href +'">here</a> to login. <br>' +
                         "If you don't have your account, please <a href=\"{% url 'signup' %}\">sign up</a>",
                 showCancelButton: false,
                 confirmButtonText: 'OK'

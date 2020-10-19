@@ -843,8 +843,9 @@
         })
     });
 
+    $('.sequence-others .like i').css('cursor', 'pointer');
     {% if not request.user.is_authenticated %}
-        function mark_view_point(image_key) {
+        $('.sequence-others .like i').click(function () {
             Swal.fire({
                 title: 'Need to login!',
                 html: 'Please click <a href="{% url 'login' %}?next='+window.location.href +'">here</a> to login. <br>' +
@@ -852,7 +853,7 @@
                 showCancelButton: false,
                 confirmButtonText: 'OK'
             })
-        }
+        });
     {% else %}
         $('.sequence-others .like i').css('cursor', 'pointer');
         $('.sequence-others .like i').click(function () {
