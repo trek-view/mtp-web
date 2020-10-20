@@ -895,13 +895,13 @@ def set_camera_make(sequence):
 
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
-    if not sequence.is_published and request.user != sequence.user:
-        messages.error(request, 'The sequence is not published.')
-        return redirect('sequence.index')
-    print('1')
-    p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
-    p.start()
-    print('2')
+    # if not sequence.is_published and request.user != sequence.user:
+    #     messages.error(request, 'The sequence is not published.')
+    #     return redirect('sequence.index')
+    # print('1')
+    # p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
+    # p.start()
+    # print('2')
     # set_camera_make(sequence)
 
     page = 1
