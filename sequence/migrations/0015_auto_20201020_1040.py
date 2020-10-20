@@ -11,10 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='mapfeature',
-            name='detections',
-        ),
         migrations.AddField(
             model_name='mapfeature',
             name='detection_keys',

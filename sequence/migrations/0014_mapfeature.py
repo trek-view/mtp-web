@@ -27,7 +27,6 @@ class Migration(migrations.Migration):
                 ('value', models.CharField(max_length=100)),
                 ('geometry_type', models.CharField(default='Point', max_length=50)),
                 ('geometry_point', django.contrib.gis.db.models.fields.PointField(blank=True, null=True, srid=4326)),
-                ('detections', models.JSONField(blank=True, null=True)),
             ],
         ),
     ]

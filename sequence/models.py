@@ -462,7 +462,6 @@ class MapFeature(models.Model):
     value = models.CharField(max_length=100)
     geometry_type = models.CharField(max_length=50, default='Point')
     geometry_point = models.PointField(null=True, blank=True)
-    # detections = models.JSONField(null=True, blank=True)
     detection_keys = ArrayField(ArrayField(models.CharField(max_length=50)), null=True, blank=True)
     image_keys = ArrayField(ArrayField(models.CharField(max_length=50)), null=True, blank=True)
     user_keys = ArrayField(ArrayField(models.CharField(max_length=50)), null=True, blank=True)
