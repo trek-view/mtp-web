@@ -2039,14 +2039,13 @@ def ajax_get_detail_by_image_key(request, image_key):
     return JsonResponse(data)
 
 
-def insert_db(request, unique_id):
-    sequence = get_object_or_404(Sequence, unique_id=unique_id)
-    if not sequence.is_published and request.user != sequence.user:
-        messages.error(request, 'The sequence is not published.')
-        return redirect('sequence.index')
-    print('1')
-    p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
-    p.start()
-    print('2')
+def insert_db(request):
+    threading.Thread(target=insert_db_with_thread)
 
     return redirect('home')
+
+
+def insert_db_with_thread():
+    sequences = Sequence.objects.all()
+    for sequence in sequences:
+        get_images_by_sequence(sequence=sequence, mf_insert=True, image_download=False)
