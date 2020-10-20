@@ -22,10 +22,10 @@ elif not os.environ.get('HEROKU_POSTGRESQL_AQUA_URL') is None:
     DATABASE_VARIABLE = 'HEROKU_POSTGRESQL_AQUA_URL'
 else:
     DATABASE_VARIABLE = 'DATABASE_URL'
-DATABASES = {
-    'default': dj_database_url.config(env=DATABASE_VARIABLE, conn_max_age=600, ssl_require=True)
-}
-DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+# DATABASES = {
+#     'default': dj_database_url.config(env=DATABASE_VARIABLE, conn_max_age=600, ssl_require=True)
+# }
+# DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 ROBOTS_USE_SITEMAP = False
 
