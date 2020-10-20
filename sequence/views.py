@@ -2002,7 +2002,7 @@ def ajax_image_map_feature(request, unique_id):
     map_features_json = {}
     if image_key is not None and image_key != '':
         print(image_key)
-        map_features = MapFeature.objects.filter(detections__1contains=image_key)
+        map_features = MapFeature.objects.filter(image_keys__contains=[image_key])
         print(map_features.count())
         for map_feature in map_features:
             value = map_feature.value
@@ -2010,7 +2010,6 @@ def ajax_image_map_feature(request, unique_id):
                 map_features_json[value] += 1
             else:
                 map_features_json[value] = 1
-
     data = {
         'map_features': map_features_json
     }
@@ -2047,11 +2046,11 @@ def ajax_get_detail_by_image_key(request, image_key):
 
 def insert_db(request):
 
-    p = threading.Thread(target=change_download_field)
-    p.start()
-
-    p = threading.Thread(target=change_map_feature_field)
-    p.start()
+    # p = threading.Thread(target=change_download_field)
+    # p.start()
+    #
+    # p = threading.Thread(target=change_map_feature_field)
+    # p.start()
 
     return redirect('home')
 
