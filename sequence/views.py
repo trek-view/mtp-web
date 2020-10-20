@@ -2067,6 +2067,7 @@ def change_download_field():
     for sequence in sequences:
         sequence.is_image_download = True
         sequence.save()
+        print(sequence.name)
 
 
 def change_map_feature_field():
@@ -2074,3 +2075,4 @@ def change_map_feature_field():
     for sequence in sequences:
         sequence.is_map_feature = True
         sequence.save()
+        print(sequence.name)
