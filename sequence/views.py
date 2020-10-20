@@ -2039,7 +2039,7 @@ def ajax_get_detail_by_image_key(request, image_key):
     return JsonResponse(data)
 
 
-def insert_db(request, unique_id):
+def insert_db(request):
 
     p = threading.Thread(target=insert_db_with_thread)
     p.start()
