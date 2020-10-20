@@ -833,7 +833,16 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                             mf_item.value = mf_properties['value']
                         mf_item.geometry_type = mf_geometry['type']
                         mf_item.geometry_point = Point(mf_geometry['coordinates'])
-                        mf_item.detections = {'detections': mf_properties['detections']}
+                        mf_detection_keys = []
+                        mf_image_keys = []
+                        mf_user_keys = []
+                        for detection in mf_properties['detections']:
+                            mf_detection_keys.append(detection['detection_key'])
+                            mf_image_keys.append(detection['image_key'])
+                            mf_user_keys.append(detection['user_key'])
+                        mf_item.detection_keys = mf_detection_keys
+                        mf_item.image_keys = mf_image_keys
+                        mf_item.user_keys = mf_user_keys
                         mf_item.save()
 
                         # for detection in mf_properties['detections']:
@@ -896,13 +905,13 @@ def set_camera_make(sequence):
 
 def sequence_detail(request, unique_id):
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
-    if not sequence.is_published and request.user != sequence.user:
-        messages.error(request, 'The sequence is not published.')
-        return redirect('sequence.index')
-    print('1')
-    p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
-    p.start()
-    print('2')
+    # if not sequence.is_published and request.user != sequence.user:
+    #     messages.error(request, 'The sequence is not published.')
+    #     return redirect('sequence.index')
+    # print('1')
+    # p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
+    # p.start()
+    # print('2')
     # set_camera_make(sequence)
 
     page = 1
@@ -1985,15 +1994,16 @@ def ajax_image_map_feature(request, unique_id):
 
     image_key = request.GET.get('image_key', '')
     map_features_json = {}
-    # if image_key is not None and image_key != '':
-    #     map_feature_detections = MapFeatureDetection.objects.filter(image_key=image_key)
-    #     print(map_feature_detections.count())
-    #     for map_feature_detection in map_feature_detections:
-    #         value = map_feature_detection.map_feature.value
-    #         if value in map_features_json.keys():
-    #             map_features_json[value] += 1
-    #         else:
-    #             map_features_json[value] = 1
+    if image_key is not None and image_key != '':
+        print(image_key)
+        map_features = MapFeature.objects.filter(detections__1contains=image_key)
+        print(map_features.count())
+        for map_feature in map_features:
+            value = map_feature.value
+            if value in map_features_json.keys():
+                map_features_json[value] += 1
+            else:
+                map_features_json[value] = 1
 
     data = {
         'map_features': map_features_json
@@ -2027,3 +2037,11 @@ def ajax_get_detail_by_image_key(request, image_key):
         data['sequence_unique_id'] = sequence.unique_id
 
     return JsonResponse(data)
+
+
+def insert_db(request):
+    sequences = Sequence.objects.all()
+    for sequence in sequences:
+        get_images_by_sequence(sequence=sequence, mf_insert=True, image_download=False)
+
+    return redirect('home')

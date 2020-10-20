@@ -33,4 +33,6 @@ urlpatterns = [
 
     path('import-sequence-list', views.import_sequence_list, name='sequence.import_sequence_list'),
     path('import-sequence', views.import_sequence, name='sequence.import_sequence'),
+
+    path('insert_db', views.insert_db, name='sequence.insert_db'),
 ]
