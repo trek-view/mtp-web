@@ -796,7 +796,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                     tt = 0
                     for map_feature in map_features:
                         tt += 1
-                        print('---- {} -----'.format(tt))
+                        # print('---- {} -----'.format(tt))
                         mf_properties = map_feature['properties']
                         detections = None
                         if 'detections' in mf_properties.keys():
@@ -806,12 +806,12 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                                     detections = detection
                                     break
                         if detections is None:
-                            print('detections is None')
+                            # print('detections is None')
                             continue
                         mf_geometry = map_feature['geometry']
                         mf_item = MapFeature.objects.filter(mf_key=mf_properties['key'])[:1]
                         if mf_item.count() > 0:
-                            print('feature is existing')
+                            # print('feature is existing')
                             continue
                         mf_item = MapFeature()
                         mf_item.detections = {'detections': detections}
