@@ -2046,6 +2046,10 @@ def ajax_get_detail_by_image_key(request, image_key):
 
 def insert_db(request):
 
+    map_features = MapFeature.objects.filter()
+    for map_feature in map_features:
+        print(map_feature.image_keys)
+
     # p = threading.Thread(target=change_download_field)
     # p.start()
     #
