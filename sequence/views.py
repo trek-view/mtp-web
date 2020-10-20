@@ -862,6 +862,9 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                         #         mf_detection.image_key = image_key
                         #         mf_detection.user_key = user_key
                         #         mf_detection.save()
+            sequence.is_map_feature = True
+            sequence.save()
+
 
         if not settings.DEBUG and len(image_keys) > 0 and image_download:
             print('image_download')
@@ -883,6 +886,9 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                 if lf:
                     image.mapillary_image.save(image.image_key, files.File(lf))
                     image.save()
+            sequence.is_image_download = True
+            sequence.save()
+
 
         if image_insert:
             sequence.is_published = True
@@ -2041,7 +2047,10 @@ def ajax_get_detail_by_image_key(request, image_key):
 
 def insert_db(request):
 
-    p = threading.Thread(target=insert_db_with_thread)
+    p = threading.Thread(target=change_download_field)
+    p.start()
+
+    p = threading.Thread(target=change_map_feature_field)
     p.start()
 
     return redirect('home')
@@ -2051,3 +2060,17 @@ def insert_db_with_thread():
     sequences = Sequence.objects.all()
     for sequence in sequences:
         get_images_by_sequence(sequence=sequence, mf_insert=True, image_download=False)
+
+
+def change_download_field():
+    sequences = Sequence.objects.all()
+    for sequence in sequences:
+        sequence.is_image_download = True
+        sequence.save()
+
+
+def change_map_feature_field():
+    sequences = Sequence.objects.all()
+    for sequence in sequences:
+        sequence.is_map_feature = True
+        sequence.save()

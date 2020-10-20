@@ -182,6 +182,8 @@ class Sequence(models.Model):
 
     is_mapillary = models.BooleanField(default=True)
     is_published = models.BooleanField(default=True)
+    is_image_download = models.BooleanField(default=False)
+    is_map_feature = models.BooleanField(default=False)
 
     google_street_view = models.BooleanField(default=False)
     strava = models.CharField(max_length=50, null=True, blank=True)
