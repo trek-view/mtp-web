@@ -360,7 +360,7 @@
         <div class="image-detection mt-3 {% if view_mode != 'mtpw_label' and view_mode != 'autodetected_label' and view_mode != 'map_features' %}d-none{% endif %}">
             <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
                     <li class="nav-item mtpw-label-tab " style="width: 30%;">
-                        <a class="nav-link {% if view_mode == 'mtpw_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>
+                        <a class="nav-link {% if view_mode != 'autodetected_label' and view_mode != 'map_features' %}active{% endif %}" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>
                     </li>
                     <li class="nav-item mapillary-label-tab border-bottom " style="width: 40%">
                         <a class="nav-link {% if view_mode == 'autodetected_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mapillary');">Autodetected Labels</a>
@@ -372,7 +372,7 @@
                 </ul>
             <div class="card" style="border-radius: 0">
                 <div class="p-2">
-                    <div class="actions text-right {% if view_mode != 'mtpw_label' %}d-none{% endif %}">
+                    <div class="actions text-right {% if view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
                         {% if request.user.is_authenticated %}
                             <div class="add-label-button w-100 d-flex justify-content-between">
                                 <button class="btn btn-primary" id="add_label_button">
