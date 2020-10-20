@@ -15,11 +15,15 @@ from lib.functions import *
 from lib.mvtManager import CustomMVTManager
 from sys_setting.models import Tag
 
+from jsonfield import JSONField
+
 UserModel = get_user_model()
+
 
 def image_directory_path(instance, filename):
     path = 'sequence/{}/{}/{}.jpg'.format(instance.user.username, str(instance.sequence.unique_id), instance.image_key)
     return path
+
 
 class Icon(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -29,6 +33,7 @@ class Icon(models.Model):
     def __str__(self):
         return self.name
 
+
 def getAllTags():
     items = Tag.objects.filter(is_actived=True)
     itemsTuple = ()
@@ -36,6 +41,7 @@ def getAllTags():
         itemsTuple = itemsTuple + ((item.pk, item.name),)
     print(itemsTuple)
     return itemsTuple
+
 
 class TransType(MPTTModel):
     name = models.CharField(max_length=50, unique=True)
@@ -64,6 +70,7 @@ class TransType(MPTTModel):
 
     class Meta:
         verbose_name_plural = 'Transport Type'
+
 
 class LabelType(MPTTModel):
     name = models.CharField(max_length=100)
@@ -134,6 +141,7 @@ class CameraModel(models.Model):
     def __str__(self):
         return self.name
 
+
 class CustomSequenceMVTManager(CustomMVTManager):
     def get_additional_where(self, kwargs):
         from tour.models import Tour
@@ -147,6 +155,7 @@ class CustomSequenceMVTManager(CustomMVTManager):
                 and id in (Select sequence_id From {table_name} Where tour_id = '{tour_id}')  
                 """
         return additional_where
+
 
 class Sequence(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -281,6 +290,7 @@ class Sequence(models.Model):
             return None
         lng = self.geometry_coordinates_ary[0][0]
         return lng
+
 
 class CustomImageMVTManager(CustomMVTManager):
     def get_additional_where(self, kwargs):
@@ -438,3 +448,24 @@ class SequenceWeather(models.Model):
     his_hourly_chanceofsnow = models.IntegerField(default=0)
     his_hourly_chanceofthunder = models.IntegerField(default=0)
     his_hourly_uv_index = models.IntegerField(default=0)
+
+
+class MapFeature(models.Model):
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    accuracy = models.FloatField(default=0)
+    altitude = models.FloatField(default=0)
+    direction = models.FloatField(default=0)
+    first_seen_at = models.DateTimeField(null=True, blank=True)
+    mf_key = models.CharField(max_length=100, null=True, blank=True)
+    last_seen_at = models.DateTimeField(null=True, blank=True)
+    layer = models.CharField(max_length=50)
+    value = models.CharField(max_length=100)
+    geometry_type = models.CharField(max_length=50, default='Point')
+    geometry_point = models.PointField(null=True, blank=True)
+
+
+class MapFeatureDetection(models.Model):
+    image_key = models.CharField(max_length=100, null=True, blank=True)
+    detection_key = models.CharField(max_length=100, null=True, blank=True)
+    user_key = models.CharField(max_length=100, null=True, blank=True)
+    map_feature = models.ForeignKey(MapFeature, on_delete=models.CASCADE)

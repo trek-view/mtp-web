@@ -53,6 +53,7 @@ importlib-resources==3.0.0
 itypes==1.2.0
 Jinja2==2.11.2
 jmespath==0.10.0
+jsonfield==3.1.0
 mailerlite-api-python==0.2.0
 MarkupSafe==1.1.1
 oauthlib==3.1.0

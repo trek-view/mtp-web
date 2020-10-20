@@ -16,8 +16,11 @@ class BaseMVTView(APIView):
     renderer_classes = (BinaryRenderer,)
     schema = MVT_SCHEMA
 
+    permission_classes = []
+
     # pylint: disable=unused-argument
     def get(self, request, *args, **kwargs):
+        print('test=================')
         """
         Args:
             request (:py:class:`rest_framework.request.Request`): Standard DRF request object

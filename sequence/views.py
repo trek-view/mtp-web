@@ -697,7 +697,7 @@ def save_weather(sequence):
     return False
 
 
-def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, image_download=True, is_weather=True):
+def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, image_download=True, is_weather=True, mf_insert=True):
     seqs = Sequence.objects.filter(unique_id=sequence.unique_id)
     if seqs.count() == 0:
         print('Sequence is not existing.')
@@ -718,6 +718,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
         image_position_ary = []
         for image_feature in image_features:
             images = Image.objects.filter(image_key=image_feature['properties']['key'])
+            image_position_ary.append(image_feature['geometry']['coordinates'])
             print(image_feature)
             print(image_feature['properties']['altitude'])
             if images.count() > 0:
@@ -726,7 +727,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
             else:
                 image = Image()
             image_keys.append(image_feature['properties']['key'])
-            image_position_ary.append(image_feature['geometry']['coordinates'])
+
 
             image.user = sequence.user
             image.sequence = sequence
@@ -781,7 +782,78 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
 
         print(image_keys)
 
-        if len(image_keys) > 0 and image_download:
+        if len(image_position_ary) > 0 and mf_insert:
+            print('Image len: ', len(image_position_ary))
+            mm = 0
+            for image_position in image_position_ary:
+                mm += 1
+                print('===== {} ====='.format(mm))
+                map_feature_json = mapillary.get_map_feature_by_close_to(image_position)
+                if map_feature_json:
+                    map_features = map_feature_json['features']
+                    print('map_features len: ', len(map_features))
+                    tt = 0
+                    for map_feature in map_features:
+                        tt += 1
+                        print('---- {} -----'.format(tt))
+                        mf_properties = map_feature['properties']
+                        detections = None
+                        if 'detections' in mf_properties.keys():
+                            for detection in mf_properties['detections']:
+                                image_key = detection['image_key']
+                                images = Image.objects.filter(image_key=image_key)[:1]
+                                if images.count() > 0:
+                                    detections = detection
+                                    break
+                        if detections is None:
+                            print('detections is None')
+                            continue
+                        mf_geometry = map_feature['geometry']
+                        mf_item = MapFeature.objects.filter(mf_key=mf_properties['key'])[:1]
+                        if mf_item.count() > 0:
+                            print('feature is existing')
+                            continue
+                        mf_item = MapFeature()
+                        mf_item.detections = {'detections': detections}
+                        if 'accuracy' in mf_properties.keys():
+                            mf_item.accuracy = mf_properties['accuracy']
+                        if 'altitude' in mf_properties.keys():
+                            mf_item.altitude = mf_properties['altitude']
+                        if 'direction' in mf_properties.keys():
+                            mf_item.direction = mf_properties['direction']
+                        if 'first_seen_at' in mf_properties.keys():
+                            mf_item.first_seen_at = mf_properties['first_seen_at']
+                        if 'key' in mf_properties.keys():
+                            mf_item.mf_key = mf_properties['key']
+                        if 'last_seen_at' in mf_properties.keys():
+                            mf_item.last_seen_at = mf_properties['last_seen_at']
+                        if 'layer' in mf_properties.keys():
+                            mf_item.layer = mf_properties['layer']
+                        if 'value' in mf_properties.keys():
+                            mf_item.value = mf_properties['value']
+                        mf_item.geometry_type = mf_geometry['type']
+                        mf_item.geometry_point = Point(mf_geometry['coordinates'])
+                        mf_item.save()
+
+                        for detection in mf_properties['detections']:
+                            detection_key = detection['detection_key']
+                            image_key = detection['image_key']
+                            user_key = detection['user_key']
+                            mf_key = mf_item.mf_key
+                            print(detection)
+                            mf_detection = MapFeatureDetection.objects.filter(map_feature=mf_item, detection_key=detection_key,
+                                                                              image_key=image_key, user_key=user_key)
+                            if mf_detection.count() > 0:
+                                continue
+                            else:
+                                mf_detection = MapFeatureDetection()
+                                mf_detection.map_feature = mf_item
+                                mf_detection.detection_key = detection_key
+                                mf_detection.image_key = image_key
+                                mf_detection.user_key = user_key
+                                mf_detection.save()
+
+        if not settings.DEBUG and len(image_keys) > 0 and image_download:
             print('image_download')
             # Create the model you want to save the image to
             for image_key in image_keys:
@@ -1526,11 +1598,6 @@ def ajax_get_image_label(request, unique_id, image_key):
 
 
 def ajax_add_label_type(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({
-            'status': 'failed',
-            'message': 'You are required login.'
-        })
     if request.method == 'POST':
         label_type_keys = request.POST.get('keys')
         if label_type_keys is not None and label_type_keys != '':
@@ -1903,6 +1970,33 @@ def ajax_get_detail(request, unique_id):
         data['message'] = "The sequence id doesn't exist."
     else:
         data['sequence_html_detail'] = render_to_string('sequence/modal_detail.html', {'sequence': sequence, 'is_mine': is_mine})
+
+    return JsonResponse(data)
+
+
+def ajax_image_map_feature(request, unique_id):
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if not sequence:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Sequence does not exist.'
+        })
+
+    image_key = request.GET.get('image_key', '')
+    map_features_json = {}
+    if image_key is not None and image_key != '':
+        map_feature_detections = MapFeatureDetection.objects.filter(image_key=image_key)
+        print(map_feature_detections.count())
+        for map_feature_detection in map_feature_detections:
+            value = map_feature_detection.map_feature.value
+            if value in map_features_json.keys():
+                map_features_json[value] += 1
+            else:
+                map_features_json[value] = 1
+
+    data = {
+        'map_features': map_features_json
+    }
 
     return JsonResponse(data)
 
