@@ -83,6 +83,7 @@ class Mapillary:
             return data
 
     def get_map_feature_by_close_to(self, close_to, layers=None):
+
         if layers is None:
             layers = ['points', 'trafficsigns', 'lines']
         layers_str = ','.join(layers)
