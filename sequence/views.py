@@ -296,6 +296,8 @@ def image_leaderboard(request):
             camera_makes = form.cleaned_data['camera_make']
             # camera_models = form.cleaned_data['camera_model']
             transport_type = form.cleaned_data['transport_type']
+            map_feature_value = form.cleaned_data['map_feature']
+            print('map_feature_value: ', map_feature_value)
 
             images = Image.objects.all()
             if not camera_makes is None and len(camera_makes) > 0:
@@ -345,15 +347,12 @@ def image_leaderboard(request):
                     else:
                         y = filter_time.split('-')[0]
                         m = filter_time.split('-')[1]
-                    print(m)
-                    print(y)
                     images = images.filter(
                         captured_at__month=m,
                         captured_at__year=y
                     )
 
                 elif time_type == 'yearly':
-                    print(filter_time)
                     if filter_time is None or filter_time == '':
                         now = datetime.now()
                         y = now.year
@@ -363,21 +362,35 @@ def image_leaderboard(request):
                         captured_at__year=y
                     )
 
+            if map_feature_value is not None and map_feature_value != '' and map_feature_value != 'all_values':
+                map_features = MapFeature.objects.filter(value=map_feature_value)
+                map_feature_images = []
+                for map_feature in map_features:
+                    map_feature_images += map_feature.image_keys
+                print(map_feature_images)
+                images = images.filter(image_key__in=map_feature_images)
     if images is None:
         images = Image.objects.all()
 
     images = images.exclude(sequence=None)
 
+    image_json = []
     if filter_type == 'label_count':
-        image_label_json = ImageLabel.objects.filter(image__in=images).values('image').annotate(
+        image_json = ImageLabel.objects.filter(image__in=images).values('image').annotate(
             image_count=Count('image')).order_by('-image_count').annotate(
             rank=Window(expression=RowNumber()))
-        print(image_label_json)
-        paginator = Paginator(image_label_json, 10)
-    else:
-        image_view_points_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
+
+    elif filter_type == 'view_point':
+        image_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
             rank=Window(expression=RowNumber()))
-        paginator = Paginator(image_view_points_json, 10)
+
+    else:
+        images = images.order_by('-captured_at')
+        image_json = images.values('id').annotate(
+            image_count=Count('image_key')).annotate(
+            rank=Window(expression=RowNumber()))
+
+    paginator = Paginator(image_json, 10)
 
     page = 1
     page = request.GET.get('page')
@@ -408,7 +421,10 @@ def image_leaderboard(request):
 
 
     for i in range(len(pItems)):
-        image = images.get(pk=pItems[i]['image'])
+        if 'image' in pItems[i].keys():
+            image = images.get(pk=pItems[i]['image'])
+        else:
+            image = images.get(pk=pItems[i]['id'])
 
         if image is None or not image:
             continue

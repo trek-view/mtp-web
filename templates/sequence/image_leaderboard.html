@@ -56,7 +56,8 @@
             <div class="paginator d-flex flex-column align-items-center">
                 {% if items.count > 0 %}
                     <select name="filter_type" style="width: 210px" class="form-control mb-2" id="id_filter_type">
-                        <option value="view_point" {% if request.GET.filter_type != 'label_count' %}selected{% endif %}>order by Viewpoint</option>
+                        <option value="captured_at" {% if request.GET.filter_type != 'label_count' and request.GET.filter_type != 'view_point' %}selected{% endif %}>order by Captured At</option>
+                        <option value="view_point" {% if request.GET.filter_type == 'view_point' %}selected{% endif %}>order by Viewpoint</option>
                         <option value="label_count" {% if request.GET.filter_type == 'label_count' %}selected{% endif %}>order by Label Count</option>
                     </select>
                 {% endif %}

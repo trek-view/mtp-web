@@ -7,6 +7,9 @@ from .models import *
 from datetime import datetime
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
 from lib.classes import CustomTagsInputField
+from django.db.models import Count
+from django.db.models.expressions import Window
+from django.db.models.functions.window import RowNumber
 ############################################################################
 ############################################################################
 
@@ -144,6 +147,18 @@ class SequenceSearchForm(forms.Form):
         )
 
 
+def get_map_feature_values():
+    map_feature_json = MapFeature.objects.all().values('value').annotate(
+        image_count=Count('value')).order_by('-image_count').annotate(
+        rank=Window(expression=RowNumber()))
+
+    map_feature_values = [['all_values', 'All Values']]
+    for map_feature in map_feature_json:
+        map_feature_values.append([map_feature['value'], map_feature['value']])
+
+    return tuple(map_feature_values)
+
+
 class ImageSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -177,6 +192,15 @@ class ImageSearchForm(forms.Form):
             queryset=TransType.objects.all(),
             empty_label='All Types'
         )
+
+        self.fields['map_feature'] = forms.ChoiceField(
+            required=False,
+            widget=forms.Select(
+                attrs={'class': 'form-control'}),
+            choices=get_map_feature_values(),
+        )
+
+
 
 
 class SequenceSearchForTourForm(forms.Form):
