@@ -8,12 +8,12 @@
 <meta property="og:title" content="{{ pageTitle }} - Map the Paths" />
 <meta property="og:description" content="{{ pageDescription }}" />
 <meta property="og:locale" content="en_US" />
-<meta property="og:url" content="https://www.mapthepaths.com/" />
+<meta property="og:url" content="{{ BASE_URL }}" />
 <meta property="og:site_name" content="Map the Paths" />
 {% if not firstImageKey is None and firstImageKey != '' %}
     <meta property="og:image" content="https://images.mapillary.com/{{ firstImageKey }}/thumb-2048.jpg" />
 {% else %}
-    <meta property="og:image" content="https://www.mapthepaths.com/static/images/meta/trek-view-360-degree-tour.jpg" />
+    <meta property="og:image" content="{{ BASE_URL }}static/images/meta/trek-view-360-degree-tour.jpg" />
 {% endif %}
 <meta property="fb:app_id" content="314866179884216"/>
 
@@ -26,7 +26,7 @@
 {% if not firstImageKey is None and firstImageKey != '' %}
     <meta name="twitter:image" content="https://images.mapillary.com/{{ firstImageKey }}/thumb-2048.jpg" />
 {% else %}
-    <meta name="twitter:image" content="https://www.mapthepaths.com/static/images/meta/trek-view-360-degree-tour.jpg" />
+    <meta name="twitter:image" content="{{ BASE_URL }}static/images/meta/trek-view-360-degree-tour.jpg" />
 {% endif %}
 
 

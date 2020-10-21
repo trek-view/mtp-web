@@ -29,6 +29,8 @@ DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 ROBOTS_USE_SITEMAP = False
 
+BASE_URL = os.environ.get('BASE_URL')
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
