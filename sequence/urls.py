@@ -20,6 +20,8 @@ urlpatterns = [
     path('<str:unique_id>/ajax_get_image_ele/', views.ajax_get_image_ele, name='sequence.ajax_get_image_ele'),
     path('<str:unique_id>/ajax_get_detail/', views.ajax_get_detail, name='sequence.ajax_get_detail'),
     path('<str:unique_id>/ajax_image_map_feature/', views.ajax_image_map_feature, name='sequence.ajax_image_map_feature'),
+    path('<str:unique_id>/ajax_get_image_gpx_data/', views.ajax_get_image_gpx_data,
+         name='sequence.ajax_get_image_gpx_data'),
 
     path('<str:seq_key>/ajax_import/', views.ajax_import, name='sequence.ajax_import'),
 

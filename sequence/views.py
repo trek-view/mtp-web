@@ -2033,6 +2033,27 @@ def ajax_image_map_feature(request, unique_id):
     return JsonResponse(data)
 
 
+def ajax_get_image_gpx_data(request, unique_id):
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if not sequence:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Sequence does not exist.'
+        })
+
+    images = Image.objects.filter(sequence=sequence)
+    points = []
+    for image in images:
+        points.append({
+            'lat': image.point.coords[1],
+            'lon': image.point.coords[0],
+            'ele': image.ele,
+            'time': image.captured_at
+        })
+
+    return JsonResponse({'points': points})
+
+
 def ajax_get_detail_by_image_key(request, image_key):
     images = Image.objects.filter(image_key=image_key)
     if images.count() == 0:
