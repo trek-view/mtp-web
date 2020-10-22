@@ -101,6 +101,8 @@ def tour_add_sequence(request, unique_id):
             tags = form.cleaned_data['tag']
             transport_type = form.cleaned_data['transport_type']
             like = form.cleaned_data['like']
+            start_time = form.cleaned_data['start_time']
+            end_time = form.cleaned_data['end_time']
 
             # start_time = form.cleaned_data['start_time']
             # end_time = form.cleaned_data['end_time']
@@ -134,6 +136,13 @@ def tour_add_sequence(request, unique_id):
                     sequences = sequences.filter(pk__in=sequence_ary)
                 elif like == 'false':
                     sequences = sequences.exclude(pk__in=sequence_ary)
+
+            if start_time is not None and start_time != '':
+                sequences = sequences.filter(captured_at__gte=start_time)
+
+            if end_time is not None and end_time != '':
+                sequences = sequences.filter(captured_at__lte=end_time)
+
 
     if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
@@ -264,6 +273,18 @@ def tour_list(request):
                     tours = tours.filter(pk__in=tour_ary)
                 elif like == 'false':
                     tours = tours.exclude(pk__in=tour_ary)
+
+            sequence_unique_id = request.GET.get('sequence_unique_id')
+            if sequence_unique_id is not None and sequence_unique_id != '':
+                try:
+                    sequences = Sequence.objects.filter(unique_id=sequence_unique_id)[:1]
+                    if sequences.count() > 0:
+                        sequence = sequences[0]
+                        tour_sequences = TourSequence.objects.filter(sequence=sequence)
+                        tours = tours.filter(pk__in=tour_sequences.values_list('tour_id'))
+                except:
+                    messages.error(request, 'Sequence Unique Id is not a valid UUID.')
+                    return redirect('home')
 
     if tours is None:
         tours = Tour.objects.all().filter(is_published=True)

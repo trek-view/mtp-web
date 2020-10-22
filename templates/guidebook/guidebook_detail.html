@@ -154,6 +154,11 @@
                                         <span>POI: {{ scene.get_poi_count }}</span>
                                     </div>
                                 </div>
+                                {% if scene.get_sequence is not None %}
+                                    <div class="">
+                                        <small>Sequence: </small><a href="{% url 'sequence.sequence_detail' unique_id=scene.get_sequence.unique_id %}?image_key={{ scene.image_key }}">{{ scene.get_sequence.name }}</a>
+                                    </div>
+                                {% endif %}
                                 <div class="d-none scene-position">
                                     <p class="image_key">{{ scene.image_key }}</p>
                                     <p class="lat">{{ scene.lat }}</p>

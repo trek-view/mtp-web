@@ -318,13 +318,13 @@ body {
 }
 
 .detail-modal {
-    position: fixed;
-    left: unset;
+    position: fixed !important;
+    left: unset !important;
     /* bottom: 0 !important; */
     right: 0 !important;
     z-index: 1050;
     display: none;
-    width: 400px;
+    width: 400px !important;
     /* height: 250px; */
     overflow: hidden;
     outline: 0;
@@ -446,6 +446,6 @@ i.fas, i.far {
     }
 
     .detail-modal {
-        width: 100%;
+        width: 100% !important;
     }
 }

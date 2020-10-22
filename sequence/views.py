@@ -65,6 +65,8 @@ def sequence_list(request):
             transport_type = form.cleaned_data['transport_type']
             username = form.cleaned_data['username']
             like = form.cleaned_data['like']
+            start_time = form.cleaned_data['start_time']
+            end_time = form.cleaned_data['end_time']
 
             sequences = Sequence.objects.all().filter(
                 is_published=True
@@ -138,6 +140,12 @@ def sequence_list(request):
                 if challenges.count() > 0:
                     challenge = challenges[0]
                     sequences = sequences.filter(geometry_coordinates__intersects=challenge.multipolygon)
+
+            if start_time is not None and start_time != '':
+                sequences = sequences.filter(captured_at__gte=start_time)
+
+            if end_time is not None and end_time != '':
+                sequences = sequences.filter(captured_at__lte=end_time)
 
     if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
@@ -289,6 +297,10 @@ def image_leaderboard(request):
     image_view_points = ImageViewPoint.objects.filter()
     label_challenges = LabelChallenge.objects.filter()
     filter_type = None
+
+    map_feature_str = ""
+    map_feature_empty_str = ""
+
     if request.method == "GET":
         page = request.GET.get('page')
         filter_type = request.GET.get('filter_type')
@@ -365,18 +377,25 @@ def image_leaderboard(request):
                     images = images.filter(
                         captured_at__year=y
                     )
+            image_query = str(images.query)
+
 
             if map_feature_value is not None and map_feature_value != '' and map_feature_value != 'all_values':
                 map_features = MapFeature.objects.filter(value=map_feature_value)
                 map_feature_images = []
                 for map_feature in map_features:
                     map_feature_images += map_feature.image_keys
-                print(map_feature_images)
+
                 images = images.filter(image_key__in=map_feature_images)
+
+                map_feature_str = str(map_feature_images)
+                map_feature_str = map_feature_str.replace('[', '(').replace(']', ')')
+                map_feature_empty_str = map_feature_str.replace("'", "")
+
     if images is None:
         images = Image.objects.all()
 
-    request.session['images_query'] = str(images.query)
+        request.session['images_query'] = str(images.query)
 
     image_json = []
     tmp_images = None
@@ -404,7 +423,6 @@ def image_leaderboard(request):
         image_json = images.values('id').annotate(
             image_count=Count('id')).order_by('-image_count').annotate(
             rank=Window(expression=RowNumber()))
-
     else:
         images = images.order_by('-captured_at')
         tmp_images = images
@@ -412,10 +430,9 @@ def image_leaderboard(request):
             image_count=Count('image_key')).annotate(
             rank=Window(expression=RowNumber()))
 
-
-
-    request.session['images_query'] = str(tmp_images.query)
-
+    tmp_image_query = str(tmp_images.query)
+    tmp_image_query = tmp_image_query.replace(map_feature_empty_str, map_feature_str)
+    request.session['images_query'] = tmp_image_query
     paginator = Paginator(image_json, 10)
 
     page = 1

@@ -163,8 +163,6 @@ class CustomSequenceMVTManager(CustomMVTManager):
 
         if page_name == 'sequence_list' and request.session['sequences_query'] is not None:
             additional_where = ' AND id in ( SELECT t.id as id FROM (' + request.session['sequences_query'] + ') as t )'
-
-        additional_where = additional_where.replace('(%', "('%%").replace('%)', "%%')")
         return additional_where
 
 
@@ -304,7 +302,6 @@ class Sequence(models.Model):
         lng = self.geometry_coordinates_ary[0][0]
         return lng
 
-
 class CustomImageMVTManager(CustomMVTManager):
     def get_additional_where(self, additional_filters={}, request=None):
         from tour.models import Tour
@@ -330,9 +327,8 @@ class CustomImageMVTManager(CustomMVTManager):
             additional_where = ' AND sequence_id in ( SELECT t.id as id FROM (' + request.session['sequences_query'] + ') as t )'
 
         elif page_name == 'photo_list' and request.session['images_query'] is not None:
-            additional_where = ' AND id in ( SELECT t.id as id FROM (' + request.session['images_query'] + ') as t )'
+            additional_where = " AND id in ( SELECT t.id as id FROM (" + request.session['images_query'] + ") as t )"
 
-        additional_where = additional_where.replace('(%', "('%%").replace('%)', "%%')")
         return additional_where
 
 

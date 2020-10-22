@@ -7,6 +7,7 @@ from .models import *
 from datetime import datetime
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
 from lib.classes import CustomTagsInputField
+from bootstrap_datepicker_plus import DatePickerInput
 from django.db.models import Count
 from django.db.models.expressions import Window
 from django.db.models.functions.window import RowNumber
@@ -132,6 +133,33 @@ class SequenceSearchForm(forms.Form):
             required=False,
         )
         self.fields['tag'].help_text = 'Search for a tag'
+
+        self.fields['start_time'] = forms.DateField(
+            widget=DatePickerInput(
+                format='YYYY-MM-DD',
+                options={
+                    "format": 'YYYY-MM-DD',
+                    "showClose": False,
+                    "showClear": False,
+                    "showTodayButton": False,
+                },
+            ),
+            required=False
+        )
+
+        self.fields['end_time'] = forms.DateField(
+            widget=DatePickerInput(
+                format='YYYY-MM-DD',
+                options={
+                    "format": 'YYYY-MM-DD',
+                    "showClose": False,
+                    "showClear": False,
+                    "showTodayButton": False,
+                },
+            ),
+            required=False
+        )
+
         self.fields['like'] = forms.ChoiceField(
             label='Like',
             widget=forms.RadioSelect(),
@@ -226,12 +254,40 @@ class SequenceSearchForTourForm(forms.Form):
             queryset=TransType.objects.filter(),
             empty_label='All Types'
         )
+
         self.fields['tag'] = CustomTagsInputField(
             Tag.objects.filter(is_actived=True),
             create_missing=False,
             required=False,
         )
         self.fields['tag'].help_text = 'Search for a tag'
+
+        self.fields['start_time'] = forms.DateField(
+            widget=DatePickerInput(
+                format='YYYY-MM-DD',
+                options={
+                    "format": 'YYYY-MM-DD',
+                    "showClose": False,
+                    "showClear": False,
+                    "showTodayButton": False,
+                },
+            ),
+            required=False
+        )
+
+        self.fields['end_time'] = forms.DateField(
+            widget=DatePickerInput(
+                format='YYYY-MM-DD',
+                options={
+                    "format": 'YYYY-MM-DD',
+                    "showClose": False,
+                    "showClear": False,
+                    "showTodayButton": False,
+                },
+            ),
+            required=False
+        )
+
         self.fields['like'] = forms.ChoiceField(
             label='Like',
             widget=forms.RadioSelect(),

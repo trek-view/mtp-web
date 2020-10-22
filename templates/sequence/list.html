@@ -66,6 +66,8 @@
                         <label>
                             <input type="number" class="d-none" name="page" value="{{ page }}">
                         </label>
+                        {% load bootstrap4 %}
+                        {% bootstrap_css %}
                         {{ form.media }}
                         {{ form.as_p }}
                         <div class="form-group text-right mt-3">
@@ -174,11 +176,13 @@
                                                     <br>
                                                     {{ sequence.get_distance }} Km
                                                 </p>
-                                                <p class="mb-1 mr-3 item-tour-count text-center">
-                                                    <i class="fas fa-clipboard-list"></i>
-                                                    <br>
-                                                    {{ sequence.tour_count }} tours
-                                                </p>
+                                                <a {% if sequence.tour_count > 0 %}href="{% url 'tour.tour_list' %}?sequence_unique_id={{ sequence.unique_id }}" {% endif %}>
+                                                    <p class="mb-1 mr-3 item-tour-count text-center">
+                                                        <i class="fas fa-clipboard-list"></i>
+                                                        <br>
+                                                        {{ sequence.tour_count }} tours
+                                                    </p>
+                                                </a>
                                             </div>
 
                                             <div class="item-tag" style="min-height: 24px;">

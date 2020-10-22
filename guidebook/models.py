@@ -10,6 +10,7 @@ from django.urls import reverse
 
 from lib.mvtManager import CustomMVTManager
 from sys_setting.models import Tag
+from sequence.models import Sequence
 
 UserModel = get_user_model()
 
@@ -169,7 +170,6 @@ class CustomSceneMVTManager(CustomMVTManager):
         if page_name == 'guidebook_detail' and request.session['guidebooks_query'] is not None:
             additional_where = ' AND guidebook_id in ( SELECT t.id as id FROM (' + request.session['guidebooks_query'] + ') as t )'
 
-        additional_where = additional_where.replace('(%', "('%%").replace('%)', "%%')")
         return additional_where
 
 class Scene(models.Model):
@@ -210,6 +210,13 @@ class Scene(models.Model):
             return ', '.join(categories)
         else:
             return ''
+
+    def get_sequence(self):
+        sequences = Sequence.objects.filter(coordinates_image__contains=[self.image_key])
+        if sequences.count() == 0:
+            return None
+        else:
+            return sequences[0]
 
 
 class PointOfInterest(models.Model):

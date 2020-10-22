@@ -1,4 +1,5 @@
 from rest_framework_mvt.managers import MVTManager
+import re
 
 class CustomMVTManager(MVTManager):
 
@@ -89,6 +90,13 @@ class CustomMVTManager(MVTManager):
             https://docs.djangoproject.com/en/2.2/topics/db/sql/#performing-raw-queries
         """
         additional_where = self.get_additional_where(additional_filters=additional_filters, request=request)
+
+        additional_where = additional_where.replace('(%', "('%%").replace('%)', "%%')")
+        date_format = re.findall('\d\d\d\d-\d\d-\d\d 00:00:00[+]00:00', additional_where)
+        for d in date_format:
+            additional_where = additional_where.replace(d, "'{}'".format(d))
+        print(additional_where)
+        # additional_where = ''
         limit = "ALL" if limit == -1 else limit
         query, parameters = self._build_query(filters=filters, additional_where=additional_where)
         with self._get_connection().cursor() as cursor:
