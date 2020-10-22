@@ -60,9 +60,11 @@ class CustomMVTManager(MVTManager):
             LIMIT %s
             OFFSET %s) AS q;
         """
+        print('type query')
+        print(type(query))
         return (query.strip(), where_clause_parameters)
 
-    def intersect(self, bbox="", limit=-1, offset=0, filters={}, kwargs='' ):
+    def intersect(self, bbox="", limit=-1, offset=0, filters={}, additional_filters={}, request=None ):
         """
         Args:
             bbox (str): A string representing a bounding box, e.g., '-90,29,-89,35'.
@@ -88,14 +90,16 @@ class CustomMVTManager(MVTManager):
 
             https://docs.djangoproject.com/en/2.2/topics/db/sql/#performing-raw-queries
         """
-        additional_where = self.get_additional_where(kwargs)
+        additional_where = self.get_additional_where(additional_filters=additional_filters, request=request)
         limit = "ALL" if limit == -1 else limit
         query, parameters = self._build_query(filters=filters, additional_where=additional_where)
         with self._get_connection().cursor() as cursor:
+            print('parameters')
+            print(query)
             cursor.execute(query, [str(bbox), str(bbox)] + parameters + [limit, offset])
             mvt = cursor.fetchall()[-1][-1]  # should always return one tile on success
         return mvt
 
-    def get_additional_where(self, kwargs=None):
+    def get_additional_where(self, additional_filters={}, request=None):
         additional_where = ''
         return additional_where

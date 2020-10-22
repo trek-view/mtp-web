@@ -1939,10 +1939,14 @@
     }
     
     function showGpxOnPhoto(points, node){
+        if (view_mode != 'original')
+        {
+            tagComponent.removeAll()
+            return
+        }
         const base_ele = eleFromGpx(node.latLon.lat, node.latLon.lon);
         tagComponent.removeAll();
         let pointTags = [];
-        console.log(points.length)
         for (let i = 0; i < points.length; i++){
             const point = points[i];
             const xy = getXY(camera_node.latLon, point, 2 + Number(base_ele) - Number(point.ele), camera_node.ca);

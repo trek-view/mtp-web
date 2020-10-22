@@ -141,17 +141,31 @@ class CameraModel(models.Model):
 
 
 class CustomSequenceMVTManager(CustomMVTManager):
-    def get_additional_where(self, kwargs):
+    def get_additional_where(self, additional_filters={}, request=None):
         from tour.models import Tour
-        additional_where = ''
-        if 'tour_unique_id' in kwargs.keys():
-            tours = Tour.objects.filter(unique_id=kwargs['tour_unique_id'])[:1]
+        additional_where = ""
+        page_name = ''
+        if 'page_name' in additional_filters.keys() and additional_filters['page_name'] != '':
+            page_name = additional_filters['page_name']
+        else:
+            return ''
+
+        if page_name == 'tour_detail' and 'tour_unique_id' in additional_filters.keys():
+            tours = Tour.objects.filter(unique_id=additional_filters['tour_unique_id'])[:1]
             if tours.count() > 0:
                 tour_id = tours[0].pk
                 table_name = 'tour_toursequence'
                 additional_where += f"""
                 and id in (Select sequence_id From {table_name} Where tour_id = '{tour_id}')  
                 """
+
+        if page_name == 'tour_list' and request.session['tours_query'] is not None:
+            additional_where = ' AND id in ( SELECT "tour_toursequence"."sequence_id" FROM "tour_toursequence" WHERE "tour_toursequence"."tour_id" in ( SELECT t.id as id FROM (' + request.session['tours_query'] + ') as t )) '
+
+        if page_name == 'sequence_list' and request.session['sequences_query'] is not None:
+            additional_where = ' AND id in ( SELECT t.id as id FROM (' + request.session['sequences_query'] + ') as t )'
+
+        additional_where = additional_where.replace('(%', "('%%").replace('%)', "%%')")
         return additional_where
 
 
@@ -293,17 +307,33 @@ class Sequence(models.Model):
 
 
 class CustomImageMVTManager(CustomMVTManager):
-    def get_additional_where(self, kwargs):
+    def get_additional_where(self, additional_filters={}, request=None):
         from tour.models import Tour
-        additional_where = ''
-        if 'tour_unique_id' in kwargs.keys():
-            tours = Tour.objects.filter(unique_id=kwargs['tour_unique_id'])[:1]
+        additional_where = ""
+        page_name = ''
+        if 'page_name' in additional_filters.keys() and additional_filters['page_name'] != '':
+            page_name = additional_filters['page_name']
+        else:
+            return ''
+        if page_name == 'tour_detail' and 'tour_unique_id' in additional_filters.keys():
+            tours = Tour.objects.filter(unique_id=additional_filters['tour_unique_id'])[:1]
             if tours.count() > 0:
                 tour_id = tours[0].pk
                 table_name = 'tour_toursequence'
                 additional_where += f"""
                 and sequence_id in (Select sequence_id From {table_name} Where tour_id = '{tour_id}')  
                 """
+
+        elif page_name == 'tour_list' and request.session['tours_query'] is not None:
+            additional_where = ' AND sequence_id in ( SELECT "tour_toursequence"."sequence_id" FROM "tour_toursequence" WHERE "tour_toursequence"."tour_id" in ( SELECT t.id as id FROM (' + request.session['tours_query'] + ') as t )) '
+
+        elif page_name == 'sequence_list' and request.session['sequences_query'] is not None:
+            additional_where = ' AND sequence_id in ( SELECT t.id as id FROM (' + request.session['sequences_query'] + ') as t )'
+
+        elif page_name == 'photo_list' and request.session['images_query'] is not None:
+            additional_where = ' AND id in ( SELECT t.id as id FROM (' + request.session['images_query'] + ') as t )'
+
+        additional_where = additional_where.replace('(%', "('%%").replace('%)', "%%')")
         return additional_where
 
 

@@ -401,7 +401,7 @@
 
         map.addSource('mtp-sequences', {
             "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.tour.sequence_mvt' version='v1' tour_unique_id=tour.unique_id %}?tile={z}/{x}/{y}"],
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?&tile={z}/{x}/{y}&page_name=tour_detail&tour_unique_id={{ tour.unique_id }}"],
         });
 
         map.addLayer({
@@ -423,7 +423,7 @@
 
         map.addSource('mtp-images', {
             "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.tour.image_mvt' version='v1' tour_unique_id=tour.unique_id %}?tile={z}/{x}/{y}"],
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?&tile={z}/{x}/{y}&page_name=tour_detail&tour_unique_id={{ tour.unique_id }}"],
         });
 
         map.addLayer({

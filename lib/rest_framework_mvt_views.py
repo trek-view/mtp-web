@@ -28,6 +28,7 @@ class BaseMVTView(APIView):
         """
         params = request.GET.dict()
 
+
         if params.pop("tile", None) is not None:
             try:
                 limit, offset = self._validate_paginate(
@@ -37,8 +38,14 @@ class BaseMVTView(APIView):
                 limit, offset = None, None
             bbox = TMSTileFilter().get_filter_bbox(request)
             try:
+                fields = self.model._meta.fields
+                filters = {}
+                for field in fields:
+                    if field.name in params.keys():
+                        filters[field.name] = params[field.name]
+                        params.pop(field.name, None)
                 mvt = self.model.vector_tiles.intersect(
-                    bbox=bbox, limit=limit, offset=offset, filters=params, kwargs=kwargs
+                    bbox=bbox, limit=limit, offset=offset, filters=filters, additional_filters=params, request=request
                 )
                 status = 200 if mvt else 204
             except ValidationError:
@@ -47,7 +54,7 @@ class BaseMVTView(APIView):
         else:
             mvt = b""
             status = 400
-
+        print(status)
         return Response(
             bytes(mvt), content_type="application/vnd.mapbox-vector-tile", status=status
         )

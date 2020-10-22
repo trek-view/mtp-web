@@ -15,7 +15,7 @@ from django.http import (
 # Django Packages
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
-
+from django.db import connection
 # Project packages
 from accounts.models import CustomUser, MapillaryUser
 from challenge.models import Challenge, LabelChallenge
@@ -143,6 +143,8 @@ def sequence_list(request):
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
+    request.session['sequences_query'] = str(sequences.query)
+
     paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
     try:
@@ -235,6 +237,8 @@ def my_sequence_list(request):
     if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
+
+    request.session['sequences_query'] = str(sequences.query)
 
     paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
@@ -372,23 +376,45 @@ def image_leaderboard(request):
     if images is None:
         images = Image.objects.all()
 
-    images = images.exclude(sequence=None)
+    request.session['images_query'] = str(images.query)
 
     image_json = []
+    tmp_images = None
+
+    images = images.exclude(sequence=None)
+
     if filter_type == 'label_count':
-        image_json = ImageLabel.objects.filter(image__in=images).values('image').annotate(
-            image_count=Count('image')).order_by('-image_count').annotate(
+        # image_json = ImageLabel.objects.filter(image__in=images).values('image').annotate(
+        #     image_count=Count('image')).order_by('-image_count').annotate(
+        #     rank=Window(expression=RowNumber()))
+
+        tmp_images = images.filter(image_label__isnull=False)
+
+        image_json = tmp_images.values('id').annotate(
+            image_count=Count('id')).order_by('-image_count').annotate(
             rank=Window(expression=RowNumber()))
 
+
     elif filter_type == 'view_point':
-        image_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
+        # image_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
+        #     rank=Window(expression=RowNumber()))
+
+        images = images.filter(pk__in=image_view_points.values_list('image_id'))
+        tmp_images = images
+        image_json = images.values('id').annotate(
+            image_count=Count('id')).order_by('-image_count').annotate(
             rank=Window(expression=RowNumber()))
 
     else:
         images = images.order_by('-captured_at')
+        tmp_images = images
         image_json = images.values('id').annotate(
             image_count=Count('image_key')).annotate(
             rank=Window(expression=RowNumber()))
+
+
+
+    request.session['images_query'] = str(tmp_images.query)
 
     paginator = Paginator(image_json, 10)
 

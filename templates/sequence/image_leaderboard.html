@@ -396,36 +396,12 @@
         if (typeof userkey == 'undefined' || userkey === '')
             filter = ['all']
 
-        if (map.getLayer('mtp-sequences')) map.removeLayer('mtp-sequences');
         if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
         if (map.getSource('mtp-images')) map.removeSource('mtp-images');
-        if (map.getSource('mtp-sequences')) map.removeSource('mtp-sequences');
-
-        map.addSource('mtp-sequences', {
-            "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?tile={z}/{x}/{y}"],
-        });
-
-        map.addLayer({
-            "id": "mtp-sequences",
-            "type": "line",
-            "source": 'mtp-sequences',
-            "source-layer": 'mtp-sequences',
-            'filter': filter,
-            "layout": {
-                "line-cap": "round",
-                "line-join": "round"
-            },
-            "paint": {
-                "line-opacity": 0.6,
-                "line-color": "#7880bd",
-                "line-width": 2
-            }
-        }, "waterway-label");
 
         map.addSource('mtp-images', {
             "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}"],
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=photo_list"],
         });
 
         map.addLayer({

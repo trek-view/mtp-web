@@ -444,6 +444,17 @@
         });
     });
 
+    function getParamsFromURL() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        let param_str = '';
+        if (urlParams.has('username') && urlParams.get('username') != '')
+            param_str += '&username=' + urlParams.get('username');
+        if (urlParams.has('name') && urlParams.get('name') != '')
+            param_str += '&sequence_name=' + urlParams.get('name');
+        return param_str
+    }
+
     function drawMapByUserKey(userkey) {
         console.log('userkey', userkey);
         let filter = ['all',
@@ -456,7 +467,7 @@
         if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
         if (map.getSource('mtp-images')) map.removeSource('mtp-images');
         if (map.getSource('mtp-sequences')) map.removeSource('mtp-sequences');
-
+        let params = getParamsFromURL()
         map.addSource('mtp-sequences', {
             "type": "vector",
             "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?tile={z}/{x}/{y}"],

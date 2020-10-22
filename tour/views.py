@@ -269,6 +269,8 @@ def tour_list(request):
         tours = Tour.objects.all().filter(is_published=True)
         form = TourSearchForm()
 
+    request.session['tours_query'] = str(tours.query)
+
     paginator = Paginator(tours.order_by('-created_at'), 10)
 
     try:
@@ -338,6 +340,8 @@ def my_tour_list(request):
     if tours is None:
         tours = Tour.objects.all().filter(is_published=True)
         form = TourSearchForm()
+
+    request.session['tours_query'] = str(tours.query)
 
     paginator = Paginator(tours.order_by('-created_at'), 10)
 
