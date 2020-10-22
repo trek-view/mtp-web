@@ -52,3 +52,10 @@ function setParamInURL(key, val) {
     url = url + '?' + urlParams.toString();
     return url;
 }
+
+function paramFromURL(key) {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    console.log(urlParams.toString())
+    return urlParams.get(key);
+}

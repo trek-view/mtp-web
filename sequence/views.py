@@ -973,6 +973,9 @@ def sequence_detail(request, unique_id):
         if view_mode is None:
             view_mode = 'original'
 
+        show_gpx = request.GET.get('show_gpx')
+        if show_gpx is None:
+            show_gpx = 'false'
 
     geometry_coordinates_ary = sequence.geometry_coordinates_ary
     coordinates_image = sequence.coordinates_image
@@ -1032,6 +1035,7 @@ def sequence_detail(request, unique_id):
         'tour_count': tour_count,
         'sequence_weather': sequence_weather,
         'view_mode': view_mode,
+        'show_gpx': show_gpx,
         'firstImageKey': firstImageKey
     }
     return render(request, 'sequence/detail.html', content)

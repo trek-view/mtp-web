@@ -226,11 +226,11 @@ body {
     padding: 1px;
 }
 
-.switch-detection > div {
+.switch-detection > div, .switch-gpx > div {
     width: 100px !important;
 }
 
-.switch-detection-auto > div {
+.switch-detection-auto > div, .switch-gpx > div {
     width: 120px !important;
 }
 

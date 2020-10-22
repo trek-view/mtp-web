@@ -289,15 +289,18 @@
                     <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
                 {% endif %}
             </div>
+
+            <div class="switch-gpx {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
+                {% if show_gpx == 'true' %}
+                    <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary" checked>
+                {% else %}
+                    <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="Hide GPX Points" data-off="Show GPX Points" data-onstyle="success" data-offstyle="primary">
+                {% endif %}
+            </div>
         </div>
 
         <div class="image-detail {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
             <div class="" id="image_detail_box">
-            </div>
-            <div class="mt-3 text-center">
-
-                <input type="checkbox" id="is_show_gpx" checked>
-                <label for="is_show_gpx">Show GPX Points</label>
             </div>
             <div id="accordion" class="mt-2">
                 <div class="card">
@@ -1311,7 +1314,7 @@
         var href = location.protocol + '//' + location.host + location.pathname ;
         history.pushState({
             id: 'Image Detail'
-        }, "{{ pageTitle }}", href + '?image_key=' + image_key + '&view_mode=' + view_mode);
+        }, "{{ pageTitle }}", href + '?image_key=' + image_key + '&view_mode=' + view_mode + '&show_gpx=' + is_show_gpx);
     }
 
     $('#switch_detection').change(function () {
@@ -1320,6 +1323,7 @@
         if ($(this).prop('checked')) {
             $('.image-detection').removeClass('d-none');
             $('.image-detail').addClass('d-none');
+            $('.switch-gpx').addClass('d-none');
             view_mode = 'mtpw_label';
             image_url_reset(image_key)
             getImageLables();
@@ -1327,6 +1331,7 @@
         else {
             $('.image-detection').addClass('d-none');
             $('.image-detail').removeClass('d-none');
+            $('.switch-gpx').removeClass('d-none');
             view_mode = 'original';
             image_url_reset(image_key);
             if (is_show_gpx)
@@ -1992,8 +1997,6 @@
         const dlat = target.lat - base.lat;
         const dlon = target.lon - base.lon;
         
-    
-        
         const dy = R * Math.sin(dlat /180 * Math.PI);
         const dx = R * Math.cos(base.lat / 180 * Math.PI) * Math.sin(dlon / 180 * Math.PI);
         
@@ -2017,7 +2020,11 @@
         
     }
     initPhoto();
-    let is_show_gpx = true;
+    let is_show_gpx = false;
+    if (paramFromURL('show_gpx') && paramFromURL('show_gpx') == 'true') {
+        is_show_gpx = true;
+    }
+    console.log(is_show_gpx)
 
     function initPhoto(){
         mly.on(Mapillary.Viewer.nodechanged, function(node) {
@@ -2029,10 +2036,15 @@
 
     $('#is_show_gpx').change(function () {
         is_show_gpx = $(this).prop('checked');
+        let url = '';
         if (is_show_gpx)
             showGpxOnPhoto(gpx_points, camera_node);
         else
             tagComponent.removeAll();
+        url = setParamInURL('show_gpx', is_show_gpx);
+        history.pushState({
+            id: 'Sequence Detail'
+        }, "{{ pageTitle }}", url);
     });
 
     const R = 6378100;	
