@@ -60,8 +60,6 @@ class CustomMVTManager(MVTManager):
             LIMIT %s
             OFFSET %s) AS q;
         """
-        print('type query')
-        print(type(query))
         return (query.strip(), where_clause_parameters)
 
     def intersect(self, bbox="", limit=-1, offset=0, filters={}, additional_filters={}, request=None ):
@@ -94,8 +92,6 @@ class CustomMVTManager(MVTManager):
         limit = "ALL" if limit == -1 else limit
         query, parameters = self._build_query(filters=filters, additional_where=additional_where)
         with self._get_connection().cursor() as cursor:
-            print('parameters')
-            print(query)
             cursor.execute(query, [str(bbox), str(bbox)] + parameters + [limit, offset])
             mvt = cursor.fetchall()[-1][-1]  # should always return one tile on success
         return mvt

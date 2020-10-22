@@ -1005,7 +1005,6 @@ def sequence_detail(request, unique_id):
     sequence_weather = None
     if sequence_weathers.count() > 0:
         sequence_weather = sequence_weathers[0]
-    print(sequence_weather)
 
     if image_key is not None and image_key != '':
         firstImageKey = image_key

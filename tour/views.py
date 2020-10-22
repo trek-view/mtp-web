@@ -730,3 +730,25 @@ def ajax_get_detail(request, unique_id):
         data['tour_html_detail'] = render_to_string('tour/modal_detail.html', {'tour': tour, 'is_mine': is_mine})
 
     return JsonResponse(data)
+
+def ajax_get_detail_by_image_key(request, image_key):
+    print(image_key)
+    sequences = Sequence.objects.filter(coordinates_image__contains=[image_key])
+    print(sequences.count())
+    if sequences.count() == 0:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "Image key error."
+        })
+
+    tours = []
+    data = {}
+
+    tour_sequences = TourSequence.objects.filter(sequence=sequences[0])
+
+    for tour_sequence in tour_sequences:
+        tours.append(tour_sequence.tour)
+
+    data['tour_html_detail'] = render_to_string('tour/modal_detail.html', {'tours': tours})
+
+    return JsonResponse(data)

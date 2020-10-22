@@ -2,22 +2,30 @@
 <div class="modal-dialog" role="document">
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="tourDetailModalTitle">{{ tour.name }}</h5>
+            <h5 class="modal-title" id="guidebookDetailModalTitle">Tours</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
         <div class="modal-body">
-            <div>
-                <div class="tour-description">
-                    <p>
-                        {{ tour.description }}
-                    </p>
+            {% for tour in tours %}
+                <div class="card p-2 mt-2">
+                    <div class="guidebook-title">
+                        <h5>{{ tour.name }}</h5>
+                    </div>
+                    <div class="guidebook-description">
+                        <p>
+                            {{ tour.description }}
+                        </p>
+                    </div>
+                    <div class="link text-right">
+                        <a type="button" href="{% url 'tour.tour_detail' unique_id=tour.unique_id %}" id="show_tour" class="btn btn-sm btn-success text-light" >Go to Detail Page</a>
+                    </div>
                 </div>
-            </div>
+            {% endfor %}
         </div>
-        <div class="modal-footer d-flex flex-row justify-content-end">
-            <a type="button" href="{% url 'tour.tour_detail' unique_id=tour.unique_id %}" id="show_tour" class="btn btn-success text-light" >Go to Detail Page</a>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
     </div>
 </div>

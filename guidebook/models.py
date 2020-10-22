@@ -33,7 +33,6 @@ def getAllTags():
     itemsTuple = ()
     for item in items:
         itemsTuple = itemsTuple + ((item.pk, item.name),)
-    print(itemsTuple)
     return itemsTuple
 
 

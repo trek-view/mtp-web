@@ -346,53 +346,140 @@
     }
 
     map.on('load', function() {
-        map.loadImage(
-            'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
-            function(error, image) {
-                if (error) throw error;
-                map.addImage('custom-marker', image);
-                map.addSource('points', {
-                    'type': 'geojson',
-                    'data': {
-                        'type': 'FeatureCollection',
-                        'features': centerPointerData
-                    }
-                });
-                map.addLayer({
-                    'id': 'points',
-                    'type': 'symbol',
-                    'source': 'points',
-                    'layout': {
-                        'icon-image': 'custom-marker',
-                        // get the title name from the source's "title" property
-                        // 'text-field': ['get', 'title'],
-                        'text-font': [
-                            'Open Sans Semibold',
-                            'Arial Unicode MS Bold'
-                        ],
-                        'text-offset': [0, 1.25],
-                        'text-anchor': 'top'
-                    }
-                });
-            }
-        )
+        drawMapByUserKey('');
+        map.on('mouseenter', 'mtp-images', function(e) {
+          // Change the cursor style as a UI indicator.
+          map.getCanvas().style.cursor = 'pointer';
 
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const key = e.features[0].properties.image_key;
+            const url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
 
-        map.on('click', 'points', function (e) {
-            getTourDetail(e.features[0].properties.tour_id);
+            // Ensure that if the map is zoomed out such that multiple
+          // copies of the feature are visible, the popup appears
+          // over the copy being pointed to.
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
 
+          // Populate the popup and set its coordinates
+          // based on the feature found.
+          popup.setLngLat(coordinates)
+          .setHTML('<img src="' + url + '" width="160"  alt=""/>')
+          .addTo(map);
         });
 
-        // Change the cursor to a pointer when the mouse is over the states layer.
-        map.on('mouseenter', 'points', function () {
-            map.getCanvas().style.cursor = 'pointer';
+        map.on('click', 'mtp-images', function (e) {
+            getTourDetailListByImageKey(e.features[0].properties["image_key"]);
         });
 
         // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'points', function () {
+        map.on('mouseleave', 'mtp-images', function () {
             map.getCanvas().style.cursor = '';
+            popup.remove();
         });
     });
+
+    function drawMapByUserKey(userkey) {
+        console.log('userkey', userkey);
+        let filter = ['all',
+            ['==', 'userkey', userkey]
+        ];
+        if (typeof userkey == 'undefined' || userkey === '')
+            filter = ['all']
+
+        if (map.getLayer('mtp-sequences')) map.removeLayer('mtp-sequences');
+        if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
+        if (map.getSource('mtp-images')) map.removeSource('mtp-images');
+        if (map.getSource('mtp-sequences')) map.removeSource('mtp-sequences');
+
+        map.addSource('mtp-sequences', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?&tile={z}/{x}/{y}&page_name=tour_list"],
+        });
+
+        map.addLayer({
+            "id": "mtp-sequences",
+            "type": "line",
+            "source": 'mtp-sequences',
+            "source-layer": 'mtp-sequences',
+            'filter': filter,
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-opacity": 0.6,
+                "line-color": "#7880bd",
+                "line-width": 2
+            }
+        }, "waterway-label");
+
+        map.addSource('mtp-images', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?&tile={z}/{x}/{y}&page_name=tour_list"],
+        });
+
+        map.addLayer({
+            "id": "mtp-images",
+            "type": "circle",
+            "source": 'mtp-images',
+            "source-layer": 'mtp-images',
+            'filter': filter,
+            "paint": {
+                "circle-color": "#7880bd",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
+    }
+
+    function getSequenceDetailByUniqueID(id) {
+        let url = "{% url 'sequence.ajax_get_detail' unique_id='unique_id' %}";
+        url = url.replace('unique_id', id);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (!data.sequence) {
+                    toastr.error(data.message);
+                }
+                else {
+                    const $detailModal = $('#sequenceDetailModal');
+                    $detailModal.html(data['sequence_html_detail'])
+                    $detailModal.modal({
+                        'backdrop': false,
+                        'show': true,
+                    });
+                }
+            }
+        });
+    }
+
+    function getTourDetailListByImageKey(image_key) {
+        let url = "{% url 'tour.ajax_get_detail_by_image_key' image_key='init_image_key' %}";
+        url = url.replace('init_image_key', image_key);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (!data['tour_html_detail']) {
+                    toastr.error(data.message);
+                }
+                else {
+                    const $detailModal = $('#tourDetailModal');
+                    $detailModal.html(data['tour_html_detail'])
+                    $detailModal.modal({
+                        'backdrop': false,
+                        'show': true,
+                    });
+                }
+            }
+        });
+    }
 
     function getTourDetail(id) {
         var url = "{% url 'tour.ajax_get_detail' unique_id='unique_id' %}";

@@ -16,4 +16,6 @@ urlpatterns = [
     path('<str:unique_id>/ajax_tour_update', views.ajax_tour_update, name='tour.ajax_tour_update'),
     path('<str:unique_id>/ajax_get_detail/', views.ajax_get_detail, name='tour.ajax_get_detail'),
     # path('<str:unique_id>/ajax_sequence/', views.ajax_get_detail, name='tour.ajax_get_detail'),
+
+    path('ajax_get_detail_by_image_key/<str:image_key>', views.ajax_get_detail_by_image_key, name='tour.ajax_get_detail_by_image_key'),
 ]

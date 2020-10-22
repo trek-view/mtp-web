@@ -54,7 +54,6 @@ class BaseMVTView(APIView):
         else:
             mvt = b""
             status = 400
-        print(status)
         return Response(
             bytes(mvt), content_type="application/vnd.mapbox-vector-tile", status=status
         )
