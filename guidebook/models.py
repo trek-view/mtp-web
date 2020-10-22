@@ -157,6 +157,21 @@ class POICategory(models.Model):
     class Meta:
         verbose_name_plural = 'POI Categories'
 
+class CustomSceneMVTManager(CustomMVTManager):
+    def get_additional_where(self, additional_filters={}, request=None):
+        from tour.models import Tour
+        additional_where = ""
+        page_name = ''
+        if 'page_name' in additional_filters.keys() and additional_filters['page_name'] != '':
+            page_name = additional_filters['page_name']
+        else:
+            return ''
+
+        if page_name == 'guidebook_detail' and request.session['guidebooks_query'] is not None:
+            additional_where = ' AND guidebook_id in ( SELECT t.id as id FROM (' + request.session['guidebooks_query'] + ') as t )'
+
+        additional_where = additional_where.replace('(%', "('%%").replace('%)', "%%')")
+        return additional_where
 
 class Scene(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -174,7 +189,7 @@ class Scene(models.Model):
     username = models.CharField(max_length=100, default='', null=True, blank=True, verbose_name="Mapillary Username", )
 
     objects = models.Manager()
-    vector_tiles = CustomMVTManager(
+    vector_tiles = CustomSceneMVTManager(
         geo_col='point',
         select_columns=['image_key', 'unique_id'],
         is_show_id=False,

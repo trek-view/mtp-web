@@ -404,12 +404,12 @@
         if (typeof user_key == 'undefined' || user_key === '')
             filter = ['all']
 
-        if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
-        if (map.getSource('mtp-images')) map.removeSource('mtp-images');
+        if (map.getLayer('mtp-scenes')) map.removeLayer('mtp-scenes');
+        if (map.getSource('mtp-scenes')) map.removeSource('mtp-scenes');
 
         map.addSource('mtp-scenes', {
             "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.guidebook.scene_mvt' version='v1' %}?tile={z}/{x}/{y}"],
+            "tiles": ["{{ BASE_URL }}{% url 'api.guidebook.scene_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=guidebook_detail"],
         });
 
         map.addLayer({

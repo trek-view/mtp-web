@@ -89,6 +89,8 @@ def guidebook_list(request):
         guidebooks = Guidebook.objects.all().filter(is_published=True, is_approved=True)
         form = GuidebookSearchForm()
 
+    request.session['guidebooks_query'] = str(guidebooks.query)
+
     paginator = Paginator(guidebooks.order_by('-created_at'), 10)
 
     try:
@@ -178,6 +180,8 @@ def my_guidebook_list(request):
             user=request.user
         )
         form = GuidebookSearchForm()
+
+    request.session['guidebooks_query'] = str(guidebooks.query)
 
     paginator = Paginator(guidebooks.order_by('-created_at'), 10)
 
