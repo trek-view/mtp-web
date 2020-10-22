@@ -2019,6 +2019,13 @@
     
         
     }
+
+    function paramFromURL(key) {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        console.log(urlParams.toString())
+        return urlParams.get(key);
+    }
     initPhoto();
     let is_show_gpx = false;
     if (paramFromURL('show_gpx') && paramFromURL('show_gpx') == 'true') {
