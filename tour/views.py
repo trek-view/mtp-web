@@ -643,6 +643,8 @@ def ajax_tour_check_publish(request, unique_id):
             'message': "You can't change the status."
         })
 
+
+
     tour = Tour.objects.get(unique_id=unique_id)
     if not tour:
         return JsonResponse({
