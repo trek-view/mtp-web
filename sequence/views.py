@@ -76,15 +76,17 @@ def sequence_list(request):
                 sequences = sequences.filter(name__icontains=name)
             if camera_makes is not None and len(camera_makes) > 0:
                 sequences = sequences.filter(camera_make__in=camera_makes)
-            if transport_type and transport_type != 0 and transport_type != '':
-                children_trans_type = TransType.objects.filter(parent_id=transport_type)
-                if children_trans_type.count() > 0:
-                    types = [transport_type]
-                    for t in children_trans_type:
-                        types.append(t.pk)
-                    sequences = sequences.filter(transport_type_id__in=types)
-                else:
-                    sequences = sequences.filter(transport_type_id=transport_type)
+            if transport_type is not None and transport_type != 'all' and transport_type != '':
+                transport_type_obj = TransType.objects.filter(name=transport_type).first()
+                if transport_type_obj is not None:
+                    children_trans_type = TransType.objects.filter(parent=transport_type_obj)
+                    if children_trans_type.count() > 0:
+                        types = [transport_type_obj]
+                        for t in children_trans_type:
+                            types.append(t)
+                        sequences = sequences.filter(transport_type__in=types)
+                    else:
+                        sequences = sequences.filter(transport_type=transport_type_obj)
             if username and username != '':
                 users = CustomUser.objects.filter(username__icontains=username)
                 sequences = sequences.filter(user__in=users)
@@ -222,15 +224,17 @@ def my_sequence_list(request):
                 sequences = sequences.filter(name__icontains=name)
             if camera_makes is not None and len(camera_makes) > 0:
                 sequences = sequences.filter(camera_make__in=camera_makes)
-            if transport_type and transport_type != 0 and transport_type != '':
-                children_trans_type = TransType.objects.filter(parent_id=transport_type)
-                if children_trans_type.count() > 0:
-                    types = [transport_type]
-                    for t in children_trans_type:
-                        types.append(t.pk)
-                    sequences = sequences.filter(transport_type_id__in=types)
-                else:
-                    sequences = sequences.filter(transport_type_id=transport_type)
+            if transport_type is not None and transport_type != 'all' and transport_type != '':
+                transport_type_obj = TransType.objects.filter(name=transport_type).first()
+                if transport_type_obj is not None:
+                    children_trans_type = TransType.objects.filter(parent=transport_type_obj)
+                    if children_trans_type.count() > 0:
+                        types = [transport_type_obj]
+                        for t in children_trans_type:
+                            types.append(t)
+                        sequences = sequences.filter(transport_type__in=types)
+                    else:
+                        sequences = sequences.filter(transport_type=transport_type_obj)
             if len(tags) > 0:
                 for tag in tags:
                     sequences = sequences.filter(tag=tag)
@@ -325,17 +329,19 @@ def image_leaderboard(request):
             # if not camera_models is None and len(camera_models) > 0:
             #     images = images.filter(camera_model__in=camera_models)
 
-            if transport_type and transport_type != 0 and transport_type != '':
-                children_trans_type = TransType.objects.filter(parent_id=transport_type)
-                if children_trans_type.count() > 0:
-                    types = [transport_type]
-                    for t in children_trans_type:
-                        types.append(t.pk)
-                    sequences = Sequence.objects.filter(transport_type_id__in=types)
-                else:
-                    sequences = Sequence.objects.filter(transport_type_id=transport_type)
+            if transport_type is not None and transport_type != 'all' and transport_type != '':
+                transport_type_obj = TransType.objects.filter(name=transport_type).first()
+                if transport_type_obj is not None:
+                    children_trans_type = TransType.objects.filter(parent=transport_type_obj)
+                    if children_trans_type.count() > 0:
+                        types = [transport_type_obj]
+                        for t in children_trans_type:
+                            types.append(t)
+                        sequences = Sequence.objects.filter(transport_type__in=types)
+                    else:
+                        sequences = Sequence.objects.filter(transport_type=transport_type_obj)
 
-                images = images.filter(sequence__in=sequences)
+                    images = images.filter(sequence__in=sequences)
 
             m_type = request.GET.get('type')
             users = None

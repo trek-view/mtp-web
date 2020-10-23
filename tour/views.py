@@ -113,15 +113,17 @@ def tour_add_sequence(request, unique_id):
                 sequences = sequences.filter(name__icontains=name)
             if camera_make and camera_make != '':
                 sequences = sequences.filter(camera_make__contains=camera_make)
-            if transport_type and transport_type != 0 and transport_type != '':
-                children_trans_type = TransType.objects.filter(parent_id=transport_type)
-                if children_trans_type.count() > 0:
-                    types = [transport_type]
-                    for t in children_trans_type:
-                        types.append(t.pk)
-                    sequences = sequences.filter(transport_type_id__in=types)
-                else:
-                    sequences = sequences.filter(transport_type_id=transport_type)
+            if transport_type is not None and transport_type != 'all' and transport_type != '':
+                transport_type_obj = TransType.objects.filter(name=transport_type).first()
+                if transport_type_obj is not None:
+                    children_trans_type = TransType.objects.filter(parent=transport_type_obj)
+                    if children_trans_type.count() > 0:
+                        types = [transport_type_obj]
+                        for t in children_trans_type:
+                            types.append(t)
+                        sequences = sequences.filter(transport_type__in=types)
+                    else:
+                        sequences = sequences.filter(transport_type=transport_type_obj)
             if len(tags) > 0:
                 for tag in tags:
                     sequences = sequences.filter(tag=tag)

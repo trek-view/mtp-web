@@ -15,6 +15,14 @@ from django.db.models.functions.window import RowNumber
 ############################################################################
 
 
+def transport_types():
+    types = TransType.objects.all()
+    ts_types = [['all', 'All Types']]
+    for t in types:
+        ts_types.append([t.name, t.name])
+    ts_tuple = tuple(ts_types)
+    return ts_tuple
+
 class TransportSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
@@ -120,18 +128,19 @@ class SequenceSearchForm(forms.Form):
             label='Camera Make (leave blank for all)',
         )
 
-        self.fields['transport_type'] = forms.ModelChoiceField(
+        self.fields['transport_type'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
-            queryset=TransType.objects.all(),
-            empty_label='All Types'
+            choices=transport_types,
         )
+
         self.fields['tag'] = CustomTagsInputField(
             Tag.objects.filter(is_actived=True),
             create_missing=False,
             required=False,
         )
+
         self.fields['tag'].help_text = 'Search for a tag'
 
         self.fields['start_time'] = forms.DateField(
@@ -221,12 +230,11 @@ class ImageSearchForm(forms.Form):
             required=False
         )
 
-        self.fields['transport_type'] = forms.ModelChoiceField(
+        self.fields['transport_type'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
-            queryset=TransType.objects.all(),
-            empty_label='All Types'
+            choices=transport_types,
         )
 
         self.fields['map_feature'] = forms.ChoiceField(
@@ -253,12 +261,11 @@ class SequenceSearchForTourForm(forms.Form):
             required=False
         )
 
-        self.fields['transport_type'] = forms.ModelChoiceField(
+        self.fields['transport_type'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
-            queryset=TransType.objects.filter(),
-            empty_label='All Types'
+            choices=transport_types,
         )
 
         self.fields['tag'] = CustomTagsInputField(
