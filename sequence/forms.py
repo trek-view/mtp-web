@@ -58,7 +58,7 @@ class TransportSearchForm(forms.Form):
         )
 
 
-class AddSequeceForm(forms.ModelForm):
+class AddSequenceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -160,6 +160,11 @@ class SequenceSearchForm(forms.Form):
             required=False
         )
 
+        self.fields['pano'] = forms.BooleanField(
+            label='Pano',
+            required=False
+        )
+
         self.fields['like'] = forms.ChoiceField(
             label='Like',
             widget=forms.RadioSelect(),
@@ -227,8 +232,6 @@ class ImageSearchForm(forms.Form):
                 attrs={'class': 'form-control'}),
             choices=get_map_feature_values(),
         )
-
-
 
 
 class SequenceSearchForTourForm(forms.Form):

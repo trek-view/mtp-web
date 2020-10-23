@@ -67,6 +67,7 @@ def sequence_list(request):
             like = form.cleaned_data['like']
             start_time = form.cleaned_data['start_time']
             end_time = form.cleaned_data['end_time']
+            pano = form.cleaned_data['pano']
 
             sequences = Sequence.objects.all().filter(
                 is_published=True
@@ -146,6 +147,9 @@ def sequence_list(request):
 
             if end_time is not None and end_time != '':
                 sequences = sequences.filter(captured_at__lte=end_time)
+
+            if pano:
+                sequences = sequences.filter(pano=True)
 
     if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
@@ -1016,7 +1020,7 @@ def sequence_detail(request, unique_id):
         i_vs = ImageViewPoint.objects.filter(image=imgs[0])
         view_points = i_vs.count()
 
-    addSequenceForm = AddSequeceForm(instance=sequence)
+    addSequenceForm = AddSequenceForm(instance=sequence)
 
     label_types = LabelType.objects.filter(parent__isnull=False)
     tours = TourSequence.objects.filter(sequence=sequence)
@@ -1101,7 +1105,7 @@ def ajax_save_sequence(request, unique_id):
             'message': 'The Sequence does not exist or has no access.'
         })
     if request.method == "POST":
-        form = AddSequeceForm(request.POST)
+        form = AddSequenceForm(request.POST)
 
         if form.is_valid():
             sequence = Sequence.objects.get(unique_id=unique_id)
@@ -1288,7 +1292,7 @@ def import_sequence_list(request):
                     sequences[i]['first_image_key'] = ''
 
 
-    addSequenceForm = AddSequeceForm()
+    addSequenceForm = AddSequenceForm()
 
     all_transport_types = []
     transport_types = TransType.objects.all()
@@ -1313,7 +1317,7 @@ def import_sequence_list(request):
 def ajax_import(request, seq_key):
     if request.method == 'POST':
 
-        # form = AddSequeceForm(request.POST)
+        # form = AddSequenceForm(request.POST)
         # if form.is_valid():
         # for unique_id in sequence_json.keys():
         #     sequence = Sequence.objects.get(unique_id=unique_id)
@@ -1321,7 +1325,7 @@ def ajax_import(request, seq_key):
         #         continue
         #     if sequence_json[unique_id]['name'] == '' or sequence_json[unique_id]['description'] == '' or sequence_json[unique_id]['transport_type'] == 0 or len(sequence_json[unique_id]['tags']) == 0:
         #         continue
-        form = AddSequeceForm(request.POST)
+        form = AddSequenceForm(request.POST)
         if form.is_valid():
 
             # for i in range(len(request.session['sequences'])):
@@ -1878,7 +1882,7 @@ def ajax_get_image_list(request, unique_id):
             pImages[i]['view_points'] = view_points.count()
             pImages[i]['guidebooks'] = scenes.count()
 
-    addSequenceForm = AddSequeceForm(instance=sequence)
+    addSequenceForm = AddSequenceForm(instance=sequence)
 
     content = {
         'sequence': sequence,

@@ -302,6 +302,7 @@ class Sequence(models.Model):
         lng = self.geometry_coordinates_ary[0][0]
         return lng
 
+
 class CustomImageMVTManager(CustomMVTManager):
     def get_additional_where(self, additional_filters={}, request=None):
         from tour.models import Tour
