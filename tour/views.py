@@ -157,7 +157,7 @@ def tour_add_sequence(request, unique_id):
         for t_s in tour_sequences:
             t_sequence_ary.append(t_s.sequence.unique_id)
     for sequence in sequences:
-        if not sequence.unique_id in t_sequence_ary:
+        if sequence.unique_id not in t_sequence_ary:
             sequence_ary.append(sequence)
 
     t_form = TourForm(instance=tour)
@@ -192,6 +192,14 @@ def tour_add_sequence(request, unique_id):
                 last_num = pSequences.number + 3
         pSequences.paginator.pages = range(first_num, last_num + 1)
         pSequences.count = len(pSequences)
+
+        for i in range(len(pSequences)):
+            tour_sequences = TourSequence.objects.filter(sequence_id=pSequences[i].pk)
+            if tour_sequences is None or not tour_sequences:
+                pSequences[i].tour_count = 0
+            else:
+                pSequences[i].tour_count = tour_sequences.count()
+
         content = {
             'sequences': pSequences,
             'sequence_count': len(pSequences),
@@ -211,6 +219,11 @@ def tour_add_sequence(request, unique_id):
         for t_s in t_sequence_ary:
             seq = Sequence.objects.filter(unique_id=t_s).first()
             if seq is not None and seq:
+                tour_sequences = TourSequence.objects.filter(sequence=seq)
+                if tour_sequences is None or not tour_sequences:
+                    seq.tour_count = 0
+                else:
+                    seq.tour_count = tour_sequences.count()
                 sequences.append(seq)
         content = {
             'sequences': sequences,

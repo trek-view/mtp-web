@@ -97,85 +97,90 @@
             <div class="item-list">
                 {% if tours.count > 0 %}
                     {% for tour in tours %}
-                        <div class="card row tour p-3 m-3 d-flex flex-row align-items-center" id="tour_{{ tour.unique_id }}" data-tour-id="{{ tour.unique_id }}">
-                            <div class="col-md-5 col-lg-4 align-items-center">
-                                <div class="row align-items-center">
-                                    <div class="col-sm-6 pl-0 pr-2">
-                                        <div class="min-map-box" id="map-{{ tour.unique_id }}">
+                        <div class="card tour pl-3 pr-3 pt-2 pb-2 m-3" id="tour_{{ tour.unique_id }}" data-tour-id="{{ tour.unique_id }}">
+                            <div class="row align-items-center">
+                                <div class="col-md-5 col-lg-4">
+                                    <div class="row align-items-center pl-1 pr-1">
+                                        <div class="col-md-6 pl-1 pr-1">
+                                            <div class="min-map-box" id="map-{{ tour.unique_id }}">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-6 cover-image-box">
-                                        <div class="row">
-                                            {% if tour.get_cover_image is None %}
-                                                <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
-                                            {% else %}
-                                                <img class="w-100" src="https://images.mapillary.com/{{ tour.get_cover_image }}/thumb-320.jpg">
-                                            {% endif %}
-                                            <div class="user-on-mapillary" >
-                                                image by {{ tour.get_cover_imageUserOnMapillary }} on mapillary
+                                        <div class=" col-md-6 pl-1 pr-1">
+                                            <div class="cover-image-box">
+                                                <div>
+                                                    {% if tour.get_cover_image is None %}
+                                                        <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
+                                                    {% else %}
+                                                        <img class="w-100" src="https://images.mapillary.com/{{ tour.get_cover_image }}/thumb-320.jpg">
+                                                    {% endif %}
+                                                </div>
+
+                                                <div class="user-on-mapillary" >
+                                                    image by {{ tour.get_cover_imageUserOnMapillary }} on mapillary
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="col-md-7 col-lg-8">
-                                 <div class="detail-box pl-3 pr-3 w-auto">
-                                     <div class="row w-100">
-                                         <div class="col-md-9 item-detail-box p-2">
-                                             <div class="item-main w-100 float-left">
-                                                 <div class="item-title text-info d-flex flex-row justify-content-between">
-                                                     <a href="{% url 'tour.tour_detail' unique_id=tour.unique_id %}">
-                                                         <h6>{{ tour.name }}</h6>
-                                                     </a>
+                                <div class="col-md-7 col-lg-8">
+                                     <div class="detail-box w-auto">
+                                         <div class="w-100">
+                                             <div class="col-md-9 item-detail-box p-2">
+                                                 <div class="item-main w-100 float-left">
+                                                     <div class="item-title text-info d-flex flex-row justify-content-between">
+                                                         <a href="{% url 'tour.tour_detail' unique_id=tour.unique_id %}">
+                                                             <h6>{{ tour.name }}</h6>
+                                                         </a>
+                                                     </div>
+
+                                                     <div class="item-description">
+                                                         <p class="mb-1">
+                                                            {{ tour.get_short_description }}
+                                                         </p>
+                                                     </div>
+
+                                                     <div class="w-100 d-flex flex-row">
+                                                         <p class="mb-1 mr-3 text-center">
+                                                             <i class="fas fa-images"></i>
+                                                             <br>
+                                                             {{ tour.getSequenceCount }} Sequences
+                                                         </p>
+                                                         <p class="mb-1 mr-3 text-center">
+                                                             <i class="fas fa-ruler-horizontal"></i>
+                                                             <br>
+                                                             {{ tour.get_distance }} Km
+                                                         </p>
+                                                         <p class="mb-1 mr-3 text-center">
+                                                             <i class="fas fa-image"></i>
+                                                             <br>
+                                                             {{ tour.get_image_count }} Photos
+                                                         </p>
+                                                     </div>
+
+                                                     <div class="item-tag" style="min-height: 24px;">
+                                                         {% for tag_name in tour.get_tags %}
+                                                             <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1" >
+                                                                 {{ tag_name }}
+                                                             </span>
+                                                         {% endfor %}
+
+                                                     </div>
+
+                                                     <div class="item-user">
+                                                         <a href="{% url 'account.profile' username=tour.user.username %}">
+                                                             <span class="user">{{ tour.user.username }}</span>
+                                                         </a>
+                                                     </div>
+
                                                  </div>
-
-                                                 <div class="item-description">
-                                                     <p class="mb-1">
-                                                        {{ tour.get_short_description }}
-                                                     </p>
-                                                 </div>
-
-                                                 <div class="w-100 d-flex flex-row">
-                                                     <p class="mb-1 mr-3 text-center">
-                                                         <i class="fas fa-images"></i>
-                                                         <br>
-                                                         {{ tour.getSequenceCount }} Sequences
-                                                     </p>
-                                                     <p class="mb-1 mr-3 text-center">
-                                                         <i class="fas fa-ruler-horizontal"></i>
-                                                         <br>
-                                                         {{ tour.get_distance }} Km
-                                                     </p>
-                                                     <p class="mb-1 mr-3 text-center">
-                                                         <i class="fas fa-image"></i>
-                                                         <br>
-                                                         {{ tour.get_image_count }} Photos
-                                                     </p>
-                                                 </div>
-
-                                                 <div class="item-tag" style="min-height: 24px;">
-                                                     {% for tag_name in tour.get_tags %}
-                                                         <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1" >
-                                                             {{ tag_name }}
-                                                         </span>
-                                                     {% endfor %}
-
-                                                 </div>
-
-                                                 <div class="item-user">
-                                                     <a href="{% url 'account.profile' username=tour.user.username %}">
-                                                         <span class="user">{{ tour.user.username }}</span>
-                                                     </a>
-                                                 </div>
-
+                                             </div>
+                                             <div class="col-md-3 p-2 text-right d-flex flex-column justify-content-center align-items-center" style="font-size: 13px;">
+                                                 <p class="mt-3">{{ tour.get_first_sequence_captured }}</p>
+                                                 <p>{{ tour.get_first_sequence_created }}</p>
                                              </div>
                                          </div>
-                                         <div class="col-md-3 p-2 text-right d-flex flex-column justify-content-center align-items-center" style="font-size: 13px;">
-                                             <p class="mt-3">{{ tour.get_first_sequence_captured }}</p>
-                                             <p>{{ tour.get_first_sequence_created }}</p>
-                                         </div>
-                                     </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
