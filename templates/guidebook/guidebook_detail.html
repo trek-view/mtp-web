@@ -155,7 +155,7 @@
                                     </div>
                                 </div>
                                 {% if scene.get_sequence is not None %}
-                                    <div class="">
+                                    <div class="scene-sequence-link">
                                         <small>Sequence: </small><a href="{% url 'sequence.sequence_detail' unique_id=scene.get_sequence.unique_id %}?image_key={{ scene.image_key }}">{{ scene.get_sequence.name }}</a>
                                     </div>
                                 {% endif %}
@@ -186,6 +186,9 @@
         <div class="poi-header mt-3 mb-2 pl-3 pr-3">
             <h5 class="scene-title"></h5>
             <span class="scene-description"></span>
+            <div class="scene-sequence-link">
+                <small>Sequence: </small><a href=""></a>
+            </div>
         </div>
         <div class="poi-list">
             <div class="accordion" id="poi_list">
@@ -410,25 +413,37 @@
     }
 
     $('.scene-box').click(function () {
-        var image_key = $(this).data('image_key');
-        var index = key_list.indexOf(image_key);
-        var href = location.protocol + '//' + location.host + location.pathname ;
-        var title = $(this).find('.scene-title').find('h6').text();
-        var description = $(this).find('.scene-description').find('span').text();
+        showSceneDetail($(this))
+    });
+
+    function showSceneDetail($obj) {
+        let image_key = $obj.data('image_key');
+
+        let index = key_list.indexOf(image_key);
+        let href = location.protocol + '//' + location.host + location.pathname ;
+        let title = $obj.find('.scene-title').find('h6').text();
+        let description = $obj.find('.scene-description').find('span').text();
+        let $sequence_link = $obj.find('.scene-sequence-link');
+        let sequence_link_html = $sequence_link.html();
+        if ($sequence_link.length == 0)
+            sequence_link_html = ''
+        else
+            sequence_link_html = $sequence_link.html()
         history.pushState({
             id: 'Guidebook Detail'
         }, "{{ pageTitle }}", href + '?image_key=' + image_key);
-        var $this = $(this);
         mapillaryViewer.moveToKey(image_key).then(function () {
-            $('.left-side.poi-box').removeClass('d-none');
+            if (is_opened_side_bar)
+                $('.left-side.poi-box').removeClass('d-none');
             $('.poi-header .scene-title').text(title);
             $('.poi-header .scene-description').text(description);
-            var start_x = $this.find('.start_x').text();
-            var start_y = $this.find('.start_y').text();
+            $('.poi-header .scene-sequence-link').html(sequence_link_html);
+            let start_x = $obj.find('.start_x').text();
+            let start_y = $obj.find('.start_y').text();
             mapillaryViewer.setCenter([start_x, start_y]);
             add_poi_icon();
         });
-    });
+    }
 
     mapboxgl.accessToken = mapboxToken;
     if (scene_positions.length > 0)
@@ -656,24 +671,8 @@
             return false;
         if (key_list.length < 2 || current_order_number == 0)
             return false;
-        var index = current_order_number - 1;
-        var image_key = key_list[index];
-        var href = location.protocol + '//' + location.host + location.pathname ;
-        history.pushState({
-            id: 'Guidebook Detail'
-        }, "{{ pageTitle }}", href + '?image_key=' + image_key);
-        var title = $('.scene-box').eq(index).find('.scene-title').find('h6').text();
-        var description = $('.scene-box').eq(index).find('.scene-description').find('span').text();
-        mapillaryViewer.moveToKey(image_key).then(function () {
-            if (is_opened_side_bar)
-                $('.left-side.poi-box').removeClass('d-none');
-            $('.poi-header .scene-title').text(title);
-            $('.poi-header .scene-description').text(description);
-            var start_x = $('.scene-box').eq(index).find('.start_x').text();
-            var start_y = $('.scene-box').eq(index).find('.start_y').text();
-            mapillaryViewer.setCenter([start_x, start_y]);
-            add_poi_icon();
-        });
+        let index = current_order_number - 1;
+        showSceneDetail($('.scene-box').eq(index));
     });
 
     $('.PrevOrNext .SequenceStepNext').click(function () {
@@ -681,25 +680,8 @@
             return false;
         if (key_list.length < 2 || current_order_number == key_list.length - 1)
             return false;
-        var index = current_order_number + 1;
-        var href = location.protocol + '//' + location.host + location.pathname ;
-
-        var image_key = key_list[index];
-        history.pushState({
-            id: 'Guidebook Detail'
-        }, "{{ pageTitle }}", href + '?image_key=' + image_key);
-        var title = $('.scene-box').eq(index).find('.scene-title').find('h6').text();
-        var description = $('.scene-box').eq(index).find('.scene-description').find('span').text();
-        mapillaryViewer.moveToKey(image_key).then(function () {
-            if (is_opened_side_bar)
-                $('.left-side.poi-box').removeClass('d-none');
-            $('.poi-header .scene-title').text(title);
-            $('.poi-header .scene-description').text(description);
-            var start_x = $('.scene-box').eq(index).find('.start_x').text();
-            var start_y = $('.scene-box').eq(index).find('.start_y').text();
-            mapillaryViewer.setCenter([start_x, start_y]);
-            add_poi_icon();
-        });
+        let index = current_order_number + 1;
+        showSceneDetail($('.scene-box').eq(index));
     });
 
     var is_mapillary_viewer = true;
