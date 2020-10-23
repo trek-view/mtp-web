@@ -345,7 +345,7 @@
         // When a click event occurs on a feature in the states layer, open a popup at the
         // location of the click, with description HTML from its properties.
         map.on('click', 'states-layer', function (e) {
-            getPhotographerDetail(e.features[0].properties.photographer_id);
+            go_to_detail_page(e.features[0].properties.photographer_id);
 
         });
 
@@ -374,7 +374,13 @@
             map.getCanvas().style.cursor = '';
         });
     });
-    
+
+    function go_to_detail_page(unique_id) {
+        let url = "{% url 'photographer.photographer_detail' unique_id='unique_id' %}";
+        url = url.replace('unique_id', unique_id);
+        location.assign(url);
+    }
+
     function getPhotographerDetail(id) {
         $.ajax({
             url: '/hire/ajax/get_photographer_detail/' + id,
@@ -466,8 +472,6 @@
         }, "{{ pageTitle }}", url);
         map.resize();
     })
-
-
 
     function draw_map(ii, geometryDataJson) {
         var polygon_data = [];
