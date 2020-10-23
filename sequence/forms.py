@@ -240,7 +240,7 @@ class ImageSearchForm(forms.Form):
         self.fields['map_feature'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'form-control'}),
+                attrs={'class': 'form-control d-none'}),
             choices=get_map_feature_values(),
         )
 

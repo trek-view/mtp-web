@@ -443,6 +443,7 @@ def image_leaderboard(request):
     tmp_image_query = str(tmp_images.query)
     tmp_image_query = tmp_image_query.replace(map_feature_empty_str, map_feature_str)
     request.session['images_query'] = tmp_image_query
+
     paginator = Paginator(image_json, 10)
 
     page = 1
