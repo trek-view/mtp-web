@@ -288,7 +288,6 @@
 
 {% block scripts %}
     <script src="{% static 'js/chart.min.js' %}"></script>
-    {% if pageName == 'my-sequence-list' %}active{% endif %}
 <script>
     $('.paginator-btn').click(function() {
         let pageNum = $(this).data('page');

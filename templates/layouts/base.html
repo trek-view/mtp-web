@@ -179,6 +179,21 @@
 
 
         $(function() {
+            // Add validator
+            $.formUtils.addValidator({
+                name : 'end_time',
+                validatorFunction : function(value, $el, config, language, $form) {
+                    if ($('#id_start_time').length == 0)
+                        return true;
+                    let start_time = $('#id_start_time').val();
+
+                    return value > start_time;
+                },
+                errorMessage : "End time can't time before start time",
+                errorMessageKey: 'badEvenNumber',
+                errorMessagePosition: 'top'
+            });
+
             $.validate();
         });
 

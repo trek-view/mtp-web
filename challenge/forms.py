@@ -54,6 +54,9 @@ class ChallengeForm(forms.ModelForm):
                 "showClear": False,
                 "showTodayButton": False,
             },
+            attrs={
+                'data-validation': 'end_time'
+            }
         ),
         required=False
     )
@@ -152,6 +155,9 @@ class LabelChallengeForm(forms.ModelForm):
                 "showClear": False,
                 "showTodayButton": False,
             },
+            attrs={
+                'data-validation': 'end_time'
+            }
         ),
         required=False
     )

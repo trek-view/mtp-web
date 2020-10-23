@@ -156,6 +156,9 @@ class SequenceSearchForm(forms.Form):
                     "showClear": False,
                     "showTodayButton": False,
                 },
+                attrs={
+                    'data-validation': 'end_time'
+                }
             ),
             required=False
         )
@@ -287,6 +290,9 @@ class SequenceSearchForTourForm(forms.Form):
                     "showClear": False,
                     "showTodayButton": False,
                 },
+                attrs={
+                    'data-validation': 'end_time'
+                }
             ),
             required=False
         )
