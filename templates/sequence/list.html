@@ -497,6 +497,8 @@
         map.addSource('mtp-images', {
             "type": "vector",
             "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_list"],
+            "minzoom": 6,
+            "maxzoom": 14
         });
 
         map.addLayer({
