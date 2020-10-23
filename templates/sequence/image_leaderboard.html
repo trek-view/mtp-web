@@ -90,76 +90,78 @@
             <div class="item-list">
                 {% if items.count > 0 %}
                     {% for item in items %}
-                        <div class="card row sequence p-3 m-3 d-flex flex-row align-items-center" id="image_{{ item.image.unique_id }}" data-image-id="{{ item.image.unique_id }}" >
-                            <div class=" col-lg-5">
-                                <div class="row align-items-center">
-                                    <div class="col-sm-6 pl-2 pr-2">
-                                        <div class="min-map-box" id="map-{{ item.image.unique_id }}">
+                        <div class="card sequence pl-3 pr-3 pt-2 pb-2 m-3 d-flex" id="image_{{ item.image.unique_id }}" data-image-id="{{ item.image.unique_id }}" >
+                            <div class="row align-items-center">
+                                <div class=" col-lg-5">
+                                    <div class="row align-items-center pl-1 pr-1">
+                                        <div class="col-sm-6 pl-1 pr-1">
+                                            <div class="min-map-box" id="map-{{ item.image.unique_id }}">
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-sm-6">
-                                        <div class="cover-image-box">
-                                            <div class="row">
-                                                {% if item.image.image_key is None %}
-                                                    <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
-                                                {% else %}
-                                                    <img class="w-100" src="https://images.mapillary.com/{{ item.image.image_key }}/thumb-320.jpg">
-                                                {% endif %}
+                                        <div class="col-sm-6 pl-1 pr-1">
+                                            <div class="cover-image-box">
+                                                <div class="">
+                                                    {% if item.image.image_key is None %}
+                                                        <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
+                                                    {% else %}
+                                                        <img class="w-100" src="https://images.mapillary.com/{{ item.image.image_key }}/thumb-320.jpg">
+                                                    {% endif %}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="detail-box col-lg-7">
-                                <div class="w-100">
-                                    <div class="item-detail-box p-2">
-                                        <div class="item-main w-100 float-left">
-                                            <div class="item-title text-info d-flex flex-row justify-content-between">
-                                                <a href="{% if item.image.sequence_unique_id != '' %}{% url 'sequence.sequence_detail' unique_id=item.image.sequence_unique_id %}?image_key={{ item.image.image_key }}{% endif %}">
-                                                    <h6>{{ item.image.image_key }}</h6>
-                                                </a>
+                                <div class="detail-box col-lg-7">
+                                    <div class="row">
+                                        <div class="item-detail-box p-2">
+                                            <div class="item-main w-100 float-left">
+                                                <div class="item-title text-info d-flex flex-row justify-content-between">
+                                                    <a href="{% if item.image.sequence_unique_id != '' %}{% url 'sequence.sequence_detail' unique_id=item.image.sequence_unique_id %}?image_key={{ item.image.image_key }}{% endif %}">
+                                                        <h6>{{ item.image.image_key }}</h6>
+                                                    </a>
+                                                </div>
+
+                                                <div class="w-100 d-flex flex-row align-items-end justify-content-between">
+                                                    <p class="mb-1 mr-2 item-transport-type text-center">
+                                                        <i class="transport-type-icon fas fa-{{ item.image.transport_parent_icon }}"></i>
+                                                        <br>
+                                                        {{ item.image.transport_parent }}
+                                                    </p>
+                                                    <p class="mb-1 mr-2 item-transport-type text-center">
+                                                        <i class="transport-type-icon fas fa-{{ item.image.transport_icon }}"></i>
+                                                        <br>
+                                                        {{ item.image.transport }}
+                                                    </p>
+                                                    <p class="mb-1 mr-2 item-image-count">
+                                                        {{ item.image.camera_make }}
+                                                    </p>
+                                                    <p class="mb-1 item-distance">
+                                                        {{ item.image.camera_model }}
+                                                    </p>
+                                                </div>
+
+
+                                                <div class="item-user">
+                                                    <a href="{% url 'account.profile' username=item.image.user %}">
+                                                        <span class="user">{{ item.image.user }}</span>
+                                                    </a>
+                                                </div>
+
+                                                <div>
+                                                    <span>View Point Count ({{ item.image.image_view_point_count }})</span>
+                                                </div>
+
+                                                <div>
+                                                    <span>Label Count ({{ item.image.image_label_count }})</span>
+                                                </div>
+
+                                                <div>
+                                                    <span>Captured at: {{ item.image.captured_at }}</span>
+                                                </div>
+
                                             </div>
-
-                                            <div class="w-100 d-flex flex-row align-items-end">
-                                                <p class="mb-1 mr-3 item-transport-type text-center">
-                                                    <i class="transport-type-icon fas fa-{{ item.image.transport_parent_icon }}"></i>
-                                                    <br>
-                                                    {{ item.image.transport_parent }}
-                                                </p>
-                                                <p class="mb-1 mr-3 item-transport-type text-center">
-                                                    <i class="transport-type-icon fas fa-{{ item.image.transport_icon }}"></i>
-                                                    <br>
-                                                    {{ item.image.transport }}
-                                                </p>
-                                                <p class="mb-1 mr-3 item-image-count">
-                                                    {{ item.image.camera_make }}
-                                                </p>
-                                                <p class="mb-1 mr-3 item-distance">
-                                                    {{ item.image.camera_model }}
-                                                </p>
-                                            </div>
-
-
-                                            <div class="item-user">
-                                                <a href="{% url 'account.profile' username=item.image.user %}">
-                                                    <span class="user">{{ item.image.user }}</span>
-                                                </a>
-                                            </div>
-
-                                            <div>
-                                                <span>View Point Count ({{ item.image.image_view_point_count }})</span>
-                                            </div>
-
-                                            <div>
-                                                <span>Label Count ({{ item.image.image_label_count }})</span>
-                                            </div>
-
-                                            <div>
-                                                <span>Captured at: {{ item.image.captured_at }}</span>
-                                            </div>
-
                                         </div>
                                     </div>
                                 </div>

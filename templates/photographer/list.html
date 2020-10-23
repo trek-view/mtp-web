@@ -129,18 +129,9 @@
                                             </p>
                                         </div>
 
-                                        <div class="item-description">
-                                            <p class="mb-1">
-                                                {{ photographer.created_at }}
-                                            </p>
-                                        </div>
-
                                         <div class="photographer-geometry d-none">{{ photographer.geometry }}</div>
 
                                         <div class="item-created-at text-secondary d-flex flex-row justify-content-between">
-                                            <span class="">
-                                                {{ photographer.created_at }}
-                                            </span>
 
                                             <a href="{% url 'account.profile' username=photographer.user.username %}">
                                                 <span class="" style="color: brown;">

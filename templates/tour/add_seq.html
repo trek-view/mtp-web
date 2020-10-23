@@ -36,9 +36,6 @@
                     </div>
 
                     <div class="tag-created-at text-secondary mt-2 d-flex justify-content-between">
-                        <span class="">
-                            {{ tour.created_at }}
-                        </span>
                         <a href="{% url 'account.profile' username=tour.user.username %}">
                             <span class="" style="color: brown;">
                                 {{ tour.user }}
@@ -193,17 +190,17 @@
                 {% if sequence_count > 0 %}
                     {% for sequence in sequences %}
                         <div class="{% if action == 'list' %}list_item{% endif %}">
-                            <div class="card row sequence p-3 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}" onclick="getSequenceDetailByUniqueID('{{ sequence.unique_id }}')">
+                            <div class="card row sequence p-1 m-3 d-flex flex-row align-items-center" id="sequence_{{ sequence.unique_id }}" data-sequence-id="{{ sequence.unique_id }}" onclick="getSequenceDetailByUniqueID('{{ sequence.unique_id }}')">
                                 <div class=" col-lg-4">
-                                    <div class="row align-items-center">
-                                        <div class="col-sm-6 pl-2 pr-2">
+                                    <div class="row align-items-center pr-1 pl-1">
+                                        <div class="col-sm-6 pl-1 pr-1">
                                             <div class="min-map-box" id="map-{{ sequence.unique_id }}">
                                             </div>
                                         </div>
 
-                                        <div class="col-sm-6 p-2">
+                                        <div class="col-sm-6 pl-1 pr-1">
                                             <div class="cover-image-box">
-                                                <div class="row " style="position: relative">
+                                                <div class="" style="position: relative">
                                                     {% if sequence.get_cover_image is None %}
                                                         <img class="w-100" src="{% static 'images/global/empty-1.png' %}">
                                                     {% else %}

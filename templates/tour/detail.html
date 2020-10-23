@@ -39,9 +39,6 @@
                 </div>
 
                 <div class="tag-created-at text-secondary mt-2">
-                    <span class="float-left">
-                        {{ tour.created_at }}
-                    </span>
                     <a href="{% url 'account.profile' username=tour.user.username %}">
                         <span class="float-right" style="color: brown;">
                             {{ tour.user }}

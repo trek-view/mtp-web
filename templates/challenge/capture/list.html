@@ -98,76 +98,73 @@
             <div class="item-list">
                 {% if challenges.count > 0 %}
                     {% for challenge in challenges %}
-                        <div class="card row challenge p-3 m-3 d-flex flex-row align-items-center" id="challenge_{{ challenge.unique_id }}" data-challenge-id="{{ challenge.unique_id }}">
-                            <div class="col-sm-5 col-md-4 col-lg-3">
-                                <div class="row">
+                        <div class="card challenge pl-3 pr-3 pt-2 pb-2 m-3" id="challenge_{{ challenge.unique_id }}" data-challenge-id="{{ challenge.unique_id }}">
+                            <div class="row align-items-center">
+                                <div class="col-sm-5 col-md-4 col-lg-3 pr-2 pl-2">
                                     <div class="w-100 min-map-box" id="map-{{ challenge.unique_id }}">
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="col-sm-7 col-md-8 detail-box col-lg-9">
-                                <div class="row w-100">
-                                    <div class="col-md-8 item-detail-box w-100 pl-3 pr-3">
-                                        <div class="item-main w-100 float-left">
-                                            <div class="item-title text-info d-flex flex-row justify-content-between">
-                                                <a href="{% url 'challenge.challenge_detail' unique_id=challenge.unique_id %}">
-                                                    <h6>{{ challenge.name }}</h6>
-                                                </a>
-                                            </div>
+                                <div class="col-sm-7 col-md-8 detail-box col-lg-9">
+                                    <div class="row w-100">
+                                        <div class="item-detail-box w-100 pl-3 pr-3">
+                                            <div class="item-main w-100 float-left">
+                                                <div class="item-title text-info d-flex flex-row justify-content-between">
+                                                    <a href="{% url 'challenge.challenge_detail' unique_id=challenge.unique_id %}">
+                                                        <h6>{{ challenge.name }}</h6>
+                                                    </a>
+                                                </div>
 
-                                            <div class="item-description">
-                                                <p class="mb-1">
-                                                    {{ challenge.get_short_description }}
-                                                </p>
-                                            </div>
+                                                <div class="item-description">
+                                                    <p class="mb-1">
+                                                        {{ challenge.get_short_description }}
+                                                    </p>
+                                                </div>
 
-                                            <div class="item-camera-make">
-                                                <p class="mb-1">
-                                                    {{ challenge.get_camera_make }}
-                                                </p>
-                                            </div>
+                                                <div class="item-camera-make">
+                                                    <p class="mb-1">
+                                                        {{ challenge.get_camera_make }}
+                                                    </p>
+                                                </div>
 
-                                            <div class="w-100 d-flex " style="white-space: nowrap">
-                                                {% if challenge.get_transport_types_obj.count > 0 %}
-                                                    {% for transport_type in challenge.get_transport_types_obj %}
-                                                        <div class="d-flex flex-row">
-                                                            <p class="mb-1 mr-1 item-transport-type text-center">
-                                                                <i class="transport-type-icon fas fa-{{ transport_type.parent.icon.font_awesome }}"></i>
-                                                                <br>
-                                                                [{{ transport_type.parent }}
-                                                            </p>
-                                                            <p class="mb-1 mr-1"><i class="transport-type-icon fas fa"></i><br>-</p>
-                                                            <p class="mb-1 mr-1 item-transport-type text-center">
-                                                                <i class="transport-type-icon fas fa-{{ transport_type.icon.font_awesome }}"></i>
-                                                                <br>
-                                                                {{ transport_type.name }}]
-                                                            </p>
-                                                        </div>
-                                                    {% endfor %}
-                                                {% endif %}
-                                            </div>
+                                                <div class="w-100 d-flex " style="white-space: nowrap">
+                                                    {% if challenge.get_transport_types_obj.count > 0 %}
+                                                        {% for transport_type in challenge.get_transport_types_obj %}
+                                                            <div class="d-flex flex-row">
+                                                                <p class="mb-1 mr-1 item-transport-type text-center">
+                                                                    <i class="transport-type-icon fas fa-{{ transport_type.parent.icon.font_awesome }}"></i>
+                                                                    <br>
+                                                                    [{{ transport_type.parent }}
+                                                                </p>
+                                                                <p class="mb-1 mr-1"><i class="transport-type-icon fas fa"></i><br>-</p>
+                                                                <p class="mb-1 mr-1 item-transport-type text-center">
+                                                                    <i class="transport-type-icon fas fa-{{ transport_type.icon.font_awesome }}"></i>
+                                                                    <br>
+                                                                    {{ transport_type.name }}]
+                                                                </p>
+                                                            </div>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </div>
 
-                                            <div class="item-time">
-                                                <p class="mb-1">
-                                                    {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
-                                                </p>
-                                            </div>
+                                                <div class="item-time">
+                                                    <p class="mb-1">
+                                                        {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
+                                                    </p>
+                                                </div>
 
-                                            <div class="challenge-geometry d-none">{{ challenge.geometry }}</div>
+                                                <div class="challenge-geometry d-none">{{ challenge.geometry }}</div>
 
-                                            <div class="item-created-at text-secondary d-flex flex-row justify-content-between">
+                                                <div class="item-created-at text-secondary d-flex flex-row justify-content-between">
 
-                                                <a href="{% url 'account.profile' username=challenge.user.username %}">
-                                                    <span class="">
-                                                        {{ challenge.user }}
-                                                    </span>
-                                                </a>
+                                                    <a href="{% url 'account.profile' username=challenge.user.username %}">
+                                                        <span class="">
+                                                            {{ challenge.user }}
+                                                        </span>
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4 p-2 d-flex text-center flex-row align-items-center" style="font-size: 13px;">
-                                            <p class="mt-3">{{ challenge.created_at }}</p>
                                     </div>
                                 </div>
                             </div>

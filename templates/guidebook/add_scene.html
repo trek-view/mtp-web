@@ -65,21 +65,13 @@
                     </div>
 
                     <div class="guidebook-created-at text-secondary mt-2 d-flex justify-content-between align-items-center">
-                        <div class="created_at mr-auto">
-                            <span class="">
-                                {{ guidebook.created_at }}
-                            </span>
-                        </div>
-
-                        <div class="username ml-auto">
+                        <div class="username">
                             <a href="{% url 'account.profile' username=guidebook.user.username %}">
                                 <span class="" style="color: brown;">
                                     {{ guidebook.user }}
                                 </span>
                             </a>
                         </div>
-
-
                     </div>
 
                     <div class="action text-right mt-2">
