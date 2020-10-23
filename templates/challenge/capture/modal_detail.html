@@ -13,49 +13,57 @@
                 </p>
             </div>
 
-            <div class="item-camera-make">
-                <p class="mb-1">
-                    {{ challenge.get_camera_make }}
-                </p>
+            <hr class="mt-1 mb-1">
+
+            <div class="mt-2">
+                <h6>To start scoring points for this challenge:</h6>
+
+                <div class="elements">
+                    <div class="help-text mb-2">
+                        Upload sequences in the area shown on the map
+                    </div>
+
+                    <div class="w-100 d-flex " style="white-space: nowrap">
+                        {% if challenge.get_transport_types_obj.count > 0 %}
+                            {% for transport_type in challenge.get_transport_types_obj %}
+                                <div class="d-flex flex-row">
+                                    <p class="mb-1 mr-1 item-transport-type text-center">
+                                        <i class="transport-type-icon fas fa-{{ transport_type.parent.icon.font_awesome }}"></i>
+                                        <br>
+                                        [{{ transport_type.parent }}
+                                    </p>
+                                    <p class="mb-1 mr-1"><i class="transport-type-icon fas fa"></i><br>-</p>
+                                    <p class="mb-1 mr-1 item-transport-type text-center">
+                                        <i class="transport-type-icon fas fa-{{ transport_type.icon.font_awesome }}"></i>
+                                        <br>
+                                        {{ transport_type.name }}]
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="item-camera-make">
+                        <p class="mb-1">
+                            {{ challenge.get_camera_make }}
+                        </p>
+                    </div>
+
+                    <div class="item-time">
+                        <span class="mb-1">
+                            {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
+                        </span>
+                    </div>
+                </div>
             </div>
 
-            <div class="w-100 d-flex " style="white-space: nowrap">
-                {% if challenge.get_transport_types_obj.count > 0 %}
-                    {% for transport_type in challenge.get_transport_types_obj %}
-                        <div class="d-flex flex-row">
-                            <p class="mb-1 mr-1 item-transport-type text-center">
-                                <i class="transport-type-icon fas fa-{{ transport_type.parent.icon.font_awesome }}"></i>
-                                <br>
-                                [{{ transport_type.parent }}
-                            </p>
-                            <p class="mb-1 mr-1"><i class="transport-type-icon fas fa"></i><br>-</p>
-                            <p class="mb-1 mr-1 item-transport-type text-center">
-                                <i class="transport-type-icon fas fa-{{ transport_type.icon.font_awesome }}"></i>
-                                <br>
-                                {{ transport_type.name }}]
-                            </p>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            </div>
 
-            <div class="item-time">
-                <p class="mb-1">
-                    {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
-                </p>
-            </div>
-
-            <div class="challenge-created-at text-secondary">
-                <h6>
-                    {{ challenge.created_at }}
-                </h6>
-            </div>
         </div>
         {% if is_mine %}
             <div class="modal-footer d-flex flex-row justify-content-end">
-                <a type="button" href="javascript:goWithSearchParam('{% url 'challenge.challenge_leaderboard' unique_id=challenge.unique_id %}')" id="show_leaderboad" class="btn btn-success text-light" >Go to Leaderboard</a>
-                <a type="button" href="{% url 'challenge.my_challenge_edit' unique_id=challenge.unique_id %}" id="edit_button" class="btn btn-primary text-light" >Edit</a>
-                <button type="button" id="delete_button" class="btn btn-danger text-light" >Delete</button>
+                <a type="button" href="javascript:goWithSearchParam('{% url 'challenge.challenge_leaderboard' unique_id=challenge.unique_id %}')" id="show_leaderboad" class="btn btn-sm btn-success text-light" >Go to Leaderboard</a>
+                <a type="button" href="{% url 'challenge.my_challenge_edit' unique_id=challenge.unique_id %}" id="edit_button" class="btn btn-primary text-light btn-sm" >Edit</a>
+                <button type="button" id="delete_button" class="btn btn-sm btn-danger text-light" >Delete</button>
                 <form method="POST" action="{% url 'challenge.my_challenge_delete' unique_id=challenge.unique_id %}" id="delete_form">
                     {% csrf_token %}
                 </form>
