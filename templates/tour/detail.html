@@ -164,11 +164,13 @@
                                                 <br>
                                                 {{ sequence.get_distance }} Km
                                             </p>
-                                            <p class="mb-1 mr-3 item-tour-count text-center">
-                                                <i class="transport-type-icon fas fa-clipboard-list"></i>
-                                                <br>
-                                                {{ sequence.tour_count }} tours
-                                            </p>
+                                            <a {% if sequence.tour_count > 0 %}href="{% url 'tour.tour_list' %}?sequence_unique_id={{ sequence.unique_id }}" {% endif %}>
+                                                <p class="mb-1 mr-3 item-tour-count text-center">
+                                                    <i class="fas fa-clipboard-list"></i>
+                                                    <br>
+                                                    {{ sequence.tour_count }} tours
+                                                </p>
+                                            </a>
                                         </div>
 
                                         <div class="item-tag" style="min-height: 24px;">
