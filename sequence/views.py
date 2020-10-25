@@ -388,7 +388,7 @@ def image_leaderboard(request):
                         if image_key not in map_feature_images:
                             map_feature_images.append(image_key)
 
-                images = images.filter(image_key__in=map_feature_images)
+                images = images.filter(image_key__in=map_features)
 
     if images is None:
         images = Image.objects.all()
@@ -2105,6 +2105,10 @@ def ajax_get_detail_by_image_key(request, image_key):
 def insert_db(request):
 
     map_features = MapFeature.objects.filter()
+    c = 0
+    for map_feature in map_features:
+        c += len(map_feature.image_keys)
+    print(c)
     print(len(map_features))
     # for map_feature in map_features:
     #     image_keys = map_feature.image_keys
