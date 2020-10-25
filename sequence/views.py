@@ -884,6 +884,17 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                         mf_item.user_keys = mf_user_keys
                         mf_item.save()
 
+                        image = Image.objects.filter(image_key=i_key).first()
+                        if image is not None:
+                            mf_keys = image.map_feature_keys
+                            if mf_keys is None:
+                                mf_keys = []
+                            if mf_item.mf_key not in mf_keys:
+                                mf_keys.append(mf_item.mf_key)
+
+                            image.map_feature_keys = mf_keys
+                            image.save()
+
                         # for detection in mf_properties['detections']:
                         #     detection_key = detection['detection_key']
                         #     image_key = detection['image_key']
@@ -2104,12 +2115,8 @@ def ajax_get_detail_by_image_key(request, image_key):
 
 def insert_db(request):
 
-    map_features = MapFeature.objects.filter()
-    c = 0
-    for map_feature in map_features:
-        c += len(map_feature.image_keys)
-    print(c)
-    print(len(map_features))
+
+
     # for map_feature in map_features:
     #     image_keys = map_feature.image_keys
     #     for image_key in image_keys:
@@ -2117,13 +2124,32 @@ def insert_db(request):
     #         for image in images:
     #             print('sequence id: {}, image key: {}'.format(image.sequence.unique_id, image.image_key))
 
-    # p = threading.Thread(target=change_download_field)
-    # p.start()
+    p = threading.Thread(target=update_mf_keys_with_thread)
+    p.start()
     #
     # p = threading.Thread(target=change_map_feature_field)
     # p.start()
 
     return redirect('home')
+
+
+def update_mf_keys_with_thread():
+    images = Image.objects.all()
+    for img in images:
+
+        image = Image.objects.filter(image_key=img.image_key).first()
+        if image is not None:
+            mf_keys = image.map_feature_keys
+            if mf_keys is None:
+                mf_keys = []
+            map_features = MapFeature.objects.filter(image_keys__contains=[image.image_key])
+            for map_feature in map_features:
+                if map_feature.mf_key not in mf_keys:
+                    mf_keys.append(map_feature.mf_key)
+
+            image.map_feature_keys = mf_keys
+            print(len(mf_keys))
+            image.save()
 
 
 def insert_db_with_thread():

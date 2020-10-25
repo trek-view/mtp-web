@@ -362,6 +362,8 @@ class Image(models.Model):
 
     image_label = models.ManyToManyField(LabelType, through='ImageLabel')
 
+    map_feature_keys = ArrayField(ArrayField(models.CharField(max_length=50)), null=True, blank=True)
+
     objects = models.Manager()
     vector_tiles = CustomImageMVTManager(
         geo_col='point',
