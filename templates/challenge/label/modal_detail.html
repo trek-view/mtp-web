@@ -23,6 +23,10 @@
                         Label photo in the area shown on the map
                     </div>
 
+                    <div class="help-text">
+                        Using the following tags:
+                    </div>
+
                     <div class="item-tag" style="min-height: 24px;">
                         {% for label_type in challenge.get_label_type_obj %}
                             <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1" style="white-space: nowrap">
@@ -33,7 +37,7 @@
 
                     <div class="item-time">
                         <span class="mb-1">
-                            {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
+                            Between dates ({{ challenge.start_time.date }} ~ {{ challenge.end_time.date }})
                         </span>
                     </div>
                 </div>

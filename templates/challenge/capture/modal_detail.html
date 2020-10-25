@@ -23,6 +23,10 @@
                         Upload sequences in the area shown on the map
                     </div>
 
+                    <div class="help-text">
+                        Using transport type:
+                    </div>
+
                     <div class="w-100 d-flex " style="white-space: nowrap">
                         {% if challenge.get_transport_types_obj.count > 0 %}
                             {% for transport_type in challenge.get_transport_types_obj %}
@@ -40,24 +44,34 @@
                                     </p>
                                 </div>
                             {% endfor %}
+                        {% else %}
+                            <div class="d-flex flex-row">
+                                All
+                            </div>
                         {% endif %}
+                    </div>
+
+                    <div class="help-text">
+                        And camera type:
                     </div>
 
                     <div class="item-camera-make">
                         <p class="mb-1">
-                            {{ challenge.get_camera_make }}
+                            {% if challenge.get_camera_make == '' %}
+                                All
+                            {% else %}
+                                {{ challenge.get_camera_make }}
+                            {% endif %}
                         </p>
                     </div>
 
                     <div class="item-time">
                         <span class="mb-1">
-                            {{ challenge.start_time.date }} ~ {{ challenge.end_time.date }}
+                            Between dates({{ challenge.start_time.date }} ~ {{ challenge.end_time.date }})
                         </span>
                     </div>
                 </div>
             </div>
-
-
         </div>
         {% if is_mine %}
             <div class="modal-footer d-flex flex-row justify-content-end">
