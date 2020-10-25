@@ -111,8 +111,8 @@ def tour_add_sequence(request, unique_id):
             ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__icontains=name)
-            if camera_make and camera_make != '':
-                sequences = sequences.filter(camera_make__contains=camera_make)
+            if camera_make is not None and len(camera_make) > 0:
+                sequences = sequences.filter(camera_make__name__in=camera_make)
             if transport_type is not None and transport_type != 'all' and transport_type != '':
                 transport_type_obj = TransType.objects.filter(name=transport_type).first()
                 if transport_type_obj is not None:

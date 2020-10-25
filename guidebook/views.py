@@ -59,8 +59,8 @@ def guidebook_list(request):
             )
             if name is not None and name != '':
                 guidebooks = guidebooks.filter(name__icontains=name)
-            if category:
-                guidebooks = guidebooks.filter(category_id=category)
+            if category is not None and category != '':
+                guidebooks = guidebooks.filter(category__name=category)
             if username and username != '':
                 users = CustomUser.objects.filter(username__icontains=username)
                 guidebooks = guidebooks.filter(user__in=users)
@@ -148,8 +148,8 @@ def my_guidebook_list(request):
             )
             if name is not None and name != '':
                 guidebooks = guidebooks.filter(name__icontains=name)
-            if category:
-                guidebooks = guidebooks.filter(category_id=category)
+            if category is not None and category != '':
+                guidebooks = guidebooks.filter(category__name=category)
 
             if len(tags) > 0:
                 for tag in tags:

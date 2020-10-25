@@ -5,6 +5,32 @@ from sequence.models import TransType, CameraMake, LabelType
 from .models import *
 
 
+def transport_types():
+    types = TransType.objects.all()
+    ts_types = [['all', 'All Types']]
+    for t in types:
+        ts_types.append([t.name, t.getFullName])
+    ts_tuple = tuple(ts_types)
+    return ts_tuple
+
+
+def camera_makes():
+    cms = CameraMake.objects.all()
+    makes = []
+    for cm in cms:
+        makes.append([cm.name, cm.name])
+    cm_tuple = tuple(makes)
+    return cm_tuple
+
+
+def label_types():
+    lts = LabelType.objects.filter(parent__isnull=False, source='mtpw')
+    label_type = [['all', 'All Types']]
+    for lt in lts:
+        label_type.append([lt.name, lt.getKey])
+    return label_type
+
+
 class ChallengeForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
                            required=False)
@@ -12,20 +38,20 @@ class ChallengeForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation': 'required'}),
         required=False)
 
-    transport_type = forms.ModelMultipleChoiceField(
+    camera_make = forms.MultipleChoiceField(
         required=False,
-        widget=forms.SelectMultiple(
-            attrs={'class': 'form-control'}),
-        queryset=TransType.objects.filter(parent__isnull=False),
-    )
-
-    camera_make = forms.ModelMultipleChoiceField(
-        required=False,
-        label='Camera Make (leave blank for all)',
         widget=forms.SelectMultiple(
             attrs={'class': 'form-control'}
         ),
-        queryset=CameraMake.objects.all()
+        choices=camera_makes,
+        label='Camera Make (leave blank for all)',
+    )
+
+    transport_type = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(
+            attrs={'class': 'form-control'}),
+        choices=transport_types,
     )
 
     geometry = forms.CharField(widget=forms.Textarea(attrs={'class': 'd-none'}), label='', required=False)
@@ -88,20 +114,21 @@ class ChallengeForm(forms.ModelForm):
 class ChallengeSearchForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
                            required=False)
-    transport_type = forms.ModelChoiceField(
-        required=False,
-        widget=forms.Select(
-            attrs={'class': 'form-control'}),
-        queryset=TransType.objects.filter(parent__isnull=False),
-        empty_label='All Types'
-    )
-    camera_make = forms.ModelMultipleChoiceField(
+
+    camera_make = forms.MultipleChoiceField(
         required=False,
         widget=forms.SelectMultiple(
             attrs={'class': 'form-control'}
         ),
+        choices=camera_makes,
         label='Camera Make (leave blank for all)',
-        queryset=CameraMake.objects.all()
+    )
+
+    transport_type = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(
+            attrs={'class': 'form-control'}),
+        choices=transport_types,
     )
 
     challenge_type = forms.ChoiceField(
@@ -187,12 +214,11 @@ class LabelChallengeForm(forms.ModelForm):
 class LabelChallengeSearchForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
                            required=False)
-    label_type = forms.ModelChoiceField(
+    label_type = forms.ChoiceField(
         required=False,
         widget=forms.Select(
             attrs={'class': 'form-control'}),
-        queryset=LabelType.objects.filter(parent__isnull=False),
-        empty_label='All Types'
+        choices=label_types(),
     )
 
     challenge_type = forms.ChoiceField(

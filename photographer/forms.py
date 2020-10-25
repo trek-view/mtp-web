@@ -3,6 +3,30 @@ from django import forms
 from .models import *
 
 
+def capture_type():
+    objs = CaptureType.objects.all()
+    results = []
+    for obj in objs:
+        results.append([obj.name, obj.name])
+    return results
+
+
+def capture_method():
+    objs = CaptureMethod.objects.all()
+    results = []
+    for obj in objs:
+        results.append([obj.name, obj.name])
+    return results
+
+
+def image_quality():
+    objs = ImageQuality.objects.all()
+    results = []
+    for obj in objs:
+        results.append([obj.name, obj.name])
+    return results
+
+
 class PhotographerForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
                            required=False)
@@ -73,28 +97,28 @@ class PhotographerSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['capture_type'] = forms.ModelMultipleChoiceField(
+        self.fields['capture_type'] = forms.MultipleChoiceField(
             required=False,
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            queryset=CaptureType.objects.all()
+            choices=capture_type()
         )
 
-        self.fields['capture_method'] = forms.ModelMultipleChoiceField(
+        self.fields['capture_method'] = forms.MultipleChoiceField(
             required=False,
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            queryset=CaptureMethod.objects.all()
+            choices=capture_method()
         )
 
-        self.fields['image_quality'] = forms.ModelMultipleChoiceField(
+        self.fields['image_quality'] = forms.MultipleChoiceField(
             required=False,
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            queryset=ImageQuality.objects.all()
+            choices=image_quality()
         )
 
 

@@ -19,9 +19,19 @@ def transport_types():
     types = TransType.objects.all()
     ts_types = [['all', 'All Types']]
     for t in types:
-        ts_types.append([t.name, t.name])
+        ts_types.append([t.name, t.getFullName])
     ts_tuple = tuple(ts_types)
     return ts_tuple
+
+
+def camera_makes():
+    cms = CameraMake.objects.all()
+    makes = []
+    for cm in cms:
+        makes.append([cm.name, cm.name])
+    cm_tuple = tuple(makes)
+    return cm_tuple
+
 
 class TransportSearchForm(forms.Form):
 
@@ -119,12 +129,12 @@ class SequenceSearchForm(forms.Form):
             required=False
         )
 
-        self.fields['camera_make'] = forms.ModelMultipleChoiceField(
+        self.fields['camera_make'] = forms.MultipleChoiceField(
             required=False,
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            queryset=CameraMake.objects.all(),
+            choices=camera_makes,
             label='Camera Make (leave blank for all)',
         )
 
@@ -208,12 +218,12 @@ class ImageSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['camera_make'] = forms.ModelMultipleChoiceField(
+        self.fields['camera_make'] = forms.MultipleChoiceField(
             required=False,
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            queryset=CameraMake.objects.all(),
+            choices=camera_makes(),
             label='Camera Make (leave blank for all)',
         )
         # self.fields['camera_model'] = forms.ModelMultipleChoiceField(
@@ -256,10 +266,13 @@ class SequenceSearchForTourForm(forms.Form):
             required=False
         )
 
-        self.fields['camera_make'] = forms.CharField(
+        self.fields['camera_make'] = forms.MultipleChoiceField(
+            required=False,
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            choices=camera_makes(),
             label='Camera Make (leave blank for all)',
-            widget=forms.TextInput(attrs={'class': 'form-control'}),
-            required=False
         )
 
         self.fields['transport_type'] = forms.ChoiceField(

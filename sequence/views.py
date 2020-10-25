@@ -74,8 +74,9 @@ def sequence_list(request):
             ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__icontains=name)
+            print(camera_makes)
             if camera_makes is not None and len(camera_makes) > 0:
-                sequences = sequences.filter(camera_make__in=camera_makes)
+                sequences = sequences.filter(camera_make__name__in=camera_makes)
             if transport_type is not None and transport_type != 'all' and transport_type != '':
                 transport_type_obj = TransType.objects.filter(name=transport_type).first()
                 if transport_type_obj is not None:
@@ -223,7 +224,7 @@ def my_sequence_list(request):
             if name and name != '':
                 sequences = sequences.filter(name__icontains=name)
             if camera_makes is not None and len(camera_makes) > 0:
-                sequences = sequences.filter(camera_make__in=camera_makes)
+                sequences = sequences.filter(camera_make__name__in=camera_makes)
             if transport_type is not None and transport_type != 'all' and transport_type != '':
                 transport_type_obj = TransType.objects.filter(name=transport_type).first()
                 if transport_type_obj is not None:
@@ -324,8 +325,8 @@ def image_leaderboard(request):
             print('map_feature_value: ', map_feature_value)
 
             images = Image.objects.all()
-            if not camera_makes is None and len(camera_makes) > 0:
-                images = images.filter(camera_make__in=camera_makes)
+            if camera_makes is not None and len(camera_makes) > 0:
+                images = images.filter(camera_make__name__in=camera_makes)
             # if not camera_models is None and len(camera_models) > 0:
             #     images = images.filter(camera_model__in=camera_models)
 

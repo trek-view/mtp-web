@@ -9,6 +9,15 @@ from .models import *
 ############################################################################
 
 
+def categories():
+    objs = Category.objects.all()
+    category = [['all', 'All Categories']]
+    for obj in objs:
+        category.append([obj.name, obj.name])
+    category_tuple = tuple(category)
+    return category_tuple
+
+
 class GuidebookForm(forms.ModelForm):
     name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
@@ -168,12 +177,11 @@ class GuidebookSearchForm(forms.Form):
             required=False
         )
 
-        self.fields['category'] = forms.ModelChoiceField(
+        self.fields['category'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
-            queryset=Category.objects.all(),
-            empty_label="All Categories"
+            choices=categories(),
         )
         self.fields['tag'] = CustomTagsInputField(
             Tag.objects.filter(is_actived=True),

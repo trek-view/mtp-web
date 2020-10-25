@@ -30,12 +30,14 @@ def index(request):
     time_type = None
     if request.method == "GET":
         filter_time = request.GET.get('time')
-        page = request.GET.get('page')
-        transport_type = request.GET.get('transport_type')
-        time_type = request.GET.get('time_type')
+        # page = request.GET.get('page')
+        # transport_type = request.GET.get('transport_type')
+        # time_type = request.GET.get('time_type')
         form = LeaderboardSearchForm(request.GET)
         if form.is_valid():
             page = request.GET.get('page')
+            transport_type = form.cleaned_data['transport_type']
+            time_type = form.cleaned_data['time_type']
             if not page or page is None:
                 page = 1
 
@@ -72,19 +74,22 @@ def index(request):
                     ).exclude(image_count=0)
                     time_type = 'yearly'
 
-            if transport_type is not None and transport_type != 0 and transport_type != '':
-                children_trans_type = TransType.objects.filter(parent_id=transport_type)
-                if children_trans_type.count() > 0:
-                    types = [transport_type]
-                    for t in children_trans_type:
-                        types.append(t.pk)
-                    sequences = sequences.filter(transport_type_id__in=types)
-                else:
-                    sequences = sequences.filter(transport_type_id=transport_type)
+            if transport_type is not None and transport_type != 'all' and transport_type != '':
+                transport_type_obj = TransType.objects.filter(name=transport_type).first()
+                if transport_type_obj is not None:
+                    children_trans_type = TransType.objects.filter(parent=transport_type_obj)
+                    if children_trans_type.count() > 0:
+                        types = [transport_type_obj]
+                        for t in children_trans_type:
+                            types.append(t)
+                        sequences = sequences.filter(transport_type__in=types)
+                    else:
+                        sequences = sequences.filter(transport_type=transport_type_obj)
 
                 form.set_transport_type(transport_type)
+
             if camera_makes is not None and len(camera_makes) > 0:
-                sequences = sequences.filter(camera_make__in=camera_makes)
+                sequences = sequences.filter(camera_make__name__in=camera_makes)
                 form.set_camera_makes(camera_makes)
 
     if sequences is None:

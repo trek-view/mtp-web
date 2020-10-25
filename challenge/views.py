@@ -198,24 +198,26 @@ def challenge_list(request):
 
             if name is not None:
                 challenges = challenges.filter(name__icontains=name)
-            if not transport_type is None and transport_type != 0 and transport_type != '':
-                children_trans_type = TransType.objects.filter(parent_id=transport_type)
-                if children_trans_type.count() > 0:
-                    transport_types = [transport_type]
-                    for t in children_trans_type:
-                        transport_types.append(t.pk)
-                    challenges = challenges.filter(transport_type_id__in=transport_types)
-                else:
-                    challenges = challenges.filter(transport_type=transport_type)
+
+            if transport_type is not None and transport_type != 'all' and transport_type != '':
+                transport_type_obj = TransType.objects.filter(name=transport_type).first()
+                if transport_type_obj is not None:
+                    children_trans_type = TransType.objects.filter(parent=transport_type_obj)
+                    if children_trans_type.count() > 0:
+                        types = [transport_type_obj]
+                        for t in children_trans_type:
+                            types.append(t)
+                        challenges = challenges.filter(transport_type__in=types)
+                    else:
+                        challenges = challenges.filter(transport_type=transport_type_obj)
 
             current_time = datetime.now()
-            if not challenge_type is None and challenge_type == 'active':
+            if challenge_type is not None and challenge_type == 'active':
                 challenges = challenges.filter(end_time__gte=current_time)
-            if not challenge_type is None and challenge_type == 'completed':
+            if challenge_type is not None and challenge_type == 'completed':
                 challenges = challenges.filter(end_time__lt=current_time)
-            if not camera_makes is None and len(camera_makes) > 0:
-                cs = Challenge.objects.filter(camera_make__in=camera_makes)
-                challenges = challenges.filter(pk__in=cs)
+            if camera_makes is not None and len(camera_makes) > 0:
+                challenges = challenges.filter(camera_make__name__in=camera_makes)
 
     if challenges is None:
         challenges = Challenge.objects.all().filter(is_published=True)
@@ -634,21 +636,24 @@ def label_challenge_list(request):
         if form.is_valid():
             challenges = LabelChallenge.objects.all().filter(is_published=True)
             name = form.cleaned_data['name']
-            labe_type = form.cleaned_data['label_type']
+            label_type = form.cleaned_data['label_type']
             challenge_type = form.cleaned_data['challenge_type']
 
             if name is not None:
                 challenges = challenges.filter(name__icontains=name)
-            print(labe_type)
-            if labe_type is not None and labe_type != 0 and labe_type != '':
-                children_label_type = LabelType.objects.filter(parent_id=labe_type)
-                if children_label_type.count() > 0:
-                    types = [labe_type]
-                    for t in children_label_type:
-                        types.append(t.pk)
-                    challenges = challenges.filter(label_type_id__in=types)
-                else:
-                    challenges = challenges.filter(label_type=labe_type)
+            print(label_type)
+
+            if label_type is not None and label_type != 'all' and label_type != '':
+                label_type_obj = LabelType.objects.filter(name=label_type).first()
+                if label_type_obj is not None:
+                    children_label_type = LabelType.objects.filter(parent=label_type_obj)
+                    if children_label_type.count() > 0:
+                        types = [label_type_obj]
+                        for t in children_label_type:
+                            types.append(t)
+                        challenges = challenges.filter(label_type__in=types)
+                    else:
+                        challenges = challenges.filter(label_type=label_type_obj)
 
             current_time = datetime.now()
             if challenge_type is not None and challenge_type == 'active':
@@ -713,15 +718,17 @@ def my_label_challenge_list(request):
 
             if name is not None:
                 challenges = challenges.filter(name__icontains=name)
-            if label_type is not None and label_type != 0 and label_type != '':
-                children_label_type = LabelType.objects.filter(parent_id=label_type)
-                if children_label_type.count() > 0:
-                    types = [label_type]
-                    for t in children_label_type:
-                        types.append(t)
-                    challenges = challenges.filter(label_type__in=types)
-                else:
-                    challenges = challenges.filter(label_type=label_type)
+            if label_type is not None and label_type != 'all' and label_type != '':
+                label_type_obj = LabelType.objects.filter(name=label_type).first()
+                if label_type_obj is not None:
+                    children_label_type = LabelType.objects.filter(parent=label_type_obj)
+                    if children_label_type.count() > 0:
+                        types = [label_type_obj]
+                        for t in children_label_type:
+                            types.append(t)
+                        challenges = challenges.filter(label_type__in=types)
+                    else:
+                        challenges = challenges.filter(label_type=label_type_obj)
 
             challenge_type = form.cleaned_data['challenge_type']
             current_time = datetime.now()

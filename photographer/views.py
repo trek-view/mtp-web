@@ -249,13 +249,13 @@ def photographer_list(request):
             photographers = Photographer.objects.all().filter(is_published=True)
 
             if image_quality is not None and len(image_quality) > 0:
-                photographers = photographers.filter(image_quality__in=image_quality)
+                photographers = photographers.filter(image_quality__name__in=image_quality)
 
             if capture_types is not None and len(capture_types) > 0:
-                photographers = photographers.filter(capture_type__in=capture_types)
+                photographers = photographers.filter(capture_type__name__in=capture_types)
 
             if capture_method is not None and len(capture_method) > 0:
-                photographers = photographers.filter(capture_method__in=capture_method)
+                photographers = photographers.filter(capture_method__name__in=capture_method)
 
     if photographers is None:
         photographers = Photographer.objects.all().filter(is_published=True)
@@ -340,65 +340,6 @@ def photographer_detail(request, unique_id):
             'page': 1
         }
     )
-
-
-@my_login_required
-def my_photographer_list(request):
-    photographers = None
-    page = 1
-    if request.method == "GET":
-        page = request.GET.get('page')
-        if page is None:
-            page = 1
-        form = PhotographerSearchForm(request.GET)
-        if form.is_valid():
-            capture_type = form.cleaned_data['capture_type']
-            capture_method = form.cleaned_data['capture_method']
-            image_quality = form.cleaned_data['image_quality']
-            photographers = Photographer.objects.all().filter(user=request.user)
-            if capture_type is not None and len(capture_type) > 0:
-                photographers = photographers.filter(capture_type__in=capture_type)
-            if capture_method is not None and len(capture_method) > 0:
-                photographers = photographers.filter(capture_method__in=capture_method)
-            if image_quality is not None and len(image_quality) > 0:
-                photographers = photographers.filter(image_quality__in=image_quality)
-
-    if photographers is None:
-        photographers = Photographer.objects.all().filter(user=request.user)
-        form = PhotographerSearchForm()
-
-    paginator = Paginator(photographers.order_by('-created_at'), 10)
-
-    try:
-        pPhotographers = paginator.page(page)
-    except PageNotAnInteger:
-        pPhotographers = paginator.page(1)
-    except EmptyPage:
-        pPhotographers = paginator.page(paginator.num_pages)
-
-    first_num = 1
-    last_num = paginator.num_pages
-    if paginator.num_pages > 7:
-        if pPhotographers.number < 4:
-            first_num = 1
-            last_num = 7
-        elif pPhotographers.number > paginator.num_pages - 3:
-            first_num = paginator.num_pages - 6
-            last_num = paginator.num_pages
-        else:
-            first_num = pPhotographers.number - 3
-            last_num = pPhotographers.number + 3
-    pPhotographers.paginator.pages = range(first_num, last_num + 1)
-    pPhotographers.count = len(pPhotographers)
-    content = {
-        'photographers': pPhotographers,
-        'form': form,
-        'pageName': 'My Photographers',
-        'pageTitle': 'My Photographers',
-        'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
-    }
-    return render(request, 'photographer/list.html', content)
 
 
 def ajax_photographer_detail(request, unique_id):

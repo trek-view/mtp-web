@@ -11,6 +11,25 @@ from sequence.models import TransType, CameraMake
 ############################################################################
 ############################################################################
 
+
+def transport_types():
+    types = TransType.objects.all()
+    ts_types = [['all', 'All Types']]
+    for t in types:
+        ts_types.append([t.name, t.getFullName])
+    ts_tuple = tuple(ts_types)
+    return ts_tuple
+
+
+def camera_make():
+    cms = CameraMake.objects.all()
+    makes = []
+    for cm in cms:
+        makes.append([cm.name, cm.name])
+    cm_tuple = tuple(makes)
+    return cm_tuple
+
+
 class LeaderboardSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
@@ -20,12 +39,19 @@ class LeaderboardSearchForm(forms.Form):
         year = now.year
         month = now.month
 
-        self.fields['transport_type'] = forms.ModelChoiceField(
+        self.fields['transport_type'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
-            queryset=TransType.objects.all(),
-            empty_label='All Types'
+            choices=transport_types(),
+        )
+
+        self.fields['camera_make'] = forms.MultipleChoiceField(
+            required=False,
+            widget=forms.SelectMultiple(
+                attrs={'class': 'form-control'}
+            ),
+            choices=camera_make()
         )
 
         self.fields['time_type'] = forms.CharField(
@@ -39,14 +65,6 @@ class LeaderboardSearchForm(forms.Form):
             choices=((0, 'Uploads'), (1, 'Distance'), (2, 'Viewpoints')),
             initial=0,
             required=False
-        )
-
-        self.fields['camera_make'] = forms.ModelMultipleChoiceField(
-            required=False,
-            widget=forms.SelectMultiple(
-                attrs={'class': 'form-control'}
-            ),
-            queryset=CameraMake.objects.all()
         )
 
     def set_timely(self, type, value):
@@ -67,12 +85,11 @@ class LeaderboardSearchForm(forms.Form):
         )
 
     def set_transport_type(self, transport_type):
-        self.fields['transport_type'] = forms.ModelChoiceField(
+        self.fields['transport_type'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
                 attrs={'class': 'form-control'}),
-            queryset=TransType.objects.all(),
-            empty_label='All Types',
+            choices=transport_types(),
             initial=transport_type
         )
 
@@ -87,11 +104,11 @@ class LeaderboardSearchForm(forms.Form):
         )
 
     def set_camera_makes(self, camera_makes):
-        self.fields['camera_make'] = forms.ModelMultipleChoiceField(
+        self.fields['camera_make'] = forms.MultipleChoiceField(
             required=False,
             widget=forms.SelectMultiple(
                 attrs={'class': 'form-control'}
             ),
-            queryset=CameraMake.objects.all(),
+            choices=camera_make(),
             initial=camera_makes
         )
