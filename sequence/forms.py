@@ -182,9 +182,11 @@ class SequenceSearchForm(forms.Form):
             required=False
         )
 
-        self.fields['pano'] = forms.BooleanField(
+        self.fields['pano'] = forms.ChoiceField(
             label='Pano',
-            required=False
+            widget=forms.RadioSelect(),
+            required=False,
+            choices=(('all', 'All'), ('true', 'Pano'), ('false', 'Not Pano')),
         )
 
         self.fields['like'] = forms.ChoiceField(

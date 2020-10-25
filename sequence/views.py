@@ -147,8 +147,11 @@ def sequence_list(request):
             if end_time is not None and end_time != '':
                 sequences = sequences.filter(captured_at__lte=end_time)
 
-            if pano:
-                sequences = sequences.filter(pano=True)
+            if pano is not None and pano != '' and pano != 'all':
+                if pano == 'true':
+                    sequences = sequences.filter(pano=True)
+                elif pano == 'false':
+                    sequences = sequences.filter(pano=False)
 
     if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
@@ -297,13 +300,9 @@ def my_sequence_list(request):
 def image_leaderboard(request):
     images = None
     page = 1
-    m_type = None
     image_view_points = ImageViewPoint.objects.filter()
     label_challenges = LabelChallenge.objects.filter()
     filter_type = None
-
-    map_feature_str = ""
-    map_feature_empty_str = ""
 
     if request.method == "GET":
         page = request.GET.get('page')
@@ -338,7 +337,6 @@ def image_leaderboard(request):
                     images = images.filter(sequence__in=sequences)
 
             m_type = request.GET.get('type')
-            users = None
             if username and username != '':
                 users = CustomUser.objects.filter(username__icontains=username)
                 if m_type is None or m_type == 'received':
@@ -386,7 +384,9 @@ def image_leaderboard(request):
                 map_features = MapFeature.objects.filter(value=map_feature_value)
                 map_feature_images = []
                 for map_feature in map_features:
-                    map_feature_images += map_feature.image_keys
+                    for image_key in map_feature.image_keys:
+                        if image_key not in map_feature_images:
+                            map_feature_images.append(image_key)
 
                 images = images.filter(image_key__in=map_feature_images)
 
