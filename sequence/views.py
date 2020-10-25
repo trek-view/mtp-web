@@ -2105,12 +2105,13 @@ def ajax_get_detail_by_image_key(request, image_key):
 def insert_db(request):
 
     map_features = MapFeature.objects.filter()
-    for map_feature in map_features:
-        image_keys = map_feature.image_keys
-        for image_key in image_keys:
-            images = Image.objects.filter(image_key=image_key)
-            for image in images:
-                print('sequence id: {}, image key: {}'.format(image.sequence.unique_id, image.image_key))
+    print(len(map_features))
+    # for map_feature in map_features:
+    #     image_keys = map_feature.image_keys
+    #     for image_key in image_keys:
+    #         images = Image.objects.filter(image_key=image_key)
+    #         for image in images:
+    #             print('sequence id: {}, image key: {}'.format(image.sequence.unique_id, image.image_key))
 
     # p = threading.Thread(target=change_download_field)
     # p.start()
