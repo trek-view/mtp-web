@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from accounts.models import CustomUser, MapillaryUser
 ## Custom Libs ##
 from lib.functions import *
+from lib.django_db_functions import get_correct_sql
 from sequence.forms import SequenceSearchForTourForm
 from sequence.models import TransType, SequenceLike
 # That includes from .models import *
@@ -305,7 +306,7 @@ def tour_list(request):
         tours = Tour.objects.all().filter(is_published=True)
         form = TourSearchForm()
 
-    request.session['tours_query'] = str(tours.query)
+    request.session['tours_query'] = get_correct_sql(tours)
 
     paginator = Paginator(tours.order_by('-created_at'), 10)
 
@@ -377,7 +378,7 @@ def my_tour_list(request):
         tours = Tour.objects.all().filter(is_published=True)
         form = TourSearchForm()
 
-    request.session['tours_query'] = str(tours.query)
+    request.session['tours_query'] = get_correct_sql(tours)
 
     paginator = Paginator(tours.order_by('-created_at'), 10)
 

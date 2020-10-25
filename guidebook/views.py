@@ -17,6 +17,7 @@ from django.urls import reverse
 from accounts.models import CustomUser
 # Custom Libs
 from lib.functions import *
+from lib.django_db_functions import get_correct_sql
 # That includes from .models import *
 from .forms import *
 
@@ -89,7 +90,7 @@ def guidebook_list(request):
         guidebooks = Guidebook.objects.all().filter(is_published=True, is_approved=True)
         form = GuidebookSearchForm()
 
-    request.session['guidebooks_query'] = str(guidebooks.query)
+    request.session['guidebooks_query'] = get_correct_sql(guidebooks)
 
     paginator = Paginator(guidebooks.order_by('-created_at'), 10)
 
@@ -181,7 +182,7 @@ def my_guidebook_list(request):
         )
         form = GuidebookSearchForm()
 
-    request.session['guidebooks_query'] = str(guidebooks.query)
+    request.session['guidebooks_query'] = get_correct_sql(guidebooks)
 
     paginator = Paginator(guidebooks.order_by('-created_at'), 10)
 

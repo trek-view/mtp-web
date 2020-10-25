@@ -91,12 +91,12 @@ class CustomMVTManager(MVTManager):
         """
         additional_where = self.get_additional_where(additional_filters=additional_filters, request=request)
 
-        additional_where = additional_where.replace('(%', "('%%").replace('%)', "%%')")
+        additional_where = additional_where.replace("('%", "('%%").replace("%)'", "%%')")
         date_format = re.findall('\d\d\d\d-\d\d-\d\d 00:00:00[+]00:00', additional_where)
         for d in date_format:
             additional_where = additional_where.replace(d, "'{}'".format(d))
-        # print(additional_where)
-        # additional_where = ''
+        print(additional_where)
+        additional_where = ''
         limit = "ALL" if limit == -1 else limit
         query, parameters = self._build_query(filters=filters, additional_where=additional_where)
         with self._get_connection().cursor() as cursor:

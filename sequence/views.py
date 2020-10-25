@@ -24,6 +24,7 @@ from tour.models import TourSequence
 # Custom Libs ##
 from lib.mapillary import Mapillary
 from lib.weatherstack import WeatherStack
+from lib.django_db_functions import get_correct_sql
 # That includes from .models import *
 from .forms import *
 
@@ -74,7 +75,6 @@ def sequence_list(request):
             ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__icontains=name)
-            print(camera_makes)
             if camera_makes is not None and len(camera_makes) > 0:
                 sequences = sequences.filter(camera_make__name__in=camera_makes)
             if transport_type is not None and transport_type != 'all' and transport_type != '':
@@ -96,7 +96,6 @@ def sequence_list(request):
                     sequences = sequences.filter(tag=tag)
             if like and like != 'all':
                 sequence_likes = SequenceLike.objects.all().values('sequence').annotate()
-                print(sequence_likes)
                 sequence_ary = []
                 if sequence_likes.count() > 0:
                     for sequence_like in sequence_likes:
@@ -120,15 +119,12 @@ def sequence_list(request):
                     else:
                         y = filter_time.split('-')[0]
                         m = filter_time.split('-')[1]
-                    print(m)
-                    print(y)
                     sequences = sequences.filter(
                         captured_at__month=m,
                         captured_at__year=y
                     )
 
                 elif time_type == 'yearly':
-                    print(filter_time)
                     if filter_time is None or filter_time == '':
                         now = datetime.now()
                         y = now.year
@@ -158,7 +154,7 @@ def sequence_list(request):
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
-    request.session['sequences_query'] = str(sequences.query)
+    request.session['sequences_query'] = get_correct_sql(sequences)
 
     paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
@@ -241,7 +237,6 @@ def my_sequence_list(request):
                     sequences = sequences.filter(tag=tag)
             if like and like != 'all':
                 sequence_likes = SequenceLike.objects.all().values('sequence').annotate()
-                print(sequence_likes)
                 sequence_ary = []
                 if sequence_likes.count() > 0:
                     for sequence_like in sequence_likes:
@@ -255,7 +250,7 @@ def my_sequence_list(request):
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
         form = SequenceSearchForm()
 
-    request.session['sequences_query'] = str(sequences.query)
+    request.session['sequences_query'] = get_correct_sql(sequences)
 
     paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
@@ -317,18 +312,16 @@ def image_leaderboard(request):
             page = 1
         form = ImageSearchForm(request.GET)
         if form.is_valid():
+
             username = form.cleaned_data['username']
             camera_makes = form.cleaned_data['camera_make']
-            # camera_models = form.cleaned_data['camera_model']
             transport_type = form.cleaned_data['transport_type']
             map_feature_value = form.cleaned_data['map_feature']
-            print('map_feature_value: ', map_feature_value)
 
             images = Image.objects.all()
+
             if camera_makes is not None and len(camera_makes) > 0:
                 images = images.filter(camera_make__name__in=camera_makes)
-            # if not camera_models is None and len(camera_models) > 0:
-            #     images = images.filter(camera_model__in=camera_models)
 
             if transport_type is not None and transport_type != 'all' and transport_type != '':
                 transport_type_obj = TransType.objects.filter(name=transport_type).first()
@@ -388,8 +381,6 @@ def image_leaderboard(request):
                     images = images.filter(
                         captured_at__year=y
                     )
-            image_query = str(images.query)
-
 
             if map_feature_value is not None and map_feature_value != '' and map_feature_value != 'all_values':
                 map_features = MapFeature.objects.filter(value=map_feature_value)
@@ -399,17 +390,8 @@ def image_leaderboard(request):
 
                 images = images.filter(image_key__in=map_feature_images)
 
-                map_feature_str = str(map_feature_images)
-                map_feature_str = map_feature_str.replace('[', '(').replace(']', ')')
-                map_feature_empty_str = map_feature_str.replace("'", "")
-
     if images is None:
         images = Image.objects.all()
-
-        request.session['images_query'] = str(images.query)
-
-    image_json = []
-    tmp_images = None
 
     images = images.exclude(sequence=None)
 
@@ -441,9 +423,7 @@ def image_leaderboard(request):
             image_count=Count('image_key')).annotate(
             rank=Window(expression=RowNumber()))
 
-    tmp_image_query = str(tmp_images.query)
-    tmp_image_query = tmp_image_query.replace(map_feature_empty_str, map_feature_str)
-    request.session['images_query'] = tmp_image_query
+    request.session['images_query'] = get_correct_sql(tmp_images)
 
     paginator = Paginator(image_json, 10)
 
@@ -587,11 +567,7 @@ def save_weather(sequence):
             historical_date = sequence.captured_at[0:10]
         else:
             historical_date = sequence.captured_at.strftime('%Y-%m-%d')
-        print(point)
-        print('historical_date: ', historical_date)
         weather_json = weatherstack.get_historical_data(point=point, historical_date=historical_date)
-        print(weather_json)
-
         if weather_json:
             sequence_weather = SequenceWeather()
 
@@ -695,7 +671,6 @@ def save_weather(sequence):
                                 if 'time' in hourly_data[h_index].keys():
                                     time_str = hourly_data[h_index]['time']
                                     time_float = float(time_str) / 100
-                                    print(sequence.captured_at)
                                     capture_h = float(sequence.captured_at.strftime('%H'))
                                     capture_m = float(sequence.captured_at.strftime('%M'))
                                     d_time = abs(capture_h + capture_m / 60 - time_float)
@@ -775,7 +750,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
         return
     sequence = seqs[0]
     if is_weather and not sequence.get_first_point_lat() is None and not sequence.get_first_point_lng() is None:
-        print(save_weather(sequence))
+        save_weather(sequence)
 
     if token is None:
         token = sequence.user.mapillary_access_token
@@ -790,8 +765,6 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
         for image_feature in image_features:
             images = Image.objects.filter(image_key=image_feature['properties']['key'])
             image_position_ary.append(image_feature['geometry']['coordinates'])
-            print(image_feature)
-            print(image_feature['properties']['altitude'])
             if images.count() > 0:
                 image = images[0]
                 continue
@@ -851,8 +824,6 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
             image.save()
             print('image key: ', image.image_key)
 
-        print(image_keys)
-
         if len(image_position_ary) > 0 and mf_insert:
             print('Image len: ', len(image_position_ary))
             mm = 0
@@ -867,7 +838,6 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                     tt = 0
                     for map_feature in map_features:
                         tt += 1
-                        # print('---- {} -----'.format(tt))
                         mf_properties = map_feature['properties']
                         detections = None
                         if 'detections' in mf_properties.keys():
@@ -877,12 +847,10 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                                     detections = detection
                                     break
                         if detections is None:
-                            # print('detections is None')
                             continue
                         mf_geometry = map_feature['geometry']
                         mf_item = MapFeature.objects.filter(mf_key=mf_properties['key'])[:1]
                         if mf_item.count() > 0:
-                            # print('feature is existing')
                             continue
                         mf_item = MapFeature()
                         mf_item.detections = {'detections': detections}
@@ -1709,7 +1677,6 @@ def ajax_add_label_type(request):
                                 l_type.name = lab
                                 l_type.source = 'mapillary'
                                 l_type.parent = l_parent_type
-                                print(l_type.name)
                                 l_type.save()
                             else:
                                 l_type = types[0]
@@ -1770,7 +1737,6 @@ def ajax_add_image_label(request, unique_id, image_key):
         geometry = json.loads(geometry_str)
         label_id = request.POST.get('label_type')
         geo_type = request.POST.get('geo_type')
-        print(label_id)
         label_types = LabelType.objects.filter(pk=label_id)[:1]
         if label_types.count() == 0:
             return JsonResponse({
@@ -1779,7 +1745,6 @@ def ajax_add_image_label(request, unique_id, image_key):
             })
         else:
             label_type = label_types[0]
-        print(geometry)
         image_label = ImageLabel()
         image_label.image = image
         image_label.user = request.user
@@ -2075,9 +2040,7 @@ def ajax_image_map_feature(request, unique_id):
     image_key = request.GET.get('image_key', '')
     map_features_json = {}
     if image_key is not None and image_key != '':
-        print(image_key)
         map_features = MapFeature.objects.filter(image_keys__contains=[image_key])
-        print(map_features.count())
         for map_feature in map_features:
             value = map_feature.value
             if value in map_features_json.keys():
@@ -2169,7 +2132,6 @@ def change_download_field():
     for sequence in sequences:
         sequence.is_image_download = True
         sequence.save()
-        print(sequence.name)
 
 
 def change_map_feature_field():
@@ -2177,4 +2139,3 @@ def change_map_feature_field():
     for sequence in sequences:
         sequence.is_map_feature = True
         sequence.save()
-        print(sequence.name)
