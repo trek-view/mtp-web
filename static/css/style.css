@@ -458,3 +458,8 @@ i.fas, i.far {
 .bootstrap-select button {
     background: white !important;
 }
+
+.bootstrap-select .dropdown-menu.show {
+    width: 100% !important;
+    min-width: 100% !important;
+}

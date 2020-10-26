@@ -20,7 +20,7 @@ from django.db import connection
 from accounts.models import CustomUser, MapillaryUser
 from challenge.models import Challenge, LabelChallenge
 from guidebook.models import Guidebook, Scene
-from tour.models import TourSequence
+from tour.models import TourSequence, Tour
 # Custom Libs ##
 from lib.mapillary import Mapillary
 from lib.weatherstack import WeatherStack
@@ -1029,6 +1029,19 @@ def sequence_detail(request, unique_id):
         if guidebooks.count() == 0:
             guidebooks = None
 
+    is_mine = False
+    tours = None
+    ts_tours = None
+    if request.user.is_authenticated and request.user == sequence.user:
+        is_mine = True
+        tours = Tour.objects.filter(user=request.user)
+        tour_sequences = TourSequence.objects.filter(sequence=sequence)
+        ts_tours = None
+        for tour_sequence in tour_sequences:
+            if ts_tours is None:
+                ts_tours = []
+            ts_tours.append(tour_sequence.tour)
+
     content = {
         'sequence': sequence,
         'guidebooks': guidebooks,
@@ -1045,7 +1058,10 @@ def sequence_detail(request, unique_id):
         'sequence_weather': sequence_weather,
         'view_mode': view_mode,
         'show_gpx': show_gpx,
-        'firstImageKey': firstImageKey
+        'firstImageKey': firstImageKey,
+        'tours': tours,
+        'ts_tours': ts_tours,
+        'is_mine': is_mine
     }
     return render(request, 'sequence/detail.html', content)
 
