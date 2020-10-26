@@ -537,6 +537,10 @@ def image_leaderboard(request):
         except:
             img['sequence_unique_id'] = ''
 
+        try:
+            img['map_features'] = ', '.join(image.map_feature_values)
+        except:
+            img['map_features'] = ''
 
         pItems[i]['image'] = img
 
@@ -1867,6 +1871,10 @@ def ajax_get_image_list(request, unique_id):
             scenes = Scene.objects.filter(image_key=image[0].image_key)
             pImages[i]['view_points'] = view_points.count()
             pImages[i]['guidebooks'] = scenes.count()
+            if image[0].map_feature_values is None:
+                pImages[i]['map_features'] = ''
+            else:
+                pImages[i]['map_features'] = ','.join(image[0].map_feature_values)
 
     addSequenceForm = AddSequenceForm(instance=sequence)
 

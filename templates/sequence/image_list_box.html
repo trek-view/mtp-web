@@ -38,6 +38,9 @@
                 <span><small>Lat: </small>{{ image.lat }}</span>
                 <span><small>Lng: </small>{{ image.lng }}</span>
             </div>
+            <div class="image-map-features">
+                <span>{{ image.map_features }}</span>
+            </div>
             <div class="image-view-point d-flex justify-content-between">
                 <span><small>Guidebooks: </small>{% if not image.guidebooks or image.guidebooks is None %}0{% else %}{{ image.guidebooks }}{% endif %}</span>
                 <span><small>Viewpoints: </small>{% if not image.view_points or image.view_points is None %}0{% else %}{{ image.view_points }}{% endif %}</span>
