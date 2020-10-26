@@ -23,6 +23,8 @@ urlpatterns = [
     path('<str:unique_id>/ajax_get_image_gpx_data/', views.ajax_get_image_gpx_data,
          name='sequence.ajax_get_image_gpx_data'),
 
+    path('<str:unique_id>/ajax_add_in_tour/', views.ajax_add_in_tour, name='sequence.ajax_add_in_tour'),
+
     path('<str:seq_key>/ajax_import/', views.ajax_import, name='sequence.ajax_import'),
 
     path('<str:unique_id>/ajax_image_mark_view/<str:image_key>/', views.ajax_image_mark_view, name='sequence.ajax_image_mark_view'),

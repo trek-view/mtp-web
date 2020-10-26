@@ -45,6 +45,27 @@ def tour_create(request, unique_id=None):
                 tour.username = mapillary_user.username
                 tour.is_published = False
                 tour.save()
+
+                sequence_unique_id = request.GET.get('sequence_unique_id', None)
+                if sequence_unique_id is not None:
+                    sequence = Sequence.objects.get(unique_id=sequence_unique_id)
+                    if sequence is not None:
+                        tour_sequence = TourSequence()
+                        tour_sequence.sequence = sequence
+                        tour_sequence.tour = tour
+
+                        max_sort_ts = TourSequence.objects.filter(sequence=sequence, tour=tour).order_by('-sort').first()
+                        if max_sort_ts is None:
+                            max_sort = 0
+                        else:
+                            max_sort = max_sort_ts.sort
+
+                        tour_sequence.sort = max_sort + 1
+                        tour_sequence.save()
+
+                        tour.is_published = True
+                        tour.save()
+
                 if form.cleaned_data['tour_tag'].count() > 0:
                     for tour_tag in form.cleaned_data['tour_tag']:
                         tour.tour_tag.add(tour_tag)

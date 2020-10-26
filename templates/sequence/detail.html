@@ -35,18 +35,20 @@
                     </h4>
                 </div>
                 {% if is_mine %}
-                    <div class="w-100 mb-2">
-                        <select class="selectpicker border form-control" multiple data-live-search="true" id="add_in_tour">
-                            {% for tour in tours %}
-                                <option value="{{ tour.unique_id }}">
-                                    {{ tour.name }}
-                                </option>
-
-                            {% endfor %}
-                            <optgroup label="">
-                                <option data-content="<a href='{% url "home" %}'>Test</a>" disabled>Test</option>
-                            </optgroup>
-                        </select>
+                    <div class="w-100 mb-2 text-right">
+                        {% if tours.count > 0 %}
+                        <div class="text-left">
+                            <label for="add_in_tour">Add sequence in tours or remove from tours. </label>
+                            <select class="selectpicker border form-control mb-2" multiple data-live-search="true" id="add_in_tour">
+                                {% for tour in tours %}
+                                    <option value="{{ tour.unique_id }}" {% if tour in ts_tours %}selected{% endif %}>
+                                        {{ tour.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+                        <a class='btn btn-success' href='{% url "tour.tour_create" %}?sequence_unique_id={{ sequence.unique_id }}'>New Tour</a>
                     </div>
                 {% endif %}
             </div>
@@ -528,10 +530,32 @@
 
     let current_page = '0';
 
-    $('#add_in_tour').change(function () {
-        let value = $(this).val();
-        console.log(value)
-    })
+    {% if request.user.is_authenticated and request.user == sequence.user %}
+        $('#add_in_tour').change(function () {
+            let value = $(this).val();
+            let url = "{% url 'sequence.ajax_add_in_tour' unique_id=sequence.unique_id %}";
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {'tour_ids': value.join(',')},
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                        toastr.error(data.message);
+                    else
+                    {
+                        toastr.success(data.message);
+                    }
+                }
+            })
+        });
+
+        $('#new_tour').click(function () {
+            alert()
+        });
+    {% endif %}
+
+
 
     mapboxgl.accessToken = mapboxToken;
     // Create a popup, but don't add it to the map yet.

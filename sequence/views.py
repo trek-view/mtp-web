@@ -2106,6 +2106,63 @@ def ajax_get_image_gpx_data(request, unique_id):
     return JsonResponse({'points': points})
 
 
+def ajax_add_in_tour(request, unique_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'You are required login.'
+        })
+
+    sequence = Sequence.objects.filter(unique_id=unique_id, user=request.user).first()
+
+    if sequence is None or not sequence.is_published:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "The Sequence does not exist or you don't have access."
+        })
+
+    if request.method == 'POST':
+        tour_sequences = TourSequence.objects.filter(sequence=sequence).order_by('sort')
+
+        tour_ids = request.POST.get('tour_ids')
+        tour_id_ary = tour_ids.split(',')
+        max_sort = 0
+
+        for tour_sequence in tour_sequences:
+
+            unique_id_str = str(tour_sequence.tour.unique_id)
+            if unique_id_str not in tour_id_ary:
+                tour = tour_sequence.tour
+                tour_sequence.delete()
+                ts = TourSequence.objects.filter(tour=tour)
+                if ts.count() == 0:
+                    tour.is_published = False
+                    tour.save()
+            else:
+                tour_id_ary.remove(unique_id_str)
+                max_sort = tour_sequence.sort
+
+        for tour_id in tour_id_ary:
+            if tour_id == '':
+                continue
+            tour = Tour.objects.get(unique_id=tour_id)
+            if tour is not None:
+                tour_sequence = TourSequence()
+                tour_sequence.tour = tour
+                tour_sequence.sequence = sequence
+                max_sort += 1
+                tour_sequence.sort = max_sort
+                tour_sequence.save()
+
+                tour.is_published = True
+                tour.save()
+
+    return JsonResponse({
+            'status': 'success',
+            'message': "Sequence is successfully updated in tours."
+        })
+
+
 def ajax_get_detail_by_image_key(request, image_key):
     images = Image.objects.filter(image_key=image_key)
     if images.count() == 0:

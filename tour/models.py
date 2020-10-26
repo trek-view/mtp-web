@@ -144,6 +144,7 @@ class TourSequence(models.Model):
     sort = models.IntegerField(default=1)
 
 
+
 class TourLike(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
