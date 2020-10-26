@@ -29,10 +29,12 @@
                 <a type="button" class="btn btn-info" href="{% url 'sequence.sequence_list' %}">Go to Sequence List</a>
             </div>
             <div class="page-header">
-                <div class="pt-3 mb-3">
-                    <h4>
-                        {{ pageName }}
-                    </h4>
+                <div class="row">
+                    <div class="col-md-7 pt-3 mb-3">
+                        <h4>
+                            {{ pageName }}
+                        </h4>
+                    </div>
                 </div>
             </div>
             {% if messages %}

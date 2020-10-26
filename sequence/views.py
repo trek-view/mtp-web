@@ -388,7 +388,7 @@ def image_leaderboard(request):
                         if image_key not in map_feature_images:
                             map_feature_images.append(image_key)
 
-                images = images.filter(image_key__in=map_features)
+                images = images.filter(image_key__in=map_feature_images)
 
     if images is None:
         images = Image.objects.all()
@@ -396,7 +396,8 @@ def image_leaderboard(request):
     images = images.exclude(sequence=None)
 
     if filter_type == 'label_count':
-        # image_json = ImageLabel.objects.filter(image__in=images).values('image').annotate(
+        # image_json = ImageLabel.objects.filter(
+        # image__in=images).values('image').annotate(
         #     image_count=Count('image')).order_by('-image_count').annotate(
         #     rank=Window(expression=RowNumber()))
 

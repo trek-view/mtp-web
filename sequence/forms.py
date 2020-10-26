@@ -91,7 +91,8 @@ class AddSequenceForm(forms.ModelForm):
         self.fields['transport_type'] = forms.ModelChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'form-control', 'data-validation': 'required'}),
+                attrs={'class': 'selectpicker form-control border', 'multiple': 'multiple', 'data-live-search': 'true', 'data-validation': 'required'}
+            ),
             queryset=TransType.objects.filter(parent__isnull=False),
             empty_label=None
         )
@@ -132,7 +133,7 @@ class SequenceSearchForm(forms.Form):
         self.fields['camera_make'] = forms.MultipleChoiceField(
             required=False,
             widget=forms.SelectMultiple(
-                attrs={'class': 'form-control'}
+                attrs={'class': 'selectpicker form-control border', 'multiple': 'multiple', 'data-live-search': 'true'}
             ),
             choices=camera_makes,
             label='Camera Make (leave blank for all)',
@@ -141,7 +142,8 @@ class SequenceSearchForm(forms.Form):
         self.fields['transport_type'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'form-control'}),
+                attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}
+            ),
             choices=transport_types,
         )
 
@@ -220,22 +222,6 @@ class ImageSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['camera_make'] = forms.MultipleChoiceField(
-            required=False,
-            widget=forms.SelectMultiple(
-                attrs={'class': 'form-control'}
-            ),
-            choices=camera_makes(),
-            label='Camera Make (leave blank for all)',
-        )
-        # self.fields['camera_model'] = forms.ModelMultipleChoiceField(
-        #     required=False,
-        #     widget=forms.SelectMultiple(
-        #         attrs={'class': 'form-control'}
-        #     ),
-        #     queryset=CameraModel.objects.all()
-        # )
-
         self.fields['username'] = forms.CharField(
             label='Username',
             widget=forms.TextInput(attrs={'class': 'form-control'}),
@@ -245,14 +231,24 @@ class ImageSearchForm(forms.Form):
         self.fields['transport_type'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'form-control'}),
+                attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}),
             choices=transport_types,
+        )
+
+        self.fields['camera_make'] = forms.MultipleChoiceField(
+            required=False,
+            widget=forms.SelectMultiple(
+                attrs={'class': 'selectpicker form-control border', 'multiple': 'multiple', 'data-live-search': 'true'}
+            ),
+            choices=camera_makes(),
+            label='Camera Make (leave blank for all)',
         )
 
         self.fields['map_feature'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'form-control'}),
+                attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}
+            ),
             choices=get_map_feature_values(),
         )
 
@@ -270,7 +266,7 @@ class SequenceSearchForTourForm(forms.Form):
         self.fields['camera_make'] = forms.MultipleChoiceField(
             required=False,
             widget=forms.SelectMultiple(
-                attrs={'class': 'form-control'}
+                attrs={'class': 'selectpicker form-control border', 'multiple': 'multiple', 'data-live-search': 'true'}
             ),
             choices=camera_makes(),
             label='Camera Make (leave blank for all)',
@@ -279,7 +275,8 @@ class SequenceSearchForTourForm(forms.Form):
         self.fields['transport_type'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'form-control'}),
+                attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}
+            ),
             choices=transport_types,
         )
 

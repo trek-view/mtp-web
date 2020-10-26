@@ -42,14 +42,14 @@ class LeaderboardSearchForm(forms.Form):
         self.fields['transport_type'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'form-control'}),
+                attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}),
             choices=transport_types(),
         )
 
         self.fields['camera_make'] = forms.MultipleChoiceField(
             required=False,
             widget=forms.SelectMultiple(
-                attrs={'class': 'form-control'}
+                attrs={'class': 'selectpicker form-control border', 'multiple': 'multiple', 'data-live-search': 'true'}
             ),
             choices=camera_make()
         )
@@ -88,7 +88,7 @@ class LeaderboardSearchForm(forms.Form):
         self.fields['transport_type'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'form-control'}),
+                attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}),
             choices=transport_types(),
             initial=transport_type
         )
@@ -107,7 +107,7 @@ class LeaderboardSearchForm(forms.Form):
         self.fields['camera_make'] = forms.MultipleChoiceField(
             required=False,
             widget=forms.SelectMultiple(
-                attrs={'class': 'form-control'}
+                attrs={'class': 'selectpicker form-control border', 'multiple': 'multiple', 'data-live-search': 'true'}
             ),
             choices=camera_make(),
             initial=camera_makes

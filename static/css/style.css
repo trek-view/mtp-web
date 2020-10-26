@@ -450,3 +450,11 @@ i.fas, i.far {
         width: 100% !important;
     }
 }
+
+.bootstrap-select .dropdown-menu.inner.show .dropdown-item.selected {
+    position: relative;
+}
+
+.bootstrap-select button {
+    background: white !important;
+}

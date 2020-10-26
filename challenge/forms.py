@@ -41,7 +41,7 @@ class ChallengeForm(forms.ModelForm):
     camera_make = forms.MultipleChoiceField(
         required=False,
         widget=forms.SelectMultiple(
-            attrs={'class': 'form-control'}
+            attrs={'class': 'selectpicker form-control border', 'multiple': 'multiple', 'data-live-search': 'true'}
         ),
         choices=camera_makes,
         label='Camera Make (leave blank for all)',
@@ -50,7 +50,8 @@ class ChallengeForm(forms.ModelForm):
     transport_type = forms.ChoiceField(
         required=False,
         widget=forms.Select(
-            attrs={'class': 'form-control'}),
+            attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}
+        ),
         choices=transport_types,
     )
 
@@ -118,7 +119,7 @@ class ChallengeSearchForm(forms.Form):
     camera_make = forms.MultipleChoiceField(
         required=False,
         widget=forms.SelectMultiple(
-            attrs={'class': 'form-control'}
+            attrs={'class': 'selectpicker form-control border', 'multiple': 'multiple', 'data-live-search': 'true'}
         ),
         choices=camera_makes,
         label='Camera Make (leave blank for all)',
@@ -127,7 +128,8 @@ class ChallengeSearchForm(forms.Form):
     transport_type = forms.ChoiceField(
         required=False,
         widget=forms.Select(
-            attrs={'class': 'form-control'}),
+            attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}
+        ),
         choices=transport_types,
     )
 
@@ -151,7 +153,7 @@ class LabelChallengeForm(forms.ModelForm):
     label_type = forms.ModelMultipleChoiceField(
         required=False,
         widget=forms.SelectMultiple(
-            attrs={'class': 'form-control'}
+            attrs={'class': 'selectpicker form-control border', 'multiple': 'multiple', 'data-live-search': 'true'}
         ),
         queryset=LabelType.objects.filter(source='mtpw')
     )
@@ -217,7 +219,8 @@ class LabelChallengeSearchForm(forms.Form):
     label_type = forms.ChoiceField(
         required=False,
         widget=forms.Select(
-            attrs={'class': 'form-control'}),
+            attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}
+        ),
         choices=label_types(),
     )
 

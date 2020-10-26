@@ -29,7 +29,7 @@
             {% endif %}
             <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
                 <li class="nav-item" style="width: 30%; margin-left: 5%;">
-                    <a class="nav-link {% if time_type == 'all_time' %}active{% endif %}" href="{% url 'leaderboard.index' %}?time_type=all_time">All Time</a>
+                    <a class="nav-link {% if time_type is None or time_type == '' or time_type == 'all_time' %}active{% endif %}" href="{% url 'leaderboard.index' %}?time_type=all_time">All Time</a>
                 </li>
                 <li class="nav-item" style="width: 30%;">
                     <a class="nav-link {% if time_type == 'yearly' %}active{% endif %}" href="{% url 'leaderboard.index' %}?time_type=yearly">Yearly</a>

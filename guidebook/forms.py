@@ -30,7 +30,8 @@ class GuidebookForm(forms.ModelForm):
     category = forms.ModelChoiceField(
         required=False,
         widget=forms.Select(
-            attrs={'class': 'form-control', 'data-validation': 'required'}),
+            attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true', 'data-validation': 'required'}
+        ),
         queryset=Category.objects.all(),
         to_field_name='pk',
         empty_label=None
@@ -146,7 +147,7 @@ class PointOfInterestForm(forms.ModelForm):
         required=False,
         label='',
         widget=forms.Select(
-            attrs={'class': 'form-control'}),
+            attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}),
         queryset=POICategory.objects.all(),
         to_field_name='pk',
         empty_label=None
@@ -180,7 +181,7 @@ class GuidebookSearchForm(forms.Form):
         self.fields['category'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'form-control'}),
+                attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}),
             choices=categories(),
         )
         self.fields['tag'] = CustomTagsInputField(
