@@ -2152,21 +2152,28 @@ def insert_db(request):
 
 def update_mf_keys_with_thread():
     images = Image.objects.all()
-    for img in images:
+    print('len image: ', images.count())
+    m = 0
+    for image in images:
+        m += 1
+        print('number image: ', m)
+        mf_values = None
+        mf_keys = image.map_feature_keys
+        if mf_keys is not None:
+            for mf_key in mf_keys:
+                mf = MapFeature.objects.filter(mf_key=mf_key).first()
+                if mf is not None:
+                    mf_value = mf.value
+                    if mf_values is None:
+                        mf_values = []
+                    if mf_value not in mf_values:
+                        mf_values.append(mf_value)
+        if mf_values is not None:
+            image.map_feature_values = mf_values
 
-        image = Image.objects.filter(image_key=img.image_key).first()
-        if image is not None:
-            mf_keys = image.map_feature_keys
-            if mf_keys is None:
-                mf_keys = []
-            map_features = MapFeature.objects.filter(image_keys__contains=[image.image_key])
-            for map_feature in map_features:
-                if map_feature.mf_key not in mf_keys:
-                    mf_keys.append(map_feature.mf_key)
-
-            image.map_feature_keys = mf_keys
-            print(len(mf_keys))
+            print(mf_values)
             image.save()
+
 
 
 def insert_db_with_thread():
