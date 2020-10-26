@@ -972,6 +972,8 @@ def sequence_detail(request, unique_id):
     # print('2')
     # set_camera_make(sequence)
 
+    image_key = None
+
     page = 1
     if request.method == "GET":
         page = request.GET.get('page')

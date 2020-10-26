@@ -96,7 +96,7 @@ class CustomMVTManager(MVTManager):
         for d in date_format:
             additional_where = additional_where.replace(d, "'{}'".format(d))
         additional_where = additional_where.replace("['", "ARRAY['")
-        print(additional_where)
+        # print(additional_where)
         # additional_where = ''
         limit = "ALL" if limit == -1 else limit
         query, parameters = self._build_query(filters=filters, additional_where=additional_where)

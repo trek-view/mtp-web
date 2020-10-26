@@ -29,19 +29,26 @@
                 <a type="button" class="btn btn-info" href="{% url 'sequence.sequence_list' %}">Go to Sequence List</a>
             </div>
             <div class="page-header">
-                <div class="row">
-                    <div class="col-md-7 pt-3 mb-3">
-                        <h4>
-                            {{ pageName }}
-                        </h4>
-                    </div>
-{##}
-{#                    <div >#}
-{#                        <select class="selectpicker border w-100" multiple data-live-search="true">#}
-{#                            {%  %}#}
-{#                        </select>#}
-{#                    </div>#}
+                <div class="pt-3 mb-3">
+                    <h4>
+                        {{ pageName }}
+                    </h4>
                 </div>
+                {% if is_mine %}
+                    <div class="w-100 mb-2">
+                        <select class="selectpicker border form-control" multiple data-live-search="true" id="add_in_tour">
+                            {% for tour in tours %}
+                                <option value="{{ tour.unique_id }}">
+                                    {{ tour.name }}
+                                </option>
+
+                            {% endfor %}
+                            <optgroup label="">
+                                <option data-content="<a href='{% url "home" %}'>Test</a>" disabled>Test</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                {% endif %}
             </div>
             {% if messages %}
                 {% for message in messages %}
@@ -519,11 +526,16 @@
       "hideMethod": "fadeOut"
     };
 
-    var current_page = '0';
+    let current_page = '0';
+
+    $('#add_in_tour').change(function () {
+        let value = $(this).val();
+        console.log(value)
+    })
 
     mapboxgl.accessToken = mapboxToken;
     // Create a popup, but don't add it to the map yet.
-    var popup = new mapboxgl.Popup({
+    let popup = new mapboxgl.Popup({
       closeButton: false,
       closeOnClick: false
     });
@@ -694,9 +706,9 @@
          mapillaryViewer.resize();
          map.resize();
     });
-    
-    
-    
+
+
+
     var is_mapillary_viewer = true;
 
     var mapillaryViewer = new Mapillary.Viewer(
@@ -711,7 +723,7 @@
             },
         }
     );
-    
+
     mapillaryViewer.on(Mapillary.Viewer.nodechanged, function (node) {
         tagComponent.removeAll();
         current_node_point = [node.latLon.lat, node.latLon.lon];
