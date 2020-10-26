@@ -91,7 +91,7 @@ class AddSequenceForm(forms.ModelForm):
         self.fields['transport_type'] = forms.ModelChoiceField(
             required=False,
             widget=forms.Select(
-                attrs={'class': 'selectpicker form-control border', 'multiple': 'multiple', 'data-live-search': 'true', 'data-validation': 'required'}
+                attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true', 'data-validation': 'required'}
             ),
             queryset=TransType.objects.filter(parent__isnull=False),
             empty_label=None
