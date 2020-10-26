@@ -1076,27 +1076,9 @@ def sequence_delete(request, unique_id):
         if sequence.user != request.user:
             messages.error(request, 'The sequence does not exist or has no access.')
             return redirect('sequence.index')
+
         name = sequence.name
-        sequence.name = ''
-        sequence.description = ''
-        sequence.transport_type = None
-        tags = sequence.tag.all()
-        for tag in tags:
-            sequence.tag.remove(tag)
-        sequence.is_published = False
-        sequence.save()
-
-        seq_likes = SequenceLike.objects.filter(sequence=sequence)
-
-        if seq_likes.count() > 0:
-            for s in seq_likes:
-                s.delete()
-
-        tour_sequences = TourSequence.objects.filter(sequence=sequence)
-
-        if tour_sequences.count() > 0:
-            for t_seq in tour_sequences:
-                t_seq.delete()
+        sequence.delete()
 
         messages.success(request, '"{}" is deleted successfully.'.format(name))
         return redirect('sequence.index')
