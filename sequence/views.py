@@ -381,14 +381,8 @@ def image_leaderboard(request):
                     )
 
             if map_feature_value is not None and map_feature_value != '' and map_feature_value != 'all_values':
-                map_features = MapFeature.objects.filter(value=map_feature_value)
-                map_feature_images = []
-                for map_feature in map_features:
-                    for image_key in map_feature.image_keys:
-                        if image_key not in map_feature_images:
-                            map_feature_images.append(image_key)
-
-                images = images.filter(image_key__in=map_feature_images)
+                print(type(map_feature_value))
+                images = images.filter(map_feature_values__contains=tuple([map_feature_value]))
 
     if images is None:
         images = Image.objects.all()
@@ -892,8 +886,15 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                                 mf_keys = []
                             if mf_item.mf_key not in mf_keys:
                                 mf_keys.append(mf_item.mf_key)
-
                             image.map_feature_keys = mf_keys
+
+                            mf_values = image.map_feature_values
+                            if mf_values is None:
+                                mf_values = []
+                            if mf_item.value not in mf_values:
+                                mf_values.append(mf_item.value)
+                            image.map_feature_values = mf_values
+
                             image.save()
 
                         # for detection in mf_properties['detections']:
