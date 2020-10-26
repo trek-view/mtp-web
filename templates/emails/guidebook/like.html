@@ -1,5 +1,5 @@
 <body>
     <p>
-        Hi {{ guidebook.user.username }}! You received a like for your guidebook: <a href="{{ BASE_URL }}{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">{{ guidebook.name }}</a>.
+        Hi {{ guidebook.user.username }}! You received a like for your guidebook: <a href="{{ BASE_URL }}{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">{{ guidebook.name }}</a> by <a href="{% url 'account.profile' username=sender.username %}">{{ sender.username }}</a>.
     </p>
 </body>

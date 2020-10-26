@@ -884,14 +884,14 @@ def check_like(request, unique_id):
 
     guidebook_like = GuidebookLike.objects.filter(guidebook=guidebook, user=request.user)
     if guidebook_like:
-        if request.user.is_liked_email:
+        if guidebook.user.is_liked_email:
             # confirm email
             try:
                 # send email to creator
                 subject = 'Your Map the Paths Guidebook Was Liked'
                 html_message = render_to_string(
                     'emails/guidebook/like.html',
-                    {'subject': subject, 'like': 'unliked', 'guidebook': guidebook},
+                    {'subject': subject, 'like': 'unliked', 'guidebook': guidebook, 'sender': request.user},
                     request
                 )
                 send_mail_with_html(subject, html_message, guidebook.user.email, settings.SMTP_REPLY_TO)

@@ -716,14 +716,14 @@ def ajax_tour_check_like(request, unique_id):
 
     tour_like = TourLike.objects.filter(tour=tour, user=request.user)
     if tour_like:
-        if request.user.is_liked_email:
+        if tour.user.is_liked_email:
             # confirm email
             try:
                 # send email to creator
                 subject = 'Your Map the Paths Tour Was Liked'
                 html_message = render_to_string(
                     'emails/tour/like.html',
-                    {'subject': subject, 'like': 'unliked', 'tour': tour},
+                    {'subject': subject, 'like': 'unliked', 'tour': tour, 'sender': request.user},
                     request
                 )
                 send_mail_with_html(subject, html_message, tour.user.email, settings.SMTP_REPLY_TO)

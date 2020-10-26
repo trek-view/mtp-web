@@ -1,5 +1,5 @@
 <body>
     <p>
-        Hi {{ sequence.user.username }}! You received a like for your sequence: <a href="{{ BASE_URL }}{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}">{{ sequence.name }}</a>.
+        Hi {{ sequence.user.username }}! You received a like for your sequence: <a href="{{ BASE_URL }}{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}">{{ sequence.name }}</a> by <a href="{% url 'account.profile' username=sender.username %}">{{ sender.username }}</a>.
     </p>
 </body>

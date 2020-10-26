@@ -1454,14 +1454,14 @@ def ajax_sequence_check_like(request, unique_id):
 
     sequence_like = SequenceLike.objects.filter(sequence=sequence, user=request.user)
     if sequence_like:
-        if request.user.is_liked_email:
+        if sequence.user.is_liked_email:
             # confirm email
             try:
                 # send email to creator
                 subject = 'Your Map the Paths Sequence Was Liked'
                 html_message = render_to_string(
                     'emails/sequence/like.html',
-                    {'subject': subject, 'like': 'unliked', 'sequence': sequence},
+                    {'subject': subject, 'like': 'unliked', 'sequence': sequence, 'sender': request.user},
                     request
                 )
                 send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
@@ -1930,14 +1930,14 @@ def ajax_image_mark_view(request, unique_id, image_key):
 
     image_view_points = ImageViewPoint.objects.filter(image=image, user=request.user)
     if image_view_points.count() > 0:
-        if request.user.is_liked_email:
+        if sequence.user.is_liked_email:
             # confirm email
             try:
                 # send email to creator
                 subject = 'Your Map the Paths Photo Received a View Point'
                 html_message = render_to_string(
                     'emails/sequence/image_view_point.html',
-                    {'subject': subject, 'like': 'unviewed', 'sequence': sequence, 'image_key': image.image_key},
+                    {'subject': subject, 'like': 'unviewed', 'sequence': sequence, 'image_key': image.image_key, 'sender': request.user},
                     request
                 )
                 send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
