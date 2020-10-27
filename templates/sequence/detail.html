@@ -314,6 +314,10 @@
                     <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="Hide GPX Points" data-off="Show GPX Points" data-onstyle="success" data-offstyle="primary">
                 {% endif %}
             </div>
+
+            <div class="embed-code">
+                <button type="button" class="btn btn-sm btn-primary text-white" data-toggle="modal" data-target="#embed_code_modal">Get Embed Code</button>
+            </div>
         </div>
 
         <div class="image-detail {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
@@ -433,8 +437,6 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 
     <div class="right-board bg-light">
@@ -493,6 +495,56 @@
     </div>
 </div>
     <div title="regular tooltip" id="label_popup">Hover me</div>
+
+<div class="modal fade" id="embed_code_modal" tabindex="-1" role="dialog" aria-labelledby="embed_code_modal_label" aria-hidden="true">
+  <div class="modal-dialog" style="margin-top: 150px" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="embed_code_modal_label">Embed</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="embed-style" data-style="photo" style="cursor: pointer">
+                    <img src="{% static 'images/icon/style-photo-highlight.svg' %}">
+                </div>
+                <div class="">
+                    <span>Image only</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="embed-style" data-style="split" style="cursor: pointer">
+                    <img src="{% static 'images/icon/style-split.svg' %}">
+                </div>
+                <div class="">
+                    <span>Split</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="embed-style" data-style="classic" style="cursor: pointer">
+                    <img src="{% static 'images/icon/style-classic.svg' %}">
+                </div>
+                <div class="">
+                    <span>Classic</span>
+                </div>
+            </div>
+          <div class="w-100 mt-4 p-2">
+              <h5>Embed Code</h5>
+              <div class="embed_code bg-light d-flex justify-content-between align-items-center" >
+                <input data-toggle="tooltip" data-placement="bottom" title="Copied embed code" style="width: calc(100% - 30px)" id="embed_code" readonly value='<iframe width="640" height="480" src="https://embed-v1.mapillary.com/embed?version=1&filter=%5B%22all%22%5D&map_filter=%5B%22all%22%5D&map_style=Mapillary streets&image_key=dc7sq4IjBkVukQ8LVMmH0w&x=0.4999999999999999&y=0.5&client_id=cEc2TDVkajU3UEF1eGFFVVVnajloQTpiNzI1MDU0M2VjMjU4NWMz&style=photo" frameborder="0"></iframe>'>
+                <i class="far fa-copy" style="cursor: pointer" id="copy_embed_code" ></i>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -502,6 +554,7 @@
 <script src="{% static 'js/pages/sequence/togeojson.js' %}"></script>
 <script src="{% static 'js/pages/sequence/leaflet-hash.js' %}"></script>
 <script>
+
     var ctx = document.getElementById('myChart').getContext('2d');
     var first_move = true;
     $.ajaxSetup({
@@ -530,6 +583,45 @@
 
     let current_page = '0';
 
+    $('#embed_code').tooltip('disable');
+
+    $('.embed-style').click(function () {
+        let url = "{% static 'images/icon/style-' %}";
+        let style = $(this).attr('data-style');
+        console.log('url', url);
+        $('.embed-style').each(function (index) {
+            let src = $(this).find('img').attr('src');
+            src = src.replace('-highlight', '');
+            $(this).find('img').attr('src', src);
+        })
+        $(this).find('img').attr('src', url + style + '-highlight.svg');
+
+        let iframe = '';
+        let sequence_html = '<p><a href="{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}?image_key=' + current_node_key + '" target=blank">Explore the imagery of OBJECT_NAME in more detail on Map the Paths</a></p>';
+
+        if (style == 'photo') {
+            iframe = '<iframe width="640" height="480" src="https://embed-v1.mapillary.com/embed?version=1&filter=%5B%22all%22%5D&map_filter=%5B%22all%22%5D&map_style=Mapillary streets&image_key=' + current_node_key + '&client_id=' + mapillaryClientId + '&style=photo" frameborder="0"></iframe>';
+        }
+        else if (style == 'split') {
+            iframe = '<iframe width="640" height="320" src="https://embed-v1.mapillary.com/embed?version=1&filter=%5B%22all%22%5D&map_filter=%5B%22all%22%5D&map_style=Mapillary streets&image_key=' + current_node_key + '&client_id=' + mapillaryClientId + '&style=split" frameborder="0"></iframe>';
+        }
+        else if (style == 'classic') {
+            iframe = '<iframe width="800" height="600" src="https://embed-v1.mapillary.com/embed?version=1&filter=%5B%22all%22%5D&map_filter=%5B%22all%22%5D&map_style=Mapillary streets&image_key=' + current_node_key + '&client_id=' + mapillaryClientId + '&style=classic" frameborder="0"></iframe>';
+        }
+
+        $('#embed_code').val(iframe + sequence_html)
+    })
+
+    $('#copy_embed_code').click(function () {
+        var copyText = document.getElementById("embed_code");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+        document.execCommand("copy");
+        $('#embed_code').tooltip('enable');
+        $('#embed_code').tooltip('show');
+        $('#embed_code').tooltip('disable');
+    });
+
     {% if request.user.is_authenticated and request.user == sequence.user %}
         $('#add_in_tour').change(function () {
             let value = $(this).val();
@@ -554,8 +646,6 @@
             alert()
         });
     {% endif %}
-
-
 
     mapboxgl.accessToken = mapboxToken;
     // Create a popup, but don't add it to the map yet.
