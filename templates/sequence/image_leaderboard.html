@@ -407,9 +407,7 @@
 
         map.addSource('mtp-images', {
             "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=photo_list&limit=5000"],
-            "minzoom": 6,
-            "maxzoom": 14
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=photo_list"],
         });
 
         map.addLayer({
@@ -424,7 +422,6 @@
             }
         }, "waterway-label");
     }
-
 
     function getImageDetail(sequence_unique_id, image_key) {
         var url = "{% url 'sequence.sequence_detail' unique_id='sequence_unique_id' %}?image_key=" + image_key;
@@ -451,6 +448,31 @@
             }
         });
     }
+
+    function loadMapFeature(value) {
+        map.on("load", function(){
+            map.loadImage('https://www.mapillary.com/developer/api-documentation/images/traffic_sign/regulatory--advisory-maximum-speed-limit--g1.png', function(error, image) {
+                if (error) throw error;
+                map.addImage(value, image);
+                map.addSource(value, {
+                    'type': 'vector',
+                    "tiles": ["{{ BASE_URL }}{% url 'api.sequence.map_feature_mvt' version='v1' %}?tile={z}/{x}/{y}&limit=500"],
+                });
+                map.addLayer({
+                    'id': 'stores',
+                    'source': value,
+                    'source-layer': 'mtp-map-features',
+                    'type': 'symbol',
+                    'layout': {
+                        'icon-image': value,
+                        'icon-size': 0.5
+                    },
+                });
+            });
+        });
+    }
+
+    {#loadMapFeature('warning--other-danger--g1');#}
 
     $('#switch-list-viewer').change(function () {
         let url;
