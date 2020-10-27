@@ -86,8 +86,9 @@ class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
 urlpatterns = [
     # path('', views.index, name='home'),
     path('', views.index, name='home'),
-    path('sequence.mvt', mvt_view_factory(model_class=Image, geom_col='point')),
     path('uploader', views.app_download, name='app_download'),
+    path('hall-of-fame/', views.hall_of_fame, name="hall_of_fame"),
+
     # path('', RedirectView.as_view(url='marketplace', permanent=False), name='home'),
     path('accounts/', include('accounts.urls')),
     path('email/', include(mail_urls)),
@@ -97,7 +98,9 @@ urlpatterns = [
     path('sequence/', include('sequence.urls')),
     path('tour/', include('tour.urls')),
     path('leaderboard/', include('leaderboard.urls')),
+
     path('user/<str:username>/profile/', account_views.profile, name="account.profile"),
+
     path('tags_input/', include('tags_input.urls', namespace='tags_input')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     re_path(r'', include(tf_urls)),
