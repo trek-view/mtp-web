@@ -31,6 +31,7 @@ def image_directory_path(instance, filename):
 
 class BusinessTier(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    url = models.TextField(null=True)
     logo = models.ImageField(upload_to=image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
 
 

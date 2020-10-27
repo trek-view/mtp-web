@@ -48,14 +48,16 @@
             {% for b in business %}
                 <div class="col-md-4 mt-2">
                     <div class="card text-center p-2">
-                        <div class="hall-logo mt-3 mb-3">
-                            <img src="{{ STATIC_URL }}{{ b.logo }}" />
-{#                            <img class="w-100" src="https://www.publicdomainpictures.net/pictures/320000/velka/background-image.png" />#}
-                        </div>
+                        <a href="{% if b.url is None %}#{% else %}{{ b.url }}{% endif %}" target="_blank">
+                            <div class="hall-logo mt-3 mb-3">
+                                <img src="{{ STATIC_URL }}{{ b.logo }}" />
+{#                                <img class="w-100" src="https://www.publicdomainpictures.net/pictures/320000/velka/background-image.png" />#}
+                            </div>
 
-                        <div class="name">
-                            <h5>{{ b.name }}</h5>
-                        </div>
+                            <div class="name">
+                                <h5>{{ b.name }}</h5>
+                            </div>
+                        </a>
                     </div>
                 </div>
             {% endfor %}
@@ -75,19 +77,23 @@
             {% for g in gold %}
                 <div class="col-lg-2 col-md-4 col-sm-6 mt-2">
                     <div class="card text-center p-2" style="min-height: 170px;">
-                        <div class="hall-avatar">
-                            {% if g.user.avatar != '' and g.user.avatar != None %}
-                                <img src="{{ STATIC_URL }}{{ g.user.avatar }}">
-                            {% else %}
-                                <img src="{% static 'images/icon/avatar1.png' %}">
-                            {% endif %}
-                        </div>
+                        <a href="{% url 'account.profile' username=g.user.username %}">
+                            <div class="hall-avatar">
+                                {% if g.user.avatar != '' and g.user.avatar != None %}
+                                    <img src="{{ STATIC_URL }}{{ g.user.avatar }}">
+                                {% else %}
+                                    <img src="{% static 'images/icon/avatar1.png' %}">
+                                {% endif %}
+                            </div>
 
-                        <div class="name mt-3">
-                            {% if g.user.first_name is not None and g.user.first_name != '' %}
-                                <h6>{{ g.user.first_name }} {% if g.user.last_name is not None and g.user.last_name != '' %}{{ g.user.last_name }}{% endif %}</h6>
-                            {% endif %}
-                        </div>
+                            <div class="name mt-3">
+                                {% if g.user.first_name is not None and g.user.first_name != '' %}
+                                    <h6>{{ g.user.first_name }} {% if g.user.last_name is not None and g.user.last_name != '' %}{{ g.user.last_name }}{% endif %}</h6>
+                                {% else %}
+                                    <h6>{{ g.user.username }}</h6>
+                                {% endif %}
+                            </div>
+                        </a>
                     </div>
                 </div>
             {% endfor %}
@@ -106,20 +112,16 @@
         <div class="row mt-3 mb-5">
             {% for g in silver %}
                 <div class="col-lg-2 col-md-4 col-sm-6 mt-2">
-                    <div class="card text-center p-2" style="min-height: 170px;">
-                        <div class="hall-avatar">
-                            {% if g.user.avatar != '' and g.user.avatar != None %}
-                                <img src="{{ STATIC_URL }}{{ g.user.avatar }}">
-                            {% else %}
-                                <img src="{% static 'images/icon/avatar1.png' %}">
-                            {% endif %}
-                        </div>
-
-                        <div class="name mt-3">
-                            {% if g.user.first_name is not None and g.user.first_name != '' %}
-                                <h6>{{ g.user.first_name }} {% if g.user.last_name is not None and g.user.last_name != '' %}{{ g.user.last_name }}{% endif %}</h6>
-                            {% endif %}
-                        </div>
+                    <div class="card text-center p-2">
+                        <a href="{% url 'account.profile' username=g.user.username %}">
+                            <div class="name mt-2">
+                                {% if g.user.first_name is not None and g.user.first_name != '' %}
+                                    <h6>{{ g.user.first_name }} {% if g.user.last_name is not None and g.user.last_name != '' %}{{ g.user.last_name }}{% endif %}</h6>
+                                {% else %}
+                                    <h6>{{ g.user.username }}</h6>
+                                {% endif %}
+                            </div>
+                        </a>
                     </div>
                 </div>
             {% endfor %}
