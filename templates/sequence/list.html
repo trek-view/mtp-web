@@ -482,7 +482,7 @@
         let params = getParamsFromURL()
         map.addSource('mtp-sequences', {
             "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_list"],
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_list&limit=2000"],
         });
 
         map.addLayer({
@@ -504,7 +504,7 @@
 
         map.addSource('mtp-images', {
             "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_list"],
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_list&limit=2000"],
         });
 
         map.addLayer({
