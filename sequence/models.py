@@ -479,6 +479,13 @@ class SequenceWeather(models.Model):
     his_hourly_uv_index = models.IntegerField(default=0)
 
 
+
+class CustomMapFeatureMVTManager(CustomMVTManager):
+    def get_additional_where(self, additional_filters={}, request=None):
+        additional_where = ""
+        return additional_where
+
+
 class MapFeature(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     accuracy = models.FloatField(default=0)
@@ -494,6 +501,14 @@ class MapFeature(models.Model):
     detection_keys = ArrayField(ArrayField(models.CharField(max_length=50)), null=True, blank=True)
     image_keys = ArrayField(ArrayField(models.CharField(max_length=50)), null=True, blank=True)
     user_keys = ArrayField(ArrayField(models.CharField(max_length=50)), null=True, blank=True)
+
+    objects = models.Manager()
+    vector_tiles = CustomMapFeatureMVTManager(
+        geo_col='geometry_point',
+        select_columns=['mf_key', 'unique_id'],
+        is_show_id=False,
+        source_layer='mtp-map-features'
+    )
 
 
 # class MapFeatureDetection(models.Model):

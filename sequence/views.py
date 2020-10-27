@@ -1485,14 +1485,14 @@ def ajax_sequence_check_like(request, unique_id):
             'liked_count': liked_count
         })
     else:
-        if request.user.is_liked_email:
+        if sequence.user.is_liked_email:
             # confirm email
             try:
                 # send email to creator
                 subject = 'Your Map the Paths Sequence Was Liked'
                 html_message = render_to_string(
                     'emails/sequence/like.html',
-                    {'subject': subject, 'like': 'liked', 'sequence': sequence},
+                    {'subject': subject, 'like': 'liked', 'sequence': sequence, 'sender': request.user},
                     request
                 )
                 send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
@@ -1965,14 +1965,14 @@ def ajax_image_mark_view(request, unique_id, image_key):
             'view_points': view_points
         })
     else:
-        if request.user.is_liked_email:
+        if sequence.user.is_liked_email:
             # confirm email
             try:
                 # send email to creator
                 subject = 'Your Map the Paths Photo Received a View Point'
                 html_message = render_to_string(
                     'emails/sequence/image_view_point.html',
-                    {'subject': subject, 'like': 'viewed', 'sequence': sequence, 'image_key': image.image_key},
+                    {'subject': subject, 'like': 'viewed', 'sequence': sequence, 'image_key': image.image_key, 'sender': request.user},
                     request
                 )
                 send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
@@ -2178,6 +2178,21 @@ def ajax_get_detail_by_image_key(request, image_key):
         data['sequence_unique_id'] = sequence.unique_id
 
     return JsonResponse(data)
+
+
+def ajax_get_map_features(request):
+    map_feature_json = MapFeature.objects.all().values('value').annotate(
+        image_count=Count('value')).order_by('-image_count').annotate(
+        rank=Window(expression=RowNumber()))
+
+    map_feature_values = []
+    for map_feature in map_feature_json:
+        map_feature_values.append(map_feature['value'])
+
+    return JsonResponse({
+        'status': 'success',
+        'map_features': map_feature_values
+    })
 
 
 def insert_db(request):

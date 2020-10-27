@@ -39,4 +39,8 @@ urlpatterns = [
     path('import-sequence', views.import_sequence, name='sequence.import_sequence'),
 
     path('insert_db', views.insert_db, name='sequence.insert_db'),
+
+
+    path('ajax_get_map_features/', views.ajax_get_map_features, name='sequence.ajax_get_map_features')
+
 ]

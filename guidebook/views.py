@@ -886,17 +886,17 @@ def check_like(request, unique_id):
     if guidebook_like:
         if guidebook.user.is_liked_email:
             # confirm email
-            # try:
-            # send email to creator
-            subject = 'Your Map the Paths Guidebook Was Liked'
-            html_message = render_to_string(
-                'emails/guidebook/like.html',
-                {'subject': subject, 'like': 'unliked', 'guidebook': guidebook, 'sender': request.user},
-                request
-            )
-            send_mail_with_html(subject, html_message, guidebook.user.email, settings.SMTP_REPLY_TO)
-            # except:
-            #     print('email sending error!')
+            try:
+                # send email to creator
+                subject = 'Your Map the Paths Guidebook Was Liked'
+                html_message = render_to_string(
+                    'emails/guidebook/like.html',
+                    {'subject': subject, 'like': 'unliked', 'guidebook': guidebook, 'sender': request.user},
+                    request
+                )
+                send_mail_with_html(subject, html_message, guidebook.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         for g in guidebook_like:
             g.delete()
         liked_guidebook = GuidebookLike.objects.filter(guidebook=guidebook)
@@ -911,18 +911,18 @@ def check_like(request, unique_id):
             'liked_count': liked_count
         })
     else:
-        if request.user.is_liked_email:
-            # try:
-            # send email to creator
-            subject = 'Your Map the Paths Guidebook Was Liked'
-            html_message = render_to_string(
-                'emails/guidebook/like.html',
-                {'subject': subject, 'like': 'liked', 'guidebook': guidebook},
-                request
-            )
-            send_mail_with_html(subject, html_message, guidebook.user.email, settings.SMTP_REPLY_TO)
-            # except:
-            #     print('email sending error!')
+        if guidebook.user.is_liked_email:
+            try:
+                # send email to creator
+                subject = 'Your Map the Paths Guidebook Was Liked'
+                html_message = render_to_string(
+                    'emails/guidebook/like.html',
+                    {'subject': subject, 'like': 'liked', 'guidebook': guidebook, 'sender': request.user},
+                    request
+                )
+                send_mail_with_html(subject, html_message, guidebook.user.email, settings.SMTP_REPLY_TO)
+            except:
+                print('email sending error!')
         guidebook_like = GuidebookLike()
         guidebook_like.guidebook = guidebook
         guidebook_like.user = request.user
