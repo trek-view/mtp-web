@@ -912,17 +912,17 @@ def check_like(request, unique_id):
         })
     else:
         if request.user.is_liked_email:
-            try:
-                # send email to creator
-                subject = 'Your Map the Paths Guidebook Was Liked'
-                html_message = render_to_string(
-                    'emails/guidebook/like.html',
-                    {'subject': subject, 'like': 'liked', 'guidebook': guidebook},
-                    request
-                )
-                send_mail_with_html(subject, html_message, guidebook.user.email, settings.SMTP_REPLY_TO)
-            except:
-                print('email sending error!')
+            # try:
+            # send email to creator
+            subject = 'Your Map the Paths Guidebook Was Liked'
+            html_message = render_to_string(
+                'emails/guidebook/like.html',
+                {'subject': subject, 'like': 'liked', 'guidebook': guidebook},
+                request
+            )
+            send_mail_with_html(subject, html_message, guidebook.user.email, settings.SMTP_REPLY_TO)
+            # except:
+            #     print('email sending error!')
         guidebook_like = GuidebookLike()
         guidebook_like.guidebook = guidebook
         guidebook_like.user = request.user
