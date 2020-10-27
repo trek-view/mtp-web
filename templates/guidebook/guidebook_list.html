@@ -405,7 +405,7 @@
 
         map.addSource('mtp-scenes', {
             "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.guidebook.scene_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=guidebook_detail"],
+            "tiles": ["{{ BASE_URL }}{% url 'api.guidebook.scene_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=guidebook_detail&limit=2000"],
         });
 
         map.addLayer({
