@@ -661,7 +661,7 @@ def ajax_delete_poi(request, unique_id, pk):
 
 
 def ajax_get_scene(request, unique_id):
-    image_key = request.GET['image_key']
+    image_key = request.GET.get('image_key', None)
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
         return JsonResponse({
@@ -670,7 +670,7 @@ def ajax_get_scene(request, unique_id):
         })
 
     scene = Scene.objects.filter(guidebook=guidebook, image_key=image_key)
-    if not scene or scene.count() == 0:
+    if not scene or scene.count() == 0 or image_key is None:
         return JsonResponse({
             'status': 'failed',
             'message': 'The scene does not exist or has no access.'

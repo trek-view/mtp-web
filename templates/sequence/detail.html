@@ -314,10 +314,6 @@
                     <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="Hide GPX Points" data-off="Show GPX Points" data-onstyle="success" data-offstyle="primary">
                 {% endif %}
             </div>
-
-            <div class="embed-code">
-                <button type="button" class="btn btn-sm btn-primary text-white" data-toggle="modal" data-target="#embed_code_modal">Get Embed Code</button>
-            </div>
         </div>
 
         <div class="image-detail {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
@@ -465,21 +461,23 @@
                     </div>
                 </div>
 
-
-                    <div class=" btn-add-to-guidebook">
-                        <button type="button" class="btn btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Add to Guidebook
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" style="background: #d0d0d0" href="javascript:addToGuidebook('new_guidebook');">New Guidebook</a>
-                            {% if not guidebooks is None %}
-                                {% for guidebook in guidebooks %}
-                                    <a class="dropdown-item" href="javascript:addToGuidebook('{{ guidebook.unique_id }}');">{{ guidebook.name }}</a>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
+                <div class=" btn-add-to-guidebook">
+                    <button type="button" class="btn btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Add to Guidebook
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" style="background: #d0d0d0" href="javascript:addToGuidebook('new_guidebook');">New Guidebook</a>
+                        {% if not guidebooks is None %}
+                            {% for guidebook in guidebooks %}
+                                <a class="dropdown-item" href="javascript:addToGuidebook('{{ guidebook.unique_id }}');">{{ guidebook.name }}</a>
+                            {% endfor %}
+                        {% endif %}
                     </div>
+                </div>
 
+                <div class="embed-code">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#embed_code_modal">Get Embed Code</button>
+                </div>
 
                 <div id='sequence_viewer' class="image-box display"></div>
             </div>
