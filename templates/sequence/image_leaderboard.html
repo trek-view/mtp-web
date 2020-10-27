@@ -392,6 +392,40 @@
             map.getCanvas().style.cursor = '';
             popup.remove();
         });
+
+
+        map.on('mouseenter', 'mtp-images-big', function(e) {
+          // Change the cursor style as a UI indicator.
+          map.getCanvas().style.cursor = 'pointer';
+
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const key = e.features[0].properties.image_key;
+            const url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+
+            // Ensure that if the map is zoomed out such that multiple
+          // copies of the feature are visible, the popup appears
+          // over the copy being pointed to.
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
+
+          // Populate the popup and set its coordinates
+          // based on the feature found.
+          popup.setLngLat(coordinates)
+          .setHTML('<img src="' + url + '" width="160"  alt=""/>')
+          .addTo(map);
+        });
+
+        map.on('click', 'mtp-images-big', function (e) {
+            console.log(e.features[0])
+            getSequenceDetailByImageKey(e.features[0].properties["image_key"]);
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'mtp-images-big', function () {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
     });
 
     function drawMapByUserKey(userkey) {
@@ -405,15 +439,38 @@
         if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
         if (map.getSource('mtp-images')) map.removeSource('mtp-images');
 
+        if (map.getLayer('mtp-images-big')) map.removeLayer('mtp-images-big');
+        if (map.getSource('mtp-images-big')) map.removeSource('mtp-images-big');
+
         map.addSource('mtp-images', {
             "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=photo_list&limit=2000"],
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=photo_list&limit=3000"],
+            "minzoom": 6,
+            "maxzoom": 14
         });
 
         map.addLayer({
             "id": "mtp-images",
             "type": "circle",
             "source": 'mtp-images',
+            "source-layer": 'mtp-images',
+            'filter': filter,
+            "paint": {
+                "circle-color": "#7880bd",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
+
+        map.addSource('mtp-images-big', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=photo_list&limit=500"],
+            "maxzoom": 6
+        });
+
+        map.addLayer({
+            "id": "mtp-images-big",
+            "type": "circle",
+            "source": 'mtp-images-big',
             "source-layer": 'mtp-images',
             'filter': filter,
             "paint": {
