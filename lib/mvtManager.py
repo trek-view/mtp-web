@@ -108,7 +108,7 @@ class CustomMVTManager(MVTManager):
         with self._get_connection().cursor() as cursor:
             cursor.execute(query, [str(bbox), str(bbox)] + parameters + [limit, offset])
             mvt = cursor.fetchall()[-1][-1]  # should always return one tile on success
-        print("--- %s seconds ---" % (time.time() - start_time))
+        print("--- %s ---" % (time.time() - start_time))
         return mvt
 
     def get_additional_where(self, additional_filters={}, request=None):
