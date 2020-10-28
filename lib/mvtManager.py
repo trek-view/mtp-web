@@ -1,7 +1,5 @@
 from rest_framework_mvt.managers import MVTManager
 import re
-import time
-import timeout_decorator
 
 
 class CustomMVTManager(MVTManager):

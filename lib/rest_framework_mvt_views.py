@@ -5,8 +5,6 @@ from rest_framework_gis.filters import TMSTileFilter
 from rest_framework_mvt.renderers import BinaryRenderer
 from rest_framework_mvt.schemas import MVT_SCHEMA
 import time
-from itertools import count
-from multiprocessing import Process
 import threading
 
 
