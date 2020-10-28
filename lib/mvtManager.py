@@ -96,11 +96,11 @@ class CustomMVTManager(MVTManager):
         for d in date_format:
             additional_where = additional_where.replace(d, "'{}'".format(d))
         additional_where = additional_where.replace("['", "ARRAY['")
-        # print(additional_where)
-        # additional_where = ''
+        print(additional_where)
+        additional_where = ''
         limit = "ALL" if limit == -1 else limit
         query, parameters = self._build_query(filters=filters, additional_where=additional_where)
-        # print(query)
+        print(query)
         with self._get_connection().cursor() as cursor:
             cursor.execute(query, [str(bbox), str(bbox)] + parameters + [limit, offset])
             mvt = cursor.fetchall()[-1][-1]  # should always return one tile on success
