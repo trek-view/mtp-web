@@ -1,6 +1,7 @@
 from rest_framework_mvt.managers import MVTManager
 import re
 import time
+import timeout_decorator
 
 
 class CustomMVTManager(MVTManager):
@@ -65,7 +66,7 @@ class CustomMVTManager(MVTManager):
         """
         return (query.strip(), where_clause_parameters)
 
-    def intersect(self, bbox="", limit=-1, offset=0, filters={}, additional_filters={}, request=None ):
+    def intersect(self, bbox="", limit=-1, offset=0, filters={}, additional_filters={}, request=None):
         """
         Args:
             bbox (str): A string representing a bounding box, e.g., '-90,29,-89,35'.
@@ -91,8 +92,7 @@ class CustomMVTManager(MVTManager):
 
             https://docs.djangoproject.com/en/2.2/topics/db/sql/#performing-raw-queries
         """
-        print('=========================================')
-        start_time = time.time()
+
         additional_where = self.get_additional_where(additional_filters=additional_filters, request=request)
 
         additional_where = additional_where.replace("('%", "('%%").replace("%)'", "%%')")
@@ -105,16 +105,9 @@ class CustomMVTManager(MVTManager):
         limit = "ALL" if limit == -1 else limit
         query, parameters = self._build_query(filters=filters, additional_where=additional_where)
         # print(query)
-        print("--- %s seconds ---" % (time.time() - start_time))
-        try:
-            with self._get_connection().cursor() as cursor:
-                cursor.execute(query, [str(bbox), str(bbox)] + parameters + [limit, offset])
-                mvt = cursor.fetchall()[-1][-1]  # should always return one tile on success
-        finally:
-            mvt = ''
-            self._get_connection().close()
-            print('TimeoutError')
-        print("--- %s ---" % (time.time() - start_time))
+        with self._get_connection().cursor() as cursor:
+            cursor.execute(query, [str(bbox), str(bbox)] + parameters + [limit, offset])
+            mvt = cursor.fetchall()[-1][-1]  # should always return one tile on success
         return mvt
 
     def get_additional_where(self, additional_filters={}, request=None):

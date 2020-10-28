@@ -4,6 +4,10 @@ from rest_framework.serializers import ValidationError
 from rest_framework_gis.filters import TMSTileFilter
 from rest_framework_mvt.renderers import BinaryRenderer
 from rest_framework_mvt.schemas import MVT_SCHEMA
+import time
+from itertools import count
+from multiprocessing import Process
+import threading
 
 
 class BaseMVTView(APIView):
@@ -17,6 +21,14 @@ class BaseMVTView(APIView):
     schema = MVT_SCHEMA
 
     permission_classes = []
+
+    mvt = b""
+    bbox = None
+    limit = None
+    offset = None
+    filters = None
+    params = None
+    request = None
 
     # pylint: disable=unused-argument
     def get(self, request, *args, **kwargs):
@@ -44,18 +56,41 @@ class BaseMVTView(APIView):
                     if field.name in params.keys():
                         filters[field.name] = params[field.name]
                         params.pop(field.name, None)
-                mvt = self.model.vector_tiles.intersect(
-                    bbox=bbox, limit=limit, offset=offset, filters=filters, additional_filters=params, request=request
-                )
-                status = 200 if mvt else 204
+                print('=========================================')
+                start_time = time.time()
+                try:
+                    self.bbox = bbox
+                    self.limit = limit
+                    self.offset = offset
+                    self.filters = filters
+                    self.params = params
+                    self.request = request
+
+                    p1 = threading.Thread(target=self.get_mvt)
+                    p1.start()
+                    p1.join(timeout=5)
+
+                    status = 200 if self.mvt else 204
+                except TimeoutError:
+                    print('TimeoutError')
+                    self.mvt = b""
+                    status = 400
+                print("--- %s ---" % (time.time() - start_time))
+
+
             except ValidationError:
-                mvt = b""
+                self.mvt = b""
                 status = 400
         else:
-            mvt = b""
+            self.mvt = b""
             status = 400
         return Response(
-            bytes(mvt), content_type="application/vnd.mapbox-vector-tile", status=status
+            bytes(self.mvt), content_type="application/vnd.mapbox-vector-tile", status=status
+        )
+
+    def get_mvt(self):
+        self.mvt = self.model.vector_tiles.intersect(
+            bbox=self.bbox, limit=self.limit, offset=self.offset, filters=self.filters, additional_filters=self.params, request=self.request
         )
 
     @staticmethod
