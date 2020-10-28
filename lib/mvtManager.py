@@ -1,5 +1,6 @@
 from rest_framework_mvt.managers import MVTManager
 import re
+import time
 
 class CustomMVTManager(MVTManager):
 
@@ -89,6 +90,8 @@ class CustomMVTManager(MVTManager):
 
             https://docs.djangoproject.com/en/2.2/topics/db/sql/#performing-raw-queries
         """
+        print('=========================================')
+        start_time = time.time()
         additional_where = self.get_additional_where(additional_filters=additional_filters, request=request)
 
         additional_where = additional_where.replace("('%", "('%%").replace("%)'", "%%')")
@@ -96,14 +99,16 @@ class CustomMVTManager(MVTManager):
         for d in date_format:
             additional_where = additional_where.replace(d, "'{}'".format(d))
         additional_where = additional_where.replace("['", "ARRAY['")
-        print(additional_where)
+        # print(additional_where)
         # additional_where = ''
         limit = "ALL" if limit == -1 else limit
         query, parameters = self._build_query(filters=filters, additional_where=additional_where)
-        print(query)
+        # print(query)
+        print("--- %s seconds ---" % (time.time() - start_time))
         with self._get_connection().cursor() as cursor:
             cursor.execute(query, [str(bbox), str(bbox)] + parameters + [limit, offset])
             mvt = cursor.fetchall()[-1][-1]  # should always return one tile on success
+        print("--- %s seconds ---" % (time.time() - start_time))
         return mvt
 
     def get_additional_where(self, additional_filters={}, request=None):
