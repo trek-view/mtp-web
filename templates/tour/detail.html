@@ -95,6 +95,32 @@
         </div>
         <div id="list-view" class="{% if request.GET.view_type is not None and request.GET.view_type == 'map-view' %}d-none{% endif %} mt-4 mb-2 ml-auto mr-auto">
             <div class="paginator">
+                {% if sequences.has_other_pages %}
+                    <ul class="pagination justify-content-center">
+                        {% if sequences.number != 1 %}
+                            <li class="page-item">
+                                <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in sequences.paginator.pages %}
+                            {% if sequences.number == i %}
+                                <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% else %}
+                                <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if sequences.number != sequences.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ sequences.paginator.num_pages }}'>&raquo;</a></li>
+                        {% else %}
+                            <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
             </div>
             <div class="item-list">
                 {% if sequence_count > 0 %}
@@ -227,6 +253,33 @@
                     <div class="no-results d-flex justify-content-center align-items-center">
                         <h5 class="text-info">No results match your criteria.</h5>
                     </div>
+                {% endif %}
+            </div>
+            <div class="paginator">
+                {% if sequences.has_other_pages %}
+                    <ul class="pagination justify-content-center">
+                        {% if sequences.number != 1 %}
+                            <li class="page-item">
+                                <a class="btn paginator-btn page-link" data-page='1'>&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="btn page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in sequences.paginator.pages %}
+                            {% if sequences.number == i %}
+                                <li class="active page-item"><a class="btn paginator-btn page-link bg-info" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% else %}
+                                <li><a class="btn paginator-btn page-link" data-page='{{ i }}'>{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if sequences.number != sequences.paginator.num_pages %}
+                            <li class="page-item"><a class="btn paginator-btn page-link" data-page='{{ sequences.paginator.num_pages }}'>&raquo;</a></li>
+                        {% else %}
+                            <li class="disabled page-item"><a class="btn page-link disabled" href="#">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
                 {% endif %}
             </div>
         </div>

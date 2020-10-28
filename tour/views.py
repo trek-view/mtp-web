@@ -441,6 +441,9 @@ def tour_detail(request, unique_id):
     if not tour.is_published and request.user != tour.user:
         messages.error(request, 'The tour is not published.')
         return redirect('tour.index')
+    page = request.GET.get('page')
+    if page is None:
+        page = 1
     sequence_ary = []
     tour_sequences = TourSequence.objects.filter(tour=tour).order_by('sort')
     t_count_ary = []
@@ -460,8 +463,33 @@ def tour_detail(request, unique_id):
         first_image_key = sequence_ary[0].coordinates_image[0]
         firstImageKey = sequence_ary[0].get_first_image_key()
 
+    paginator = Paginator(sequence_ary, 10)
+
+    try:
+        pItems = paginator.page(page)
+    except PageNotAnInteger:
+        pItems = paginator.page(1)
+    except EmptyPage:
+        pItems = paginator.page(paginator.num_pages)
+
+    first_num = 1
+    last_num = paginator.num_pages
+    if paginator.num_pages > 7:
+        if pItems.number < 4:
+            first_num = 1
+            last_num = 7
+        elif pItems.number > paginator.num_pages - 3:
+            first_num = paginator.num_pages - 6
+            last_num = paginator.num_pages
+        else:
+            first_num = pItems.number - 3
+            last_num = pItems.number + 3
+
+    pItems.paginator.pages = range(first_num, last_num + 1)
+    pItems.count = len(pItems)
+
     content = {
-        'sequences': sequence_ary,
+        'sequences': pItems,
         'sequence_count': len(sequence_ary),
         'pageName': 'Tour Detail',
         'pageTitle': tour.name + ' - Tour Detail',
@@ -469,7 +497,8 @@ def tour_detail(request, unique_id):
         'tour': tour,
         'first_image_key': first_image_key,
         't_count_ary': t_count_ary,
-        'firstImageKey': firstImageKey
+        'firstImageKey': firstImageKey,
+        'page': page
     }
     return render(request, 'tour/detail.html', content)
 
@@ -790,6 +819,7 @@ def ajax_get_detail(request, unique_id):
         data['tour_html_detail'] = render_to_string('tour/modal_detail.html', {'tour': tour, 'is_mine': is_mine})
 
     return JsonResponse(data)
+
 
 def ajax_get_detail_by_image_key(request, image_key):
     print(image_key)

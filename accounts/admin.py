@@ -7,8 +7,8 @@ from .models import CustomUser, MapillaryUser
 
 
 class CustomUserAdmin(UserAdmin):
-    list_display = ('email', 'username', 'is_staff', 'is_active', 'is_maillist')
-    list_filter = ('email', 'username', 'is_staff', 'is_active', 'is_maillist')
+    list_display = ('email', 'username', 'is_staff', 'date_joined', 'is_active', 'is_maillist')
+    list_filter = ('email', 'username', 'is_staff', 'date_joined', 'is_active', 'is_maillist')
     fieldsets = (
         (None, {'fields': ('email', 'username', 'password')}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'user_permissions', 'mapillary_access_token')}),
