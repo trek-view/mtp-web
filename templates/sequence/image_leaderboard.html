@@ -393,7 +393,7 @@
             popup.remove();
         });
 
-
+        /*
         map.on('mouseenter', 'mtp-images-big', function(e) {
           // Change the cursor style as a UI indicator.
           map.getCanvas().style.cursor = 'pointer';
@@ -426,6 +426,7 @@
             map.getCanvas().style.cursor = '';
             popup.remove();
         });
+        */
     });
 
     function drawMapByUserKey(userkey) {
@@ -439,8 +440,8 @@
         if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
         if (map.getSource('mtp-images')) map.removeSource('mtp-images');
 
-        if (map.getLayer('mtp-images-big')) map.removeLayer('mtp-images-big');
-        if (map.getSource('mtp-images-big')) map.removeSource('mtp-images-big');
+        {#if (map.getLayer('mtp-images-big')) map.removeLayer('mtp-images-big');#}
+        {#if (map.getSource('mtp-images-big')) map.removeSource('mtp-images-big');#}
 
         map.addSource('mtp-images', {
             "type": "vector",
@@ -461,6 +462,7 @@
             }
         }, "waterway-label");
 
+        /*
         map.addSource('mtp-images-big', {
             "type": "vector",
             "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=photo_list&limit=500"],
@@ -479,6 +481,7 @@
                 "circle-radius": 6
             }
         }, "waterway-label");
+        */
     }
 
     function getImageDetail(sequence_unique_id, image_key) {

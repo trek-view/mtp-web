@@ -455,7 +455,7 @@
             popup.remove();
         });
 
-
+        /*
         map.on('mouseenter', 'mtp-images-big', function(e) {
           // Change the cursor style as a UI indicator.
           map.getCanvas().style.cursor = 'pointer';
@@ -487,6 +487,7 @@
             map.getCanvas().style.cursor = '';
             popup.remove();
         });
+        */
     });
 
     function getParamsFromURL() {
@@ -512,12 +513,12 @@
         if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
         if (map.getSource('mtp-images')) map.removeSource('mtp-images');
         if (map.getSource('mtp-sequences')) map.removeSource('mtp-sequences');
-        if (map.getLayer('mtp-images-big')) map.removeLayer('mtp-images-big');
-        if (map.getSource('mtp-images-big')) map.removeSource('mtp-images-big');
+        {#if (map.getLayer('mtp-images-big')) map.removeLayer('mtp-images-big');#}
+        {#if (map.getSource('mtp-images-big')) map.removeSource('mtp-images-big');#}
         let params = getParamsFromURL()
         map.addSource('mtp-sequences', {
             "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_list&limit=500"],
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_list&limit=2500"],
         });
 
         map.addLayer({
@@ -537,11 +538,12 @@
             }
         }, "waterway-label");
 
+
         map.addSource('mtp-images', {
             "type": "vector",
             "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_list&limit=5000"],
-            "minzoom": 6,
-            "maxzoom": 14
+            {#"minzoom": 6,#}
+            {#"maxzoom": 14#}
         });
 
         map.addLayer({
@@ -556,6 +558,7 @@
             }
         }, "waterway-label");
 
+        /*
         map.addSource('mtp-images-big', {
             "type": "vector",
             "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_list&limit=500"],
@@ -574,6 +577,7 @@
                 "circle-radius": 6
             }
         }, "waterway-label");
+        */
     }
 
     function getSequenceDetailByUniqueID(id) {
