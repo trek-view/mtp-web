@@ -97,7 +97,7 @@ class CustomMVTManager(MVTManager):
             additional_where = additional_where.replace(d, "'{}'".format(d))
         additional_where = additional_where.replace("['", "ARRAY['")
         print(additional_where)
-        additional_where = ''
+        # additional_where = ''
         limit = "ALL" if limit == -1 else limit
         query, parameters = self._build_query(filters=filters, additional_where=additional_where)
         print(query)
