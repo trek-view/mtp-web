@@ -2,6 +2,7 @@ from rest_framework_mvt.managers import MVTManager
 import re
 import time
 
+
 class CustomMVTManager(MVTManager):
 
     select_columns = None
@@ -105,9 +106,14 @@ class CustomMVTManager(MVTManager):
         query, parameters = self._build_query(filters=filters, additional_where=additional_where)
         # print(query)
         print("--- %s seconds ---" % (time.time() - start_time))
-        with self._get_connection().cursor() as cursor:
-            cursor.execute(query, [str(bbox), str(bbox)] + parameters + [limit, offset])
-            mvt = cursor.fetchall()[-1][-1]  # should always return one tile on success
+        try:
+            with self._get_connection().cursor() as cursor:
+                cursor.execute(query, [str(bbox), str(bbox)] + parameters + [limit, offset])
+                mvt = cursor.fetchall()[-1][-1]  # should always return one tile on success
+        finally:
+            mvt = ''
+            self._get_connection().close()
+            print('TimeoutError')
         print("--- %s ---" % (time.time() - start_time))
         return mvt
 
