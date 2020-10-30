@@ -38,4 +38,5 @@ def hall_of_fame(request):
         'pageTitle': 'Hall of Fame',
         'pageDescription': 'Trek View is creating open source software to save the environment. The Hall of Fame highlights people helping us to achieve our ambitious goal.'
     }
+
     return render(request, 'about/hall_of_fame.html', content)

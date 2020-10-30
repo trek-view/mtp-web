@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'tour.apps.TourConfig',
     'leaderboard.apps.LeaderboardConfig',
     'sys_setting.apps.SysSettingConfig',
+    'cron_job.apps.CronJobConfig',
     # ========================
     'oauth2_provider',
     'corsheaders',
