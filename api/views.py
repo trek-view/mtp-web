@@ -49,14 +49,6 @@ class SequenceCreate(APIView):
         else:
             trans_type = trans_types[0]
 
-        start_time = request.POST.get('start_time')
-        if not start_time or start_time is None:
-            return Response({'error': 'start_time is missing', 'status': False})
-
-        end_time = request.POST.get('end_time')
-        if not end_time or end_time is None:
-            return Response({'error': 'end_time is missing', 'status': False})
-
         sequence = Sequence()
 
         sequence.user = request.user
@@ -67,10 +59,6 @@ class SequenceCreate(APIView):
         sequence.transport_type_id = trans_type.pk
         sequence.is_published = False
         sequence.is_mapillary = False
-
-        sequence.start_time = start_time
-        sequence.end_time = end_time
-
         sequence.save()
 
         if not request.POST.get('tag') is None:
