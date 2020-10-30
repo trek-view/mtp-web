@@ -44,4 +44,6 @@ urlpatterns = [
     path('check-mtpu-mapillary-oauth', views.MapillaryTokenRedirectView.as_view(), name='check_mtpu_mapillary_oauth'),
     path('check-mtpu-google-oauth', views.GoogleTokenRedirectView.as_view(), name='check_mtpu_google_oauth'),
     path('', include('oauth2_provider.urls', namespace='oauth2_provider')),
+
+    path('close/', views.account_close, name='account.account_close'),
 ]

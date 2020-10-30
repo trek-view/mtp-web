@@ -157,6 +157,14 @@ def check_mapillary_oauth(request):
         return redirect('home')
 
 
+@my_login_required
+def account_close(request):
+    if request.method == 'POST':
+        user = request.user
+        user.delete()
+    return redirect('home')
+
+
 def check_mtpu_mapillary_oauth(request):
     return redirect()
 

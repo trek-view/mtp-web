@@ -199,6 +199,18 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-12 mt-3">
+                    <div><h5>Close My Account</h5></div>
+                    <div class="">
+                        <form id="close_form" action="{% url 'account.account_close' %}" method="post" class="">
+                            {% csrf_token %}
+                            <button type="button" class="btn btn-danger" onclick="close_account()">Close</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         {% endif %}
     </div>
 </div>
@@ -393,6 +405,25 @@
     $('#uploadfile').click(function(){
         myDropzone.processQueue();
     });
+
+    {% if request.user.is_authenticated and current_user == request.user %}
+        function close_account() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Your data should be completely deleted from MTP.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.value) {
+                    $('#close_form').submit()
+                }
+            })
+            return false;
+        }
+    {% endif %}
 </script>
 
 <script>
