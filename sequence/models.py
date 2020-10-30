@@ -188,8 +188,6 @@ class Sequence(models.Model):
     description = models.TextField(default='')
     transport_type = models.ForeignKey(TransType, on_delete=models.CASCADE, null=True)
     tag = models.ManyToManyField(Tag)
-    start_time = models.DateTimeField(null=True, blank=True)
-    end_time = models.DateTimeField(null=True, blank=True)
 
     image_count = models.IntegerField(default=0)
 
