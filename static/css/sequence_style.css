@@ -165,42 +165,55 @@ body {
     transform: rotate(45deg);
 }
 
-.right-board .image-view-point {
-    font-size: 14px;
-    top: 15px;
-    color: white;
-    border-radius: 4px;
-    text-align: center;
-    background: #28a745 !important;
-    z-index: 300;
-    position: absolute;
-    right: 15px;
-    padding: 5px;
-}
+/*.right-board .image-view-point {*/
+/*    font-size: 14px;*/
+/*    top: 15px;*/
+/*    color: white;*/
+/*    border-radius: 4px;*/
+/*    text-align: center;*/
+/*    background: #28a745 !important;*/
+/*    z-index: 300;*/
+/*    position: absolute;*/
+/*    right: 15px;*/
+/*    padding: 5px;*/
+/*}*/
 
-.right-board .btn-add-to-guidebook {
-    font-size: 14px;
-    top: 55px;
-    color: white;
-    border-radius: 4px;
-    text-align: center;
-    z-index: 300;
-    position: absolute;
-    right: 15px;
-}
+/*.right-board .btn-add-to-guidebook {*/
+/*    font-size: 14px;*/
+/*    top: 55px;*/
+/*    color: white;*/
+/*    border-radius: 4px;*/
+/*    text-align: center;*/
+/*    z-index: 300;*/
+/*    position: absolute;*/
+/*    right: 15px;*/
+/*}*/
 
-.right-board .embed-code {
+/*.right-board .embed-code {*/
+/*    font-size: 14px;*/
+/*    top: 95px;*/
+/*    color: white;*/
+/*    border-radius: 4px;*/
+/*    text-align: center;*/
+/*    z-index: 200;*/
+/*    position: absolute;*/
+/*    right: 15px;*/
+/*}*/
+
+.right-board .mapillary-right-actions{
     font-size: 14px;
-    top: 95px;
     color: white;
     border-radius: 4px;
     text-align: center;
     z-index: 200;
     position: absolute;
-    right: 15px;
+    right: 10px;
+    top: 10px;
+    width: 150px;
 }
 
-.right-board .btn-add-to-guidebook button, .right-board .btn-add-to-guidebook div, .right-board .embed-code button {
+
+.right-board .btn-add-to-guidebook button, .right-board .btn-add-to-guidebook div, .right-board button {
     font-size: 14px;
     color: white;
     padding: 3px;
@@ -219,32 +232,48 @@ body {
     border-radius: 18px;
 }
 
-.small-screen .image-view-point {
-    padding-top: 0px;
+
+
+/*.small-screen .image-view-point {*/
+/*    padding-top: 0px;*/
+/*    padding-bottom: 0px;*/
+/*}*/
+
+/*.small-screen .btn-add-to-guidebook {*/
+/*    padding-top: 0px;*/
+/*    padding-bottom: 0px;*/
+/*    top: 40px;*/
+/*}*/
+
+/*.small-screen .embed-code {*/
+/*    padding-top: 0px;*/
+/*    padding-bottom: 0px;*/
+/*    top: 70px;*/
+/*}*/
+
+.mapillary-right-actions label.btn {
+    padding-top: 2px;
     padding-bottom: 0px;
 }
 
-.small-screen .btn-add-to-guidebook {
-    padding-top: 0px;
-    padding-bottom: 0px;
-    top: 40px;
+.mapillary-right-actions .toggle.btn {
+    min-height: 30px;
+    height: 30px;
 }
 
-.small-screen .embed-code {
-    padding-top: 0px;
-    padding-bottom: 0px;
-    top: 70px;
+.small-screen .mapillary-right-actions {
+    display: none !important;
 }
 
-.small-screen .embed-code button {
-    padding-top: 0px;
-    padding-bottom: 0px;
-}
+/*.small-screen .embed-code button {*/
+/*    padding-top: 0px;*/
+/*    padding-bottom: 0px;*/
+/*}*/
 
-.small-screen .btn-add-to-guidebook button, .right-board .btn-add-to-guidebook div {
-    padding-top: 0px;
-    padding-bottom: 0px;
-}
+/*.small-screen .btn-add-to-guidebook button, .right-board .btn-add-to-guidebook div {*/
+/*    padding-top: 0px;*/
+/*    padding-bottom: 0px;*/
+/*}*/
 
 .detection-tag {
     margin: 3px;
