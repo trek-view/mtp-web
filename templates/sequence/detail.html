@@ -106,9 +106,13 @@
                     </div>
 
                     <div class="sequence-tour-count" id="sequence_tour_count">
-                        <a href="{% url 'tour.tour_list' %}?sequence_key={{ sequence.seq_key }}">
+                        {% if tour_count > 0 %}
+                            <a href="{% url 'tour.tour_list' %}?sequence_key={{ sequence.seq_key }}">
+                                Tours ({{ tour_count }})
+                            </a>
+                        {% else %}
                             Tours ({{ tour_count }})
-                        </a>
+                        {% endif %}
                     </div>
 
                     <div class="guidebook-created-at d-flex flex-row align-items-center justify-content-between mt-2">
