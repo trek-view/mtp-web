@@ -27,7 +27,7 @@
         </div>
         <div class="mt-2">
             <label class="col-4">Username: </label>
-            <span class="col-8">{{ image.username }}</span>
+            <span class="col-8"><a href="{% url 'account.profile' username=image.sequence.user.username %}">{{ image.username }}</a></span>
         </div>
         <div class="mt-2">
             <label class="col-4">Organization Key: </label>
