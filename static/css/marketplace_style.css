@@ -14,7 +14,7 @@
 
 /* Mapbox board */
 .mapboxgl-map {
-    height: calc(100vh - 100px) !important;
+    height: calc(var(--vh, 1vh) * 100 - 100px) !important;
 }
 
 .mapbox-gl-draw_line {
@@ -76,10 +76,10 @@
 }
 
 .modal-body .photographer-description, .modal-body .job-description {
-    max-height: calc(100vh - 390px);
+    max-height: calc(var(--vh, 1vh) * 100 - 390px);
     overflow-y: auto;
 }
 
 .photographer-detail.modal, .job-detail.modal {
-    max-height: calc(100vh - 110px);
+    max-height: calc(var(--vh, 1vh) * 100 - 110px);
 }

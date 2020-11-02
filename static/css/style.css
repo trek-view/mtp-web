@@ -61,7 +61,7 @@ nav.navbar {
 .left-side {
     width: 400px;
     overflow-y: auto;
-    height: calc(100vh - 100px);
+    height: calc(var(--vh, 1vh) * 100 - 100px);
     position: fixed;
     padding-top: 20px;
     z-index: 400;
@@ -77,7 +77,7 @@ nav.navbar {
 
 .right-board {
     width: calc(100vw - 400px);
-    min-height: calc(100vh - 100px);
+    min-height: calc(var(--vh, 1vh) * 100 - 100px);
     margin-left: 400px;
     position: relative;
     overflow-x: hidden;
@@ -299,7 +299,7 @@ i.open-sidebar {
 
 
 .right-board > #map.mapboxgl-map {
-    height: calc(100vh - 100px) !important;
+    height: calc(var(--vh, 1vh) * 100 - 100px) !important;
 }
 
 .right-board .paginator:first-child {
@@ -313,7 +313,7 @@ body {
 
 @media only screen and (max-width: 600px) {
     .right-board > #map.mapboxgl-map {
-        height: calc(100vh - 80px) !important;
+        height: calc(var(--vh, 1vh) * 100 - 80px) !important;
     }
 }
 
@@ -328,7 +328,7 @@ body {
     /* height: 250px; */
     overflow: hidden;
     outline: 0;
-    max-height: calc(100vh - 110px);
+    max-height: calc(var(--vh, 1vh) * 100 - 110px);
 }
 
 input.ui-autocomplete-input::placeholder {
@@ -413,7 +413,7 @@ i.fas, i.far {
         min-height: 80px !important;
     }
     .left-side {
-        height: calc(100vh - 80px);
+        height: calc(var(--vh, 1vh) * 100 - 80px);
     }
 
     .close-sidebar, .open-sidebar {
@@ -422,7 +422,7 @@ i.fas, i.far {
 
     .full-screen {
         top: 80px !important;
-        height: calc(100vh - 80px) !important;
+        height: calc(var(--vh, 1vh) * 100 - 80px) !important;
     }
 
     .detail-box {
@@ -451,7 +451,7 @@ i.fas, i.far {
     }
 
     .right-board {
-        min-height: calc(100vh - 80px);
+        min-height: calc(var(--vh, 1vh) * 100 - 80px);
     }
 }
 

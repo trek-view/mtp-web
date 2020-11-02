@@ -86,8 +86,8 @@ body {
 }
 
 .full-screen {
-    height: calc(100vh - 100px);
-    width: calc(100vw - 400px);
+    height: calc(var(--vh, 1vh) * 100 - 100px);
+    width: calc(var(--vh, 1vh) * 100 - 400px);
     position: fixed;
     top: 100px;
     z-index: 0;
