@@ -449,6 +449,10 @@ i.fas, i.far {
     .detail-modal {
         width: 100% !important;
     }
+
+    .right-board {
+        min-height: calc(100vh - 80px);
+    }
 }
 
 .bootstrap-select .dropdown-menu.inner.show .dropdown-item.selected {
