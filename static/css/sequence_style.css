@@ -213,7 +213,7 @@ body {
 }
 
 
-.right-board .btn-add-to-guidebook button, .right-board .btn-add-to-guidebook div, .right-board button {
+.right-board .btn-add-to-guidebook button, .right-board .btn-add-to-guidebook div, .right-board .mapillary-right-actions button {
     font-size: 14px;
     color: white;
     padding: 3px;
