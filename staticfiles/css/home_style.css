@@ -1,11 +1,11 @@
 .mapboxgl-map {
-    height: calc(100vh - 100px) !important;
+    height: calc(var(--vh, 1vh) * 100 - 100px) !important;
 }
 
 
 @media only screen and (max-width: 600px) {
     .mapboxgl-map {
-        height: calc(100vh - 80px) !important;
+        height: calc(var(--vh, 1vh) * 100 - 80px) !important;
     }
 }
 

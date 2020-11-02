@@ -63,12 +63,12 @@
 }
 
 .modal-body .challenge-description{
-    max-height: calc(100vh - 390px);
+    max-height: calc(var(--vh, 1vh) * 100 - 390px);
     overflow-y: auto;
 }
 
 .challenge-detail.modal{
-    max-height: calc(100vh - 110px);
+    max-height: calc(var(--vh, 1vh) * 100 - 110px);
 }
 
 .tag {

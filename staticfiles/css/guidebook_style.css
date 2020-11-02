@@ -1,5 +1,5 @@
 .full-screen {
-    height: calc(100vh - 100px);
+    height: calc(var(--vh, 1vh) * 100 - 100px);
     width: calc(100vw - 400px);
     position: fixed;
     top: 100px;
@@ -353,6 +353,36 @@ body {
 .mapboxgl-ctrl-geocoder--input {
     height: 36px;
 }
+
+.right-board .embed-code {
+    font-size: 14px;
+    top: 15px;
+    color: white;
+    border-radius: 4px;
+    text-align: center;
+    z-index: 200;
+    position: absolute;
+    right: 15px;
+}
+
+.right-board .embed-code button {
+    font-size: 14px;
+    color: white;
+    padding: 3px;
+    border-radius: 4px;
+}
+
+.small-screen .embed-code {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    top: 15px;
+}
+
+.small-screen .embed-code button {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
 
 @media only screen and (max-width: 600px) {
     .detail-box {
