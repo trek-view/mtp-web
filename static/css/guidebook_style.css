@@ -1,11 +1,15 @@
 .full-screen {
     height: calc(var(--vh, 1vh) * 100 - 100px);
-    width: calc(100vw - 400px) !important;
-
+    width: calc(100vw - 400px);
     position: fixed;
     top: 100px;
     z-index: 0;
 }
+
+.opened-sidebar.full-screen {
+    width: calc(100vw - 400px) !important;
+}
+
 
 .board-w-400 {
     width: calc(100vw - 400px) !important;
