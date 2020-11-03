@@ -311,6 +311,21 @@ body {
     overflow-y: auto;
 }
 
+.return-scene {
+    font-size: 16px;
+    top: 50px;
+    color: white;
+    width: 160px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    background: #7082dc;
+    z-index: 300;
+    position: absolute;
+    left: calc(50% - 74px);
+}
+
+
 @media only screen and (max-width: 600px) {
     .right-board > #map.mapboxgl-map {
         height: calc(var(--vh, 1vh) * 100 - 80px) !important;

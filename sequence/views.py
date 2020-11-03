@@ -1529,13 +1529,14 @@ def ajax_get_image_detail(request, unique_id, image_key):
                 'status': 'failed',
                 'message': "You can't access this sequence."
             })
-    images = Image.objects.filter(image_key=image_key)[:1]
+
+    images = Image.objects.filter(image_key=image_key, sequence=sequence)[:1]
     if images.count() > 0:
         image = images[0]
     else:
         return JsonResponse({
             'status': 'failed',
-            'message': "The image doesn't exist.",
+            'message': "Image outside of current sequence",
         })
 
     view_points = ImageViewPoint.objects.filter(image=image)
@@ -2238,7 +2239,6 @@ def update_mf_keys_with_thread():
 
             print(mf_values)
             image.save()
-
 
 
 def insert_db_with_thread():

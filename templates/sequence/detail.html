@@ -442,7 +442,12 @@
                 <div class="switch-full-screen switch_screen d-none" >
                     <img class="w-100" src="{% static 'images/icon/flap.svg' %}">
                 </div>
+
                 <div class="switch-cover"></div>
+
+                <div class="return-scene d-none" style="">
+                    Return to sequence
+                </div>
 
                 <div class="mapillary-right-actions d-flex flex-column align-items-end">
                     <div class="image-view-point mb-2" style="cursor: pointer;" onclick="mark_view_point()" style="">
@@ -490,8 +495,6 @@
                         {% endif %}
                     </div>
                 </div>
-
-
 
                 <div id='sequence_viewer' class="image-box display"></div>
             </div>
@@ -852,8 +855,6 @@
          map.resize();
     });
 
-
-
     var is_mapillary_viewer = true;
 
     var mapillaryViewer = new Mapillary.Viewer(
@@ -1061,8 +1062,16 @@
             });
         });
     {% endif %}
-
+    let latest_image_key = first_image_key
     function show_image_detail(image_key) {
+        if (image_keys.indexOf(image_key) == -1)
+        {
+            {#toastr.error('Image outside of current sequence');#}
+            $('.return-scene').removeClass('d-none');
+            return;
+        }
+        $('.return-scene').addClass('d-none');
+        latest_image_key = image_key;
         var url = "{% url 'sequence.ajax_get_image_detail' unique_id=sequence.unique_id image_key='image_key' %}";
         url = url.replace('image_key', image_key);
 
@@ -1106,6 +1115,10 @@
             }
         });
     }
+
+    $('.return-scene').click(function () {
+        mapillaryViewer.moveToKey(latest_image_key);
+    });
 
     function move_image(image_key) {
         if (image_key == current_node_key)
@@ -1680,8 +1693,6 @@
             $tooltipSpan.removeClass('d-none');
         }
     };
-
-
 
     var switchMpaillaryLable = function(type) {
         allClear();
