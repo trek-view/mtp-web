@@ -94,6 +94,9 @@
                 <li class="nav-item d-flex align-items-center dropdown">
                     <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">Challenge</a>
                     <ul class="dropdown-menu">
+                        <li class="dropdown-item nav-item {% block app_hall_of_fame %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'hall_of_fame' %}">Hall of Fame</a>
+                        </li>
                         <li class="dropdown-item nav-item {% block app_challenge %}{% endblock %}">
                             <a class="nav-link" href="{% url 'challenge.index' %}">Capture Challenge</a>
                         </li>
@@ -106,11 +109,8 @@
                 <li class="nav-item d-flex align-items-center dropdown">
                     <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">About</a>
                     <ul class="dropdown-menu">
-                        <li class="dropdown-item nav-item {% block app_hall_of_fame %}{% endblock %}">
-                            <a class="nav-link" href="{% url 'hall_of_fame' %}">Hall of Fame</a>
-                        </li>
-                        <li class="dropdown-item nav-item {% block about_us %}{% endblock %}">
-                            <a class="nav-link" href="{% url 'about_us' %}">About us</a>
+                        <li class="dropdown-item nav-item {% block about %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'about' %}">About</a>
                         </li>
                         <li class="dropdown-item nav-item">
                             <a class="nav-link" href="https://www.trekview.org" target="_blank">Trek View</a>

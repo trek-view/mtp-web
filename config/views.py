@@ -4,7 +4,7 @@ from lib.functions import *
 from sys_setting.models import BusinessTier, GoldTier, SilverTier
 ############################################################################
 
-MAIN_PAGE_DESCRIPTION = "Access street-level imagery and map data from all over the world.  Fill in the gaps by requesting new coverage or capturing your own."
+MAIN_PAGE_DESCRIPTION = "Access off-road street-level imagery and map data from all over the world. Fill in the gaps by requesting new coverage or capturing your own."
 
 def index(request):
     content = {
@@ -42,11 +42,11 @@ def hall_of_fame(request):
     return render(request, 'about/hall_of_fame.html', content)
 
 
-def about_us(request):
+def about(request):
     content = {
         'pageName': 'About Us',
         'pageTitle': 'About Us',
         'pageDescription': ''
     }
 
-    return render(request, 'about/about_us.html', content)
+    return render(request, 'about/about.html', content)
