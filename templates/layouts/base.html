@@ -9,7 +9,11 @@
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
-
+    <style>
+        :root {
+          --vh: 1vh;
+        }
+    </style>
 
     {% include "layouts/meta.html" with pageName=pageName %}
 
@@ -335,6 +339,12 @@
         let vh = window.innerHeight * 0.01;
         // Then we set the value in the --vh custom property to the root of the document
         document.documentElement.style.setProperty('--vh', `${vh}px`);
+        // We listen to the resize event
+        window.addEventListener('resize', () => {
+          // We execute the same script as before
+          let vh = window.innerHeight * 0.01;
+          document.documentElement.style.setProperty('--vh', `${vh}px`);
+        });
     </script>
 </body>
 </html>
