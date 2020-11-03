@@ -40,3 +40,13 @@ def hall_of_fame(request):
     }
 
     return render(request, 'about/hall_of_fame.html', content)
+
+
+def about_us(request):
+    content = {
+        'pageName': 'About Us',
+        'pageTitle': 'About Us',
+        'pageDescription': ''
+    }
+
+    return render(request, 'about/about_us.html', content)

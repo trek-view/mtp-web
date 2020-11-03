@@ -88,6 +88,7 @@ urlpatterns = [
     path('', views.index, name='home'),
     path('uploader', views.app_download, name='app_download'),
     path('hall-of-fame/', views.hall_of_fame, name="hall_of_fame"),
+    path('about_us/', views.about_us, name="about_us"),
 
     # path('', RedirectView.as_view(url='marketplace', permanent=False), name='home'),
     path('accounts/', include('accounts.urls')),
