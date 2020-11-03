@@ -380,10 +380,10 @@
         <div class="image-detection mt-3 {% if view_mode != 'mtpw_label' and view_mode != 'autodetected_label' and view_mode != 'map_features' %}d-none{% endif %}">
             <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
                     <li class="nav-item mtpw-label-tab " style="width: 30%;">
-                        <a class="nav-link {% if view_mode != 'autodetected_label' and view_mode != 'map_features' %}active{% endif %}" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>
+                        <a class="nav-link {% if view_mode == 'mtpw_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>
                     </li>
                     <li class="nav-item mapillary-label-tab border-bottom " style="width: 40%">
-                        <a class="nav-link {% if view_mode == 'autodetected_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mapillary');">Autodetected Labels</a>
+                        <a class="nav-link {% if view_mode != 'mtpw_label' and view_mode != 'map_features' %}active{% endif %}" href="javascript: switchMpaillaryLable('mapillary');">Autodetected Labels</a>
                     </li>
                     <li class="nav-item map-features-tab border-bottom " style="width: 30%">
                         <a class="nav-link {% if view_mode == 'map_features' %}active{% endif %}" href="javascript: switchMpaillaryLable('mapillary_feature');">Map Features</a>
@@ -481,17 +481,17 @@
 
                     <div class="switch-detection mb-2">
                         {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}
-                            <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary" checked>
+                            <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Detections Off" data-off="Detections On" data-onstyle="success" data-offstyle="primary" checked>
                         {% else %}
-                            <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Original" data-off="Detection" data-onstyle="success" data-offstyle="primary">
+                            <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Detections Off" data-off="Detections On" data-onstyle="success" data-offstyle="primary">
                         {% endif %}
                     </div>
 
-                    <div class="switch-gpx mb-2 {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
+                    <div class="switch-gpx mb-2">
                         {% if show_gpx == 'true' %}
-                            <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="Hide GPX Points" data-off="Show GPX Points" data-onstyle="success" data-offstyle="primary" checked>
+                            <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="AR Off" data-off="AR On" data-onstyle="success" data-offstyle="primary" checked>
                         {% else %}
-                            <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="Hide GPX Points" data-off="Show GPX Points" data-onstyle="success" data-offstyle="primary">
+                            <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="AR Off" data-off="AR On" data-onstyle="success" data-offstyle="primary">
                         {% endif %}
                     </div>
                 </div>
@@ -1501,15 +1501,14 @@
         if ($(this).prop('checked')) {
             $('.image-detection').removeClass('d-none');
             $('.image-detail').addClass('d-none');
-            $('.switch-gpx').addClass('d-none');
-            view_mode = 'mtpw_label';
+            view_mode = 'autodetected_label';
+            $('.image-detection .actions').addClass('d-none');
             image_url_reset(image_key)
-            getImageLables();
+            getDetection(image_key);
         }
         else {
             $('.image-detection').addClass('d-none');
             $('.image-detail').removeClass('d-none');
-            $('.switch-gpx').removeClass('d-none');
             view_mode = 'original';
             image_url_reset(image_key);
             if (is_show_gpx)

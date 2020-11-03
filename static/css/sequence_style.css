@@ -282,11 +282,11 @@ body {
 }
 
 .switch-detection > div, .switch-gpx > div {
-    width: 100px !important;
+    width: 140px !important;
 }
 
 .switch-detection-auto > div, .switch-gpx > div {
-    width: 120px !important;
+    width: 90px !important;
 }
 
 .image-detection .detections > div:first-child {
