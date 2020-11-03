@@ -171,11 +171,11 @@
                                         <h6>Location Weather: </h6>
                                         <div class="mt-2">
                                             <label class="col-6">Min Temp: </label>
-                                            <span class="col-6">{{ sequence_weather.his_mintemp }}</span>
+                                            <span class="col-6">{% if sequence_weather.his_mintemp > sequence_weather.his_hourly_temperature %}{{ sequence_weather.his_hourly_temperature }}{% else %}{{ sequence_weather.his_mintemp }}{% endif %} °C</span>
                                         </div>
                                         <div class="mt-2">
                                             <label class="col-6">Max Temp: </label>
-                                            <span class="col-6">{{ sequence_weather.his_maxtemp }}</span>
+                                            <span class="col-6">{% if sequence_weather.his_maxtemp < sequence_weather.his_hourly_temperature %}{{ sequence_weather.his_hourly_temperature }}{% else %}{{ sequence_weather.his_maxtemp }}{% endif %} °C</span>
                                         </div>
                                         <div class="mt-2">
                                             <label class="col-6">Sunrise: </label>
@@ -327,11 +327,11 @@
                                 <h6>Location Weather: </h6>
                                 <div class="mt-2">
                                     <label class="col-6">Min Temp: </label>
-                                    <span class="col-6">{{ sequence_weather.his_mintemp }}</span>
+                                    <span class="col-6">{% if sequence_weather.his_mintemp > sequence_weather.his_hourly_temperature %}{{ sequence_weather.his_hourly_temperature }}{% else %}{{ sequence_weather.his_mintemp }}{% endif %} °C</span>
                                 </div>
                                 <div class="mt-2">
                                     <label class="col-6">Max Temp: </label>
-                                    <span class="col-6">{{ sequence_weather.his_maxtemp }}</span>
+                                    <span class="col-6">{% if sequence_weather.his_maxtemp < sequence_weather.his_hourly_temperature %}{{ sequence_weather.his_hourly_temperature }}{% else %}{{ sequence_weather.his_maxtemp }}{% endif %} °C</span>
                                 </div>
                                 <div class="mt-2">
                                     <label class="col-6">Sunrise: </label>
