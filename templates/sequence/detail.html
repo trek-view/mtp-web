@@ -425,6 +425,71 @@
                 </div>
             </div>
         </div>
+
+        <div id="accordion" class="mt-2">
+                        <div class="card">
+                            <div class="card-header p-0" id="headingOne">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        Weather
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body">
+                                    <div class="sequence-weather pt-2" id="sequence_weather">
+                                        <h6>Location Weather: </h6>
+                                        <div class="mt-2">
+                                            <label class="col-6">Min Temp: </label>
+                                            <span class="col-6">{{ sequence_weather.his_mintemp }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Max Temp: </label>
+                                            <span class="col-6">{{ sequence_weather.his_maxtemp }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Sunrise: </label>
+                                            <span class="col-6">{{ sequence_weather.his_astro_sunrise }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Sunset: </label>
+                                            <span class="col-6">{{ sequence_weather.his_astro_sunset }}</span>
+                                        </div>
+                                        <h6 class="mt-3">Conditions at time of sequence:</h6>
+                                        <div class="mt-2">
+                                            <label class="col-6">Temperature: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_temperature }} °C</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Wind Speed: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_wind_speed }} Km/h</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Wind direction: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_wind_dir }}</span>
+                                        </div>
+                {#                        <div class="mt-2">#}
+                {#                            <label class="col-4">Weather: </label>#}
+                {#                            <span class="col-8">{{ imagesequence_weather.his_astro_sunrise }}</span>#}
+                {#                        </div>#}
+                                        <div class="mt-2">
+                                            <label class="col-6">Precip: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_precip }} mm</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Cloud Cover: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_cloudcover }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Visibility: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_visibility }} Km</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
     </div>
 
     <div class="right-board bg-light">
@@ -722,6 +787,8 @@
         var first_point = scene_positions[first_image_index];
     else
         var first_point = null;
+
+
 
     if (first_point != null) {
         var map = new mapboxgl.Map({
@@ -1660,6 +1727,37 @@
         lastPos = event.pixelPoint;
         setHoveredTag(event.pixelPoint);
     }
+    window.onmousemove = function (e) {
+        var x = e.clientX,
+            y = e.clientY,
+            w = window.innerWidth,
+            h = window.innerHeight;
+        var start_x = 0;
+        if (is_opened_side_bar) {
+            start_x = 400;
+        }
+        if (current_hover_label_id != '')
+        {
+            $tooltipSpan.css('top', y + 'px');
+            $tooltipSpan.css('left', x + 'px');
+
+            if (x < start_x + 250) {
+                $tooltipSpan.css('left', (x + 20) + 'px');
+                $tooltipSpan.css('right', 'unset');
+            }
+            else if (x > w - 250) {
+                $tooltipSpan.css('left', 'unset');
+                $tooltipSpan.css('right', (w - x + 20) + 'px');
+            }
+            else {
+                $tooltipSpan.css('left', (x + 20) + 'px');
+                $tooltipSpan.css('right', 'unset');
+            }
+            $tooltipSpan.css('margin-top', '-15px');
+            $tooltipSpan.text(label_tags[current_hover_label_id]['label_type_key']);
+            $tooltipSpan.removeClass('d-none');
+        }
+    };
 
     window.onmousemove = function (e) {
         var x = e.clientX,
@@ -1692,6 +1790,8 @@
             $tooltipSpan.removeClass('d-none');
         }
     };
+
+
 
     var switchMpaillaryLable = function(type) {
         allClear();
@@ -1972,7 +2072,7 @@
     {% endif %}
 
     goto_page("{{ page }}", "{{ image_key }}");
-    
+
 
     /***********************************************************************************************
      display GPX data on mapillary viewer

@@ -40,11 +40,11 @@ class ChallengeForm(forms.ModelForm):
 
     camera_make = forms.MultipleChoiceField(
         required=False,
+        label='Camera Make (leave blank for all)',
         widget=forms.SelectMultiple(
             attrs={'class': 'selectpicker form-control border', 'multiple': 'multiple', 'data-live-search': 'true'}
         ),
         choices=camera_makes,
-        label='Camera Make (leave blank for all)',
     )
 
     transport_type = forms.ChoiceField(
@@ -230,6 +230,7 @@ class LabelChallengeSearchForm(forms.Form):
         required=False,
         initial='all'
     )
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

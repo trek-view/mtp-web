@@ -257,6 +257,7 @@ def photographer_list(request):
             if capture_method is not None and len(capture_method) > 0:
                 photographers = photographers.filter(capture_method__name__in=capture_method)
 
+
     if photographers is None:
         photographers = Photographer.objects.all().filter(is_published=True)
         form = PhotographerSearchForm()
@@ -340,6 +341,7 @@ def photographer_detail(request, unique_id):
             'page': 1
         }
     )
+
 
 
 def ajax_photographer_detail(request, unique_id):

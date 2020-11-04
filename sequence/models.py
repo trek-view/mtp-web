@@ -479,7 +479,6 @@ class SequenceWeather(models.Model):
     his_hourly_uv_index = models.IntegerField(default=0)
 
 
-
 class CustomMapFeatureMVTManager(CustomMVTManager):
     def get_additional_where(self, additional_filters={}, request=None):
         additional_where = ""

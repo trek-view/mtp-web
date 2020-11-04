@@ -172,6 +172,7 @@ class CustomSceneMVTManager(CustomMVTManager):
 
         return additional_where
 
+
 class Scene(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     guidebook = models.ForeignKey(Guidebook, on_delete=models.CASCADE)

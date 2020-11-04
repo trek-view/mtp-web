@@ -269,6 +269,7 @@ class SequenceSearchForTourForm(forms.Form):
             ),
             choices=camera_makes(),
             label='Camera Make (leave blank for all)',
+
         )
 
         self.fields['transport_type'] = forms.ChoiceField(

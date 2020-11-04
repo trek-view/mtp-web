@@ -228,6 +228,28 @@ body {
     font-size: 14px;
 }
 
+.right-board .btn-add-to-guidebook {
+    font-size: 14px;
+    top: 55px;
+    color: white;
+    border-radius: 4px;
+    text-align: center;
+    z-index: 300;
+    position: absolute;
+    right: 15px;
+}
+
+.right-board .btn-add-to-guidebook button, .right-board .btn-add-to-guidebook div {
+    font-size: 14px;
+    color: white;
+    padding: 3px;
+    border-radius: 4px;
+}
+
+.right-board .image-view-point i {
+    font-size: 14px;
+}
+
 .right-board .image-view-point img {
     border-radius: 18px;
 }

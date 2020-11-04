@@ -337,6 +337,7 @@ def image_leaderboard(request):
                     images = images.filter(sequence__in=sequences)
 
             m_type = request.GET.get('type')
+            users = None
             if username and username != '':
                 users = CustomUser.objects.filter(username__icontains=username)
                 if m_type is None or m_type == 'received':

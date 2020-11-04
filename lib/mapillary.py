@@ -189,3 +189,4 @@ class Mapillary:
             user_data = self.get_mapillary_user()
             if user_data:
                 self.user_data = user_data
+

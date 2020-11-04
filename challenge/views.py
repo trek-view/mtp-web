@@ -274,6 +274,7 @@ def my_challenge_list(request):
             name = form.cleaned_data['name']
             transport_type = form.cleaned_data['transport_type']
             camera_makes = form.cleaned_data['camera_make']
+            challenge_type = form.cleaned_data['challenge_type']
 
             if not name is None:
                 challenges = challenges.filter(name__icontains=name)
@@ -282,8 +283,8 @@ def my_challenge_list(request):
                 if children_trans_type.count() > 0:
                     types = [transport_type]
                     for t in children_trans_type:
-                        types.append(t)
-                    challenges = challenges.filter(transport_type__in=types)
+                        transport_types.append(t.pk)
+                    challenges = challenges.filter(transport_type_id__in=transport_types)
                 else:
                     challenges = challenges.filter(transport_type=transport_type)
 

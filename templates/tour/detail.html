@@ -147,6 +147,9 @@
                                                     image by {{ sequence.username }} on mapillary
                                                 </div>
                                             </div>
+                                            <div class="user-on-mapillary" >
+                                                image by {{ sequence.username }} on mapillary
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -219,7 +222,6 @@
                                                 </div>
 
                                             </div>
-
                                         </div>
                                         <div class="col-md-4 p-0 text-center d-flex flex-column align-items-center justify-content-center" style="font-size: 13px;">
                                             <div class="d-flex flex-row justify-content-center  align-items-center text-right">
@@ -505,6 +507,7 @@
     function getSequenceDetailByUniqueID(id) {
         let url = "{% url 'sequence.ajax_get_detail' unique_id='unique_id' %}";
         url = url.replace('unique_id', id);
+
         $.ajax({
             url: url,
             type: 'GET',
