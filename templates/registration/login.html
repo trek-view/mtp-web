@@ -23,7 +23,7 @@
                         </div>
                         {% endfor %}
                     {% endif %}
-                    <form method="post" class="mb-3">
+                    <form method="post" class="mb-3" onsubmit="return check_actived_user()">
                         {% csrf_token %}
                         {{ form.as_p }}
                         {% if not next is None and next != ''  %}
@@ -33,6 +33,9 @@
                         {% else %}
                             <input type="hidden" name="next" value="" />
                         {% endif %}
+                        <div class="text-danger user-disabled d-none">
+                          Account not confirmed. Click <a href="">here</a> to resend confirmation email.
+                        </div>
                         <div class="d-flex flex-row justify-content-between align-items-center">
                             <a href="{% url 'signup' %}">Sign Up</a>
                             <button type="submit" class="btn btn-primary">Login</button>
@@ -45,4 +48,36 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function check_actived_user() {
+            let return_flag = true;
+            $.ajax({
+                type: 'GET',
+                url: '{% url "check_unconfirmed_user" %}',
+                async: false,
+                dataType: 'json',
+                data: {'email': $('#id_email').val()},
+                success: function (data) {
+                    if  (data.status == 'success') {
+                        if (data.type == 'disabled') {
+                            $('.user-disabled').removeClass('d-none');
+
+                            let url = "{% url 'retry_verify_user' email='email' %}";
+                            url = url.replace('email', $('#id_email').val());
+                            $('.user-disabled a').attr('href', url);
+                            return_flag = false;
+                        }
+                    }
+                }
+            })
+            return return_flag;
+        }
+
+        $('#id_email').change(function () {
+            $('.user-disabled').addClass('d-none');
+        })
+    </script>
 {% endblock %}

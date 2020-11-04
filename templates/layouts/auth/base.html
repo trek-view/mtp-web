@@ -22,9 +22,14 @@
         {% block content %}
         {% endblock %}
     </main>
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="{% static 'js/jquery.js' %}"></script>
     <script src="{% static 'js/form-validator/jquery.form-validator.js' %}"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap-toggle/bootstrap-toggle.min.css' %}">
+    {% block scripts %}
+      <!--- some scripts that apply to all pages -->
+    {% endblock %}
     <script>
         $(function() {
             $.validate();

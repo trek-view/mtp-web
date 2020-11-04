@@ -32,7 +32,7 @@ def signup(request):
             email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password1')
             authenticate(email=email, password=password)
-            if user != None:
+            if user is not None:
                 user.verify_email_key = secrets.token_urlsafe(50)
                 user.save()
 
@@ -66,6 +66,32 @@ def signup(request):
     else:
         form = UserSignUpForm()
     return render(request, 'signup.html', {'form': form})
+
+
+def retry_verify_user(request, email):
+    if request.method == "GET":
+        if email is not None and email != '':
+            user = UserModel.objects.filter(email=email).first()
+            if user is not None:
+                user.verify_email_key = secrets.token_urlsafe(50)
+                user.save()
+
+                # confirm email
+                try:
+                    # send email to creator
+                    subject = 'Please confirm your email'
+                    html_message = render_to_string(
+                        'emails/account/signup_email_confirm.html',
+                        {'subject': subject, 'url': '/accounts/email-verify/' + user.verify_email_key},
+                        request
+                    )
+                    send_mail_with_html(subject, html_message, email, settings.SMTP_REPLY_TO)
+                except:
+                    print('email sending error!')
+
+                messages.success(request, 'Please check inbox to confirm your email address.')
+                return redirect('login')
+    return redirect('password_reset')
 
 
 def email_verify(request, key):
@@ -362,6 +388,32 @@ def ajax_user_change_liked_email(request):
     return JsonResponse({
         'status': 'failed',
         'message': "You can't access."
+    })
+
+
+def check_unconfirmed_user(request):
+    if request.method == 'GET':
+        email = request.GET.get('email')
+        if email is not None and email != '':
+            user = UserModel.objects.filter(email=email).first()
+            if user is not None:
+                if user.is_active:
+                    return JsonResponse({
+                        'status': 'success',
+                        'type': "enabled"
+                    })
+                else:
+                    return JsonResponse({
+                        'status': 'success',
+                        'type': "disabled"
+                    })
+            return JsonResponse({
+                'status': 'success',
+                'type': "none"
+            })
+    return JsonResponse({
+        'status': 'failed',
+        'message': ""
     })
 
 

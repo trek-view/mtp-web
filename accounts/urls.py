@@ -46,4 +46,7 @@ urlpatterns = [
     path('', include('oauth2_provider.urls', namespace='oauth2_provider')),
 
     path('close/', views.account_close, name='account.account_close'),
+
+    path('check_unconfirmed_user/', views.check_unconfirmed_user, name='check_unconfirmed_user'),
+    path('retry_verify_user/<str:email>/', views.retry_verify_user, name='retry_verify_user')
 ]
