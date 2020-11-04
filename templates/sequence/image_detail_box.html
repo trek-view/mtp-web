@@ -45,6 +45,10 @@
             <label class="col-4">Ele: </label>
             <span class="col-8">{{ image.ele }}</span>
         </div>
+        <div class="mt-2">
+            <label class="col-4">Captured At: </label>
+            <span class="col-8">{{ image.captured_at }}</span>
+        </div>
 
         <div class="mt-2 d-flex flex-row justify-content-center align-items-center" id="mapillary-view">
             <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ image.lng }}/{{ image.lat }}&photo_overlay=mapillary">
