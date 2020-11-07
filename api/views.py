@@ -53,7 +53,7 @@ class SequenceCreate(APIView):
 
         sequence.user = request.user
 
-        sequence.name = sequence_name.repalce('__', ' ').replace('_', ' ')
+        sequence.name = sequence_name
         if not request.POST.get('description') is None:
             sequence.description = request.POST.get('description')
         sequence.transport_type_id = trans_type.pk

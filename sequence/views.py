@@ -2198,11 +2198,7 @@ def ajax_get_map_features(request):
 
 def insert_db(request):
 
-    sequences = Sequence.objects.filter()
 
-    for sequence in sequences:
-        sequence.name = sequence.name.replace('__', ' ').replace('_', ' ')
-        sequence.save()
 
     # for map_feature in map_features:
     #     image_keys = map_feature.image_keys
@@ -2211,8 +2207,8 @@ def insert_db(request):
     #         for image in images:
     #             print('sequence id: {}, image key: {}'.format(image.sequence.unique_id, image.image_key))
 
-    # p = threading.Thread(target=update_mf_keys_with_thread)
-    # p.start()
+    p = threading.Thread(target=update_mf_keys_with_thread)
+    p.start()
     #
     # p = threading.Thread(target=change_map_feature_field)
     # p.start()
