@@ -21,6 +21,14 @@
 <script>
     mapboxgl.accessToken = mapboxToken;
 
+    Swal.fire({
+        title: 'Welcome to Map the Paths!',
+        html: "Access off-road street-level imagery and map data from all over the world. Fill in the gaps by requesting new coverage or capturing your own.",
+        showCancelButton: false,
+        confirmButtonText: 'OK'
+    })
+
+
     const map = new mapboxgl.Map({
         container: 'map', // container id
         style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
