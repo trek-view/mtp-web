@@ -994,6 +994,10 @@ def sequence_detail(request, unique_id):
         if show_gpx is None:
             show_gpx = 'false'
 
+        show_street_level_poi = request.GET.get('show_street_level_poi')
+        if show_street_level_poi is None:
+            show_street_level_poi = 'false'
+
     geometry_coordinates_ary = sequence.geometry_coordinates_ary
     coordinates_image = sequence.coordinates_image
     coordinates_cas = sequence.coordinates_cas
@@ -1066,6 +1070,7 @@ def sequence_detail(request, unique_id):
         'sequence_weather': sequence_weather,
         'view_mode': view_mode,
         'show_gpx': show_gpx,
+        'show_street_level_poi': show_street_level_poi,
         'firstImageKey': firstImageKey,
         'tours': tours,
         'ts_tours': ts_tours,
@@ -1196,6 +1201,9 @@ def import_sequence_list(request):
             else:
                 map_user = map_users[0]
 
+            features = []
+            sequences_ary = []
+
             if page is None:
                 start_time = month + '-01'
 
@@ -1224,15 +1232,15 @@ def import_sequence_list(request):
                 request.session['sequences'] = features
 
                 page = 1
-            if request.session['sequences'] is None or not request.session['sequences']:
-                request.session['sequences'] = []
 
-            sequences_ary = []
+                for seq in features:
+                    seq_s = Sequence.objects.filter(seq_key=seq['properties']['key'])[:1]
+                    if seq_s.count() == 0:
+                        sequences_ary.append(seq)
+                request.session['sequences'] = sequences_ary
 
-            for seq in request.session['sequences']:
-                seq_s = Sequence.objects.filter(seq_key=seq['properties']['key'])[:1]
-                if seq_s.count() == 0:
-                    sequences_ary.append(seq)
+            else:
+                sequences_ary = request.session['sequences']
 
             paginator = Paginator(sequences_ary, 10)
             try:
@@ -1323,6 +1331,9 @@ def ajax_import(request, seq_key):
         if form.is_valid():
 
             # for i in range(len(request.session['sequences'])):
+            seq_index = 0
+            sequences = []
+            sequence_unique_id = ""
             for feature in request.session['sequences']:
                 # feature = request.session['sequences'][i]
                 if feature['properties']['key'] == seq_key:
@@ -1389,11 +1400,19 @@ def ajax_import(request, seq_key):
                     p.start()
                     print('2')
                     # messages.success(request, "Sequences successfully imported.")
-                    return JsonResponse({
-                        'status': 'success',
-                        'message': 'Sequence successfully imported. Sequence will be published in about 30 minutes.',
-                        'unique_id': str(sequence.unique_id)
-                    })
+
+                    sequence_unique_id = str(sequence.unique_id)
+                    continue
+
+                sequences.append(feature)
+
+            request.session['sequences'] = sequences
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Sequence successfully imported. Sequence will be published in about 30 minutes.',
+                'unique_id': sequence_unique_id
+            })
         else:
             errors = []
             for field in form:
@@ -2195,6 +2214,38 @@ def ajax_get_map_features(request):
         'status': 'success',
         'map_features': map_feature_values
     })
+
+
+def ajax_get_import_sequences(request):
+    if request.session['sequences'] is not None:
+        print('sequence len: ', len(request.session['sequences']))
+        return JsonResponse({
+            'status': 'success',
+            'sequences': request.session['sequences'],
+            'message': 'success'
+        })
+    else:
+        return JsonResponse({
+            'status': 'failed',
+            'sequences': None,
+        })
+
+
+def ajax_get_import_sequence(request):
+    sequence_key = request.GET.get('sequence_key')
+    if sequence_key is not None:
+        pass
+    if request.session['sequences'] is not None:
+        return JsonResponse({
+            'status': 'success',
+            'sequences': request.session['sequences'],
+            'message': 'success'
+        })
+    else:
+        return JsonResponse({
+            'status': 'failed',
+            'sequences': None,
+        })
 
 
 def insert_db(request):

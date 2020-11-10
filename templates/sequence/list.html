@@ -560,26 +560,6 @@
             }
         }, "waterway-label");
 
-        /*
-        map.addSource('mtp-images-big', {
-            "type": "vector",
-            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_list&limit=500"],
-            "minzoom": 1,
-            "maxzoom": 5
-        });
-
-        map.addLayer({
-            "id": "mtp-images-big",
-            "type": "circle",
-            "source": 'mtp-images-big',
-            "source-layer": 'mtp-images',
-            'filter': filter,
-            "paint": {
-                "circle-color": "#7880bd",
-                "circle-radius": 6
-            }
-        }, "waterway-label");
-        */
     }
 
     function getSequenceDetailByUniqueID(id) {
