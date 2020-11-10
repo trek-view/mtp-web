@@ -2516,7 +2516,7 @@
 
 
 	function redrawNodes(){
-		viewer.getComponent("tag").removeAll();
+		{#viewer.getComponent("tag").removeAll();#}
 		viewer.getComponent("popup").removeAll();
 		if (overpassjson.length>0){
 			drawOSMdata(overpassjson);
@@ -3098,7 +3098,7 @@
 		}
 
 
-		tagComponent.add(grids);
+		{#tagComponent.add(grids);#}
 		window.addEventListener("resize", function() { viewer.resize(); });
 	}
 
@@ -3282,7 +3282,7 @@
 	}
 
 	function buttonCloseAll(){
-		viewer.getComponent("tag").removeAll();
+		{#viewer.getComponent("tag").removeAll();#}
 		viewer.getComponent("popup").removeAll();
 		overpassjson = [];
 		specialjson = [];
