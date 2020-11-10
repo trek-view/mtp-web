@@ -1201,6 +1201,7 @@ def import_sequence_list(request):
                 map_user = map_users[0]
 
             features = []
+            sequences_ary = []
 
             if page is None:
                 start_time = month + '-01'
@@ -1231,13 +1232,14 @@ def import_sequence_list(request):
 
                 page = 1
 
-            sequences_ary = []
+                for seq in features:
+                    seq_s = Sequence.objects.filter(seq_key=seq['properties']['key'])[:1]
+                    if seq_s.count() == 0:
+                        sequences_ary.append(seq)
+                request.session['sequences'] = sequences_ary
 
-            for seq in features:
-                seq_s = Sequence.objects.filter(seq_key=seq['properties']['key'])[:1]
-                if seq_s.count() == 0:
-                    sequences_ary.append(seq)
-            request.session['sequences'] = sequences_ary
+            else:
+                sequences_ary = request.session['sequences']
 
             paginator = Paginator(sequences_ary, 10)
             try:
