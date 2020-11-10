@@ -2832,7 +2832,7 @@
 		}
 		let showroute = "";
 		if (Number(json.distance) < 2000){
-			showroute = `<input type="button" onclick="showRoute(${json.lat},${json.lon}, '${escape(json.name)}');" value="Route to ${json.name}">`;
+			{#showroute = `<input type="button" onclick="showRoute(${json.lat},${json.lon}, '${escape(json.name)}');" value="Route to ${json.name}">`;#}
 		}
 
 		content = `<p class="${pclass}"><a target="_blank" href="${json.url}">${json.text}</a><br/></p>
