@@ -993,6 +993,10 @@ def sequence_detail(request, unique_id):
         if show_gpx is None:
             show_gpx = 'false'
 
+        show_street_level_poi = request.GET.get('show_street_level_poi')
+        if show_street_level_poi is None:
+            show_street_level_poi = 'false'
+
     geometry_coordinates_ary = sequence.geometry_coordinates_ary
     coordinates_image = sequence.coordinates_image
     coordinates_cas = sequence.coordinates_cas
@@ -1065,6 +1069,7 @@ def sequence_detail(request, unique_id):
         'sequence_weather': sequence_weather,
         'view_mode': view_mode,
         'show_gpx': show_gpx,
+        'show_street_level_poi': show_street_level_poi,
         'firstImageKey': firstImageKey,
         'tours': tours,
         'ts_tours': ts_tours,

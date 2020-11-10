@@ -11,7 +11,8 @@ def get_settings(request):
         'MAPILLARY_CLIENT_SECRET': settings.MAPILLARY_CLIENT_SECRET,
         'MEDIA_URL': settings.MEDIA_URL,
         'FONT_AWESOME_KIT': settings.FONT_AWESOME_KIT,
-        'BASE_URL': settings.BASE_URL
+        'BASE_URL': settings.BASE_URL,
+        'OPENROUTESERVICE_API_KEY': settings.OPENROUTESERVICE_API_KEY
     }
 
 def baseurl(request):
