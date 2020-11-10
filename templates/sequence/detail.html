@@ -681,47 +681,8 @@
 
 {% block scripts %}
 <script src='https://unpkg.com/mapillary-js@2.21.0/dist/mapillary.min.js'></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script src="{% static 'js/chart.min.js' %}"></script>
-<script src="{% static 'js/pages/sequence/leaflet.rotatedMarker.js' %}"></script>
-<script src="{% static 'js/pages/sequence/togeojson.js' %}"></script>
-<script src="{% static 'js/pages/sequence/leaflet-hash.js' %}"></script>
-<script src="{% static 'Street-level-POI-Viewer/leaflet.rotatedMarker.js' %}"></script>
-<pre><span id="data"></span></pre>
-<script src="{% static 'Street-level-POI-Viewer/leaflet-hash.js' %}"></script>
-{#<script src="{% static 'Street-level-POI-Viewer/viewer.js' %}"></script>#}
-<script src="{% static 'Street-level-POI-Viewer/utils.js' %}"></script>
-<script>
-
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var first_move = true;
-    $.ajaxSetup({
-        data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
-    });
-    var current_node_point = null;
-    var current_node_key = '';
-    var current_order_number = 0;
-    toastr.options = {
-      "closeButton": false,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-top-right",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    };
-
-    let current_page = '0';
-
-    {#$('#embed_code').tooltip('disable');#}
+    <script>
+    $('#embed_code').tooltip('disable');
 
     $('.embed-code').click(function () {
         let url = "{% static 'images/icon/style-' %}";
@@ -777,6 +738,48 @@
         $('#embed_code').tooltip('show');
         $('#embed_code').tooltip('disable');
     });
+    </script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{% static 'js/chart.min.js' %}"></script>
+<script src="{% static 'js/pages/sequence/leaflet.rotatedMarker.js' %}"></script>
+<script src="{% static 'js/pages/sequence/togeojson.js' %}"></script>
+<script src="{% static 'js/pages/sequence/leaflet-hash.js' %}"></script>
+<script src="{% static 'Street-level-POI-Viewer/leaflet.rotatedMarker.js' %}"></script>
+<pre><span id="data"></span></pre>
+<script src="{% static 'Street-level-POI-Viewer/leaflet-hash.js' %}"></script>
+{#<script src="{% static 'Street-level-POI-Viewer/viewer.js' %}"></script>#}
+<script src="{% static 'Street-level-POI-Viewer/utils.js' %}"></script>
+<script>
+
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var first_move = true;
+    $.ajaxSetup({
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+    var current_node_point = null;
+    var current_node_key = '';
+    var current_order_number = 0;
+    toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    };
+
+    let current_page = '0';
+
+
 
     {% if request.user.is_authenticated and request.user == sequence.user %}
         $('#add_in_tour').change(function () {
