@@ -610,6 +610,8 @@
                                     <li style="font-size: small;">Filter by Lang: <input type="text" class="" id="filter_lang" value="en"
                                             size="5"></li>
                             </ul>
+                            <p style="text-align: right; margin:3px;"><input type="button" class="" id="" value="Clear Results"
+                        onclick="buttonCloseAll()"></p>
                         </div>
                     </div>
                 </div>
@@ -2137,7 +2139,7 @@
             data = this.response;
             const json = JSON.parse(data);
             if (json.features.length < 1) {
-                {#alert("No 360 photo around here");#}
+                toastr.info("No 360 photo around here")
                 return;
             }
             const coordinates = json.features[0].geometry.coordinates;
@@ -2501,7 +2503,7 @@
 			const json = JSON.parse(data);
 
 			if (json.features.length < 1){
-				{#alert("No 360 photo here");#}
+			    toastr.info("No 360 photo here")
 				return;
 			}
 			const key = json.features[0].properties.key;
@@ -2579,7 +2581,7 @@
 
 			//データが入っていなかったらダメ
 			if (data.elements.length < 1) {
-				{#alert("No data");#}
+				toastr.info('No results')
 				return;
 			}
 
@@ -2769,7 +2771,7 @@
 
 			}
 		}
-		if (popup_number < 1) console.log("No named objects");
+		if (popup_number < 1) toastr.info("No named objects");
 	}
 
 
@@ -2871,6 +2873,7 @@
 				console.log('Body:', this.responseText);
 
 				if (this.status != 200){
+
 					{#alert("Routing error");#}
 				}
 
@@ -3122,7 +3125,7 @@
 			//queryが入っていなかったらダメ
 			let query = json.query;
 			if (!query) {
-				{#alert("No data");#}
+			    toastr.info('No results');
 				return;
 			}
 
@@ -3189,7 +3192,7 @@
 
 				//座標がなかったらダメ
 				if (!pages[page].coordinates) {
-					{#alert("No data");#}
+				    toastr.info('No results')
 					return;
 				}
 
