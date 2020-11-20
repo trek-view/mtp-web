@@ -216,7 +216,10 @@ class Sequence(models.Model):
         return reverse('sequence.sequence_detail', kwargs={'unique_id': str(self.unique_id)})
 
     def get_image_count(self):
-        return self.like_count
+        if self.coordinates_image is not None:
+            return len(self.coordinates_image)
+        else:
+            return 0
 
     def get_tag_str(self):
         tags = []

@@ -60,6 +60,7 @@ class Guidebook(models.Model):
     is_approved = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=datetime.now, blank=True)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)
+
     like_count = models.IntegerField(default=0)
 
     def get_absolute_url(self):
@@ -91,7 +92,11 @@ class Guidebook(models.Model):
         return scenes.count()
 
     def get_like_count(self):
-        return self.like_count
+        liked_guidebook = GuidebookLike.objects.filter(guidebook=self)
+        if not liked_guidebook:
+            return 0
+        else:
+            return liked_guidebook.count()
 
     def get_short_description(self):
         description = self.description

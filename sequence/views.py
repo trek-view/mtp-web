@@ -2274,11 +2274,26 @@ def insert_db(request):
     #         for image in images:
     #             print('sequence id: {}, image key: {}'.format(image.sequence.unique_id, image.image_key))
 
-    p = threading.Thread(target=update_mf_keys_with_thread)
-    p.start()
+    # p = threading.Thread(target=update_mf_keys_with_thread)
+    # p.start()
     #
     # p = threading.Thread(target=change_map_feature_field)
     # p.start()
+    method = request.GET.get('method')
+    if method == 'sort_by_like':
+        sequences = Sequence.objects.all()
+        for sequence in sequences:
+            sequence.like_count = sequence.get_like_count()
+            sequence.save()
+        guidebooks = Guidebook.objects.all()
+        for guidebook in guidebooks:
+            guidebook.like_count = guidebook.get_like_count()
+            guidebook.save()
+        tours = Tour.objects.all()
+        for tour in tours:
+            tour.like_count = tour.get_like_count()
+            tour.save()
+
 
     return redirect('home')
 
