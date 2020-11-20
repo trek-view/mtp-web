@@ -426,6 +426,13 @@ i.fas, i.far {
     height: 160px !important;
 }
 
+@media only screen and (max-width: 768px) {
+    .right-board .paginator:first-child {
+        min-height: 38px;
+        margin-top: 70px;
+    }
+}
+
 
 @media only screen and (max-width: 600px) {
     .left-side {
@@ -463,10 +470,7 @@ i.fas, i.far {
         top: 80px;
     }
 
-    .right-board .paginator:first-child {
-        min-height: 38px;
-        margin-top: 70px;
-    }
+
 
     .detail-modal {
         width: 100% !important;
