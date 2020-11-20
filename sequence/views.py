@@ -54,10 +54,12 @@ def import_sequence(request):
 def sequence_list(request):
     sequences = None
     page = 1
+    order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
             page = 1
+        order_type = request.GET.get('order_type')
         form = SequenceSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -158,8 +160,10 @@ def sequence_list(request):
         form = SequenceSearchForm()
 
     request.session['sequences_query'] = get_correct_sql(sequences)
-
-    paginator = Paginator(sequences.order_by('-captured_at'), 10)
+    if order_type == 'most_likes':
+        paginator = Paginator(sequences.order_by('-like_count', '-captured_at'), 10)
+    else:
+        paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
     try:
         pSequences = paginator.page(page)
@@ -196,7 +200,8 @@ def sequence_list(request):
         'pageName': 'Sequences',
         'pageTitle': 'Sequences',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
+        'page': page,
+        'order_type': order_type
     }
     return render(request, 'sequence/list.html', content)
 
@@ -205,10 +210,12 @@ def sequence_list(request):
 def my_sequence_list(request):
     sequences = None
     page = 1
+    order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
             page = 1
+        order_type = request.GET.get('order_type')
         form = SequenceSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -255,7 +262,10 @@ def my_sequence_list(request):
 
     request.session['sequences_query'] = get_correct_sql(sequences)
 
-    paginator = Paginator(sequences.order_by('-captured_at'), 10)
+    if order_type == 'most_likes':
+        paginator = Paginator(sequences.order_by('-like_count', '-captured_at'), 10)
+    else:
+        paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
     try:
         pSequences = paginator.page(page)
@@ -292,7 +302,8 @@ def my_sequence_list(request):
         'pageName': 'My Sequences',
         'pageTitle': 'My Sequences',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
+        'page': page,
+        'order_type': order_type
     }
     return render(request, 'sequence/list.html', content)
 
@@ -1498,6 +1509,8 @@ def ajax_sequence_check_like(request, unique_id):
             liked_count = 0
         else:
             liked_count = liked_sequence.count()
+        sequence.like_count = liked_count
+        sequence.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Unliked',
@@ -1527,6 +1540,8 @@ def ajax_sequence_check_like(request, unique_id):
             liked_count = 0
         else:
             liked_count = liked_sequence.count()
+        sequence.like_count = liked_count
+        sequence.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Liked',

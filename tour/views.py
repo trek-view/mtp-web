@@ -268,10 +268,12 @@ def tour_add_sequence(request, unique_id):
 def tour_list(request):
     tours = None
     page = 1
+    order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
             page = 1
+        order_type = request.GET.get('order_type')
         form = TourSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -328,8 +330,12 @@ def tour_list(request):
         form = TourSearchForm()
 
     request.session['tours_query'] = get_correct_sql(tours)
+    print(order_type)
 
-    paginator = Paginator(tours.order_by('-created_at'), 10)
+    if order_type == 'most_likes':
+        paginator = Paginator(tours.order_by('-like_count', '-created_at'), 10)
+    else:
+        paginator = Paginator(tours.order_by('-created_at'), 10)
 
     try:
         pTours = paginator.page(page)
@@ -358,7 +364,8 @@ def tour_list(request):
         'pageName': 'Tours',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
         'pageTitle': 'Tours',
-        'page': page
+        'page': page,
+        'order_type': order_type
     }
     return render(request, 'tour/list.html', content)
 
@@ -367,10 +374,12 @@ def tour_list(request):
 def my_tour_list(request):
     tours = None
     page = 1
+    order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
             page = 1
+        order_type = request.GET.get('order_type')
         form = TourSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -401,7 +410,10 @@ def my_tour_list(request):
 
     request.session['tours_query'] = get_correct_sql(tours)
 
-    paginator = Paginator(tours.order_by('-created_at'), 10)
+    if order_type == 'most_likes':
+        paginator = Paginator(tours.order_by('-like_count', '-created_at'), 10)
+    else:
+        paginator = Paginator(tours.order_by('-created_at'), 10)
 
     try:
         pTours = paginator.page(page)
@@ -431,7 +443,9 @@ def my_tour_list(request):
         'pageName': 'My Tours',
         'pageTitle': 'My Tours',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
+        'page': page,
+        'order_type': order_type
+
     }
     return render(request, 'tour/list.html', content)
 
@@ -765,6 +779,8 @@ def ajax_tour_check_like(request, unique_id):
             liked_count = 0
         else:
             liked_count = liked_tour.count()
+        tour.like_count = liked_count
+        tour.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Unliked',
@@ -794,6 +810,8 @@ def ajax_tour_check_like(request, unique_id):
             liked_count = 0
         else:
             liked_count = liked_tour.count()
+        tour.like_count = liked_count
+        tour.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Liked',

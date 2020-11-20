@@ -42,10 +42,12 @@ def guidebook_list(request):
         scene.save()
     guidebooks = None
     page = 1
+    order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
             page = 1
+        order_type = request.GET.get('order_type')
         form = GuidebookSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -92,7 +94,10 @@ def guidebook_list(request):
 
     request.session['guidebooks_query'] = get_correct_sql(guidebooks)
 
-    paginator = Paginator(guidebooks.order_by('-created_at'), 10)
+    if order_type == 'most_likes':
+        paginator = Paginator(guidebooks.order_by('-like_count', '-captured_at'), 10)
+    else:
+        paginator = Paginator(guidebooks.order_by('-captured_at'), 10)
 
     try:
         p_guidebooks = paginator.page(page)
@@ -121,7 +126,8 @@ def guidebook_list(request):
         'pageName': 'Guidebooks',
         'pageTitle': 'Guidebooks',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
+        'page': page,
+        'order_type': order_type
     }
     return render(request, 'guidebook/guidebook_list.html', content)
 
@@ -132,10 +138,12 @@ def my_guidebook_list(request):
     global form
     guidebooks = None
     page = 1
+    order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
             page = 1
+        order_type = request.GET.get('order_type')
         form = GuidebookSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -184,7 +192,10 @@ def my_guidebook_list(request):
 
     request.session['guidebooks_query'] = get_correct_sql(guidebooks)
 
-    paginator = Paginator(guidebooks.order_by('-created_at'), 10)
+    if order_type == 'most_likes':
+        paginator = Paginator(guidebooks.order_by('-like_count', '-captured_at'), 10)
+    else:
+        paginator = Paginator(guidebooks.order_by('-captured_at'), 10)
 
     try:
         p_guidebooks = paginator.page(page)
@@ -214,7 +225,8 @@ def my_guidebook_list(request):
         'pageName': 'My Guidebooks',
         'pageTitle': 'My Guidebooks',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
+        'page': page,
+        'order_type': order_type
     }
     return render(request, 'guidebook/guidebook_list.html', content)
 
@@ -904,6 +916,8 @@ def check_like(request, unique_id):
             liked_count = 0
         else:
             liked_count = liked_guidebook.count()
+        guidebook.like_count = liked_count
+        guidebook.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Unliked',
@@ -932,6 +946,8 @@ def check_like(request, unique_id):
             liked_count = 0
         else:
             liked_count = liked_guidebook.count()
+        guidebook.like_count = liked_count
+        guidebook.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Liked',

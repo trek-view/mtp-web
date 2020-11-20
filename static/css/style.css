@@ -230,12 +230,19 @@ i.transport-type-icon {
     position: fixed;
     top: 110px;
     left: 10px;
-    opacity: .4;
+    opacity: 1;
+    background: #28a745!important;
+    padding: 1px;
+
+    color: white;
+}
+.close-sidebar {
+     border-radius: 50%;
 }
 
 i.open-sidebar {
     color: white;
-    background: black;
+    /*background: black;*/
     padding: 3px;
 }
 
@@ -419,6 +426,13 @@ i.fas, i.far {
     height: 160px !important;
 }
 
+@media only screen and (max-width: 768px) {
+    .right-board .paginator:first-child {
+        min-height: 38px;
+        margin-top: 70px;
+    }
+}
+
 
 @media only screen and (max-width: 600px) {
     .left-side {
@@ -456,10 +470,7 @@ i.fas, i.far {
         top: 80px;
     }
 
-    .right-board .paginator:first-child {
-        min-height: 38px;
-        margin-top: 70px;
-    }
+
 
     .detail-modal {
         width: 100% !important;

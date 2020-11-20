@@ -230,12 +230,19 @@ i.transport-type-icon {
     position: fixed;
     top: 110px;
     left: 10px;
-    opacity: .4;
+    opacity: 1;
+    background: #28a745!important;
+    padding: 1px;
+
+    color: white;
+}
+.close-sidebar {
+     border-radius: 50%;
 }
 
 i.open-sidebar {
     color: white;
-    background: black;
+    /*background: black;*/
     padding: 3px;
 }
 

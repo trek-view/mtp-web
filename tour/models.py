@@ -31,6 +31,7 @@ class Tour(models.Model):
     created_at = models.DateTimeField(default=datetime.now, blank=True)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)
     is_published = models.BooleanField(default=True)
+    like_count = models.IntegerField(default=0)
 
     def get_absolute_url(self):
         from django.urls import reverse
@@ -102,11 +103,7 @@ class Tour(models.Model):
         return image_count
 
     def get_like_count(self):
-        liked_tour = TourLike.objects.filter(tour=self)
-        if not liked_tour:
-            return 0
-        else:
-            return liked_tour.count()
+        return self.like_count
 
     def getSequenceCount(self):
         tour_sequences = TourSequence.objects.filter(tour=self)

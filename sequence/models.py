@@ -201,6 +201,8 @@ class Sequence(models.Model):
 
     distance = models.FloatField(null=True, blank=True)
 
+    like_count = models.IntegerField(default=0)
+
     objects = models.Manager()
     vector_tiles = CustomSequenceMVTManager(
         geo_col='geometry_coordinates',
@@ -214,10 +216,7 @@ class Sequence(models.Model):
         return reverse('sequence.sequence_detail', kwargs={'unique_id': str(self.unique_id)})
 
     def get_image_count(self):
-        if self.coordinates_image is not None:
-            return len(self.coordinates_image)
-        else:
-            return 0
+        return self.like_count
 
     def get_tag_str(self):
         tags = []

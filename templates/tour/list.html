@@ -63,7 +63,13 @@
         {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board list bg-light">
-        <div class="switch-list-viewer">
+        <div class="switch-list-viewer d-flex justify-content-between">
+            <div class="mr-2">
+                <select class="form-control" id="order_type" {{ order_type }} >
+                    <option value="latest_date" {% if order_type == 'latest_date' %}selected{% endif %}>Latest Date</option>
+                    <option value="most_likes" {% if order_type == 'most_likes' %}selected{% endif %}>Most Likes</option>
+                </select>
+            </div>
             <input class="" type="checkbox" id="switch-list-viewer" {% if request.GET.view_type is not None and request.GET.view_type == 'map-view' %}checked{% endif %} data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
         </div>
         <div id="list-view" class="{% if request.GET.view_type is not None and request.GET.view_type == 'map-view' %}d-none{% endif %} mt-4 mb-2 ml-auto mr-auto">
@@ -167,10 +173,13 @@
 
                                                      </div>
 
-                                                     <div class="item-user">
+                                                     <div class="item-user d-flex justify-content-between">
                                                          <a href="{% url 'account.profile' username=tour.user.username %}">
                                                              <span class="user">{{ tour.user.username }}</span>
                                                          </a>
+                                                         {% if tour.like_count > 0 %}
+                                                            <div><i class="fa-thumbs-up fas"></i><span class="ml-2" style="font-size: 15px">{{ tour.like_count }}</span></div>
+                                                        {% endif %}
                                                      </div>
 
                                                  </div>

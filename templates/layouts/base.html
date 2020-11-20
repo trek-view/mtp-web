@@ -349,6 +349,12 @@
           let vh = window.innerHeight * 0.01;
           document.documentElement.style.setProperty('--vh', `${vh}px`);
         });
+
+        $('#order_type').change(function () {
+            let value = $(this).val();
+            let url = setParamInURL('order_type', value);
+            location.assign(url);
+        });
     </script>
 </body>
 </html>
