@@ -615,6 +615,16 @@
                         onclick="buttonCloseAll()"></p>
                         </div>
                     </div>
+
+                    <div class="social-share sidebar-icon">
+                        <div class="facebook p-1" onclick="social_share('facebook')">
+                            <i class="fab fa-facebook"></i>
+                        </div>
+                        <div class="twitter p-1" onclick="social_share('twitter')">
+                            <i class="fab fa-twitter-square"></i>
+                        </div>
+
+                    </div>
                 </div>
 
                 <div id='sequence_viewer' class="image-box display"></div>
@@ -3395,6 +3405,22 @@
         })
 
     });
+
+    function social_share(type) {
+        let url = '';
+        switch (type) {
+            case 'facebook':
+                url = 'https://www.facebook.com/sharer/sharer.php?u=' + location.href;
+                console.log(url);
+                break;
+            case 'twitter':
+                url = 'https://twitter.com/intent/tweet?text=New Song ' + location.href;
+                console.log(url);
+                break;
+        }
+        if (url != '')
+            window.open(url, '_blank');
+    }
 
 </script>
 {% endblock %}

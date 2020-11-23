@@ -327,3 +327,8 @@ body {
 .image-detection .detections > div.selected {
     background: #d6dad7;
 }
+
+.mapillary-right-actions .sidebar-icon i {
+    font-size: 30px;
+    cursor: pointer;
+}
