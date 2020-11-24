@@ -329,6 +329,26 @@ body {
 }
 
 .mapillary-right-actions .sidebar-icon i {
-    font-size: 30px;
+    font-size: 28px;
     cursor: pointer;
+}
+
+.mapillary-right-actions > div {
+    cursor: pointer;
+}
+
+.mapillary-right-actions .show-button {
+    transition: display 5s;
+}
+
+/*.mapillary-right-actions .hover-button:hover {*/
+/*    width: 130px;*/
+/*}*/
+
+.mapillary-right-actions .ui-accordion-header-icon {
+    display: none;
+}
+
+.mapillary-right-actions .ui-accordion-content-active {
+    height: 200px !important;
 }

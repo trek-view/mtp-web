@@ -95,9 +95,9 @@ def guidebook_list(request):
     request.session['guidebooks_query'] = get_correct_sql(guidebooks)
 
     if order_type == 'most_likes':
-        paginator = Paginator(guidebooks.order_by('-like_count', '-captured_at'), 10)
+        paginator = Paginator(guidebooks.order_by('-like_count', '-created_at'), 10)
     else:
-        paginator = Paginator(guidebooks.order_by('-captured_at'), 10)
+        paginator = Paginator(guidebooks.order_by('-created_at'), 10)
 
     try:
         p_guidebooks = paginator.page(page)
@@ -193,9 +193,9 @@ def my_guidebook_list(request):
     request.session['guidebooks_query'] = get_correct_sql(guidebooks)
 
     if order_type == 'most_likes':
-        paginator = Paginator(guidebooks.order_by('-like_count', '-captured_at'), 10)
+        paginator = Paginator(guidebooks.order_by('-like_count', '-created_at'), 10)
     else:
-        paginator = Paginator(guidebooks.order_by('-captured_at'), 10)
+        paginator = Paginator(guidebooks.order_by('-created_at'), 10)
 
     try:
         p_guidebooks = paginator.page(page)

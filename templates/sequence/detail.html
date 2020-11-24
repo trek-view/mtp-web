@@ -531,100 +531,130 @@
                 </div>
 
                 <div class="mapillary-right-actions d-flex flex-column align-items-end">
-                    <div class="image-view-point mb-2" style="cursor: pointer;" onclick="mark_view_point()" style="">
-                        <button type="button" class="btn btn-primary view_point text-center">
+                    <div class="p-1 image-view-point action" onclick="mark_view_point()" style="">
+                        <button type="button" class="btn btn-primary view_point text-center show-button d-none">
                             <i class="fas fa-binoculars"></i>
                             <span class="text-center m-0 disabled">
                                 {{ view_points }} Viewpoints
                             </span>
                         </button>
+
+                        <div class="sidebar-icon default-icon">
+                            <i class="fas fa-binoculars"></i>
+                        </div>
                     </div>
 
                     {% if request.user.is_authenticated %}
-                        <div class=" btn-add-to-guidebook mb-2">
-                            <button type="button" class="btn btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Add to Guidebook
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" style="background: #d0d0d0" href="javascript:addToGuidebook('new_guidebook');">New Guidebook</a>
-                                {% if not guidebooks is None %}
-                                    {% for guidebook in guidebooks %}
-                                        <a class="dropdown-item" href="javascript:addToGuidebook('{{ guidebook.unique_id }}');">{{ guidebook.name }}</a>
-                                    {% endfor %}
-                                {% endif %}
+                        <div class="p-1 action">
+                            <div class="btn-add-to-guidebook show-button d-none">
+                                <button type="button" class="btn btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Add to Guidebook
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item" style="background: #d0d0d0" href="javascript:addToGuidebook('new_guidebook');">New Guidebook</a>
+                                    {% if not guidebooks is None %}
+                                        {% for guidebook in guidebooks %}
+                                            <a class="dropdown-item" href="javascript:addToGuidebook('{{ guidebook.unique_id }}');">{{ guidebook.name }}</a>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="sidebar-icon default-icon">
+                                <i class="fas fa-map-marked-alt"></i>
                             </div>
                         </div>
                     {% endif %}
 
-                    <div class="embed-code mb-2">
-                        <button type="button" class="btn btn-primary">Get Embed Code</button>
-                    </div>
-
-                    <div class="switch-detection mb-2">
-                        {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}
-                            <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Detections Off" data-off="Detections On" data-onstyle="success" data-offstyle="primary" checked>
-                        {% else %}
-                            <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Detections Off" data-off="Detections On" data-onstyle="success" data-offstyle="primary">
-                        {% endif %}
-                    </div>
-
-                    <div class="switch-gpx mb-1">
-                        {% if show_gpx == 'true' %}
-                            <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="AR Off" data-off="AR On" data-onstyle="success" data-offstyle="primary" checked>
-                        {% else %}
-                            <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="AR Off" data-off="AR On" data-onstyle="success" data-offstyle="primary">
-                        {% endif %}
-                    </div>
-
-                    <div id='nav'>
-                        <h1 class="bg-primary text-white">Street-level POI Viewer</h1>
-                        <div class="text-left">
-                            <h2>OpenStreetMap:</h2>
-                                <ul id="osm_options">
-                                    <li>
-                                        Category:
-                                        <select id="osm_keys">
-                                            <option value="amenity">amenity</option>
-                                            <option value="shop">shop</option>
-                                            <option value="leisure">leisure</option>
-                                            <option value="historic">historic</option>
-                                            <option value="tourism">tourism</option>
-                                        </select>
-                                        <input type="button" value="Search" onclick="buttonOverpassKey()">
-                                    </li>
-                                    <li>
-                                        <form onsubmit="buttonOverpassName(); return false;">Name: <input type="text" class=""
-                                                id="osm_name" value="" size="15"></form>
-                                    </li>
-
-                                    <li style="font-size: small;">Filter by date: <input type="date" id="osm_data_date" value="">
-                                    </li>
-                                </ul>
-
-                            <h2>Wikipedia:</h2>
-                            <ul id="wikipedia_options">
-                                    <li>
-                                        <form onsubmit="buttonPOI(); return false;">Global: <input type="text" class=""
-                                                id="poi_string" value="" size="15"></form>
-                                    </li>
-                                    <li>Nearby: <input type="button" class="" id="" value="Search" onclick="buttonWikipedia()"></li>
-                                    <li style="font-size: small;">Filter by Lang: <input type="text" class="" id="filter_lang" value="en"
-                                            size="5"></li>
-                            </ul>
-                            <p style="text-align: right; margin:3px;"><input type="button" class="" id="" value="Clear Results"
-                        onclick="buttonCloseAll()"></p>
+                    <div class="p-1 action">
+                        <div class="embed-code show-button d-none">
+                            <button type="button" class="btn btn-primary">Get Embed Code</button>
+                        </div>
+                        <div class="sidebar-icon default-icon mr-1">
+                            <i class="fas fa-share-alt"></i>
                         </div>
                     </div>
 
-                    <div class="social-share sidebar-icon">
-                        <div class="facebook p-1" onclick="social_share('facebook')">
+                    <div class="show-button p-1 d-none action">
+                        <div class="switch-detection">
+                            {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}
+                                <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Detections Off" data-off="Detections On" data-onstyle="success" data-offstyle="primary" checked>
+                            {% else %}
+                                <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Detections Off" data-off="Detections On" data-onstyle="success" data-offstyle="primary">
+                            {% endif %}
+                        </div>
+                        <div class="sidebar-icon default-icon">
+                            <i class="fas fa-binoculars"></i>
+                        </div>
+                    </div>
+
+                    <div class="p-1 action">
+                        <div class="switch-gpx show-button d-none">
+                            {% if show_gpx == 'true' %}
+                                <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="AR Off" data-off="AR On" data-onstyle="success" data-offstyle="primary" checked>
+                            {% else %}
+                                <input class="" type="checkbox" id="is_show_gpx" data-toggle="toggle" data-on="AR Off" data-off="AR On" data-onstyle="success" data-offstyle="primary">
+                            {% endif %}
+                        </div>
+                        <div class="sidebar-icon default-icon mr-1">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                    </div>
+
+                    <div class="social-share p-1 sidebar-icon">
+                        <div class="facebook" onclick="social_share('facebook')">
                             <i class="fab fa-facebook"></i>
                         </div>
-                        <div class="twitter p-1" onclick="social_share('twitter')">
+                        <div class="twitter pt-2" onclick="social_share('twitter')">
                             <i class="fab fa-twitter-square"></i>
                         </div>
-
                     </div>
+
+                    <div class="p-1 action">
+                        <div id='nav' class="show-button d-none">
+                            <h1 class="bg-primary text-white">Street-level POI Viewer</h1>
+                            <div class="text-left">
+                                <h2>OpenStreetMap:</h2>
+                                    <ul id="osm_options">
+                                        <li>
+                                            Category:
+                                            <select id="osm_keys">
+                                                <option value="amenity">amenity</option>
+                                                <option value="shop">shop</option>
+                                                <option value="leisure">leisure</option>
+                                                <option value="historic">historic</option>
+                                                <option value="tourism">tourism</option>
+                                            </select>
+                                            <input type="button" value="Search" onclick="buttonOverpassKey()">
+                                        </li>
+                                        <li>
+                                            <form onsubmit="buttonOverpassName(); return false;">Name: <input type="text" class=""
+                                                    id="osm_name" value="" size="15"></form>
+                                        </li>
+
+                                        <li style="font-size: small;">Filter by date: <input type="date" id="osm_data_date" value="">
+                                        </li>
+                                    </ul>
+
+                                <h2>Wikipedia:</h2>
+                                <ul id="wikipedia_options">
+                                        <li>
+                                            <form onsubmit="buttonPOI(); return false;">Global: <input type="text" class=""
+                                                    id="poi_string" value="" size="15"></form>
+                                        </li>
+                                        <li>Nearby: <input type="button" class="" id="" value="Search" onclick="buttonWikipedia()"></li>
+                                        <li style="font-size: small;">Filter by Lang: <input type="text" class="" id="filter_lang" value="en"
+                                                size="5"></li>
+                                </ul>
+                                <p style="text-align: right; margin:3px;"><input type="button" class="" id="" value="Clear Results"
+                            onclick="buttonCloseAll()"></p>
+                            </div>
+                        </div>
+                        <div class="sidebar-icon default-icon">
+                            <i class="fas fa-search-location"></i>
+                        </div>
+                    </div>
+
+
                 </div>
 
                 <div id='sequence_viewer' class="image-box display"></div>
@@ -3421,6 +3451,16 @@
         if (url != '')
             window.open(url, '_blank');
     }
+
+    $('.action').mouseover(function () {
+        $('.default-icon.d-none').removeClass('d-none');
+        $('.show-button.show').addClass('d-none').removeClass('show');
+        $(this).find('.default-icon').addClass('d-none');
+        $(this).find('.show-button').removeClass('d-none').addClass('show');
+    }).mouseleave(function () {
+        $('.default-icon.d-none').removeClass('d-none');
+        $('.show-button.show').addClass('d-none').removeClass('show');
+    });
 
 </script>
 {% endblock %}
