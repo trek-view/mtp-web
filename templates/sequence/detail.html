@@ -22,7 +22,6 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 
-
     <style>
         body {
             overflow-y: hidden;
@@ -101,6 +100,8 @@
     </style>
 {% endblock %}
 {% block content %}
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v9.0" nonce="kq51J7sg"></script>
 
 <div class="main-body">
     <div class="left-side p-3 d-flex flex-column justify-content-between">
@@ -383,10 +384,9 @@
         </div>
 
         <div class="d-flex flex-row justify-content-between align-items-center mt-3">
-
-
-
         </div>
+
+
 
         <div class="image-detail {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
             <div class="" id="image_detail_box">
@@ -504,6 +504,10 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="user-comment d-flex justify-content-center">
+            <div class="fb-comments w-100" data-href="{{ request.get_full_path  }}" data-numposts="5" data-width="350" ></div>
         </div>
 
     </div>
@@ -1665,10 +1669,12 @@
     }
 
     var image_url_reset = function(image_key) {
-        var href = location.protocol + '//' + location.host + location.pathname ;
+        let href = location.protocol + '//' + location.host + location.pathname ;
+        let url = href + '?image_key=' + image_key + '&view_mode=' + view_mode + '&show_gpx=' + is_show_gpx;
         history.pushState({
             id: 'Image Detail'
-        }, "{{ pageTitle }}", href + '?image_key=' + image_key + '&view_mode=' + view_mode + '&show_gpx=' + is_show_gpx);
+        }, "{{ pageTitle }}", url);
+        $('.fb-comments').attr('data-href', url);
     }
 
     $('#switch_detection').change(function () {
@@ -2432,10 +2438,7 @@
             showGpxOnPhoto(gpx_points, camera_node);
         else
             tagComponent.removeAll();
-        url = setParamInURL('show_gpx', is_show_gpx);
-        history.pushState({
-            id: 'Sequence Detail'
-        }, "{{ pageTitle }}", url);
+        image_url_reset(current_node_key);
     });
 
     function getDistancePhi(base, target){
