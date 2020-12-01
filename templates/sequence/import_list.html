@@ -228,8 +228,9 @@
           </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary btn-save" onclick="save_add_form()">Import Now</button>
+        <button type="button" class="btn btn-secondary btn-sm btn-cancel" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm btn-save" onclick="save_add_form(false)">Import Now</button>
+        <button type="button" class="btn btn-primary btn-sm btn-save" onclick="save_add_form(true)">copy settings to next sequence import</button>
       </div>
     </div>
   </div>
@@ -363,7 +364,7 @@
         else
             var first_point = null;
 
-        console.log('positions', sceneData)
+        {#console.log('positions', sceneData)#}
         if (first_point != null) {
             var map = new mapboxgl.Map({
                 container: obj_id, // container id
@@ -410,6 +411,9 @@
     var selected_sequence_id = '';
 
     function show_add_modal(id) {
+        if (checkLimit() <= 0) {
+            return;
+        }
         selected_sequence_id = id;
         var modal_form = $('#add_form_modal .modal-body');
         $('.tagsinput .tag').each(function (index) {
@@ -437,25 +441,31 @@
         transport_btn.removeClass('d-none');
     }
 
-    function save_add_form() {
+    function save_add_form(next = false) {
+        if (checkLimit() <= 0)
+        {
+            $('#add_form_modal').modal('hide');
+            return;
+        }
 
         if (!$('#add_form').isValid())
             return;
 
-        var modal_form = $('#add_form_modal .modal-body');
-        var name = modal_form.find('input[name="name"]').val();
-        var description = modal_form.find('textarea[name="description"]').val();
-        var transport_type = modal_form.find('select[name="transport_type"]').val();
-        var tags = modal_form.find('input[name="tag"]').val();
-        console.log(tags)
+        let modal_form = $('#add_form_modal .modal-body');
+        let name = modal_form.find('input[name="name"]').val();
+        let description = modal_form.find('textarea[name="description"]').val();
+        let transport_type = modal_form.find('select[name="transport_type"]').val();
+        let tags = modal_form.find('input[name="tag"]').val();
         /*
         sequences[selected_sequence_id]['name'] = name;
         sequences[selected_sequence_id]['description'] = description;
         sequences[selected_sequence_id]['transport_type'] = transport_type;
         sequences[selected_sequence_id]['tags'] = tags;
         */
-        var url = "{% url 'sequence.ajax_import' seq_key='seq_key' %}";
+        let url = "{% url 'sequence.ajax_import' seq_key='seq_key' %}";
         url = url.replace('seq_key', selected_sequence_id)
+        let next_sequence_id = getNextSequenceId(selected_sequence_id);
+        console.log('next: ', next_sequence_id)
         $.ajax({
             url: url,
             type: 'POST',
@@ -466,13 +476,11 @@
                     toastr.error(data.message);
                 else {
                     toastr.success(data.message);
-                    console.log(selected_sequence_id);
-                    console.log($('#sequence_' + selected_sequence_id).length);
                     if ($('#sequence_' + selected_sequence_id).length > 0) {
-                        var added_form = $('#sequence_' + selected_sequence_id).find('.added-form');
-                        var transport_btn = $('#sequence_' + selected_sequence_id).find('.transport-btn');
-                        var action = $('#sequence_' + selected_sequence_id).find('.actions').find('a');
-                        var url = action.attr('href');
+                        let added_form = $('#sequence_' + selected_sequence_id).find('.added-form');
+                        let transport_btn = $('#sequence_' + selected_sequence_id).find('.transport-btn');
+                        let action = $('#sequence_' + selected_sequence_id).find('.actions').find('a');
+                        let url = action.attr('href');
                         url = url.replace('unique_id', data.unique_id);
                         action.attr('href', url)
                         added_form.removeClass('d-none');
@@ -480,15 +488,30 @@
                         added_form.find('.sequence-name .contents').text(name);
                         added_form.find('.sequence-description .contents').text(description);
                         added_form.find('.sequence-transport-type .contents').text(all_transport_types[transport_type]);
-                        var tag_html = '';
-                        var tag_ary = tags.split(',');
-                        for (var i = 0; i < tag_ary.length; i++) {
+                        let tag_html = '';
+                        let tag_ary = tags.split(',');
+                        for (let i = 0; i < tag_ary.length; i++) {
                             tag_html += '<span class="tag">' + tag_ary[i] + '</span>';
                         }
                         added_form.find('.sequence-tag .contents').html(tag_html);
                     }
 
-                    $('#add_form_modal').modal('hide');
+                    if (!next)
+                        $('#add_form_modal').modal('hide');
+                    else
+                    {
+                        if (next_sequence_id == '')
+                        {
+                            toastr.info("Next sequence key doesn't exist.");
+                            $('#add_form_modal').modal('hide');
+                        }
+                        else
+                            selected_sequence_id = next_sequence_id;
+                        console.log('selected_sequence_id', selected_sequence_id)
+                    }
+
+
+                    /* Map view reload */
                     $.ajax({
                         url: "{% url 'sequence.ajax_get_import_sequences' %}",
                         type: 'POST',
@@ -507,6 +530,57 @@
             }
         });
     }
+
+    function checkLimit() {
+        let sequence_limit_count = 0;
+        $.ajax({
+            url: "{% url 'sequence.ajax_check_import_limit' %}",
+            type: 'GET',
+            data: {},
+            dataType: 'json',
+            async: false,
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else {
+                    sequence_limit_count = data.sequence_limit_count
+                    if (sequence_limit_count <= 0)
+                    {
+                        Swal.fire({
+                            title: 'Need to upgrade your account!',
+                            html: 'The number of sequences you can import in MTPW per day is {{ request.user.get_sequence_limit }}. Please click <a target="_blank" href="https://www.patreon.com/trekview">here</a> to upgrade your account.',
+                            showCancelButton: false,
+                            confirmButtonText: 'OK'
+                        })
+                    }
+                }
+            }
+        });
+
+        return sequence_limit_count;
+    }
+
+
+    function getNextSequenceId(sequence_id) {
+        let next_sequence_id = '';
+        $.ajax({
+            url: "{% url 'sequence.ajax_get_import_next_sequence_id' %}",
+            type: 'GET',
+            data: {'sequence_key': sequence_id},
+            dataType: 'json',
+            async: false,
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else {
+                    next_sequence_id = data.next_sequence_key;
+                    console.log('next_sequence_id', next_sequence_id)
+                }
+            }
+        });
+        return next_sequence_id;
+    }
+
 
     function submit_form_data(next) {
         if (next)
@@ -630,7 +704,6 @@
                 "line-width": 2
             }
         }, "waterway-label");
-        console.log(sequences)
         let item, i=0, j=0, sequence, point, image_key, sequence_key, camera_make, captured_at, uploaded_at, photo_count;
         let images = [];
         for (i=0; i<sequences.length; i++) {

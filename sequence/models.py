@@ -182,7 +182,7 @@ class Sequence(models.Model):
     coordinates_image = ArrayField(models.CharField(default='', max_length=100), null=True, blank=True)
     is_uploaded = models.BooleanField(default=False)
     is_private = models.BooleanField(default=False)
-    updated_at = models.DateTimeField(default=datetime.now, blank=True)
+    imported_at = models.DateTimeField(default=datetime.now, blank=True)
 
     name = models.CharField(max_length=100, default='')
     description = models.TextField(default='')

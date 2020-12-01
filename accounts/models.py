@@ -47,6 +47,15 @@ def image_directory_path(instance, filename):
     return 'user/avatar/{}'.format(instance.username)
 
 
+class Grade(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(null=True, blank=True)
+    sequence_limit_count = models.IntegerField(default=5)
+
+    def __str__(self):
+        return self.name
+
+
 class CustomUser(AbstractUser):
     # username = None
     email = models.EmailField(_('email address'), unique=True)
@@ -64,6 +73,8 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(max_length=30, null=True, blank=True, validators=[alpha])
     website_url = models.TextField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+
+    user_grade = models.ForeignKey(Grade, on_delete=models.CASCADE, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -91,6 +102,12 @@ class CustomUser(AbstractUser):
         else:
             return website_url
 
+    def get_sequence_limit(self):
+        if self.user_grade is None:
+            return 5
+        else:
+            return self.user_grade.sequence_limit_count
+
 
 class MapillaryUser(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -104,3 +121,6 @@ class MapillaryUser(models.Model):
     iamges_total_count = models.IntegerField(default=0)
     sequences_total_count = models.IntegerField(default=0)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)
+
+
+

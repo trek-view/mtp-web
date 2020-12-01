@@ -43,6 +43,7 @@ urlpatterns = [
 
     path('ajax_get_map_features/', views.ajax_get_map_features, name='sequence.ajax_get_map_features'),
     path('ajax_get_import_sequences/', views.ajax_get_import_sequences, name='sequence.ajax_get_import_sequences'),
-    path('ajax_get_import_sequence/', views.ajax_get_import_sequence, name='sequence.ajax_get_import_sequence')
-
+    path('ajax_get_import_sequence/', views.ajax_get_import_sequence, name='sequence.ajax_get_import_sequence'),
+    path('ajax_get_import_next_sequence_id/', views.ajax_get_import_next_sequence_id, name='sequence.ajax_get_import_next_sequence_id'),
+    path('ajax_check_import_limit/', views.ajax_check_import_limit, name='sequence.ajax_check_import_limit'),
 ]

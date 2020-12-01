@@ -754,8 +754,15 @@ def save_weather(sequence):
     return False
 
 
+def get_images_by_multi_sequences(sequences):
+    if isinstance(sequences, list) and len(sequences) > 0:
+        for sequence in sequences:
+            get_images_by_sequence(sequence)
+
+
 def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, image_download=True, is_weather=True, mf_insert=True):
     seqs = Sequence.objects.filter(unique_id=sequence.unique_id)
+    is_print = False
     if seqs.count() == 0:
         print('Sequence is not existing.')
         return
@@ -769,7 +776,9 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
     image_json = mapillary.get_images_with_ele_by_seq_key([sequence.seq_key])
     if image_json and image_insert:
         image_features = image_json['features']
-        print('Images insert!')
+
+        if is_print:
+            print('Images insert!')
 
         image_keys = []
         image_position_ary = []
@@ -833,19 +842,23 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
 
             image.point = Point(image.lat, image.lng)
             image.save()
-            print('image key: ', image.image_key)
+            if is_print:
+                print('image key: ', image.image_key)
 
         if len(image_position_ary) > 0 and mf_insert:
-            print('Image len: ', len(image_position_ary))
+            if is_print:
+                print('Image len: ', len(image_position_ary))
             mm = 0
             for image_position in image_position_ary:
                 i_key = image_features[mm]['properties']['key']
                 mm += 1
-                print('===== {} ====='.format(mm))
+                if is_print:
+                    print('===== {} ====='.format(mm))
                 map_feature_json = mapillary.get_map_feature_by_close_to(image_position)
                 if map_feature_json:
                     map_features = map_feature_json['features']
-                    print('map_features len: ', len(map_features))
+                    if is_print:
+                        print('map_features len: ', len(map_features))
                     tt = 0
                     for map_feature in map_features:
                         tt += 1
@@ -935,16 +948,19 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
 
 
         if not settings.DEBUG and len(image_keys) > 0 and image_download:
-            print('image_download')
+            if is_print:
+                print('image_download')
             # Create the model you want to save the image to
             for image_key in image_keys:
                 images = Image.objects.filter(image_key=image_key)
                 if images.count() == 0:
-                    print('image_count: ', images.count())
+                    if is_print:
+                        print('image_count: ', images.count())
                     continue
                 if not images[0].mapillary_image is None and images[0].mapillary_image != '':
-                    print(images[0].mapillary_image)
-                    print('mapillary_image is not none')
+                    if is_print:
+                        print(images[0].mapillary_image)
+                        print('mapillary_image is not none')
                     continue
                 image = images[0]
 
@@ -1200,7 +1216,7 @@ def import_sequence_list(request):
         if action is None:
             action = 'filter'
 
-        if not month is None:
+        if month is not None:
             search_form.set_month(month)
 
             y = month.split('-')[0]
@@ -1215,6 +1231,7 @@ def import_sequence_list(request):
             features = []
             sequences_ary = []
 
+            # if page is none, then call mapillary api.
             if page is None:
                 start_time = month + '-01'
 
@@ -1350,9 +1367,9 @@ def ajax_import(request, seq_key):
                 if feature['properties']['key'] == seq_key:
                     properties = feature['properties']
                     geometry = feature['geometry']
-                    sequence = Sequence.objects.filter(seq_key=seq_key)[:1]
+                    sequence = Sequence.objects.filter(seq_key=seq_key).first()
 
-                    if sequence.count() > 0:
+                    if sequence is not None:
                         continue
                     else:
                         sequence = Sequence()
@@ -1387,10 +1404,15 @@ def ajax_import(request, seq_key):
                     if 'private' in properties:
                         sequence.is_private = properties['private']
 
-                    sequence.name = form.cleaned_data['name']
+                    # if name empty, then use captured_at
+                    if form.cleaned_data['name'] is None or form.cleaned_data['name'] == '':
+                        captured_at = datetime.strptime(sequence.captured_at, '%Y-%m-%dT%H:%M:%S.000%z')
+                        sequence.name = captured_at.strftime("%Y-%m-%d %H:%M:%S")
+                    else:
+                        sequence.name = form.cleaned_data['name']
                     sequence.description = form.cleaned_data['description']
                     sequence.transport_type = form.cleaned_data['transport_type']
-                    sequence.is_published = True
+                    sequence.is_published = False
                     sequence.save()
 
                     sequence.distance = sequence.get_distance()
@@ -1436,6 +1458,100 @@ def ajax_import(request, seq_key):
     return JsonResponse({
         'status': 'failed',
         'message': 'Sequence was not imported.'
+    })
+
+
+@my_login_required
+def ajax_multi_import(request):
+    if request.method == 'POST':
+        sequence_keys_str = request.POST.get('sequence_keys')
+        transport_type = request.POST.get('transport_type')
+
+        if sequence_keys_str is not None and sequence_keys_str != '' and transport_type is not None and transport_type != '':
+            sequence_keys = sequence_keys_str.split(',')
+            sequences = []
+            sequence_unique_id = ""
+            for feature in request.session['sequences']:
+                # feature = request.session['sequences'][i]
+                if feature['properties']['key'] in sequence_keys:
+                    properties = feature['properties']
+                    geometry = feature['geometry']
+                    sequence = Sequence.objects.filter(seq_key=feature['properties']['key'])[:1]
+
+                    if sequence.count() > 0:
+                        continue
+                    else:
+                        sequence = Sequence()
+                    sequence.user = request.user
+                    if 'camera_make' in properties and properties['camera_make'] != '':
+                        camera_makes = CameraMake.objects.filter(name=properties['camera_make'])
+                        if camera_makes.count() > 0:
+                            c = camera_makes[0]
+                        else:
+                            c = CameraMake()
+                            c.name = properties['camera_make']
+                            c.save()
+                        sequence.camera_make = c
+
+                    sequence.captured_at = properties['captured_at']
+                    if 'created_at' in properties:
+                        sequence.created_at = properties['created_at']
+                    sequence.seq_key = properties['key']
+                    if 'pano' in properties:
+                        sequence.pano = properties['pano']
+                    if 'user_key' in properties:
+                        sequence.user_key = properties['user_key']
+                    if 'username' in properties:
+                        sequence.username = properties['username']
+                    sequence.geometry_coordinates_ary = geometry['coordinates']
+                    sequence.image_count = len(geometry['coordinates'])
+
+                    sequence.geometry_coordinates = LineString(sequence.geometry_coordinates_ary)
+
+                    sequence.coordinates_cas = properties['coordinateProperties']['cas']
+                    sequence.coordinates_image = properties['coordinateProperties']['image_keys']
+                    if 'private' in properties:
+                        sequence.is_private = properties['private']
+
+                    sequence.name = str(properties['captured_at'])
+                    sequence.description = None
+                    sequence.transport_type = transport_type
+                    sequence.is_published = True
+                    sequence.save()
+
+                    sequence.distance = sequence.get_distance()
+                    sequence.save()
+
+                    set_camera_make(sequence)
+
+                    continue
+
+                sequences.append(feature)
+
+            request.session['sequences'] = sequences
+
+            if len(sequences) > 0:
+                # get image data from mapillary with sequence_key
+                print('1')
+                p = threading.Thread(target=get_images_by_multi_sequences, args=(sequences,))
+                p.start()
+                print('2')
+                # messages.success(request, "Sequences successfully imported.")
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Sequences successfully imported. Sequences will be published in about 30 minutes or longer.'
+            })
+        else:
+            errors = []
+
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'Error'
+            })
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'Sequences were not imported.'
     })
 
 
@@ -2261,6 +2377,59 @@ def ajax_get_import_sequence(request):
             'status': 'failed',
             'sequences': None,
         })
+
+
+def ajax_get_import_next_sequence_id(request):
+    sequence_key = request.GET.get('sequence_key')
+    print(sequence_key)
+    is_seq = False
+    next_sequence_key = ''
+    for feature in request.session['sequences']:
+        # feature = request.session['sequences'][i]
+        if feature['properties']['key'] == sequence_key:
+            is_seq = True
+            continue
+        if is_seq:
+            next_sequence_key = feature['properties']['key']
+            break
+    print('next_sequence_key', next_sequence_key)
+    return JsonResponse({
+        'status': 'success',
+        'next_sequence_key': next_sequence_key,
+        'message': 'success'
+    })
+
+
+def ajax_check_import_limit(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You can't change the status."
+        })
+    user = request.user
+
+    user_grade = user.user_grade
+
+    sequence_limit_count = 5
+    if user_grade is not None:
+        sequence_limit_count = user_grade.sequence_limit_count
+
+    from datetime import timedelta, time
+    today = datetime.now().date()
+    tomorrow = today + timedelta(1)
+    today_start = datetime.combine(today, time())
+    today_end = datetime.combine(tomorrow, time())
+    today_imported_sequences = Sequence.objects.filter(is_mapillary=True, imported_at__gte=today_start, imported_at__lt=today_end)
+
+    today_count = len(today_imported_sequences)
+
+    print('today_count', today_count)
+    print(sequence_limit_count - today_count)
+
+    return JsonResponse({
+        'status': 'success',
+        'sequence_limit_count': sequence_limit_count - today_count
+    })
 
 
 def insert_db(request):
