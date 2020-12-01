@@ -147,9 +147,6 @@
                                                     image by {{ sequence.username }} on mapillary
                                                 </div>
                                             </div>
-                                            <div class="user-on-mapillary" >
-                                                image by {{ sequence.username }} on mapillary
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -215,11 +212,17 @@
                                                     {% endfor %}
                                                 </div>
 
-                                                <div class="item-user">
-                                                    <a href="{% url 'account.profile' username=sequence.user.username %}">
-                                                        <span class="user">{{ sequence.user.username }}</span>
-                                                    </a>
-                                                </div>
+                                                <div class="item-user d-flex justify-content-between">
+                                                     <a href="{% url 'account.profile' username=tour.user.username %}">
+                                                         <span class="user">{{ tour.user.username }}</span>
+                                                     </a>
+                                                     {% if tour.like_count > 0 %}
+                                                         <div><i class="fa-thumbs-up fas"></i><span class="ml-2" style="font-size: 15px">{{ tour.like_count }}</span></div>
+                                                     {% else %}
+                                                         <div><i class="fa-thumbs-up far"></i><span class="ml-2" style="font-size: 15px">0</span></div>
+                                                     {% endif %}
+
+                                                 </div>
 
                                             </div>
                                         </div>

@@ -162,11 +162,6 @@
                                                          <br>
                                                          {{ guidebook.getSceneCount }} Photos
                                                      </p>
-                                                     <p class="mb-1 mr-3 text-center">
-                                                         <i class="far fa-thumbs-up"></i>
-                                                         <br>
-                                                         {{ guidebook.get_like_count }} Likes
-                                                     </p>
                                                  </div>
 
                                                 <div class="guidebook-tag" style="min-height: 24px;">
@@ -183,6 +178,8 @@
                                                     </a>
                                                     {% if guidebook.like_count > 0 %}
                                                         <div><i class="fa-thumbs-up fas"></i><span class="ml-2" style="font-size: 15px">{{ guidebook.like_count }}</span></div>
+                                                    {% else %}
+                                                        <div><i class="fa-thumbs-up far"></i><span class="ml-2" style="font-size: 15px">0</span></div>
                                                     {% endif %}
                                                 </div>
 
