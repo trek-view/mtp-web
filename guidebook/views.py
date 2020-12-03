@@ -758,6 +758,7 @@ def ajax_save_poi(request, unique_id, pk):
             poi = PointOfInterest()
             poi.title = ''
             poi.description = ''
+            poi.external_url = ''
             categories = POICategory.objects.all()
             poi.category_id = categories[0].pk
             poi.position_x = request.POST.get('position_x')
@@ -792,6 +793,7 @@ def ajax_save_poi(request, unique_id, pk):
             poi.title = request.POST.get('title')
             poi.category_id = request.POST.get('category_id')
             poi.description = request.POST.get('description')
+            poi.external_url = request.POST.get('external_url')
             poi.save()
             message = 'Point of Interest is saved successfully.'
 

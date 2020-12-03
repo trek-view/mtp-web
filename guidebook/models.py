@@ -251,7 +251,7 @@ class PointOfInterest(models.Model):
     video_url = models.TextField(default='')
     image = models.ImageField(upload_to=poi_image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
 
-
+    external_url = models.TextField(default='')
 
     def __str__(self):
         return self.title

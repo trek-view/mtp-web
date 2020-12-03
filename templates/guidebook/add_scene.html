@@ -1191,6 +1191,7 @@
             var title = poi_form.find("input[name=title]").val();
             var description = poi_form.find("textarea[name=description]").val();
             var category_id = poi_form.find("select[name=category]").val();
+            var external_url = poi_form.find("input[name=external_url]").val();
             $.ajax({
                 url: 'ajax/save_poi/' + current_scene_id + '/',
                 type: 'POST',
@@ -1199,7 +1200,8 @@
                     'poi_id': poi_id,
                     'title': title,
                     'category_id': category_id,
-                    'description': description
+                    'description': description,
+                    'external_url': external_url
                 },
                 dataType: 'json',
                 success: function (data) {
