@@ -26,7 +26,12 @@ urlpatterns = [
     path('<str:unique_id>/ajax/get_scene/', views.ajax_get_scene, name='guidebook.ajax_get_scene'),
     path('<str:unique_id>/ajax/get_scene_list/', views.ajax_get_scene_list, name='guidebook.ajax_get_scene_list'),
 
-    path('ajax_get_detail_by_image_key/<str:image_key>', views.ajax_get_detail_by_image_key,
-         name='guidebook.ajax_get_detail_by_image_key'),
+    path('ajax_get_detail_by_image_key/<str:image_key>', views.ajax_get_detail_by_image_key, name='guidebook.ajax_get_detail_by_image_key'),
+
+    path('<str:unique_id>/scene/ajax_upload_scene_image/<str:scene_id>', views.ajax_upload_scene_image, name='guidebook.ajax_upload_scene_image'),
+    path('<str:unique_id>/scene/ajax_upload_scene_video/<str:scene_id>', views.ajax_upload_scene_video, name='guidebook.ajax_upload_scene_video'),
+    path('<str:unique_id>/scene/<str:scene_id>/ajax_upload_poi_image/<str:poi_id>', views.ajax_upload_poi_image, name='guidebook.ajax_upload_poi_image'),
+    path('<str:unique_id>/scene/<str:scene_id>/ajax_upload_poi_video/<str:poi_id>', views.ajax_upload_poi_video,
+         name='guidebook.ajax_upload_poi_video'),
 
 ]

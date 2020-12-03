@@ -12,12 +12,27 @@ from lib.mvtManager import CustomMVTManager
 from sys_setting.models import Tag
 from sequence.models import Sequence
 
+from django.conf import settings
+from storages.backends.s3boto3 import S3Boto3Storage
+
 UserModel = get_user_model()
 
 
 def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return 'guidebook/{0}/cover_image/{1}'.format(instance.unique_id, filename)
+
+
+def scene_image_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return 'guidebook/{}/scene/{}'.format(instance.guidebook.unique_id, instance.unique_id)
+
+
+def poi_image_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return 'guidebook/{}/scene/{}/poi/{}'.format(instance.scene.guidebook.unique_id, instance.scene.unique_id, instance.unique_id)
+
+
 
 # class Tag(models.Model):
 #     alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Only alphanumeric characters are allowed for Username.')
@@ -159,6 +174,7 @@ class POICategory(models.Model):
     class Meta:
         verbose_name_plural = 'POI Categories'
 
+
 class CustomSceneMVTManager(CustomMVTManager):
     def get_additional_where(self, additional_filters={}, request=None):
         from tour.models import Tour
@@ -189,6 +205,9 @@ class Scene(models.Model):
     sort = models.IntegerField(default=1, null=True)
     image_url = models.CharField(max_length=100, null=True)
     username = models.CharField(max_length=100, default='', null=True, blank=True, verbose_name="Mapillary Username", )
+
+    video_url = models.TextField(default='')
+    image = models.ImageField(upload_to=scene_image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
 
     objects = models.Manager()
     vector_tiles = CustomSceneMVTManager(
@@ -229,6 +248,10 @@ class PointOfInterest(models.Model):
     position_x = models.FloatField(default=0)
     position_y = models.FloatField(default=0)
     category = models.ForeignKey(POICategory, on_delete=models.CASCADE, default=1)
+    video_url = models.TextField(default='')
+    image = models.ImageField(upload_to=poi_image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
+
+
 
     def __str__(self):
         return self.title

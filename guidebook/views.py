@@ -433,6 +433,187 @@ def ajax_upload_file(request, unique_id):
 
 
 @my_login_required
+def ajax_upload_scene_image(request, unique_id, scene_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You can't access."
+        })
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+
+        form = SceneImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            form_data = form.save(commit=False)
+            scene.image = form_data.image
+            scene.video_url = None
+            scene.save()
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Picture is uploaded successfully.'
+            })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
+def ajax_upload_scene_video(request, unique_id, scene_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You can't access."
+        })
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+
+        form = SceneVideoForm(request.POST)
+        if form.is_valid():
+            scene.video_url = form.cleaned_data['video_url']
+            scene.video_url = scene.video_url.replace('watch?v=', 'embed/')
+            scene.image = None
+            scene.save()
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Video URL is saved successfully.'
+            })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
+def ajax_upload_poi_image(request, unique_id, scene_id, poi_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        messages.error(request, "You can't access the page.")
+        return redirect('/')
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+
+        poi = PointOfInterest.objects.filter(scene=scene, pk=poi_id).first()
+        if poi is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Poi doesn't exist."
+            })
+
+        form = PoiImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            form_data = form.save(commit=False)
+            poi.image = form_data.image
+            poi.video_url = None
+            poi.save()
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Picture is uploaded successfully.'
+            })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
+def ajax_upload_poi_video(request, unique_id, scene_id, poi_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        messages.error(request, "You can't access the page.")
+        return redirect('/')
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+        poi = PointOfInterest.objects.filter(scene=scene, pk=poi_id).first()
+        if poi is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Poi doesn't exist."
+            })
+
+        form = PoiVideoForm(request.POST)
+        if form.is_valid():
+            poi.video_url = form.cleaned_data['video_url']
+            poi.video_url = poi.video_url.replace('watch?v=', 'embed/')
+            poi.image = None
+            poi.save()
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Video URL is saved successfully.'
+            })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
 def ajax_add_scene(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:

@@ -217,6 +217,14 @@
                 errorMessagePosition: 'top'
             });
 
+            $.formUtils.addValidator({
+                name : 'youtube',
+                    validatorFunction : function(value, $el, config, language, $form) {
+                        alert(value);
+                        return value.search('youtube.com/watch') >= 0;
+                    },
+                    errorMessage : 'Video must be youtube one.',
+                });
             $.validate();
         });
 

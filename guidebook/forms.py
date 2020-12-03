@@ -211,3 +211,60 @@ class GuidebookSearchForm(forms.Form):
             required=False
         )
 
+
+class SceneImageForm(forms.ModelForm):
+    image = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        required=False
+    )
+
+    class Meta:
+        model = Scene
+
+        fields = (
+            'image',
+        )
+
+
+class SceneVideoForm(forms.ModelForm):
+    video_url = forms.CharField(
+        label='Guidebook Name',
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=False
+    )
+
+    class Meta:
+        model = Scene
+
+        fields = (
+            'video_url',
+        )
+
+
+class PoiImageForm(forms.ModelForm):
+    image = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        required=False
+    )
+
+    class Meta:
+        model = PointOfInterest
+
+        fields = (
+            'image',
+        )
+
+
+class PoiVideoForm(forms.ModelForm):
+    video_url = forms.CharField(
+        label='Guidebook Name',
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=False
+    )
+
+    class Meta:
+        model = PointOfInterest
+
+        fields = (
+            'video_url',
+        )

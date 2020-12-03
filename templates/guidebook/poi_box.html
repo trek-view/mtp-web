@@ -8,6 +8,12 @@
     </div>
     <div id="poi_body_{{ poi.pk }}" class="collapse" aria-labelledby="poi_header_{{ poi.pk }}" data-parent="#poi_list">
         <div class="card-body">
+            {% if poi.video_url is not None and poi.video_url != '' %}
+                <iframe class="w-100 ml-auto mr-auto" height="200" src="{{ poi.video_url }}">
+                </iframe>
+            {% elif poi.image is not None %}
+                <img src="{{ poi.image }}" />
+            {% endif %}
             <div class="poi-description">
                 <span>{{ poi.description }}</span>
             </div>

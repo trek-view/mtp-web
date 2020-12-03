@@ -506,8 +506,8 @@
             </div>
         </div>
 
-        <div class="user-comment d-flex justify-content-center">
-            <div class="fb-comments w-100" data-href="{{ request.get_full_path  }}" data-numposts="5" data-width="350" ></div>
+        <div class="user-comment mt-2 d-flex justify-content-center">
+            <div class="fb-comments w-100 border" data-href="{{ request.get_full_path  }}" data-numposts="5" data-width="350" ></div>
         </div>
 
     </div>
@@ -580,8 +580,8 @@
                         </div>
                     </div>
 
-                    <div class="show-button d-none action">
-                        <div class="switch-detection">
+                    <div class="show-button action p-1">
+                        <div class="switch-detection show-button d-none">
                             {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}
                                 <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Detections Off" data-off="Detections On" data-onstyle="success" data-offstyle="primary" checked>
                             {% else %}
@@ -589,7 +589,7 @@
                             {% endif %}
                         </div>
                         <div class="sidebar-icon default-icon">
-                            <i class="fas fa-binoculars"></i>
+                            <i class="fas fa-object-group"></i>
                         </div>
                     </div>
 

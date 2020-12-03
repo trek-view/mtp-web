@@ -138,6 +138,12 @@
                     {% for scene in guidebook.getScenes %}
                         <div class="card mb-2 scene-box" id="scene_{{ scene.pk }}" data-image_key="{{ scene.image_key }}" style="cursor: pointer">
                             <div class="card-body">
+                                {% if scene.video_url is not None and scene.video_url != '' %}
+                                    <iframe class="w-100 ml-auto mr-auto" height="200" src="{{ scene.video_url }}">
+                                    </iframe>
+                                {% elif scene.image is not None %}
+                                    <img src="{{ scene.image }}" />
+                                {% endif %}
                                 <div class="scene-title">
                                     <h6>{{ scene.title }}</h6>
                                 </div>

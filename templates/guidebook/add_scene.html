@@ -2,6 +2,8 @@
 {% load static %}
 {% block app_guidebook %}active{% endblock %}
 {% block app_style %}
+    <link href="{% static 'css/dropzone.min.css' %}" type='text/css' rel='stylesheet' />
+    <script src="{% static 'js/dropzone.min.js' %}" type='text/javascript'></script>
     <link rel="stylesheet" href="{% static 'css/guidebook_style.css' %}">
     <style>
         .TagContainer .TagVertex {
@@ -18,7 +20,50 @@
             height: 50px;
             border-radius: 50%;
         }
-    </style>
+
+    .dz-image img {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    .dz-image {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0px !important;
+    }
+    .dz-preview.dz-image-preview {
+        width: 100% !important;
+        height: 100% !important;
+        padding: 0px !important;
+        margin: 0px !important;
+    }
+    form.dropzone {
+        padding: 0px !important;
+        width: 200px !important;
+        height: 200px !important;
+    }
+    .dropzone .dz-preview .dz-error-message {
+        left: 103px;
+    }
+
+    .dropzone .dz-preview:hover .dz-image img {
+        -webkit-transform: unset;
+        transform: unset;
+        -webkit-filter: unset;
+        filter: unset;
+    }
+
+    .dz-image-cover img {
+        width: 120px !important;
+        height: 120px !important;
+        border-radius: 50% !important;
+    }
+
+
+    .modal-dialog {
+        margin-top: 130px;
+    }
+</style>
+
 {% endblock %}
 {% block content %}
     <link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
@@ -256,6 +301,36 @@
             <hr class="mt-2 mb-2" />
 
             <div class="">
+                <div class="">
+                    <p class="font-weight-bold">Link video or image to this scene.</p>
+
+                    <p>
+                        You can link video or upload image for your scene.
+                    </p>
+                </div>
+
+                <div class="text-right mb-3">
+{#                    <button type="button" onclick="uploadSceneImage()" class="btn btn-sm btn-warning">#}
+{#                        Upload Image#}
+{#                    </button>#}
+{#                    <button type="button" onclick="showSceneVideoModal()" class="btn btn-sm btn-warning">#}
+{#                        Link Video#}
+{#                    </button>#}
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Link Type
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="javascript:showSceneVideoModal();">Link Video</a>
+                            <a class="dropdown-item" href="javascript:uploadSceneImage();">Upload Image</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mt-2 mb-2" />
+
+            <div class="">
                 <p>
                     Add point's of interest to this scene to give viewers more information.
                 </p>
@@ -307,9 +382,93 @@
 
     </div>
 </div>
+
+    <!-- Modal -->
+<div class="modal fade" id="uploadPictureModal" tabindex="-1" role="dialog" aria-labelledby="uploadPictureModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadPictureModalLabel">Upload Picture</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="file-upload">
+                    <form action="{% url 'guidebook.ajax_upload_scene_image' unique_id=guidebook.unique_id scene_id='scene_id' %}" class="dropzone ml-auto mr-auto d-flex align-items-center justify-content-center">
+                        <div class="fallback">
+                            <input name="image" type="file" multiple="false" />
+                        </div>
+                    </form>
+                    <div class="text-right mt-3">
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary d-none" id='uploadfile'>Upload</button>
+                <button type="button" class="btn btn-danger d-none" id="removefile">Remove</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="uploadVideoModal" tabindex="-1" role="dialog" aria-labelledby="uploadVideoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadVideoModalLabel">Link Youtube Video.</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="">
+                    <form action="{% url 'guidebook.ajax_upload_scene_video' unique_id=guidebook.unique_id scene_id='scene_id' %}" class="">
+                        {% csrf_token %}
+                        <input name="video_url" type="text" class="form-control w-100" data-validation="custom" data-validation-regexp="youtube.com/watch" />
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="saveSceneVideoURL()">Save</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}
 
 {% block scripts %}
+<script>
+
+
+    var poi_clicking = false;
+
+    var poi_mouseup = function (e) {
+        poi_clicking = false;
+        var poi_id = e.target['data-poi-id'];
+    };
+    var poi_mousemove = function (e) {
+        console.log('mousemove', e.target['data-poi-id'])
+    };
+    var poi_mousedown = function (e) {
+        poi_clicking = true;
+        console.log('mousedown', e)
+    };
+    var poi_mouseover = function (e) {
+        console.log('mouseover', e)
+        refresh_mapillery_classes();
+    };
+    var poi_click = function (e) {
+        console.log('mouseclick', e)
+    };
+    var selected_poi_id = 0;
+</script>
+<script src="{% static 'js/mapillary.js' %}"></script>
 <script>
     var add_new_scene = false;
     $('#add_scene_button').click(function () {
@@ -356,32 +515,7 @@
             }
         });
     });
-</script>
-<script>
-    var poi_clicking = false;
 
-    var poi_mouseup = function (e) {
-        poi_clicking = false;
-        var poi_id = e.target['data-poi-id'];
-    };
-    var poi_mousemove = function (e) {
-        console.log('mousemove', e.target['data-poi-id'])
-    };
-    var poi_mousedown = function (e) {
-        poi_clicking = true;
-        console.log('mousedown', e)
-    };
-    var poi_mouseover = function (e) {
-        console.log('mouseover', e)
-        refresh_mapillery_classes();
-    };
-    var poi_click = function (e) {
-        console.log('mouseclick', e)
-    };
-    var selected_poi_id = 0;
-</script>
-<script src="{% static 'js/mapillary.js' %}"></script>
-<script>
     var is_show_poi_list = false;
     function hide_poi_box() {
         $('.left-side.poi-box').addClass('d-none');
@@ -681,9 +815,7 @@
         }, "waterway-label");
     }
 
-
-
-    var mapillery_clicking = false;
+    let mapillery_clicking = false;
     mapillaryViewer.on('mousedown', function () {
         mapillery_clicking = true;
     });
@@ -1620,5 +1752,132 @@
     });
 
     reorder_scene()
+
+    Dropzone.autoDiscover = false;
+    let server_image = false;
+
+    let myDropzone = new Dropzone(".dropzone", {
+        autoProcessQueue: false,
+        uploadMultiple: false,
+        parallelUploads: 1,
+        paramName: "image", // The name that will be used to transfer the file
+        maxFilesize: 20,
+        {#addRemoveLinks: true,#}
+        maxFiles: 1,
+        thumbnailWidth: 200,
+        thumbnailHeight: 200,
+        sending: function(file, xhr, formData) {
+            formData.append("csrfmiddlewaretoken", '{{ csrf_token }}');
+        },
+        init: function() {
+            this.on("maxfilesexceeded", function(file) {
+                this.removeAllFiles();
+                this.addFile(file);
+            });
+            this.on("success", function(file, responseText) {
+                toastr.success('A picture is updated successfully.');
+            });
+            this.on("thumbnail", function(file, dataUrl) {
+                $('.dz-image').css('border-radius', '0px');
+                $('.dz-image img').css('width', '100%');
+                $('.dz-image img').css('height', '100%');
+                $('.dz-details').remove();
+                $('.dropzone .dz-preview').off('hover');
+            });
+            this.on('addedfile', function () {
+                $('#uploadfile').removeClass('d-none');
+                $('#removefile').removeClass('d-none');
+                if (server_image)
+                    $('#cancelfile').removeClass('d-none');
+                else
+                    $('#cancelfile').addClass('d-none');
+            });
+            this.on('removedfile', function () {
+                $('#uploadfile').addClass('d-none');
+                $('#removefile').addClass('d-none');
+            });
+            this.on('complete', function () {
+                var h = $('.dz-image').html();
+                $('.dz-image-cover').html(h);
+                server_image = true;
+                this.removeAllFiles();
+                $('#cancelfile').addClass('d-none');
+                $('#uploadPictureModal').modal('hide');
+                $('#user_cover_image').removeClass('d-none');
+            });
+
+            $('#change_file').click(function () {
+                $('#user_cover_image').addClass('d-none');
+                $('#file-upload').removeClass('d-none');
+            });
+        }
+    });
+
+    $('#cancelfile').click(function () {
+        myDropzone.removeAllFiles();
+        $('#user_cover_image').removeClass('d-none');
+        $('#file-upload').addClass('d-none');
+    });
+
+    $('#removefile').click(function () {
+        myDropzone.removeAllFiles();
+    });
+
+    $('#uploadfile').click(function(){
+        myDropzone.processQueue();
+    });
+
+
+    function uploadSceneImage() {
+        let url = "{% url 'guidebook.ajax_upload_scene_image' unique_id=guidebook.unique_id scene_id='scene_id' %}";
+        url = url.replace('scene_id', '' + current_scene_id);
+        myDropzone.options.url = url;
+        $('#uploadPictureModal').modal('show');
+    }
+
+    function showSceneVideoModal() {
+        let url = "{% url 'guidebook.ajax_upload_scene_video' unique_id=guidebook.unique_id scene_id='scene_id' %}";
+        url = url.replace('scene_id', '' + current_scene_id);
+        $('#uploadVideoModal form').attr('action', url);
+        $('#uploadVideoModal').modal('show');
+    }
+
+    function showPOIVideoModal() {
+        let url = "{% url 'guidebook.ajax_upload_poi_video' unique_id=guidebook.unique_id scene_id='scene_id' poi_id='poi_id' %}";
+        url = url.replace('scene_id', '' + current_scene_id);
+        url = url.replace('poi_id', '' + selected_poi_id);
+        $('#uploadVideoModal form').attr('action', url);
+        $('#uploadVideoModal').modal('show');
+    }
+
+    function saveSceneVideoURL() {
+        let url = $('#uploadVideoModal form').attr('action');
+        if ($('#uploadVideoModal form').isValid()) {
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: $('#uploadVideoModal form').serialize(),
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                        toastr.error(data.message);
+                    else {
+                        toastr.success(data.message);
+                        $('#uploadVideoModal').modal('hide');
+                    }
+                }
+            });
+        }
+    }
+
+    function uploadPOIImage() {
+        let url = "{% url 'guidebook.ajax_upload_poi_image' unique_id=guidebook.unique_id scene_id='scene_id' poi_id='poi_id' %}";
+        url = url.replace('scene_id', '' + current_scene_id);
+        url = url.replace('poi_id', '' + selected_poi_id);
+        myDropzone.options.url = url;
+        $('#uploadPictureModal').modal('show');
+    }
+
+
 </script>
 {% endblock %}
