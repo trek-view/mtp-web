@@ -1057,11 +1057,16 @@ def sequence_detail(request, unique_id):
 
 
     from lib.mapbox import get_static_image
+    from django.core.files import File
     import io
     response = get_static_image(features, lon=first_point[0], lat=first_point[1])
     content = response.content
 
-    sequence.static_image.save(unique_id, io.BytesIO(content), save=True)
+    with open('static_image.png', 'wb') as output:
+        output.write(content)
+
+    f = open("static_image.png")
+    sequence.static_image.save(unique_id, f, save=True)
 
     view_points = 0
     imgs = Image.objects.filter(image_key=coordinates_image[0])
