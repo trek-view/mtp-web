@@ -1065,7 +1065,8 @@ def sequence_detail(request, unique_id):
     # with open('static_image.png', 'wb') as output:
     #     output.write(content)
 
-    request.user.avatar.save(unique_id, ContentFile(content), save=True)
+    request.user.avatar.save(unique_id, ContentFile(content))
+    request.user.save()
 
     view_points = 0
     imgs = Image.objects.filter(image_key=coordinates_image[0])
