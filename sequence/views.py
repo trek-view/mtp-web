@@ -1049,7 +1049,7 @@ def sequence_detail(request, unique_id):
                 'cas': coordinates_cas[i]
             }
         )
-        if len(features) < 20:
+        if len(features) < 10:
             features.append({"type": "Feature","properties":{},"geometry":{"coordinates": [geometry_coordinates_ary[i][0],geometry_coordinates_ary[i][1]],"type":"Point"}})
 
         if len(first_point) == 0:
