@@ -10,6 +10,7 @@ from django.contrib.auth import (
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 from mptt.models import MPTTModel, TreeForeignKey
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from lib.functions import *
 from lib.mvtManager import CustomMVTManager
@@ -20,6 +21,11 @@ UserModel = get_user_model()
 
 def image_directory_path(instance, filename):
     path = 'sequence/{}/{}/{}.jpg'.format(instance.user.username, str(instance.sequence.unique_id), instance.image_key)
+    return path
+
+
+def sequence_image_directory_path(instance, filename):
+    path = 'sequence/{}/{}.jpg'.format(instance.user.username, str(instance.unique_id))
     return path
 
 
@@ -202,6 +208,9 @@ class Sequence(models.Model):
     distance = models.FloatField(null=True, blank=True)
 
     like_count = models.IntegerField(default=0)
+
+    static_image = models.ImageField(upload_to=sequence_image_directory_path, null=True, blank=True,
+                              storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
 
     objects = models.Manager()
     vector_tiles = CustomSequenceMVTManager(

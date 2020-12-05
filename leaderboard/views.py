@@ -22,44 +22,8 @@ MAIN_PAGE_DESCRIPTION = "Leaderboard shows the ranking of users by Monthly and T
 ############################################################################
 
 
-def test_mapbox():
-    from mapbox import Geocoder
-    from django.conf import settings
-    from mapbox import Datasets
-
-    # map_token = settings.MAPBOX_PUBLISH_TOKEN
-    map_token = 'pk.eyJ1IjoiZGV2ZWxvcGVyNjEzIiwiYSI6ImNrZzBqd2I3eTBocmsydXFpdGQwZm9tanYifQ.b2fVHJfFOGwb2X21l7SOLg'
-    geocoder = Geocoder(access_token=map_token)
-    print(geocoder.session.params['access_token'])
-
-    datasets = Datasets(access_token=map_token)
-    resp = datasets.create()
-    print(resp)
-    # new_id = resp.json()['id']
-    feature = {
-        'type': 'Feature',
-        'id': '1',
-        'properties':
-            {
-                'name': 'Insula Nulla'
-            },
-        'geometry':
-            {
-                'type': 'Point',
-                'coordinates': [0, 0]
-            }
-    }
-
-    # resp = datasets.update_feature(new_id, '1', feature)
-    # print(resp.status_code)
-
-    return True
-
 
 def index(request):
-
-    # test_mapbox()
-
 
     sequences = None
     page = 1

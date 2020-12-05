@@ -994,6 +994,10 @@ def set_camera_make(sequence):
 
 
 def sequence_detail(request, unique_id):
+
+
+
+
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
     # if not sequence.is_published and request.user != sequence.user:
     #     messages.error(request, 'The sequence is not published.')
@@ -1005,6 +1009,8 @@ def sequence_detail(request, unique_id):
     # set_camera_make(sequence)
 
     image_key = None
+
+
 
     page = 1
     if request.method == "GET":
@@ -1029,7 +1035,10 @@ def sequence_detail(request, unique_id):
     coordinates_image = sequence.coordinates_image
     coordinates_cas = sequence.coordinates_cas
 
+
     images = []
+    features = []
+    first_point = []
 
     for i in range(len(coordinates_image)):
         images.append(
@@ -1040,6 +1049,19 @@ def sequence_detail(request, unique_id):
                 'cas': coordinates_cas[i]
             }
         )
+        if len(features) < 20:
+            features.append({"type": "Feature","properties":{},"geometry":{"coordinates": [geometry_coordinates_ary[i][0],geometry_coordinates_ary[i][1]],"type":"Point"}})
+
+        if len(first_point) == 0:
+            first_point = [geometry_coordinates_ary[i][0], geometry_coordinates_ary[i][1]]
+
+
+    from lib.mapbox import get_static_image
+    import io
+    response = get_static_image(features, lon=first_point[0], lat=first_point[1])
+    content = response.content
+
+    sequence.static_image.save(unique_id, io.BytesIO(content), save=True)
 
     view_points = 0
     imgs = Image.objects.filter(image_key=coordinates_image[0])
