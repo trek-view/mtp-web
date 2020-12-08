@@ -13,7 +13,7 @@ if os.name == 'nt':
     os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
     os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
 
-import dj_database_url
+# import dj_database_url
 from decouple import config
 
 # SECURITY WARNING: keep the secret key used in production secret!
