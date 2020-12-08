@@ -35,3 +35,9 @@ Having problems? [Ask a question around the Campfire (our community forum)](http
 ## License
 
 [GNU Affero General Public License v3.0](/LICENSE.txt).
+
+
+### Deploy on Ubuntu Server.
+* git clone https://github.com/trek-view/mtp-web.git
+* pip3 install -r requirements.txt
+* 

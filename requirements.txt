@@ -71,6 +71,7 @@ pycparser==2.20
 pycryptodome==3.9.8
 PyJWT==1.7.1
 python-dateutil==2.8.1
+python-decouple==3.3
 pytz==2020.1
 qrcode==6.1
 redis==3.5.3
