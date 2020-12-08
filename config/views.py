@@ -1,10 +1,17 @@
 ## Django Packages
 from django.shortcuts import get_object_or_404, render
 from lib.functions import *
-from sys_setting.models import BusinessTier, GoldTier, SilverTier
+from sys_setting.models import BusinessTier
+from django.contrib.auth import (
+    get_user_model, )
+
+from accounts.models import Grade
+
+UserModel = get_user_model()
 ############################################################################
 
 MAIN_PAGE_DESCRIPTION = "Access off-road street-level imagery and map data from all over the world. Fill in the gaps by requesting new coverage or capturing your own."
+
 
 def index(request):
     content = {
@@ -28,12 +35,18 @@ def app_download(request):
 
 def hall_of_fame(request):
     business = BusinessTier.objects.all()
-    gold = GoldTier.objects.all()
-    silver = SilverTier.objects.all()
+    paid_grades = Grade.objects.filter(user_type='Paid')
+    user_grades = []
+    for paid_grade in paid_grades:
+        paid_users = UserModel.objects.filter(user_grade=paid_grade)
+        if paid_users.count() > 0:
+            user_grades.append({
+                'grade': paid_grade,
+                'users': paid_users
+            })
     content = {
+        'user_grades': user_grades,
         'business': business,
-        'gold': gold,
-        'silver': silver,
         'pageName': 'Hall of Fame',
         'pageTitle': 'Hall of Fame',
         'pageDescription': 'Trek View is creating open source software to save the environment. The Hall of Fame highlights people helping us to achieve our ambitious goal.'

@@ -147,7 +147,7 @@ class PointOfInterestForm(forms.ModelForm):
         required=False,
         label='',
         widget=forms.Select(
-            attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}),
+            attrs={'class': 'form-control border', 'data-live-search': 'true'}),
         queryset=POICategory.objects.all(),
         to_field_name='pk',
         empty_label=None
@@ -163,7 +163,9 @@ class PointOfInterestForm(forms.ModelForm):
         model = PointOfInterest
         fields = (
             'title',
+            'category',
             'description',
+
             'external_url'
         )
 

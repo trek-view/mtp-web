@@ -534,6 +534,29 @@
                     Return to sequence
                 </div>
 
+                <div class="mapillary-custom-banner">
+                    <div>
+                        {% if sequence.user.get_custom_banner is not None and sequence.user.get_custom_banner.banner_text != '' %}
+                            <span>
+                                {% if sequence.user.get_custom_banner.linked_url is not None and sequence.user.get_custom_banner.linked_url != '' %}
+                                    <a target="_blank" href="{{ sequence.user.get_custom_banner.linked_url }}">{{ sequence.user.get_custom_banner.banner_text }}</a>
+                                {% else %}
+                                    {{ sequence.user.get_custom_banner.banner_text }}
+                                {% endif %}
+                                <i id="close_banner_button" class="far fa-times-circle"></i>
+                            </span>
+                        {% else %}
+                            {% if request.user == sequence.user %}
+                                <span>Add a custom banner here <a href="javascript:add_custom_banner();" style="color: #31d453 !important;">Add Now</a><i id="close_banner_button" class="far fa-times-circle"></i></span>
+                            {% endif %}
+                        {% endif %}
+
+                    </div>
+                </div>
+
+
+
+
                 <div class="mapillary-right-actions d-flex flex-column align-items-end">
                     <div class="p-1 image-view-point action" onclick="mark_view_point()" style="">
                         <button type="button" class="btn btn-primary view_point text-center show-button d-none">
@@ -3469,6 +3492,22 @@
         $('.default-icon.d-none').removeClass('d-none');
         $('.show-button.show').addClass('d-none').removeClass('show');
     });
+
+
+    function add_custom_banner() {
+        {% if request.user == sequence.user %}
+            {% if sequence.user.user_grade is not None and sequence.user.user_grade.user_type == 'Paid' %}
+                location.assign("{% url 'account.profile' username=sequence.user.username %}?add_banner=true");
+            {% else %}
+                Swal.fire({
+                    title: 'Need to pay!',
+                    html: 'To enable this feature, please support us on Patreon for as little at $2 <a target="_blank" href="https://www.patreon.com/trekview?fan_landing=truec">PATREON LINK</a>.',
+                    showCancelButton: false,
+                    confirmButtonText: 'OK'
+                })
+            {% endif %}
+        {% endif %}
+    }
 
 </script>
 {% endblock %}

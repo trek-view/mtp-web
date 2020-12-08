@@ -363,6 +363,10 @@
             let url = setParamInURL('order_type', value);
             location.assign(url);
         });
+
+        $('#close_banner_button').click(function () {
+            $(this).parent().addClass('d-none');
+        })
     </script>
 </body>
 </html>

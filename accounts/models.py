@@ -51,6 +51,19 @@ class Grade(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(null=True, blank=True)
     sequence_limit_count = models.IntegerField(default=5)
+    is_hall = models.BooleanField(default=False)
+    hall_title = models.CharField(max_length=100, default='')
+    is_hall_avatar = models.BooleanField(default=False)
+    hall_text = models.TextField(null=True, blank=True)
+    hall_link = models.TextField(null=True, blank=True)
+    user_type = models.CharField(
+        max_length=255,
+        choices=(
+            ('Free', 'Free'),
+            ('Paid', 'Paid'),
+        ),
+        default='Free',
+    )
 
     def __str__(self):
         return self.name
@@ -108,6 +121,13 @@ class CustomUser(AbstractUser):
         else:
             return self.user_grade.sequence_limit_count
 
+    def get_custom_banner(self):
+        custom_banner = CustomBanner.objects.filter(user=self).order_by('-updated_at').first()
+        if custom_banner is None:
+            return None
+        else:
+            return custom_banner
+
 
 class MapillaryUser(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -123,4 +143,8 @@ class MapillaryUser(models.Model):
     updated_at = models.DateTimeField(default=datetime.now, blank=True)
 
 
-
+class CustomBanner(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    banner_text = models.TextField(null=True)
+    linked_url = models.TextField(null=True)
+    updated_at = models.DateTimeField(default=datetime.now, blank=True)

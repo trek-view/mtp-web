@@ -1037,8 +1037,6 @@ def sequence_detail(request, unique_id):
 
 
     images = []
-    features = []
-    first_point = []
 
     for i in range(len(coordinates_image)):
         images.append(
@@ -1049,24 +1047,6 @@ def sequence_detail(request, unique_id):
                 'cas': coordinates_cas[i]
             }
         )
-        if len(features) < 10:
-            features.append({"type": "Feature","properties":{},"geometry":{"coordinates": [geometry_coordinates_ary[i][0],geometry_coordinates_ary[i][1]],"type":"Point"}})
-
-        if len(first_point) == 0:
-            first_point = [geometry_coordinates_ary[i][0], geometry_coordinates_ary[i][1]]
-
-
-    from lib.mapbox import get_static_image
-    from django.core.files.base import ContentFile
-    import io
-    response = get_static_image(features, lon=first_point[0], lat=first_point[1])
-    content = response.content
-
-    # with open('static_image.png', 'wb') as output:
-    #     output.write(content)
-
-    request.user.avatar.save(unique_id, ContentFile(content))
-    request.user.save()
 
     view_points = 0
     imgs = Image.objects.filter(image_key=coordinates_image[0])

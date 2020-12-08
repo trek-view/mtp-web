@@ -236,6 +236,25 @@
                     <button type="button" class="btn btn-primary">Get Embed Code</button>
                 </div>
                 <div id='mapillary_image_box' class="image-box display"></div>
+                <div class="mapillary-custom-banner">
+                    <div>
+                        {% if guidebook.user.get_custom_banner is not None and guidebook.user.get_custom_banner.banner_text != '' %}
+                            <span>
+                                {% if guidebook.user.get_custom_banner.linked_url is not None and guidebook.user.get_custom_banner.linked_url != '' %}
+                                    <a target="_blank" href="{{ guidebook.user.get_custom_banner.linked_url }}">{{ guidebook.user.get_custom_banner.banner_text }}</a>
+                                {% else %}
+                                    {{ guidebook.user.get_custom_banner.banner_text }}
+                                {% endif %}
+                                <i id="close_banner_button" class="far fa-times-circle"></i>
+                            </span>
+                        {% else %}
+                            {% if request.user == guidebook.user %}
+                                <span>Add a custom banner here <a href="javascript:add_custom_banner();" style="color: #31d453 !important;">Add Now</a><i id="close_banner_button" class="far fa-times-circle"></i></span>
+                            {% endif %}
+                        {% endif %}
+
+                    </div>
+                </div>
             </div>
             <div class="show-or-hide">
                 <div class="minimize-button" onclick="showOrHide()">
@@ -995,5 +1014,19 @@
             }
         })
     });
+    function add_custom_banner() {
+        {% if request.user == guidebook.user %}
+            {% if guidebook.user.user_grade is not None and guidebook.user.user_grade.user_type == 'Paid' %}
+                location.assign("{% url 'account.profile' username=guidebook.user.username %}?add_banner=true");
+            {% else %}
+                Swal.fire({
+                    title: 'Need to pay!',
+                    html: 'To enable this feature, please support us on Patreon for as little at $2 <a target="_blank" href="https://www.patreon.com/trekview?fan_landing=truec">PATREON LINK</a>.',
+                    showCancelButton: false,
+                    confirmButtonText: 'OK'
+                })
+            {% endif %}
+        {% endif %}
+    }
 </script>
 {% endblock %}

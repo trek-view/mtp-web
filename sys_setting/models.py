@@ -34,11 +34,3 @@ class BusinessTier(models.Model):
     url = models.TextField(null=True)
     logo = models.ImageField(upload_to=image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
 
-
-class GoldTier(models.Model):
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-
-
-class SilverTier(models.Model):
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-

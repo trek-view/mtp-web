@@ -12,19 +12,4 @@ class BusinessTierAdmin(admin.ModelAdmin):
     )
 
 
-class GoldTierAdmin(admin.ModelAdmin):
-    list_display = (
-        'user',
-    )
-
-
-class SilverTierAdmin(admin.ModelAdmin):
-    list_display = (
-        'user',
-    )
-
-
 admin.site.register(BusinessTier, BusinessTierAdmin)
-admin.site.register(GoldTier, GoldTierAdmin)
-admin.site.register(SilverTier, SilverTierAdmin)
-

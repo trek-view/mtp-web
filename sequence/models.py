@@ -209,9 +209,6 @@ class Sequence(models.Model):
 
     like_count = models.IntegerField(default=0)
 
-    static_image = models.ImageField(upload_to=sequence_image_directory_path, null=True, blank=True,
-                              storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
-
     objects = models.Manager()
     vector_tiles = CustomSequenceMVTManager(
         geo_col='geometry_coordinates',
