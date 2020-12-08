@@ -2219,6 +2219,7 @@ def ajax_image_map_feature(request, unique_id):
 
     image_key = request.GET.get('image_key', '')
     map_features_json = {}
+    features = []
     if image_key is not None and image_key != '':
         map_features = MapFeature.objects.filter(image_keys__contains=[image_key])
         for map_feature in map_features:
@@ -2227,8 +2228,20 @@ def ajax_image_map_feature(request, unique_id):
                 map_features_json[value] += 1
             else:
                 map_features_json[value] = 1
+            features.append({
+                'value': map_feature.value,
+                'mf_key': map_feature.mf_key,
+                'geometry_type': map_feature.geometry_type,
+                'lon': map_feature.geometry_point.coords[0],
+                'lat': map_feature.geometry_point.coords[1],
+                'accuracy': map_feature.accuracy,
+                'altitude': map_feature.altitude,
+                'direction': map_feature.direction,
+                'layer': map_feature.layer,
+            })
     data = {
-        'map_features': map_features_json
+        'map_features': map_features_json,
+        'features': features
     }
 
     return JsonResponse(data)

@@ -303,7 +303,7 @@ body {
     padding: 1px;
 }
 
-.switch-detection > div, .switch-gpx > div {
+.switch-detection > div, .switch-gpx > div, .switch-map-feature > div {
     width: 140px !important;
 }
 
