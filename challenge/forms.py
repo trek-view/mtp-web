@@ -24,11 +24,12 @@ def camera_makes():
 
 
 def label_types():
-    lts = LabelType.objects.filter(parent__isnull=False, source='mtpw')
-    label_type = [['all', 'All Types']]
-    for lt in lts:
-        label_type.append([lt.name, lt.getKey])
-    return label_type
+    # lts = LabelType.objects.filter(parent__isnull=False, source='mtpw')
+    # label_type = [['all', 'All Types']]
+    # for lt in lts:
+    #     label_type.append([lt.name, lt.getKey])
+    # return label_type
+    pass
 
 
 class ChallengeForm(forms.ModelForm):

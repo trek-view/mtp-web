@@ -40,4 +40,12 @@ Having problems? [Ask a question around the Campfire (our community forum)](http
 ### Deploy on Ubuntu Server.
 * git clone https://github.com/trek-view/mtp-web.git
 * pip3 install -r requirements.txt
-* 
+
+Insall PostgreSQL.
+[Go here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-20-04).
+
+pip3 install python_decouple
+
+django-oauth-toolkit==1.3.2
+django-otp==0.9.4
+django-two-factor-auth==1.12.1

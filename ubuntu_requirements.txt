@@ -41,3 +41,6 @@ sqlparse==0.3.1
 whitenoise==5.1.0
 YubiOTP==0.2.2.post1
 zipp==3.1.0
+
+phonenumbers==8.12.7
+mailerlite-api-python==0.2.0
