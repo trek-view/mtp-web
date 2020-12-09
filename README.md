@@ -49,3 +49,6 @@ pip3 install python_decouple
 django-oauth-toolkit==1.3.2
 django-otp==0.9.4
 django-two-factor-auth==1.12.1
+
+
+sudo apt install postgis postgresql-12-postgis-3

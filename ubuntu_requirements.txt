@@ -44,3 +44,5 @@ zipp==3.1.0
 
 phonenumbers==8.12.7
 mailerlite-api-python==0.2.0
+Pillow==7.2.0
+jsonfield==3.1.0
