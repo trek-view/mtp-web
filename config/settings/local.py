@@ -18,9 +18,13 @@ from decouple import config
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY', 'default')
-print('test')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+debug = config('DEBUG', 0)
+if debug > 0:
+    DEBUG = True
+else:
+    DEBUG = False
+
 
 INSTALLED_APPS += ['whitenoise.runserver_nostatic']
 
