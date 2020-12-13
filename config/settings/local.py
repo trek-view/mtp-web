@@ -19,8 +19,8 @@ from decouple import config
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY', 'default')
 # SECURITY WARNING: don't run with debug turned on in production!
-debug = config('DEBUG', 0)
-if debug > 0:
+debug = config('DEBUG', '0')
+if debug == '1':
     DEBUG = True
 else:
     DEBUG = False
