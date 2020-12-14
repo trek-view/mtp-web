@@ -37,18 +37,56 @@ Having problems? [Ask a question around the Campfire (our community forum)](http
 [GNU Affero General Public License v3.0](/LICENSE.txt).
 
 
+
+
+
 ### Deploy on Ubuntu Server.
+#### 1. [Download App](https://github.com/trek-view/mtp-web.git).
 * git clone https://github.com/trek-view/mtp-web.git
-* pip3 install -r requirements.txt
 
-Insall PostgreSQL.
-[Go here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-20-04).
 
-pip3 install python_decouple
+#### 2. [Insall PostgreSQL].(https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-20-04).
 
-django-oauth-toolkit==1.3.2
-django-otp==0.9.4
-django-two-factor-auth==1.12.1
+```
+sudo apt install postgresql postgresql-contrib;
 
+sudo -i -u postgres;
+
+psql;
+
+ALTER USER postgres PASSWORD 'myPassword';
+
+exit;
 
 sudo apt install postgis postgresql-12-postgis-3
+```
+
+#### 3. Install Python Packages
+```
+sudo -H pip3 install virtualenv
+
+virtualenv venv
+
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+and change .env file
+
+```commandline
+python manage.py migrate
+
+python manage.py createsuperuser
+```
+
+#### Install Nginx, SSL and Run Service
+
+```
+chmod +x nginx+SSL+python.txt
+
+./nginx+SSL+python.txt
+```
+
+
+

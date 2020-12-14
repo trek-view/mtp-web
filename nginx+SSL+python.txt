@@ -1,0 +1,55 @@
+#!/bin/bash
+apt-get update
+apt-get install nginx -y
+systemctl enable nginx
+systemctl start nginx
+
+
+read -p "Enter the domain name : " YOUR_DOMAIN_NAME
+
+cat >> /etc/nginx/sites-enabled/myproject.conf << EOF
+server {
+    server_name $YOUR_DOMAIN_NAME www.YOUR_DOMAIN_NAME;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/wang/mpt-web;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://127.0.0.1:8000/;
+    }
+
+
+}
+EOF
+
+snap install core; sudo snap refresh core
+snap install --classic certbot
+ln -s /snap/bin/certbot /usr/bin/certbot
+certbot --nginx
+
+certbot --nginx  --agree-tos --register-unsafely-without-email -d $YOUR_DOMAIN_NAME www.$YOUR_DOMAIN_NAME
+
+
+
+
+cat >> /etc/systemd/system/python.service << EOF
+[Unit]
+Description=Python daemon
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/home/wang/mtp-web/
+ExecStart=/home/wang/mtp-web/venv/bin/python3 /home/wang/mtp-web/manage.py runserver
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl start python.service
+systemctl enable python.service
