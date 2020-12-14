@@ -80,13 +80,99 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-#### Install Nginx, SSL and Run Service
-
+and exit venv.
+```commandline
+deactivate
 ```
+
+#### 4. Install Nginx, SSL and Run Service
+
+##### Install Nginx
+```commandline
+apt-get update
+apt-get install nginx -y
+systemctl enable nginx
+systemctl start nginx
+```
+
+create nginx config file.
+```commandline
+sudo nano /etc/nginx/sites-enabled/myproject.conf
+```
+fill the file following contents.
+```
+server {
+    server_name $YOUR_DOMAIN_NAME www.YOUR_DOMAIN_NAME;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/wang/mpt-web;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://127.0.0.1:8000/;
+    }
+}
+```
+
+##### Install Encrypt SSL
+```commandline
+snap install core 
+sudo snap refresh core
+snap install --classic certbot
+ln -s /snap/bin/certbot /usr/bin/certbot
+certbot --nginx
+
+certbot --nginx  --agree-tos --register-unsafely-without-email -d $YOUR_DOMAIN_NAME www.$YOUR_DOMAIN_NAME
+```
+
+##### Create Python Service File
+```commandline
+sudo nano /etc/systemd/system/python.service
+```
+
+fill the file following content.
+```
+[Unit]
+Description=Python daemon
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=$APP_ROOT_PATH
+ExecStart=$APP_ROOT_PATH/venv/bin/python3 $APP_ROOT_PATH/manage.py runserver
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### Run MTPW APP
+```commandline
+systemctl daemon-reload
+systemctl start python.service
+systemctl enable python.service
+```
+
+Check MTPW Service
+```commandline
+systemctl status python.service
+```
+
+Stop MTPW Service
+```commandline
+systemctl stop python.service
+```
+
+Restart MTPW Service
+```commandline
+systemctl restart python.service
+```
+
+#### * Install Nginx, SSL and Run Service (Quick Run)
+```commandline
 chmod +x nginx+SSL+python.txt
 
 ./nginx+SSL+python.txt
 ```
-
-
-
