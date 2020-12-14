@@ -5,6 +5,8 @@ from two_factor.views import (
     ProfileView, QRGeneratorView, SetupCompleteView, SetupView,
 )
 
+SetupView.success_url = 'admin:index'
+
 core = [
     url(
         regex=r'^accounts/login/$',
