@@ -78,7 +78,7 @@ class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
         return redirect_to_login(redirect_to)
 
 
-# handler404 = marketplaceViews.handler404
+handler404 = views.handler404
 # handler500 = marketplaceViews.handler500
 
 if settings.USE_TWO_FACTOR_OAUTH == 1 or settings.USE_TWO_FACTOR_OAUTH == '1':

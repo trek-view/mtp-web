@@ -4,6 +4,7 @@
 .idea
 /.env
 .env.production
+.env.staging
 /config/settings_dev.py
 /config/_settings.py
 /sent_emails/

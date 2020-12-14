@@ -5,6 +5,7 @@ from sys_setting.models import BusinessTier
 from django.contrib.auth import (
     get_user_model, )
 
+
 from accounts.models import Grade
 
 UserModel = get_user_model()
@@ -63,3 +64,11 @@ def about(request):
     }
 
     return render(request, 'about/about.html', content)
+
+
+def handler404(request, *args, **argv):
+    return render(request, '404.html')
+
+
+def handler500(request, *args, **argv):
+    return render(request, '500.html')
