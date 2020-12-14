@@ -85,7 +85,7 @@ and install database tables.
 python manage.py migrate
 ```
 
-and create super admin user.
+and create super admin.
 ```commandline
 python manage.py createsuperuser
 ```
