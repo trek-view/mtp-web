@@ -72,11 +72,21 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-and change .env file
+and change .env file for database connection and others.
+```
+DATABASE_NAME = 'postgres'
+DATABASE_USER = 'postgres'
+DATABASE_PASSWORD = 'password'
+DATABASE_HOST = 'localhost'
+```
 
+and install database tables.
 ```commandline
 python manage.py migrate
+```
 
+and create super admin user.
+```commandline
 python manage.py createsuperuser
 ```
 
