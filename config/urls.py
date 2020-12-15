@@ -49,6 +49,7 @@ sitemaps = {
     }, priority=0.9),
 }
 
+
 class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
     def login(self, request, extra_context=None):
         redirect_to = request.POST.get(
@@ -82,7 +83,7 @@ handler404 = views.handler404
 # handler500 = marketplaceViews.handler500
 
 if settings.USE_TWO_FACTOR_OAUTH == 1 or settings.USE_TWO_FACTOR_OAUTH == '1':
-    admin.site.__class__ = AdminSiteOTPRequiredMixinRedirSetup
+    admin.site.__class__ = AdminSiteOTPRequired
 
 urlpatterns = [
     # path('', views.index, name='home'),
@@ -105,8 +106,9 @@ urlpatterns = [
 
     path('tags_input/', include('tags_input.urls', namespace='tags_input')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
-    re_path(r'', include(tf_urls)),
     path('mission-control/', admin.site.urls, name='admin'),
+    re_path(r'', include(tf_urls)),
+
     path('api/', include('api.urls')),
     path('exchange_token', include('accounts.strava_url')),
 ]
