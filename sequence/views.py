@@ -969,6 +969,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                 # Save the temporary image to the model#
                 # This saves the model so be sure that is it valid
                 if lf:
+                    print('image: ', image.image_key)
                     image.mapillary_image.save(image.image_key, files.File(lf))
                     image.save()
             sequence.is_image_download = True
