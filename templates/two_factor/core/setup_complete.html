@@ -2,6 +2,8 @@
 {% load i18n %}
 
 {% block content %}
+    <div class="container">
+        <div class="content pt-5">
   <h1>{% block title %}{% trans "Enable Two-Factor Authentication" %}{% endblock %}</h1>
 
   <p>{% blocktrans trimmed %}Congratulations, you've successfully enabled two-factor
@@ -30,5 +32,6 @@
     </div>
 
   {% endif %}
-
+        </div>
+    </div>
 {% endblock %}
