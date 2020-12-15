@@ -4,8 +4,8 @@ from django.views.generic import RedirectView
 from django_email_verification import urls as mail_urls
 from django.conf import settings
 from django.conf.urls.static import static
-# from two_factor.urls import urlpatterns as tf_urls
-from .two_factor_urls import urlpatterns as tf_urls
+from two_factor.urls import urlpatterns as tf_urls
+# from .two_factor_urls import urlpatterns as tf_urls
 from two_factor.admin import AdminSiteOTPRequired, AdminSiteOTPRequiredMixin
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.urls import reverse
@@ -83,7 +83,7 @@ handler404 = views.handler404
 # handler500 = marketplaceViews.handler500
 
 if settings.USE_TWO_FACTOR_OAUTH == 1 or settings.USE_TWO_FACTOR_OAUTH == '1':
-    admin.site.__class__ = AdminSiteOTPRequired
+    admin.site.__class__ = AdminSiteOTPRequiredMixinRedirSetup
 
 urlpatterns = [
     # path('', views.index, name='home'),
