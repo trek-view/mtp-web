@@ -217,6 +217,14 @@ class Sequence(models.Model):
         source_layer='mtp-sequences'
     )
 
+    def __str__(self):
+        if self.name is not None and self.name != '':
+            return self.name
+        elif self.seq_key is not None and self.seq_key != '':
+            return self.seq_key
+        else:
+            return self.unique_id
+
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('sequence.sequence_detail', kwargs={'unique_id': str(self.unique_id)})
