@@ -90,7 +90,11 @@ class Mapillary:
         if self.token is None:
             return False
         url = '{}images/{}/download_original?client_id={}'.format(self.root_url, image_key, self.client_id)
+
         headers = {"Authorization": "Bearer {}".format(self.token)}
+
+        print(url)
+        print(headers)
         request = requests.get(url, headers=headers, stream=True)
         # Was the request OK?
         if request.status_code != requests.codes.ok:
