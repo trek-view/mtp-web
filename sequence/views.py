@@ -762,7 +762,8 @@ def get_images_by_multi_sequences(sequences):
 
 def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, image_download=True, is_weather=True, mf_insert=True):
     seqs = Sequence.objects.filter(unique_id=sequence.unique_id)
-    is_print = True
+    print('sequence importing: ', sequence.seq_key)
+    is_print = False
     if seqs.count() == 0:
         print('Sequence is not existing.')
         return
@@ -967,8 +968,6 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                 lf = mapillary.download_mapillary_image(image.image_key)
                 # Save the temporary image to the model#
                 # This saves the model so be sure that is it valid
-                print('lf')
-                print(lf)
                 if lf:
                     image.mapillary_image.save(image.image_key, files.File(lf))
                     image.save()
