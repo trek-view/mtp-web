@@ -190,10 +190,10 @@ class Sequence(models.Model):
     is_private = models.BooleanField(default=False)
     imported_at = models.DateTimeField(default=datetime.now, blank=True)
 
-    name = models.CharField(max_length=100, default='')
-    description = models.TextField(default='')
+    name = models.CharField(max_length=100, default='', blank=True)
+    description = models.TextField(default='', blank=True)
     transport_type = models.ForeignKey(TransType, on_delete=models.CASCADE, null=True)
-    tag = models.ManyToManyField(Tag)
+    tag = models.ManyToManyField(Tag, null=True, blank=True)
 
     image_count = models.IntegerField(default=0)
 
