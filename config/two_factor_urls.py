@@ -7,7 +7,7 @@ from two_factor.views import (
 
 core = [
     url(
-        regex=r'^accounts/login/$',
+        regex=r'^mission-control/login/$',
         view=LoginView.as_view(),
         name='login',
     ),
