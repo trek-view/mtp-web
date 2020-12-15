@@ -82,8 +82,10 @@ class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
 handler404 = views.handler404
 # handler500 = marketplaceViews.handler500
 
+
 if settings.USE_TWO_FACTOR_OAUTH == 1 or settings.USE_TWO_FACTOR_OAUTH == '1':
     admin.site.__class__ = AdminSiteOTPRequiredMixinRedirSetup
+
 
 urlpatterns = [
     # path('', views.index, name='home'),
@@ -106,12 +108,16 @@ urlpatterns = [
 
     path('tags_input/', include('tags_input.urls', namespace='tags_input')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+
+
+
     path('mission-control/', admin.site.urls, name='admin'),
     re_path(r'', include(tf_urls)),
 
     path('api/', include('api.urls')),
     path('exchange_token', include('accounts.strava_url')),
 ]
+
 
 # This part is for deploying this project as a production(DEBUG=True) on heroku.
 if not settings.DEBUG:

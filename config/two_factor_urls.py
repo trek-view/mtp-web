@@ -1,13 +1,18 @@
 from django.conf.urls import url
-
+from django.conf import settings
 from two_factor.views import (
     BackupTokensView, DisableView, LoginView, PhoneDeleteView, PhoneSetupView,
     ProfileView, QRGeneratorView, SetupCompleteView, SetupView,
 )
 
+login_path = r'^accounts/login/$'
+if settings.USE_TWO_FACTOR_OAUTH == 1 or settings.USE_TWO_FACTOR_OAUTH == '1':
+    login_path = r'^accounts/two_factor/login/$'
+
+
 core = [
     url(
-        regex=r'^accounts/two_factor/login/$',
+        regex=login_path,
         view=LoginView.as_view(),
         name='login',
     ),
