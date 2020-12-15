@@ -93,8 +93,7 @@ class SequenceAdmin(tags_input_admin.TagsInputAdmin):
         return obj.username
 
     def get_form(self, request, obj=None, **kwargs):
-        if obj.type == "1":
-            self.exclude = ("geometry_coordinates", 'geometry_coordinates_ary', 'coordinates_cas', 'coordinates_image', )
+        self.exclude = ("geometry_coordinates", 'geometry_coordinates_ary', 'coordinates_cas', 'coordinates_image', )
         form = super(SequenceAdmin, self).get_form(request, obj, **kwargs)
         return form
 
