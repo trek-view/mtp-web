@@ -763,7 +763,7 @@ def get_images_by_multi_sequences(sequences):
 def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, image_download=True, is_weather=True, mf_insert=True):
     seqs = Sequence.objects.filter(unique_id=sequence.unique_id)
     print('sequence importing: ', sequence.seq_key)
-    is_print = False
+    is_print = True
     if seqs.count() == 0:
         print('Sequence is not existing.')
         return
