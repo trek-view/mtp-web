@@ -56,6 +56,33 @@ class SequenceAdmin(tags_input_admin.TagsInputAdmin):
         'description'
     )
 
+    readonly_fields = [
+        "user",
+        "camera_make",
+        "captured_at",
+        'created_at',
+        'seq_key',
+        'pano',
+        'user_key',
+        'username',
+        'geometry_coordinates',
+        'geometry_coordinates_ary',
+        'coordinates_cas',
+        'coordinates_image',
+        'is_uploaded',
+        'is_private',
+        'imported_at',
+        'image_count',
+        'is_mapillary',
+        'is_image_download',
+        'is_map_feature',
+        'google_street_view',
+        'strava',
+        'distance',
+        'like_count',
+
+    ]
+
     def mapillary_sequence_key(self, obj):
         return obj.seq_key
 

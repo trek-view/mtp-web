@@ -181,7 +181,7 @@
                                                     <p class="mb-1 item-distance text-center">
                                                         <i class="fas fa-ruler-horizontal "></i>
                                                         <br>
-{#                                                        {{ sequence.get_distance }} Km#}
+                                                        {{ sequence.get_distance }} Km
                                                     </p>
                                                     <a {% if sequence.tour_count > 0 %}href="{% url 'tour.tour_list' %}?sequence_unique_id={{ sequence.unique_id }}" {% endif %}>
                                                         <p class="mb-1 item-tour-count text-center">
