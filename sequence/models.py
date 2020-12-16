@@ -307,8 +307,6 @@ class Sequence(models.Model):
             return None
 
     def get_first_point_lat(self):
-        print('self.seq_key: ', self.seq_key)
-        print(self.geometry_coordinates_ary)
         if self.geometry_coordinates_ary is None:
             return None
         lat = self.geometry_coordinates_ary[0][1]
