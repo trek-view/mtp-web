@@ -1743,6 +1743,9 @@
             $('.image-detail').addClass('d-none');
             view_mode = 'autodetected_label';
             $('.image-detection .actions').addClass('d-none');
+            if ($('#is_show_gpx').prop('checked')) {
+                $('.switch-gpx > div').trigger('click');
+            }
             image_url_reset(image_key)
             getDetection(image_key);
         }
@@ -1751,8 +1754,8 @@
             $('.image-detail').removeClass('d-none');
             view_mode = 'original';
             image_url_reset(image_key);
-            if (is_show_gpx)
-                showGpxOnPhoto(gpx_points, camera_node);
+            {#if (is_show_gpx)#}
+            {#    showGpxOnPhoto(gpx_points, camera_node);#}
         }
     })
 
@@ -2488,7 +2491,12 @@
         is_show_gpx = $(this).prop('checked');
         let url = '';
         if (is_show_gpx)
+        {
             showGpxOnPhoto(gpx_points, camera_node);
+            if ($('#switch_detection').prop('checked')) {
+                $('.switch-detection > div').trigger('click');
+            }
+        }
         else
             tagComponent.removeAll();
         image_url_reset(current_node_key);
@@ -3011,7 +3019,7 @@
 			console.log(popup);
 			popup.setDOMContent(div);
 			//遠い店舗は上のほうに表示
-			popup.setBasicPoint([xy.x, xy.y]);
+			popup.setBasicPoint([xy.x, -0.1 +  xy.y - 0.05*(xy.distance/1000)]);
 			popupComponent.add([popup]);
 			map_feature_popup.push(popup);
 		}
