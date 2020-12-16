@@ -2447,7 +2447,7 @@ def ajax_check_import_limit(request):
     print('today_start: ', today_start)
     print('today_end: ', today_end)
 
-    today_imported_sequences = Sequence.objects.filter(is_mapillary=True, imported_at__gte=today_start, imported_at__lt=today_end)
+    today_imported_sequences = Sequence.objects.filter(user=user, is_mapillary=True, imported_at__gte=today_start, imported_at__lt=today_end)
 
     today_count = len(today_imported_sequences)
 
