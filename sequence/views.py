@@ -2431,16 +2431,22 @@ def ajax_check_import_limit(request):
     user = request.user
 
     user_grade = user.user_grade
-
+    print('user_grade: ', user_grade)
     sequence_limit_count = 5
     if user_grade is not None:
         sequence_limit_count = user_grade.sequence_limit_count
+
+    print('sequence_limit_count: ', sequence_limit_count)
 
     from datetime import timedelta, time
     today = datetime.now().date()
     tomorrow = today + timedelta(1)
     today_start = datetime.combine(today, time())
     today_end = datetime.combine(tomorrow, time())
+
+    print('today_start: ', today_start)
+    print('today_end: ', today_end)
+
     today_imported_sequences = Sequence.objects.filter(is_mapillary=True, imported_at__gte=today_start, imported_at__lt=today_end)
 
     today_count = len(today_imported_sequences)
