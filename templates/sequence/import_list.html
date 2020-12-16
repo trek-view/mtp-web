@@ -614,6 +614,7 @@
 
 
     function get_sequences() {
+        console.log('TEst');
         $.ajax({
             url: "{% url 'sequence.ajax_get_import_sequences' %}",
             type: 'POST',
@@ -624,8 +625,9 @@
                     toastr.error(data.message);
                 else {
                     let sequences = data.sequences;
+                    console.log('test');
                     map.on('load', function() {
-                        console.log('test');
+
                         drawMapWithSequences(sequences);
                         map.on('mouseenter', 'mtp-images', function(e) {
                           // Change the cursor style as a UI indicator.
