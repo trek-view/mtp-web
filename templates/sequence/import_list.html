@@ -627,7 +627,7 @@
                     let sequences = data.sequences;
                     console.log('test');
                     console.log(sequences)
-                    map.on('load', function() {
+                    //map.on('load', function() {
                         console.log('map load');
                         drawMapWithSequences(sequences);
                         map.on('mouseenter', 'mtp-images', function(e) {
@@ -668,7 +668,7 @@
                             map.getCanvas().style.cursor = '';
                             popup.remove();
                         });
-                    });
+                    //});
                 }
             }
         })
