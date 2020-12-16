@@ -102,7 +102,7 @@ class CustomMVTManager(MVTManager):
         # additional_where = ''
         limit = "ALL" if limit == -1 else limit
         query, parameters = self._build_query(filters=filters, additional_where=additional_where)
-        # print(query)
+        print([str(bbox), str(bbox)] + parameters + [limit, offset])
         with self._get_connection().cursor() as cursor:
             cursor.execute(query, [str(bbox), str(bbox)] + parameters + [limit, offset])
             mvt = cursor.fetchall()[-1][-1]  # should always return one tile on success
