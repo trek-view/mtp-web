@@ -366,7 +366,7 @@
 
         {#console.log('positions', sceneData)#}
         if (first_point != null) {
-            var map = new mapboxgl.Map({
+            var small_map = new mapboxgl.Map({
                 container: obj_id, // container id
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: first_point, // starting position
@@ -374,22 +374,22 @@
             });
         }
         else {
-            var map = new mapboxgl.Map({
+            var small_map = new mapboxgl.Map({
                 container: obj_id, // container id
                 style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
                 center: [-87.622088, 41.878781], // starting position
                 zoom: 12, // starting zoom
             });
         }
-        map.on('load', function() {
-            map.addSource('points', {
+        small_map.on('load', function() {
+            small_map.addSource('points', {
                 'type': 'geojson',
                 'data': {
                     'type': 'FeatureCollection',
                     'features': sceneData
                 }
             });
-            map.addLayer({
+            small_map.addLayer({
                 'id': 'mapillary-images',
                 'type': 'circle',
                 'source': 'points',
@@ -399,8 +399,8 @@
                 }
             });
         });
-        map_ary.push(map);
-        map.resize();
+        map_ary.push(small_map);
+        small_map.resize();
     }
 
     for (i = 0; i < positions.length; i++)
