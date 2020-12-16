@@ -2492,10 +2492,10 @@
         let url = '';
         if (is_show_gpx)
         {
-            showGpxOnPhoto(gpx_points, camera_node);
             if ($('#switch_detection').prop('checked')) {
                 $('.switch-detection > div').trigger('click');
             }
+            showGpxOnPhoto(gpx_points, camera_node);
         }
         else
             tagComponent.removeAll();
