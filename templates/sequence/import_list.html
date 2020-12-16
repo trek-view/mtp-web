@@ -682,6 +682,7 @@
         if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
         if (map.getSource('mtp-images')) map.removeSource('mtp-images');
         if (map.getSource('mtp-sequences')) map.removeSource('mtp-sequences');
+        console.log('sequences', sequences)
         map.addSource('mtp-sequences', {
             'type': 'geojson',
             'data': {
