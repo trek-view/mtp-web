@@ -39,8 +39,9 @@
     {% block app_style %}{% endblock %}
     <script src="{% static 'js/jquery.js' %}"></script>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
+
     {% if GOOGLE_ANALYTICS is not None and GOOGLE_ANALYTICS != '' %}
+        <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-136706582-7"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
