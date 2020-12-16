@@ -40,13 +40,15 @@
     <script src="{% static 'js/jquery.js' %}"></script>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-136706582-7"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '{{ GOOGLE_ANALYTICS }}');
-    </script>
+    {% if GOOGLE_ANALYTICS is not None %}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-136706582-7"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{ GOOGLE_ANALYTICS }}');
+        </script>
+    {% endif %}
 <style>
     @media only screen and (max-width: 600px) {
         .right-board {
