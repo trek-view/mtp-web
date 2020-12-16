@@ -628,7 +628,7 @@
                     console.log('test');
                     console.log(sequences)
                     map.on('load', function() {
-
+                        console.log('map load');
                         drawMapWithSequences(sequences);
                         map.on('mouseenter', 'mtp-images', function(e) {
                           // Change the cursor style as a UI indicator.
