@@ -3,7 +3,7 @@
         Hi {{ tour.user.username }}!
     </p>
     <p>
-    	You received a like for your tour: <a href="{{ BASE_URL }}{% url 'tour.tour_detail' unique_id=tour.unique_id %}">{{ tour.name }}</a> ({{ BASE_URL }}{% url 'tour.tour_detail' unique_id=tour.unique_id %}) from <a href="{% url 'account.profile' username=sender.username %}">{{ sender.username }}</a> ({% url 'account.profile' username=sender.username %}).
+    	You received a like for your tour: <a href="{{ BASE_URL }}{% url 'tour.tour_detail' unique_id=tour.unique_id %}">{{ tour.name }}</a> ({{ BASE_URL }}{% url 'tour.tour_detail' unique_id=tour.unique_id %}) from <a href="{{ BASE_URL }}{% url 'account.profile' username=sender.username %}">{{ sender.username }}</a> ({{ BASE_URL }}{% url 'account.profile' username=sender.username %}).
     </p>
     <p>
         --<br/>

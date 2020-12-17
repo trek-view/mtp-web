@@ -3,7 +3,7 @@
         Hi {{ sequence.user.username }}!
     </p>
     <p>
-    	You received a view point for your photo: <a href="{{ BASE_URL }}{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}?image_key={{ image_key }}">{{ image_key }}</a> ({{ BASE_URL }}{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}?image_key={{ image_key }}) from <a href="{% url 'account.profile' username=sender.username %}">{{ sender.username }}</a> ({% url 'account.profile' username=sender.username %}).
+    	You received a view point for your photo: <a href="{{ BASE_URL }}{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}?image_key={{ image_key }}">{{ image_key }}</a> ({{ BASE_URL }}{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}?image_key={{ image_key }}) from <a href="{{ BASE_URL }}{% url 'account.profile' username=sender.username %}">{{ sender.username }}</a> ({{ BASE_URL }}{% url 'account.profile' username=sender.username %}).
     </p>
     <p>
         --<br/>
