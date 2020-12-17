@@ -101,8 +101,7 @@
 {% endblock %}
 {% block content %}
 <div id="fb-root"></div>
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v9.0" nonce="kq51J7sg"></script>
-
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v9.0" nonce="t36Bhl7X"></script>
 <div class="main-body">
     <div class="left-side p-3 d-flex flex-column justify-content-between">
         <div>
@@ -504,9 +503,8 @@
                 </div>
             </div>
         </div>
-
         <div class="user-comment mt-2 d-flex justify-content-center">
-            <div class="fb-comments w-100 border" data-href="{{ request.get_full_path  }}" data-numposts="5" data-width="350" ></div>
+            <div class="fb-comments w-100 border" data-href="{{ request.build_absolute_uri  }}" data-numposts="5" data-width="350" ></div>
         </div>
 
     </div>
