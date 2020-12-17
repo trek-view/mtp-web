@@ -202,7 +202,7 @@ class Sequence(models.Model):
     is_image_download = models.BooleanField(default=False)
     is_map_feature = models.BooleanField(default=False)
 
-    google_street_view = models.BooleanField(default=False)
+    google_street_view = models.TextField(default='', blank=True)
     strava = models.CharField(max_length=50, null=True, blank=True)
 
     distance = models.FloatField(null=True, blank=True)
