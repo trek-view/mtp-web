@@ -203,10 +203,10 @@
                                 <span class="" style="font-size: 13px; width: 60%">{{ sequence.captured_at }}</span>
                             </div>
 
-                            <div class="w-100 p-1 ">
-                                <label class="" style="width: 40%">Uploaded at: </label>
-                                <span class="" style="font-size: 13px; width: 60%">{{ sequence.created_at }}</span>
-                            </div>
+{#                            <div class="w-100 p-1 ">#}
+{#                                <label class="" style="width: 40%">Uploaded at: </label>#}
+{#                                <span class="" style="font-size: 13px; width: 60%">{{ sequence.created_at }}</span>#}
+{#                            </div>#}
 
                             <a href="{% url 'account.profile' username=sequence.user.username %}">
                                 <span class="" style="color: brown;">{{ sequence.user.username }}</span>
