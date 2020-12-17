@@ -136,7 +136,7 @@
                                     <div class="w-100">
                                         <div class="item-detail-box p-2">
                                             <div class="row align-items-center">
-                                                <div class="guidebook-main col-md-7">
+                                                <div class="guidebook-main col-md-9">
                                                     <div class="item-title text-info d-flex flex-row justify-content-between">
                                                         <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
                                                             <h5>
@@ -185,8 +185,8 @@
                                                     </div>
 
                                                 </div>
-                                                <div class="col-md-5 text-right">
-                                                    {{ guidebook.created_at }}
+                                                <div class="col-md-3 text-center align-items-center">
+                                                    <div>Created at:<br>{{ guidebook.created_at }}</div>
                                                 </div>
                                             </div>
                                         </div>
