@@ -2451,7 +2451,7 @@ def ajax_check_import_limit(request):
     })
 
 
-def insert_db(request):
+def manual_update(request):
 
     # for map_feature in map_features:
     #     image_keys = map_feature.image_keys
@@ -2480,6 +2480,13 @@ def insert_db(request):
             tour.like_count = tour.get_like_count()
             tour.save()
 
+
+    if method == 'google_street_view':
+        sequences = Sequence.objects.all()
+        for sequence in sequences:
+            if sequence.google_street_view == False or sequence.google_street_view == 'false':
+                sequence.google_street_view = ''
+                sequence.save()
 
     return redirect('home')
 
