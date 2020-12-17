@@ -231,8 +231,11 @@
                                                 <a target="_blank" class="mr-2" href="https://www.openstreetmap.org/edit?editor=id#map=18/{{ sequence.get_first_point_lat }}/{{ sequence.get_first_point_lng }}&photo_overlay=mapillary">
                                                     <img style="width: 32px" src="{% static "images/icon/90606167-57892980-e1f7-11ea-96e7-ed01ef35b2b7.png" %}"  alt=""/>
                                                 </a>
-                                                {% if sequence.google_street_view %}
-                                                    <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.get_first_point_lat }},{{ sequence.get_first_point_lng }},14z">
+                                                {% if sequence.google_street_view is not None and sequence.google_street_view != '' %}
+{#                                                    <a class="mr-2" target="_blank" href="https://www.google.co.uk/maps/@{{ sequence.get_first_point_lat }},{{ sequence.get_first_point_lng }},14z">#}
+{#                                                        <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico"  alt=""/>#}
+{#                                                    </a>#}
+                                                    <a class="mr-2" target="_blank" href="{{ sequence.google_street_view }}">
                                                         <img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico"  alt=""/>
                                                     </a>
                                                 {% endif %}
