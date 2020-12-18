@@ -1057,9 +1057,10 @@ def sequence_detail(request, unique_id):
         i_vs = ImageViewPoint.objects.filter(image=imgs[0])
         view_points = i_vs.count()
         if view_points > 0:
-            i_vs_marked = i_vs.filter(user=request.user).first()
-            if i_vs_marked is not None:
-                is_marked_point = True
+            if request.user.is_authenticated:
+                i_vs_marked = i_vs.filter(user=request.user).first()
+                if i_vs_marked is not None:
+                    is_marked_point = True
     addSequenceForm = AddSequenceForm(instance=sequence)
 
     label_types = LabelType.objects.filter(parent__isnull=False)
@@ -1707,9 +1708,10 @@ def ajax_get_image_detail(request, unique_id, image_key):
     view_points = ImageViewPoint.objects.filter(image=image)
     is_marked_point = False
     if view_points.count() > 0:
-        marked_point = view_points.filter(user=request.user).first()
-        if marked_point is not None:
-            is_marked_point = True
+        if request.user.is_authenticated:
+            marked_point = view_points.filter(user=request.user).first()
+            if marked_point is not None:
+                is_marked_point = True
     scenes = Scene.objects.filter(image_key=image_key)
     content = {
         'image': image,
