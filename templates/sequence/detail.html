@@ -1393,11 +1393,13 @@
                         toastr.error(data.message)
                     }
                     else {
+                        console.log(data.is_marked);
                         if (data.is_marked) {
-                            $('.image-others .view_point').removeClass('btn-primary').addClass('btn-success');
+
+                            $('.mapillary-right-actions .image-view-point .view_point').removeClass('btn-primary').addClass('btn-success');
                         }
                         else {
-                            $('.image-others .view_point').addClass('btn-primary').removeClass('btn-success');
+                            $('.mapillary-right-actions .image-view-point .view_point').addClass('btn-primary').removeClass('btn-success');
                         }
                         $('.image-others .view_point span').text(data.view_points + ' Viewpoints');
                         $('.mapillary-right-actions .image-view-point span').text(data.view_points + ' Viewpoints');
