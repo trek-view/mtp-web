@@ -556,7 +556,7 @@
 
                 <div class="mapillary-right-actions d-flex flex-column align-items-end">
                     <div class="p-1 image-view-point action" onclick="mark_view_point()" style="">
-                        <button type="button" class="btn btn-primary view_point text-center show-button d-none">
+                        <button type="button" class="btn {% if is_marked_point %}btn-success{% else %}btn-primary{% endif %} view_point text-center show-button d-none">
                             <span class="text-center m-0 disabled">
                                 {{ view_points }} Viewpoints
                             </span>
@@ -1322,6 +1322,13 @@
                         $('.image-detail-box').removeClass('d-none');
                     $('#image_detail_box').html(data.image_detail_box_html);
                     $('.right-board .image-view-point span').text(data.view_points + ' Viewpoints');
+                    $('.mapillary-right-actions .image-view-point .sidebar-icon p').text(data.view_points);
+                    if (data.is_marked_point) {
+                        $('.mapillary-right-actions .image-view-point .view_point').removeClass('btn-primary').addClass('btn-success');
+                    }
+                    else {
+                        $('.mapillary-right-actions .image-view-point .view_point').addClass('btn-primary').removeClass('btn-success');
+                    }
                     var image_index = image_keys.indexOf(image_key);
                     if (image_index >= 0)
                     {
@@ -1386,6 +1393,12 @@
                         toastr.error(data.message)
                     }
                     else {
+                        if (data.is_marked) {
+                            $('.image-others .view_point').removeClass('btn-primary').addClass('btn-success');
+                        }
+                        else {
+                            $('.image-others .view_point').addClass('btn-primary').removeClass('btn-success');
+                        }
                         $('.image-others .view_point span').text(data.view_points + ' Viewpoints');
                         $('.mapillary-right-actions .image-view-point span').text(data.view_points + ' Viewpoints');
                         $('.mapillary-right-actions .image-view-point p').text(data.view_points);

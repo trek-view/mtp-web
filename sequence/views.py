@@ -1051,11 +1051,14 @@ def sequence_detail(request, unique_id):
         )
 
     view_points = 0
+    is_marked_point = False
     imgs = Image.objects.filter(image_key=coordinates_image[0])
     if imgs.count() > 0:
         i_vs = ImageViewPoint.objects.filter(image=imgs[0])
         view_points = i_vs.count()
-
+        if view_points > 0:
+            if i_vs.filter(user=request.user).first() is not None:
+                is_marked_point = True
     addSequenceForm = AddSequenceForm(instance=sequence)
 
     label_types = LabelType.objects.filter(parent__isnull=False)
@@ -1099,6 +1102,7 @@ def sequence_detail(request, unique_id):
         'first_image': images[0],
         'page': page,
         'view_points': view_points,
+        'is_marked_point': is_marked_point,
         'addSequenceForm': addSequenceForm,
         'label_types': label_types,
         'image_key': image_key,
@@ -1700,6 +1704,10 @@ def ajax_get_image_detail(request, unique_id, image_key):
         })
 
     view_points = ImageViewPoint.objects.filter(image=image)
+    is_marked_point = False
+    if view_points.count() > 0:
+        if view_points.filter(user=request.user).first() is not None:
+            is_marked_point = True
     scenes = Scene.objects.filter(image_key=image_key)
     content = {
         'image': image,
@@ -1716,7 +1724,8 @@ def ajax_get_image_detail(request, unique_id, image_key):
         'image_detail_box_html': image_detail_box_html,
         'status': 'success',
         'message': "",
-        'view_points': view_points.count()
+        'view_points': view_points.count(),
+        'is_marked_point': is_marked_point
     })
 
 
@@ -2094,7 +2103,6 @@ def ajax_image_mark_view(request, unique_id, image_key):
             'status': 'failed',
             'message': "The Image does not exist."
         })
-    print(image)
 
 
     image_view_points = ImageViewPoint.objects.filter(image=image, user=request.user)
@@ -2114,7 +2122,6 @@ def ajax_image_mark_view(request, unique_id, image_key):
                 # send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
-        print('email sent')
         for v in image_view_points:
             v.delete()
         marked_images = ImageViewPoint.objects.filter(image=image)
@@ -2122,7 +2129,6 @@ def ajax_image_mark_view(request, unique_id, image_key):
             view_points = 0
         else:
             view_points = marked_images.count()
-        print(view_points)
         return JsonResponse({
             'status': 'success',
             'message': 'Unmarked',
@@ -2145,7 +2151,6 @@ def ajax_image_mark_view(request, unique_id, image_key):
                 # send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
-        print('email sent 2')
         image_view_point = ImageViewPoint()
         image_view_point.image = image
         image_view_point.user = request.user
@@ -2156,7 +2161,6 @@ def ajax_image_mark_view(request, unique_id, image_key):
             view_points = 0
         else:
             view_points = marked_images.count()
-        print(view_points)
         return JsonResponse({
 
             'status': 'success',
