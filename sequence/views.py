@@ -2109,7 +2109,9 @@ def ajax_image_mark_view(request, unique_id, image_key):
                     {'subject': subject, 'like': 'unviewed', 'sequence': sequence, 'image_key': image.image_key, 'sender': request.user},
                     request
                 )
-                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
+                email_thread = threading.Thread(target=send_mail_with_html, args=(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO,))
+                email_thread.start()
+                # send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         print('email sent')
@@ -2138,7 +2140,9 @@ def ajax_image_mark_view(request, unique_id, image_key):
                     {'subject': subject, 'like': 'viewed', 'sequence': sequence, 'image_key': image.image_key, 'sender': request.user},
                     request
                 )
-                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
+                email_thread = threading.Thread(target=send_mail_with_html, args=(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO,))
+                email_thread.start()
+                # send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         print('email sent 2')
