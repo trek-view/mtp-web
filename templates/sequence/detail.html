@@ -460,15 +460,20 @@
         </div>
 
         <div class="image-detection mt-3 {% if view_mode != 'mtpw_label' and view_mode != 'autodetected_label' and view_mode != 'map_features' %}d-none{% endif %}">
-            <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">
-                    <li class="nav-item mtpw-label-tab " style="width: 30%;">
-                        <a class="nav-link {% if view_mode == 'mtpw_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>
-                    </li>
-                    <li class="nav-item mapillary-label-tab border-bottom " style="width: 40%">
-                        <a class="nav-link {% if view_mode != 'mtpw_label' and view_mode != 'map_features' %}active{% endif %}" href="javascript: switchMpaillaryLable('mapillary');">Autodetected Labels</a>
-                    </li>
-                </ul>
+{#            <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">#}
+{#                    <li class="nav-item mtpw-label-tab " style="width: 30%;">#}
+{#                        <a class="nav-link {% if view_mode == 'mtpw_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item mapillary-label-tab border-bottom " style="width: 40%">#}
+{#                        <a class="nav-link {% if view_mode != 'mtpw_label' and view_mode != 'map_features' %}active{% endif %}" href="javascript: switchMpaillaryLable('mapillary');">Autodetected Labels</a>#}
+{#                    </li>#}
+{#                </ul>#}
             <div class="card" style="border-radius: 0">
+                <div class="ml-2 mt-2 mr-2">
+                    <h5 class="label_type">
+                        {% if view_mode == 'mtpw_label' %}MTPW Labels{% else %}Autodetected Labels{% endif %}
+                    </h5>
+                </div>
                 <div class="p-2">
                     <div class="actions text-right {% if view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
                         {% if request.user.is_authenticated %}
@@ -602,7 +607,7 @@
 
                     <div class="show-button action p-1">
                         <div class="switch-detection show-button d-none">
-                            {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}
+                            {% if view_mode == 'autodetected_label' %}
                                 <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Detections Off" data-off="Detections On" data-onstyle="success" data-offstyle="primary" checked>
                             {% else %}
                                 <input class="" type="checkbox" id="switch_detection" data-toggle="toggle" data-on="Detections Off" data-off="Detections On" data-onstyle="success" data-offstyle="primary">
@@ -610,6 +615,19 @@
                         </div>
                         <div class="sidebar-icon default-icon">
                             <i class="fas fa-object-group"></i>
+                        </div>
+                    </div>
+
+                    <div class="show-button action p-1">
+                        <div class="switch-mtpw-labels show-button d-none">
+                            {% if view_mode == 'mtpw_label' %}
+                                <input class="" type="checkbox" id="switch_mtpw_labels" data-toggle="toggle" data-on="MTPW Labels Off" data-off="MTPW Labels On" data-onstyle="success" data-offstyle="primary" checked>
+                            {% else %}
+                                <input class="" type="checkbox" id="switch_mtpw_labels" data-toggle="toggle" data-on="MTPW Labels Off" data-off="MTPW Labels On" data-onstyle="success" data-offstyle="primary">
+                            {% endif %}
+                        </div>
+                        <div class="sidebar-icon default-icon">
+                            <i class="fas fa-user-tag"></i>
                         </div>
                     </div>
 
@@ -1755,6 +1773,7 @@
         allClear();
         var image_key = current_node_key;
         if ($(this).prop('checked')) {
+            /*
             $('.image-detection').removeClass('d-none');
             $('.image-detail').addClass('d-none');
             view_mode = 'autodetected_label';
@@ -1762,16 +1781,58 @@
             if ($('#is_show_gpx').prop('checked')) {
                 $('.switch-gpx > div').trigger('click');
             }
+            if ($('#switch_mtpw_labels').prop('checked')) {
+                $('.switch-mtpw-labels > div').trigger('click');
+            }
             image_url_reset(image_key)
             getDetection(image_key);
+             */
+            switchMpaillaryLable('mapillary');
+            $('.image-detection').removeClass('d-none');
+            $('.image-detail').addClass('d-none');
+            if ($('#is_show_gpx').prop('checked')) {
+                $('.switch-gpx > div').trigger('click');
+            }
+            if ($('#switch_mtpw_labels').prop('checked')) {
+                $('.switch-mtpw-labels > div').trigger('click');
+            }
         }
         else {
-            $('.image-detection').addClass('d-none');
-            $('.image-detail').removeClass('d-none');
-            view_mode = 'original';
-            image_url_reset(image_key);
+            if (!$('#switch_mtpw_labels').prop('checked')) {
+                $('.image-detection').addClass('d-none');
+                $('.image-detail').removeClass('d-none');
+                view_mode = 'original';
+                image_url_reset(image_key);
+            }
+
             {#if (is_show_gpx)#}
             {#    showGpxOnPhoto(gpx_points, camera_node);#}
+        }
+    })
+
+    $('#switch_mtpw_labels').change(function () {
+        allClear();
+        var image_key = current_node_key;
+        if ($(this).prop('checked')) {
+
+            switchMpaillaryLable('mtpw');
+            $('.image-detection').removeClass('d-none');
+            $('.image-detail').addClass('d-none');
+            if ($('#is_show_gpx').prop('checked')) {
+                $('.switch-gpx > div').trigger('click');
+            }
+            if ($('#switch_detection').prop('checked')) {
+                $('.switch-detection > div').trigger('click');
+            }
+
+        }
+        else {
+            if (!$('#switch_detection').prop('checked')) {
+                $('.image-detection').addClass('d-none');
+                $('.image-detail').removeClass('d-none');
+                view_mode = 'original';
+                image_url_reset(image_key);
+            }
         }
     })
 
@@ -1996,6 +2057,8 @@
             view_mode = 'mtpw_label';
             image_url_reset(image_key);
             getImageLables();
+            // label type (title)
+            $('.label_type').text('MTPW Labels');
         }
         else if (type == 'mapillary') {
             $('li.mtpw-label-tab a').removeClass('active');
@@ -2005,6 +2068,8 @@
             view_mode = 'autodetected_label';
             image_url_reset(image_key);
             getDetection(current_node_key);
+            // label type (title)
+            $('.label_type').text('Autodetected Labels');
         }
     }
 
@@ -2510,6 +2575,9 @@
         {
             if ($('#switch_detection').prop('checked')) {
                 $('.switch-detection > div').trigger('click');
+            }
+            if ($('#switch_mtpw_labels').prop('checked')) {
+                $('.switch-mtpw-labels > div').trigger('click');
             }
             showGpxOnPhoto(gpx_points, camera_node);
         }

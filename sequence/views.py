@@ -1954,8 +1954,8 @@ def ajax_add_image_label(request, unique_id, image_key):
 
 
 def ajax_get_image_list(request, unique_id):
-    sequence = Sequence.objects.get(unique_id=unique_id)
-    if not sequence:
+    sequence = Sequence.objects.filter(unique_id=unique_id).first()
+    if sequence is None:
         return JsonResponse({
             'status': 'failed',
             'message': 'The Sequence does not exist.'
