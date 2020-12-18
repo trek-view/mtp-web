@@ -758,7 +758,6 @@ def ajax_save_poi(request, unique_id, pk):
             poi = PointOfInterest()
             poi.title = ''
             poi.description = ''
-            poi.external_url = ''
             categories = POICategory.objects.all()
             poi.category_id = categories[0].pk
             poi.position_x = request.POST.get('position_x')
@@ -793,7 +792,6 @@ def ajax_save_poi(request, unique_id, pk):
             poi.title = request.POST.get('title')
             poi.category_id = request.POST.get('category_id')
             poi.description = request.POST.get('description')
-            poi.external_url = request.POST.get('external_url')
             poi.save()
             message = 'Point of Interest is saved successfully.'
 
@@ -817,6 +815,102 @@ def ajax_save_poi(request, unique_id, pk):
         'status': 'failed',
         'message': 'It failed to save Point of Interest!'
     })
+
+
+@my_login_required
+def ajax_add_external_url(request, unique_id, pk):
+    guidebook = Guidebook.objects.get(unique_id=unique_id)
+    if not guidebook:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Guidebook does not exist or has no access.'
+        })
+    scene = Scene.objects.get(pk=pk)
+    if not scene or scene.guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Scene does not exist or has no access.'
+        })
+    if request.method == "POST":
+        poi = PointOfInterest.objects.get(pk=request.POST.get('poi_id'))
+        if not poi:
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'The Point of Interest does not exist or has no access.'
+            })
+        external_url = request.POST.get('external_url')
+        if external_url is None or external_url == '':
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'External URL is required.'
+            })
+
+        external_url_obj = POIExternalURL()
+        external_url_obj.external_url = external_url
+        external_url_obj.save()
+        poi.external_url.add(external_url_obj)
+        poi.save()
+
+        message = 'External URL is successfully added.'
+
+        return JsonResponse({
+            'status': 'success',
+            'message': message,
+            'poi_count': scene.get_poi_count(),
+            'external_url_id': external_url_obj.pk,
+            'short_external_url': external_url_obj.short_external_url()
+        })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'It failed to delete Point of Interest!'
+    })
+
+
+@my_login_required
+def ajax_delete_external_url(request, unique_id, pk):
+    guidebook = Guidebook.objects.get(unique_id=unique_id)
+    if not guidebook:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Guidebook does not exist or has no access.'
+        })
+    scene = Scene.objects.get(pk=pk)
+    if not scene or scene.guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Scene does not exist or has no access.'
+        })
+    if request.method == "POST":
+        poi = PointOfInterest.objects.get(pk=request.POST.get('poi_id'))
+        if not poi:
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'The Point of Interest does not exist or has no access.'
+            })
+        external_url_id = request.POST.get('external_url_id')
+        if external_url_id is None or external_url_id == '':
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'External URL is required.'
+            })
+
+        external_url = poi.external_url.filter(pk=external_url_id).first()
+        if external_url is not None:
+            external_url.delete()
+
+        message = 'External URL is successfully deleted.'
+
+        return JsonResponse({
+            'status': 'success',
+            'message': message,
+        })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'It failed to delete External URL of Interest!'
+    })
+
 
 
 @my_login_required
@@ -920,6 +1014,8 @@ def ajax_get_edit_scene(request, unique_id):
         poi_list = []
         for poi in pois:
             poi_form = PointOfInterestForm(instance=poi)
+            for sss in poi.external_url.all():
+                print(sss.external_url)
             poi_box_html = render_to_string(
                 'guidebook/poi_edit_box.html',
                 {'poi': poi, 'poi_form': poi_form},

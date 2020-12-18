@@ -22,11 +22,16 @@
                     {{ poi.category }}
                 </p>
             </div>
-            {% if poi.external_url is not None and poi.external_url != '' %}
-                <div class="poi-external_url">
-                    <a href="{{ poi.external_url }}">{{ poi.external_url }}</a>
-                </div>
-            {% endif %}
+            <div class="d-flex justify-content-between">
+                <span>External URLs: </span>
+            </div>
+            <ul class="d-flex flex-column pl-1" style="list-style-type: none" >
+                {% for external_url in poi.get_external_urls %}
+                    <li id="external_url_{{ external_url.pk }}">
+                        <a href="{{ external_url.external_url }}" target="_blank">{{ external_url.short_external_url }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
             <div class="d-none">
                 <div class=""><span>X: </span><span class="position-x">{{ poi.position_x }}</span></div>
                 <div class=""><span>Y: </span><span class="position-y">{{ poi.position_y }}</span></div>

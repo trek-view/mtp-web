@@ -241,6 +241,22 @@ class Scene(models.Model):
             return sequences[0]
 
 
+class POIExternalURL(models.Model):
+    external_url = models.TextField(default='')
+
+    class Meta:
+        ordering = ['external_url']
+
+    def __str__(self):
+        return self.external_url
+
+    def short_external_url(self):
+        external_url = self.external_url
+        if len(external_url) > 30:
+            return external_url[0:30] + '...'
+        else:
+            return external_url
+
 class PointOfInterest(models.Model):
     scene = models.ForeignKey(Scene, on_delete=models.CASCADE)
     title = models.CharField(max_length=255, default='')
@@ -251,12 +267,15 @@ class PointOfInterest(models.Model):
     video_url = models.TextField(default='')
     image = models.ImageField(upload_to=poi_image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
 
-    external_url = models.TextField(default='')
+    external_url = models.ManyToManyField(POIExternalURL)
+
 
     def __str__(self):
         return self.title
 
-
+    def get_external_urls(self):
+        external_urls = self.external_url.all()
+        return external_urls
 
 
 

@@ -153,20 +153,12 @@ class PointOfInterestForm(forms.ModelForm):
         empty_label=None
     )
 
-    external_url = forms.CharField(
-        label='',
-        required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'External URL'}),
-    )
-
     class Meta:
         model = PointOfInterest
         fields = (
             'title',
             'category',
             'description',
-
-            'external_url'
         )
 
 

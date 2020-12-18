@@ -13,26 +13,44 @@
             <form method="post">
                 {{ poi_form.as_p }}
 
+                <div class="external-url-list">
+                    <div class="d-flex justify-content-between">
+                        <span>External URLs: </span>
+                        <button type="button" class="save btn btn-warning btn-sm save-btn add-external-url" onclick="addExternalURL('{{ poi.pk }}')" data-poi-id="{{ poi.pk }}" >Add External URL</button>
+                    </div>
+                    <div>
+                        <textarea rows="1" class="form-control mt-1" placeholder="Please input external URL" id="input_external_url_{{ poi.pk }}"></textarea>
+                    </div>
+                    <ul class="d-flex flex-column" style="list-style-type: none" >
+                        {% for external_url in poi.get_external_urls %}
+                            <li id="external_url_{{ external_url.pk }}">
+                                <a href="{{ external_url.external_url }}" target="_blank">{{ external_url.short_external_url }}</a>
+                                <i class="far fa-times-circle" onclick="deleteExternalURL('{{ poi.pk }}', '{{ external_url.pk }}')" style="font-size: 15px; cursor: pointer"></i>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="text-left">
                         <div class="d-none"><span>X: </span><span class="position-x">{{ poi.position_x }}</span></div>
                         <div class="d-none"><span>Y: </span><span class="position-y">{{ poi.position_y }}</span></div>
                     </div>
 
-                    <div class="text-right">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Link Type
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="javascript:showPOIVideoModal();">Link Video</a>
-                                <a class="dropdown-item" href="javascript:uploadPOIImage();">Upload Image</a>
+                    <div class="w-100">
+                        <div class="text-right">
+                            <div class="btn-group dropup">
+                                <button type="button" class="btn btn-sm btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Link Type
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="javascript:showPOIVideoModal();">Link Video</a>
+                                    <a class="dropdown-item" href="javascript:uploadPOIImage();">Upload Image</a>
+                                </div>
                             </div>
+                            <button type="button" class="save btn btn-danger btn-sm delete-btn delete-poi-button" data-poi-id="{{ poi.pk }}" >Delete</button>
+                            <button type="button" class="save btn btn-primary btn-sm save-btn save-poi-button" data-poi-id="{{ poi.pk }}" >Save</button>
                         </div>
-{#                        <button type="button" class="save btn btn-warning btn-sm save-btn" onclick="uploadPOIImage()" data-poi-id="{{ poi.pk }}" >Upload Image</button>#}
-{#                        <button type="button" class="save btn btn-warning btn-sm save-btn" onclick="showPOIVideoModal()" data-poi-id="{{ poi.pk }}" >Link Video</button>#}
-                        <button type="button" class="save btn btn-danger btn-sm delete-btn delete-poi-button" data-poi-id="{{ poi.pk }}" >Delete</button>
-                        <button type="button" class="save btn btn-primary btn-sm save-btn save-poi-button" data-poi-id="{{ poi.pk }}" >Save</button>
                     </div>
                 </div>
             </form>

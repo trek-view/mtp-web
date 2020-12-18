@@ -1256,6 +1256,54 @@
         })
     }
 
+    function addExternalURL(poi_id) {
+        let external_url = $('#input_external_url_' + poi_id).val();
+         $.ajax({
+            url: 'ajax/add_external_url/' + current_scene_id + '/',
+            type: 'POST',
+            data: {
+                'poi_id': selected_poi_id,
+                'external_url': external_url
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else
+                {
+                    toastr.success(data.message);
+                    let external_url_li = '<li id="external_url_'+data.external_url_id+'">\n' +
+                        '                     <a href="'+external_url+'" target="_blank">'+data.short_external_url+'</a>\n' +
+                        '                         <i class="far fa-times-circle" onclick="deleteExternalURL(\''+poi_id+'\', \''+data.external_url_id+'\')" style="font-size: 15px; cursor: pointer"></i>\n' +
+                        '                  </li>';
+                    $('#poi_body_' + poi_id + ' .external-url-list ul').append(external_url_li);
+                    $('#input_external_url_' + poi_id).val('');
+                }
+            }
+        });
+    }
+
+    function deleteExternalURL(poi_id, external_url_id) {
+        $.ajax({
+            url: 'ajax/delete_external_url/' + current_scene_id + '/',
+            type: 'POST',
+            data: {
+                'poi_id': poi_id,
+                'external_url_id': external_url_id
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else
+                {
+                    toastr.success(data.message);
+                    $('#external_url_' + external_url_id).remove();
+                }
+            }
+        });
+    }
+
     function refresh_mapillery_classes() {
 
         $('.TagSpotInteractor').off('mousedown');
