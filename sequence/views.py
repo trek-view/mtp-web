@@ -2087,15 +2087,15 @@ def ajax_image_mark_view(request, unique_id, image_key):
             'message': "This sequence is not published."
         })
 
-    images = Image.objects.filter(seq_key=sequence.seq_key, image_key=image_key)
+    image = Image.objects.filter(seq_key=sequence.seq_key, image_key=image_key).first()
 
-    if images.count() == 0:
+    if image is None:
         return JsonResponse({
             'status': 'failed',
             'message': "The Image does not exist."
         })
+    print(image)
 
-    image = images[0]
 
     image_view_points = ImageViewPoint.objects.filter(image=image, user=request.user)
     if image_view_points.count() > 0:
@@ -2112,6 +2112,7 @@ def ajax_image_mark_view(request, unique_id, image_key):
                 send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
+        print('email sent')
         for v in image_view_points:
             v.delete()
         marked_images = ImageViewPoint.objects.filter(image=image)
@@ -2119,6 +2120,7 @@ def ajax_image_mark_view(request, unique_id, image_key):
             view_points = 0
         else:
             view_points = marked_images.count()
+        print(view_points)
         return JsonResponse({
             'status': 'success',
             'message': 'Unmarked',
@@ -2139,6 +2141,7 @@ def ajax_image_mark_view(request, unique_id, image_key):
                 send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
+        print('email sent 2')
         image_view_point = ImageViewPoint()
         image_view_point.image = image
         image_view_point.user = request.user
@@ -2149,6 +2152,7 @@ def ajax_image_mark_view(request, unique_id, image_key):
             view_points = 0
         else:
             view_points = marked_images.count()
+        print(view_points)
         return JsonResponse({
 
             'status': 'success',
