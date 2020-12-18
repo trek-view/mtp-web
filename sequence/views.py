@@ -7,7 +7,7 @@ from django.contrib.gis.geos import Point, Polygon, LineString
 from django.core import files
 from django.core import serializers
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.db.models.expressions import Window
 from django.db.models.functions.window import RowNumber
 from django.http import (
@@ -418,10 +418,10 @@ def image_leaderboard(request):
         # image_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
         #     rank=Window(expression=RowNumber()))
 
-        images = images.filter(pk__in=image_view_points.values_list('image_id'))
+        # images = images.filter(pk__in=image_view_points.values_list('image_id'))
         tmp_images = images
         image_json = images.values('id').annotate(
-            image_count=Count('id')).order_by('-image_count').annotate(
+            image_count=Sum('view_point_count')).order_by('-image_count').annotate(
             rank=Window(expression=RowNumber()))
     else:
         images = images.order_by('-captured_at')
@@ -2133,6 +2133,8 @@ def ajax_image_mark_view(request, unique_id, image_key):
             view_points = 0
         else:
             view_points = marked_images.count()
+        image.view_point_count = view_points
+        image.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Unmarked',
@@ -2165,6 +2167,9 @@ def ajax_image_mark_view(request, unique_id, image_key):
             view_points = 0
         else:
             view_points = marked_images.count()
+
+        image.view_point_count = view_points
+        image.save()
         return JsonResponse({
 
             'status': 'success',
@@ -2503,6 +2508,16 @@ def manual_update(request):
             if sequence.google_street_view == False or sequence.google_street_view == 'false':
                 sequence.google_street_view = ''
                 sequence.save()
+
+
+    if method == 'view_point':
+        view_points = ImageViewPoint.objects.all()
+        for view_point in view_points:
+            if view_point.image.view_point_count is None:
+                view_point.image.view_point_count = 1
+            else:
+                view_point.image.view_point_count += 1
+            view_point.image.save()
 
     return redirect('home')
 

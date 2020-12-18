@@ -115,6 +115,34 @@ class ImageAdmin(admin.ModelAdmin):
         'image_key',
     )
 
+    readonly_fields = [
+        "user",
+        "camera_make",
+        "camera_model",
+        'cas',
+        'captured_at',
+        'sequence',
+        'seq_key',
+        'image_key',
+        'pano',
+        'user_key',
+        'username',
+        'organization_key',
+        'is_uploaded',
+        'is_private',
+        'is_mapillary',
+        'lat',
+        'lng',
+        'ele',
+        'type',
+        'point',
+        'mapillary_image',
+        'image_label',
+        'map_feature_keys',
+        'map_feature_values',
+        'view_point_count'
+    ]
+
 
 class CameraMakeAdmin(admin.ModelAdmin):
     list_display = (

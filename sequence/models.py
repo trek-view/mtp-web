@@ -381,6 +381,8 @@ class Image(models.Model):
     map_feature_keys = ArrayField(ArrayField(models.CharField(max_length=50)), null=True, blank=True)
     map_feature_values = ArrayField(ArrayField(models.CharField(max_length=50)), null=True, blank=True)
 
+    view_point_count = models.IntegerField(default=0)
+
     objects = models.Manager()
     vector_tiles = CustomImageMVTManager(
         geo_col='point',
