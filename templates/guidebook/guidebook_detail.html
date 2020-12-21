@@ -141,7 +141,7 @@
                                 {% if scene.video_url is not None and scene.video_url != '' %}
                                     <iframe class="w-100 ml-auto mr-auto" height="200" src="{{ scene.video_url }}">
                                     </iframe>
-                                {% elif scene.image is not None %}
+                                {% elif scene.image is not None and scene.image != '' %}
                                     <img class="w-100" height="200" src="{{ STATIC_URL }}{{ scene.image }}" />
                                 {% endif %}
                                 <div class="scene-title">
