@@ -1591,7 +1591,9 @@
         is_show_map_feature = $(this).prop('checked');
         let url = '';
         if (is_show_map_feature)
+        {
             getMapFeature(current_node_key);
+        }
         else
         {
             buttonClose('map_feature');
@@ -1796,6 +1798,8 @@
             if ($('#switch_mtpw_labels').prop('checked')) {
                 $('.switch-mtpw-labels > div').trigger('click');
             }
+            if (is_opened_side_bar)
+                $('.image-detail-box').removeClass('d-none');
         }
         else {
             if (!$('#switch_mtpw_labels').prop('checked')) {
@@ -1824,7 +1828,8 @@
             if ($('#switch_detection').prop('checked')) {
                 $('.switch-detection > div').trigger('click');
             }
-
+            if (is_opened_side_bar)
+                $('.image-detail-box').removeClass('d-none');
         }
         else {
             if (!$('#switch_detection').prop('checked')) {
