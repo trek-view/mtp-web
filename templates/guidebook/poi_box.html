@@ -13,7 +13,7 @@
                 <iframe class="w-100 ml-auto mr-auto" height="200" src="{{ poi.video_url }}">
                 </iframe>
             {% elif poi.image is not None %}
-                <img src="{% static poi.image %}" />
+                <img src="{{ poi.image }}" />
             {% endif %}
             <div class="poi-description">
                 <span>{{ poi.description }}</span>
