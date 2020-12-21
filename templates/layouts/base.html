@@ -39,15 +39,15 @@
     {% block app_style %}{% endblock %}
     <script src="{% static 'js/jquery.js' %}"></script>
 
-
     {% if GOOGLE_ANALYTICS is not None and GOOGLE_ANALYTICS != '' %}
         <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-136706582-7"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ GOOGLE_ANALYTICS }}"></script>
         <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '{{ GOOGLE_ANALYTICS }}');
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', '{{ GOOGLE_ANALYTICS }}');
         </script>
     {% endif %}
 <style>
