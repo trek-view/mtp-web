@@ -540,10 +540,13 @@ def ajax_upload_poi_image(request, unique_id, scene_id, poi_id):
                 'message': "Poi doesn't exist."
             })
 
+        print(poi)
+
         form = PoiImageForm(request.POST, request.FILES)
         if form.is_valid():
             form_data = form.save(commit=False)
             poi.image = form_data.image
+            print(poi.image)
             poi.video_url = ''
             poi.save()
             return JsonResponse({
