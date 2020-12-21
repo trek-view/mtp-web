@@ -496,6 +496,7 @@ def ajax_upload_scene_video(request, unique_id, scene_id):
         if form.is_valid():
             video_url = form.cleaned_data['video_url']
             scene.video_url = get_youtube_embed_url(video_url)
+            print(scene.video_url)
             scene.image = None
             scene.save()
             return JsonResponse({
@@ -540,17 +541,13 @@ def ajax_upload_poi_image(request, unique_id, scene_id, poi_id):
                 'message': "Poi doesn't exist."
             })
 
-        print(poi)
 
         form = PoiImageForm(request.POST, request.FILES)
         if form.is_valid():
             form_data = form.save(commit=False)
             poi.image = form_data.image
-            print(poi.image)
             poi.video_url = ''
-            print('video_url')
             poi.save()
-            print('saved')
             return JsonResponse({
                 'status': 'success',
                 'message': 'Picture is uploaded successfully.'
@@ -596,6 +593,7 @@ def ajax_upload_poi_video(request, unique_id, scene_id, poi_id):
         if form.is_valid():
             video_url = form.cleaned_data['video_url']
             poi.video_url = get_youtube_embed_url(video_url)
+            print(scene.video_url)
             poi.image = None
             poi.save()
             return JsonResponse({
