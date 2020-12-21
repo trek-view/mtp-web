@@ -1,3 +1,4 @@
+{% load static %}
 <div class="card poi" id="poi_{{ poi.pk }}">
     <div class="card-header " id="poi_header_{{ poi.pk }}">
         <h2 class="mb-0">
@@ -12,7 +13,7 @@
                 <iframe class="w-100 ml-auto mr-auto" height="200" src="{{ poi.video_url }}">
                 </iframe>
             {% elif poi.image is not None %}
-                <img src="{{ poi.image }}" />
+                <img src="{% static poi.image %}" />
             {% endif %}
             <div class="poi-description">
                 <span>{{ poi.description }}</span>
