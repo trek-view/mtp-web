@@ -81,3 +81,41 @@ def check_mapillary_token(user, token=None):
         return False
     else:
         return map_user_data
+
+
+def get_url_with_params(url, params=None):
+    if url is None or url == '':
+        return ''
+    import urllib.parse as urlparse
+    from urllib.parse import parse_qs
+    parsed = urlparse.urlparse(url)
+
+    # url doesn't have params.
+    main_url = url.split('?')[0]
+
+    # target url
+    url = ''
+
+    basic_params = parse_qs(parsed.query)
+    print(basic_params)
+
+    if params is not None and isinstance(params, list):
+        first = True
+        for param in params:
+            if param not in basic_params.keys():
+                print(param)
+                continue
+            if first:
+                url = '{}?{}={}'.format(main_url, param, parse_qs(parsed.query)[param][0])
+                first = False
+            else:
+                url = '{}&{}={}'.format(url, param, parse_qs(parsed.query)[param][0])
+
+    elif params is not None and isinstance(params, str) and params != '' and params in basic_params.keys():
+        url = '{}?{}={}'.format(main_url, params, parse_qs(parsed.query)[params][0])
+    return url
+
+
+def get_youtube_embed_url(url):
+    return get_url_with_params(url, 'v')
+
