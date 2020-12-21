@@ -30,7 +30,7 @@ def scene_image_directory_path(instance, filename):
 
 def poi_image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'guidebook/{}/scene/{}/poi/{}'.format(instance.scene.guidebook.unique_id, instance.scene.unique_id, instance.unique_id)
+    return 'guidebook/{}/scene/{}/poi/{}'.format(instance.scene.guidebook.unique_id, instance.scene.unique_id, instance.pk)
 
 
 
