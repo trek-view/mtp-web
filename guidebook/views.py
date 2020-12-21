@@ -548,7 +548,9 @@ def ajax_upload_poi_image(request, unique_id, scene_id, poi_id):
             poi.image = form_data.image
             print(poi.image)
             poi.video_url = ''
+            print('video_url')
             poi.save()
+            print('saved')
             return JsonResponse({
                 'status': 'success',
                 'message': 'Picture is uploaded successfully.'
