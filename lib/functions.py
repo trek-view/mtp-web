@@ -117,5 +117,6 @@ def get_url_with_params(url, params=None):
 
 
 def get_youtube_embed_url(url):
-    return get_url_with_params(url, 'v')
+    url = get_url_with_params(url, 'v')
+    return url.replace('watch?v=', 'embed/')
 
