@@ -212,8 +212,8 @@
 
 <!-- Sequence Form Modal -->
 <div class="modal fade mt-5 pt-5" id="add_form_modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="add_form_modal" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
+  <div class="modal-dialog" style="max-width: 434px" role="document">
+    <div class="modal-content" >
       <div class="modal-header">
         <h5 class="modal-title" id="staticBackdropLabel">Information for Map the Paths</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -221,9 +221,39 @@
         </button>
       </div>
       <div class="modal-body">
+          <div class="modal-map" id="modal_map" style="width: 100% !important; height: 300px !important;">
+          </div>
+          <div class="modal-sequence-detail mt-2">
+              <div class="sequence-main">
+                    <div class="sequence-captured-at text-info">
+                        <span>Captured:</span>
+                        <span class="text">
+                        </span>
+                    </div>
+
+                    <div class="sequence-created-at">
+                        <span>Uploaded:</span>
+                        <span class="mb-1 text">
+                        </span>
+                    </div>
+
+                    <div class="sequence-camera-make" style="color: blueviolet;">
+                        <span>Camera Make:</span>
+                        <span class="mb-1 text">
+                        </span>
+                    </div>
+
+                    <div class="sequence-image-count" style="color: #a79f9f;">
+                        <span>Number of photos:</span>
+                        <span class="mb-1 text">
+                        </span>
+                    </div>
+
+                </div>
+          </div>
+          <hr class="mt-1 mb-1">
           <form id="add_form">
               {% csrf_token %}
-
               {{ addSequenceForm.as_p }}
           </form>
       </div>
@@ -405,12 +435,114 @@
 
     for (i = 0; i < positions.length; i++)
     {
-        draw_map(i, positions[i])
+        draw_map(i, positions[i]);
+
+    }
+
+    let all_sequences = [];
+
+    function draw_modal_map() {
+        var target_map = modal_map;
+        if (target_map.getLayer('modal-sequences')) target_map.removeLayer('modal-sequences');
+        if (target_map.getLayer('modal-images')) target_map.removeLayer('modal-images');
+        if (target_map.getSource('modal-images')) target_map.removeSource('modal-images');
+        if (target_map.getSource('modal-sequences')) target_map.removeSource('modal-sequences');
+        if (selected_sequence_id == '' || selected_sequence_id == null)
+            return;
+
+        var selected_sequences = null;
+        var s_i = 0;
+        for (s_i=0; s_i < all_sequences.length; s_i++) {
+             if (selected_sequence_id == all_sequences[s_i]['properties']['key']) {
+                 selected_sequences = [all_sequences[s_i]]
+                 break;
+             }
+        }
+
+        if (selected_sequences == null) {
+            return;
+        }
+
+        let captured_at = selected_sequences[0]['properties']['captured_at'];
+        let created_at = selected_sequences[0]['properties']['created_at'];
+        let camera_make = selected_sequences[0]['properties']['camera_make'];
+        let image_count = selected_sequences[0]['properties']['coordinateProperties']['image_keys'].length;
+
+        $('.modal-sequence-detail .sequence-captured-at .text').text(captured_at);
+        $('.modal-sequence-detail .sequence-created-at .text').text(created_at);
+        $('.modal-sequence-detail .sequence-camera-make .text').text(camera_make);
+        $('.modal-sequence-detail .sequence-image-count .text').text(image_count);
+
+        target_map.addSource('modal-sequences', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': selected_sequences
+            }
+        });
+
+        target_map.addLayer({
+            "id": "modal-sequences",
+            "type": "line",
+            "source": 'modal-sequences',
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-opacity": 0.6,
+                "line-color": "red",
+                "line-width": 2
+            }
+        }, "waterway-label");
+        let item, i=0, j=0, sequence, point, image_key, sequence_key;
+        let images = [];
+        for (i=0; i<selected_sequences.length; i++) {
+            sequence = selected_sequences[i]
+            for (j=0; j<sequence.geometry.coordinates.length; j++) {
+                point = sequence.geometry.coordinates[j];
+                image_key = sequence.properties.coordinateProperties.image_keys[j];
+                sequence_key = sequence.properties.key;
+                item = {
+                    "type": "Feature",
+                    "properties": {
+                        'image_key': image_key,
+                        'sequence_key': sequence_key,
+                    },
+                    "geometry": {
+                        "coordinates": point,
+                        "type": "Point"
+                    }
+                };
+                images.push(item);
+            }
+        }
+
+        target_map.addSource('modal-images', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': images
+            }
+        });
+
+        target_map.addLayer({
+            "id": "modal-images",
+            "type": "circle",
+            "source": 'modal-images',
+            "paint": {
+                "circle-color": "red",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
+
+        target_map.flyTo({ center: selected_sequences[0]['geometry']['coordinates'][0], zoom: 14});
     }
 
     var selected_sequence_id = '';
 
     function show_add_modal(id) {
+
         if (checkLimit() <= 0) {
             return;
         }
@@ -424,7 +556,9 @@
         modal_form.find('select[name="transport_type"]').val('');
         modal_form.find('.filter-option-inner-inner').text('---------');
         modal_form.find('input[name="tag"]').val('');
+
         $('#add_form_modal').modal('show');
+        draw_modal_map();
     }
 
     function reset_added_form(id) {
@@ -465,7 +599,8 @@
         let url = "{% url 'sequence.ajax_import' seq_key='seq_key' %}";
         url = url.replace('seq_key', selected_sequence_id)
         let next_sequence_id = getNextSequenceId(selected_sequence_id);
-        console.log('next: ', next_sequence_id)
+        selected_sequence_id = next_sequence_id;
+        {#console.log('next: ', next_sequence_id)#}
         $.ajax({
             url: url,
             type: 'POST',
@@ -506,8 +641,10 @@
                             $('#add_form_modal').modal('hide');
                         }
                         else
+                        {
                             selected_sequence_id = next_sequence_id;
-                        console.log('selected_sequence_id', selected_sequence_id)
+                            draw_modal_map();
+                        }
                     }
 
 
@@ -560,7 +697,6 @@
         return sequence_limit_count;
     }
 
-
     function getNextSequenceId(sequence_id) {
         let next_sequence_id = '';
         $.ajax({
@@ -581,7 +717,6 @@
         return next_sequence_id;
     }
 
-
     function submit_form_data(next) {
         if (next)
             location.reload();
@@ -595,6 +730,15 @@
         center: [-74.5, 40], // starting position
         zoom: 1 // starting zoom
     });
+
+    const modal_map = new mapboxgl.Map({
+        container: 'modal_map', // container id
+        style: 'mapbox://styles/mapbox/streets-v11', //hosted style id
+        center: [-74.5, 40], // starting position
+        zoom: 1 // starting zoom
+    });
+
+    modal_map.resize();
 
     map.addControl(
         new MapboxGeocoder({
@@ -613,8 +757,7 @@
     });
 
 
-    function get_sequences() {
-        console.log('TEst');
+    function get_sequences(modal=false) {
         $.ajax({
             url: "{% url 'sequence.ajax_get_import_sequences' %}",
             type: 'POST',
@@ -625,49 +768,19 @@
                     toastr.error(data.message);
                 else {
                     let sequences = data.sequences;
-                    console.log('test');
-                    console.log(sequences)
+                    let target_map = map;
+                    if (modal) {
+
+                    }
+                    {#console.log(sequences)#}
                     //map.on('load', function() {
                         console.log('map load');
+                        console.log(sequences);
+                        all_sequences = sequences;
                         drawMapWithSequences(sequences);
-                        map.on('mouseenter', 'mtp-images', function(e) {
-                          // Change the cursor style as a UI indicator.
-                          map.getCanvas().style.cursor = 'pointer';
-                            console.log(e.features[0])
-                            const coordinates = e.features[0].geometry.coordinates.slice();
-                            const key = e.features[0].properties.image_key;
-                            const url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
-
-                            // Ensure that if the map is zoomed out such that multiple
-                          // copies of the feature are visible, the popup appears
-                          // over the copy being pointed to.
-                          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-                          }
-
-                          // Populate the popup and set its coordinates
-                          // based on the feature found.
-                          popup.setLngLat(coordinates)
-                          .setHTML('<img src="' + url + '" width="160"  alt=""/>')
-                          .addTo(map);
-                        });
-
-                        map.on('click', 'mtp-images', function (e) {
-                            $('#sequence_detail_modal').modal('show');
-                            let properties = e.features[0].properties;
-                            $('#sequence_detail_modal_import').data('sequence_key', properties['sequence_key']);
-                            let $sequence_detail_modal_box = $('#sequence_detail_modal_box');
-                            $sequence_detail_modal_box.find('.sequence-captured-at h6').text(properties['captured_at']);
-                            $sequence_detail_modal_box.find('.sequence-created-at p').text(properties['uploaded_at']);
-                            $sequence_detail_modal_box.find('.sequence-camera-make p').text(properties['camera_make']);
-                            $sequence_detail_modal_box.find('.sequence-image-count p').text(properties['photo_count']);
-                        });
-
-                        // Change it back to a pointer when it leaves.
-                        map.on('mouseleave', 'mtp-images', function () {
-                            map.getCanvas().style.cursor = '';
-                            popup.remove();
-                        });
+                        drawMapWithSequences(sequences, true);
+                        actionMap()
+                        actionMap(true)
                     //});
                 }
             }
@@ -680,88 +793,141 @@
         $('#sequence_detail_modal').modal('hide');
     });
 
-    function drawMapWithSequences(sequences) {
-        if (map.getLayer('mtp-sequences')) map.removeLayer('mtp-sequences');
-        if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
-        if (map.getSource('mtp-images')) map.removeSource('mtp-images');
-        if (map.getSource('mtp-sequences')) map.removeSource('mtp-sequences');
-        console.log('sequences', sequences)
-        map.addSource('mtp-sequences', {
-            'type': 'geojson',
-            'data': {
-                'type': 'FeatureCollection',
-                'features': sequences
-            }
-        });
+    function drawMapWithSequences(sequences, modal=false) {
 
-        map.addLayer({
-            "id": "mtp-sequences",
-            "type": "line",
-            "source": 'mtp-sequences',
-            "layout": {
-                "line-cap": "round",
-                "line-join": "round"
-            },
-            "paint": {
-                "line-opacity": 0.6,
-                "line-color": "#7880bd",
-                "line-width": 2
-            }
-        }, "waterway-label");
-        let item, i=0, j=0, sequence, point, image_key, sequence_key, camera_make, captured_at, uploaded_at, photo_count;
-        let images = [];
-        for (i=0; i<sequences.length; i++) {
-            sequence = sequences[i]
-            for (j=0; j<sequence.geometry.coordinates.length; j++) {
-                point = sequence.geometry.coordinates[j];
-                image_key = sequence.properties.coordinateProperties.image_keys[j];
-                sequence_key = sequence.properties.key;
-                camera_make = sequence.properties.camera_make;
-                uploaded_at = sequence.properties.captured_at;
-                captured_at = sequence.properties.captured_at;
-                photo_count = sequence.geometry.coordinates.length;
-                if (photo_count == 2 && sequence.geometry.coordinates[0] == sequence.geometry.coordinates[1])
-                    photo_count = 1
-                item = {
-                    "type": "Feature",
-                    "properties": {
-                        'image_key': image_key,
-                        'sequence_key': sequence_key,
-                        'camera_make': camera_make,
-                        'uploaded_at': uploaded_at,
-                        'captured_at': captured_at,
-                        'photo_count': photo_count
-                    },
-                    "geometry": {
-                        "coordinates": point,
-                        "type": "Point"
-                    }
-                };
-                images.push(item);
-            }
+        if (modal) {
+            var target_map = modal_map;
         }
+        else {
+            var target_map = map;
+        }
+        target_map.on('load', () => {
+            if (target_map.getLayer('mtp-sequences')) target_map.removeLayer('mtp-sequences');
+            if (target_map.getLayer('mtp-images')) target_map.removeLayer('mtp-images');
+            if (target_map.getSource('mtp-images')) target_map.removeSource('mtp-images');
+            if (target_map.getSource('mtp-sequences')) target_map.removeSource('mtp-sequences');
+            target_map.addSource('mtp-sequences', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'FeatureCollection',
+                    'features': sequences
+                }
+            });
 
-
-
-
-        map.addSource('mtp-images', {
-            'type': 'geojson',
-            'data': {
-                'type': 'FeatureCollection',
-                'features': images
+            target_map.addLayer({
+                "id": "mtp-sequences",
+                "type": "line",
+                "source": 'mtp-sequences',
+                "layout": {
+                    "line-cap": "round",
+                    "line-join": "round"
+                },
+                "paint": {
+                    "line-opacity": 0.6,
+                    "line-color": "#7880bd",
+                    "line-width": 2
+                }
+            }, "waterway-label");
+            let item, i=0, j=0, sequence, point, image_key, sequence_key, camera_make, captured_at, uploaded_at, photo_count;
+            let images = [];
+            for (i=0; i<sequences.length; i++) {
+                sequence = sequences[i]
+                for (j=0; j<sequence.geometry.coordinates.length; j++) {
+                    point = sequence.geometry.coordinates[j];
+                    image_key = sequence.properties.coordinateProperties.image_keys[j];
+                    sequence_key = sequence.properties.key;
+                    camera_make = sequence.properties.camera_make;
+                    uploaded_at = sequence.properties.captured_at;
+                    captured_at = sequence.properties.captured_at;
+                    photo_count = sequence.geometry.coordinates.length;
+                    if (photo_count == 2 && sequence.geometry.coordinates[0] == sequence.geometry.coordinates[1])
+                        photo_count = 1
+                    item = {
+                        "type": "Feature",
+                        "properties": {
+                            'image_key': image_key,
+                            'sequence_key': sequence_key,
+                            'camera_make': camera_make,
+                            'uploaded_at': uploaded_at,
+                            'captured_at': captured_at,
+                            'photo_count': photo_count
+                        },
+                        "geometry": {
+                            "coordinates": point,
+                            "type": "Point"
+                        }
+                    };
+                    images.push(item);
+                }
             }
+
+            target_map.addSource('mtp-images', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'FeatureCollection',
+                    'features': images
+                }
+            });
+
+            target_map.addLayer({
+                "id": "mtp-images",
+                "type": "circle",
+                "source": 'mtp-images',
+                "paint": {
+                    "circle-color": "#7880bd",
+                    "circle-radius": 6
+                }
+            }, "waterway-label");
+            target_map.resize();
+        })
+
+    }
+
+    function actionMap(modal=false) {
+        let target_map = map;
+        if (modal) target_map = modal_map;
+        target_map.on('mouseenter', 'mtp-images', function(e) {
+          // Change the cursor style as a UI indicator.
+          target_map.getCanvas().style.cursor = 'pointer';
+            console.log(e.features[0])
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const key = e.features[0].properties.image_key;
+            const url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+
+            // Ensure that if the map is zoomed out such that multiple
+          // copies of the feature are visible, the popup appears
+          // over the copy being pointed to.
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
+
+          // Populate the popup and set its coordinates
+          // based on the feature found.
+          popup.setLngLat(coordinates)
+          .setHTML('<img src="' + url + '" width="160"  alt=""/>')
+          .addTo(target_map);
         });
 
-        map.addLayer({
-            "id": "mtp-images",
-            "type": "circle",
-            "source": 'mtp-images',
-            "paint": {
-                "circle-color": "#7880bd",
-                "circle-radius": 6
-            }
-        }, "waterway-label");
+        target_map.on('click', 'mtp-images', function (e) {
+            let properties = e.features[0].properties;
+            let sequence_key = properties['sequence_key'];
+            show_add_modal(sequence_key);
+            /*
+            $('#sequence_detail_modal_import').data('sequence_key', properties['sequence_key']);
+            let $sequence_detail_modal_box = $('#sequence_detail_modal_box');
+            $sequence_detail_modal_box.find('.sequence-captured-at h6').text(properties['captured_at']);
+            $sequence_detail_modal_box.find('.sequence-created-at p').text(properties['uploaded_at']);
+            $sequence_detail_modal_box.find('.sequence-camera-make p').text(properties['camera_make']);
+            $sequence_detail_modal_box.find('.sequence-image-count p').text(properties['photo_count']);
 
+             */
+        });
+
+        // Change it back to a pointer when it leaves.
+        target_map.on('mouseleave', 'mtp-images', function () {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
     }
 
     get_sequences();

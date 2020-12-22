@@ -307,12 +307,23 @@
                 map.resize();
             }
 
+            if (typeof modal_map != 'undefined') {
+                modal_map.resize();
+            }
+
             if (typeof map_ary != 'undefined') {
                 for (var l=0; l < map_ary.length; l++) {
                     map_ary[l].resize();
                 }
             }
 
+        }
+
+        if (typeof modal_map != 'undefined') {
+            modal_map.addControl(new mapboxgl.NavigationControl({
+                showCompass: false,
+                showZoom: true
+            }), 'bottom-right');
         }
 
         if (typeof map != 'undefined') {
