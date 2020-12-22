@@ -212,7 +212,7 @@
 
 <!-- Sequence Form Modal -->
 <div class="modal fade mt-5 pt-5" id="add_form_modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="add_form_modal" aria-hidden="true">
-  <div class="modal-dialog" style="max-width: 434px" role="document">
+  <div class="modal-dialog mb-2" style="max-width: 434px" role="document">
     <div class="modal-content" >
       <div class="modal-header">
         <h5 class="modal-title" id="staticBackdropLabel">Information for Map the Paths</h5>
@@ -223,7 +223,7 @@
       <div class="modal-body">
           <div class="modal-map" id="modal_map" style="width: 100% !important; height: 300px !important;">
           </div>
-          <div class="modal-sequence-detail mt-2">
+          <div class="modal-sequence-detail">
               <div class="sequence-main">
                     <div class="sequence-captured-at text-info">
                         <span>Captured:</span>
@@ -257,10 +257,10 @@
               {{ addSequenceForm.as_p }}
           </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-sm btn-cancel" data-dismiss="modal">Cancel</button>
+      <div class="modal-footer mb-4">
         <button type="button" class="btn btn-primary btn-sm btn-save" onclick="save_add_form(false)">Import Now</button>
         <button type="button" class="btn btn-primary btn-sm btn-save" onclick="save_add_form(true)">copy settings to next sequence import</button>
+        <button type="button" class="btn btn-secondary btn-sm btn-cancel" data-dismiss="modal">Cancel</button>
       </div>
     </div>
   </div>
@@ -643,7 +643,8 @@
                         else
                         {
                             selected_sequence_id = next_sequence_id;
-                            draw_modal_map();
+                            get_sequences(true);
+
                         }
                     }
 
@@ -774,13 +775,13 @@
                     }
                     {#console.log(sequences)#}
                     //map.on('load', function() {
-                        console.log('map load');
-                        console.log(sequences);
                         all_sequences = sequences;
                         drawMapWithSequences(sequences);
                         drawMapWithSequences(sequences, true);
                         actionMap()
                         actionMap(true)
+                        if (modal)
+                            draw_modal_map();
                     //});
                 }
             }
@@ -801,85 +802,82 @@
         else {
             var target_map = map;
         }
-        target_map.on('load', () => {
-            if (target_map.getLayer('mtp-sequences')) target_map.removeLayer('mtp-sequences');
-            if (target_map.getLayer('mtp-images')) target_map.removeLayer('mtp-images');
-            if (target_map.getSource('mtp-images')) target_map.removeSource('mtp-images');
-            if (target_map.getSource('mtp-sequences')) target_map.removeSource('mtp-sequences');
-            target_map.addSource('mtp-sequences', {
-                'type': 'geojson',
-                'data': {
-                    'type': 'FeatureCollection',
-                    'features': sequences
-                }
-            });
-
-            target_map.addLayer({
-                "id": "mtp-sequences",
-                "type": "line",
-                "source": 'mtp-sequences',
-                "layout": {
-                    "line-cap": "round",
-                    "line-join": "round"
-                },
-                "paint": {
-                    "line-opacity": 0.6,
-                    "line-color": "#7880bd",
-                    "line-width": 2
-                }
-            }, "waterway-label");
-            let item, i=0, j=0, sequence, point, image_key, sequence_key, camera_make, captured_at, uploaded_at, photo_count;
-            let images = [];
-            for (i=0; i<sequences.length; i++) {
-                sequence = sequences[i]
-                for (j=0; j<sequence.geometry.coordinates.length; j++) {
-                    point = sequence.geometry.coordinates[j];
-                    image_key = sequence.properties.coordinateProperties.image_keys[j];
-                    sequence_key = sequence.properties.key;
-                    camera_make = sequence.properties.camera_make;
-                    uploaded_at = sequence.properties.captured_at;
-                    captured_at = sequence.properties.captured_at;
-                    photo_count = sequence.geometry.coordinates.length;
-                    if (photo_count == 2 && sequence.geometry.coordinates[0] == sequence.geometry.coordinates[1])
-                        photo_count = 1
-                    item = {
-                        "type": "Feature",
-                        "properties": {
-                            'image_key': image_key,
-                            'sequence_key': sequence_key,
-                            'camera_make': camera_make,
-                            'uploaded_at': uploaded_at,
-                            'captured_at': captured_at,
-                            'photo_count': photo_count
-                        },
-                        "geometry": {
-                            "coordinates": point,
-                            "type": "Point"
-                        }
-                    };
-                    images.push(item);
-                }
+        if (target_map.getLayer('mtp-sequences')) target_map.removeLayer('mtp-sequences');
+        if (target_map.getLayer('mtp-images')) target_map.removeLayer('mtp-images');
+        if (target_map.getSource('mtp-images')) target_map.removeSource('mtp-images');
+        if (target_map.getSource('mtp-sequences')) target_map.removeSource('mtp-sequences');
+        target_map.addSource('mtp-sequences', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': sequences
             }
+        });
 
-            target_map.addSource('mtp-images', {
-                'type': 'geojson',
-                'data': {
-                    'type': 'FeatureCollection',
-                    'features': images
-                }
-            });
+        target_map.addLayer({
+            "id": "mtp-sequences",
+            "type": "line",
+            "source": 'mtp-sequences',
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-opacity": 0.6,
+                "line-color": "#7880bd",
+                "line-width": 2
+            }
+        }, "waterway-label");
+        let item, i=0, j=0, sequence, point, image_key, sequence_key, camera_make, captured_at, uploaded_at, photo_count;
+        let images = [];
+        for (i=0; i<sequences.length; i++) {
+            sequence = sequences[i]
+            for (j=0; j<sequence.geometry.coordinates.length; j++) {
+                point = sequence.geometry.coordinates[j];
+                image_key = sequence.properties.coordinateProperties.image_keys[j];
+                sequence_key = sequence.properties.key;
+                camera_make = sequence.properties.camera_make;
+                uploaded_at = sequence.properties.captured_at;
+                captured_at = sequence.properties.captured_at;
+                photo_count = sequence.geometry.coordinates.length;
+                if (photo_count == 2 && sequence.geometry.coordinates[0] == sequence.geometry.coordinates[1])
+                    photo_count = 1
+                item = {
+                    "type": "Feature",
+                    "properties": {
+                        'image_key': image_key,
+                        'sequence_key': sequence_key,
+                        'camera_make': camera_make,
+                        'uploaded_at': uploaded_at,
+                        'captured_at': captured_at,
+                        'photo_count': photo_count
+                    },
+                    "geometry": {
+                        "coordinates": point,
+                        "type": "Point"
+                    }
+                };
+                images.push(item);
+            }
+        }
 
-            target_map.addLayer({
-                "id": "mtp-images",
-                "type": "circle",
-                "source": 'mtp-images',
-                "paint": {
-                    "circle-color": "#7880bd",
-                    "circle-radius": 6
-                }
-            }, "waterway-label");
-            target_map.resize();
-        })
+        target_map.addSource('mtp-images', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': images
+            }
+        });
+
+        target_map.addLayer({
+            "id": "mtp-images",
+            "type": "circle",
+            "source": 'mtp-images',
+            "paint": {
+                "circle-color": "#7880bd",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
 
     }
 
