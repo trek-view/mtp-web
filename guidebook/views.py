@@ -846,6 +846,8 @@ def ajax_save_poi(request, unique_id, pk):
             poi.position_x = request.POST.get('position_x')
             poi.position_y = request.POST.get('position_y')
             poi.scene = scene
+            poi.image = None
+            poi.video_url = ''
             poi.save()
             message = 'A new Point of Interest is created successfully.'
 
