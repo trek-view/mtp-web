@@ -727,11 +727,24 @@ def ajax_add_scene(request, unique_id):
                 old_scene.point = Point(lat, lng)
                 old_scene.username = username
                 old_scene.save()
+
+                scene_external_html = render_to_string(
+                    'guidebook/scene_external_edit_box.html',
+                    {'scene': old_scene},
+                    request
+                )
+
+                scene_json = serializers.serialize('json', [old_scene, ])
+                json_scene = json.loads(scene_json)
+
+
                 return JsonResponse({
                     'type': 'update',
                     'scene_id': old_scene.pk,
                     'title': old_scene.title,
                     'description': old_scene.description,
+                    'scene': json_scene,
+                    'scene_external_html': scene_external_html,
                     'status': 'success',
                     'message': 'Scene is updated successfully.'
                 })
@@ -765,11 +778,23 @@ def ajax_add_scene(request, unique_id):
                         guidebook.save()
                 else:
                     scene_count = 0
+
+                scene_external_html = render_to_string(
+                    'guidebook/scene_external_edit_box.html',
+                    {'scene': new_scene},
+                    request
+                )
+
+                scene_json = serializers.serialize('json', [new_scene, ])
+                json_scene = json.loads(scene_json)
+
                 return JsonResponse({
                     'type': 'new',
                     'scene_id': new_scene.pk,
                     'scene_box_html': scene_box_html,
                     'scene_count': scene_count,
+                    'scene': json_scene,
+                    'scene_external_html': scene_external_html,
                     'status': 'success',
                     'message': 'A new Scene is added successfully.'
                 })
