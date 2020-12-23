@@ -435,6 +435,11 @@ def ajax_upload_file(request, unique_id):
 @my_login_required
 def ajax_upload_scene_image(request, unique_id, scene_id):
     guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+
+
+
+
+
     if guidebook.user != request.user:
         return JsonResponse({
             'status': 'failed',
@@ -490,6 +495,19 @@ def ajax_upload_scene_image(request, unique_id, scene_id):
 
 @my_login_required
 def ajax_upload_scene_video(request, unique_id, scene_id):
+    import boto
+    from boto.s3.key import Key
+    from django.conf import settings
+
+    # def s3_delete(id):
+    s3conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID,
+                             settings.AWS_SECRET_ACCESS_KEY)
+    bucket = s3conn.get_bucket(settings.AWS_STORAGE_BUCKET_NAME)
+
+    k = Key(bucket)
+    k.key = 'guidebook/fa9f1e3b-7e64-48f5-bf23-8026b519641c/scene/402107ea-f8c6-4909-8185-a34a034100a5.jpg'
+    k.delete()
+
     guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
     if guidebook.user != request.user:
         return JsonResponse({
