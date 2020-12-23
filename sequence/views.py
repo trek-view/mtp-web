@@ -1272,14 +1272,18 @@ def import_sequence_list(request):
                 data = response.json()
                 features = data['features']
                 # features.sort(key=sort_by_captured_at)
-                request.session['sequences'] = features
+                # request.session['sequences'] = features
 
                 page = 1
 
-                for seq in features:
-                    seq_s = Sequence.objects.filter(seq_key=seq['properties']['key'])[:1]
-                    if seq_s.count() == 0:
-                        sequences_ary.append(seq)
+                features_len = len(features)
+
+                if features_len > 0:
+                    for feature_index in range(features_len):
+                        seq = features[features_len - 1 - feature_index]
+                        seq_s = Sequence.objects.filter(seq_key=seq['properties']['key']).first()
+                        if seq_s is None:
+                            sequences_ary.append(seq)
                 request.session['sequences'] = sequences_ary
 
             else:
