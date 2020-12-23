@@ -545,7 +545,9 @@ def ajax_scene_media_delete(request, unique_id, scene_id):
 
         scene.video_url = ''
         if bool(scene.image):
+            print('test')
             scene.image.delete(save=True)
+        print(scene.image)
         scene.save()
 
         return JsonResponse({
