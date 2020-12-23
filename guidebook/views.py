@@ -456,13 +456,11 @@ def ajax_upload_scene_image(request, unique_id, scene_id):
             scene.video_url = ''
             scene.save()
 
-            print('test')
             scene_media_html = render_to_string(
                 'guidebook/media_box/scene_media.html',
                 {'scene': scene},
                 request
             )
-            print(scene_media_html)
 
             return JsonResponse({
                 'status': 'success',
