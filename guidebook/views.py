@@ -452,7 +452,6 @@ def ajax_upload_scene_image(request, unique_id, scene_id):
         form = SceneImageForm(request.POST, request.FILES)
         if form.is_valid():
             form_data = form.save(commit=False)
-            scene.image.delete()
             scene.image = form_data.image
             scene.video_url = ''
             scene.save()
@@ -545,6 +544,8 @@ def ajax_scene_media_delete(request, unique_id, scene_id):
             })
 
         scene.video_url = ''
+        if bool(scene.image):
+            scene.image.delete()
         scene.image = None
         scene.save()
 
