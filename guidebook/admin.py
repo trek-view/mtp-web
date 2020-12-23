@@ -76,7 +76,7 @@ class POICategoryAdmin(admin.ModelAdmin):
 
 class SceneAdmin(admin.ModelAdmin):
     list_display = (
-        'name',
+        'title',
         'description'
     )
 
