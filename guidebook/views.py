@@ -457,7 +457,11 @@ def ajax_upload_scene_image(request, unique_id, scene_id):
             scene.save()
             return JsonResponse({
                 'status': 'success',
-                'message': 'Picture is uploaded successfully.'
+                'message': 'Picture is uploaded successfully.',
+                'poi_image': '',
+                'poi_video': '',
+                'scene_image': scene.image,
+                'scene_video': ''
             })
         else:
             errors = []
@@ -496,12 +500,15 @@ def ajax_upload_scene_video(request, unique_id, scene_id):
         if form.is_valid():
             video_url = form.cleaned_data['video_url']
             scene.video_url = get_youtube_embed_url(video_url)
-            print(scene.video_url)
             scene.image = None
             scene.save()
             return JsonResponse({
                 'status': 'success',
-                'message': 'Video URL is saved successfully.'
+                'message': 'Video URL is saved successfully.',
+                'poi_image': '',
+                'poi_video': '',
+                'scene_image': '',
+                'scene_video': scene.video_url
             })
         else:
             errors = []
@@ -512,6 +519,37 @@ def ajax_upload_scene_video(request, unique_id, scene_id):
                 'status': 'failed',
                 'message': '<br>'.join(errors)
             })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
+def ajax_scene_media_delete(request, unique_id, scene_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You can't access."
+        })
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+
+        scene.video_url = ''
+        scene.image = None
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Media is deleted successfully.',
+        })
 
     return JsonResponse({
         'status': 'failed',
@@ -550,7 +588,11 @@ def ajax_upload_poi_image(request, unique_id, scene_id, poi_id):
             poi.save()
             return JsonResponse({
                 'status': 'success',
-                'message': 'Picture is uploaded successfully.'
+                'message': 'Picture is uploaded successfully.',
+                'poi_image': poi.image,
+                'poi_video': '',
+                'scene_image': '',
+                'scene_video': ''
             })
         else:
             errors = []
@@ -593,12 +635,15 @@ def ajax_upload_poi_video(request, unique_id, scene_id, poi_id):
         if form.is_valid():
             video_url = form.cleaned_data['video_url']
             poi.video_url = get_youtube_embed_url(video_url)
-            print(scene.video_url)
             poi.image = None
             poi.save()
             return JsonResponse({
                 'status': 'success',
-                'message': 'Video URL is saved successfully.'
+                'message': 'Video URL is saved successfully.',
+                'poi_image': '',
+                'poi_video': poi.video_url,
+                'scene_image': '',
+                'scene_video': ''
             })
         else:
             errors = []
@@ -609,6 +654,41 @@ def ajax_upload_poi_video(request, unique_id, scene_id, poi_id):
                 'status': 'failed',
                 'message': '<br>'.join(errors)
             })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
+def ajax_poi_media_delete(request, unique_id, scene_id, poi_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        messages.error(request, "You can't access the page.")
+        return redirect('/')
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+        poi = PointOfInterest.objects.filter(scene=scene, pk=poi_id).first()
+        if poi is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Poi doesn't exist."
+            })
+
+        poi.video_url = ''
+        poi.image = None
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Media is deleted successfully.',
+        })
 
     return JsonResponse({
         'status': 'failed',

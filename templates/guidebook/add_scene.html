@@ -316,20 +316,24 @@
 
 
                 <div class="text-right mb-3">
-{#                    <button type="button" onclick="uploadSceneImage()" class="btn btn-sm btn-warning">#}
-{#                        Upload Image#}
-{#                    </button>#}
-{#                    <button type="button" onclick="showSceneVideoModal()" class="btn btn-sm btn-warning">#}
-{#                        Link Video#}
-{#                    </button>#}
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Add photo or video
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="javascript:showSceneVideoModal();">Link Video</a>
-                            <a class="dropdown-item" href="javascript:uploadSceneImage();">Upload Image</a>
+                    <div class="scene-added-media">
+                    </div>
+                    <div class="w-100 btn-group dropup scene-media-actions scene-add-media text-right">
+                        <div class="w-100 add-actions d-none">
+                            <a class="btn btn-warning btn-sm" href="javascript:showSceneVideoModal();">Add Video</a>
+                            <a class="btn btn-warning btn-sm ml-3" href="javascript:uploadSceneImage();">Add Photo</a>
                         </div>
+
+                        <div class="w-100 delete-action d-none">
+                            <a class="btn btn-danger btn-sm ml-3" href="javascript:deleteMedia(true);">Delete Media</a>
+                        </div>
+{#                                <button type="button" class="btn btn-sm btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+{#                                    Add photo or video#}
+{#                                </button>#}
+{#                                <div class="dropdown-menu">#}
+{#                                    <a class="dropdown-item" href="javascript:showPOIVideoModal();">Link Video</a>#}
+{#                                    <a class="dropdown-item" href="javascript:uploadPOIImage();">Upload Image</a>#}
+{#                                </div>#}
                     </div>
                 </div>
             </div>
@@ -878,6 +882,8 @@
 
                     $('.external-scene').html(data.scene_external_html);
 
+                    var resp = {'poi_image': '', 'poi_video': '', 'scene_image': data.scene[0]['fields']['image_url'], 'scene_video': data.scene[0]['fields']['video_url']}
+                    updateMediaBox(resp);
                 }
                 set_select_scene();
                 if (is_show_poi_list) {
@@ -1965,6 +1971,7 @@
         url = url.replace('scene_id', '' + current_scene_id);
         $('#uploadVideoModal form').attr('action', url);
         $('#uploadVideoModal').modal('show');
+        $('#uploadVideoModal input[name="video_url"]').val('');
     }
 
     function showPOIVideoModal() {
@@ -1973,6 +1980,7 @@
         url = url.replace('poi_id', '' + selected_poi_id);
         $('#uploadVideoModal form').attr('action', url);
         $('#uploadVideoModal').modal('show');
+        $('#uploadVideoModal input[name="video_url"]').val('');
     }
 
     function saveSceneVideoURL() {
@@ -1989,10 +1997,75 @@
                     else {
                         toastr.success(data.message);
                         $('#uploadVideoModal').modal('hide');
+                        updateMediaBox(data);
                     }
                 }
             });
         }
+    }
+
+    function deleteMedia(scene=false) {
+        if (scene) {
+            var url = "{% url 'guidebook.ajax_scene_media_delete' unique_id=guidebook.unique_id scene_id='scene_id' %}";
+            url = url.replace('scene_id', '' + current_scene_id);
+        }
+        else {
+            var url = "{% url 'guidebook.ajax_poi_media_delete' unique_id=guidebook.unique_id scene_id='scene_id' poi_id='poi_id' %}";
+            url = url.replace('scene_id', '' + current_scene_id);
+            url = url.replace('poi_id', '' + selected_poi_id);
+        }
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else {
+                    toastr.success(data.message);
+                    if (scene) {
+                        $('.scene-added-media').html('');
+                        $('.scene-media-actions .add-actions').removeClass('d-none');
+                        $('.scene-media-actions .delete-action').addClass('d-none');
+                    }
+                    else {
+                        $('#poi_body_' + selected_poi_id + ' .media-box .added-media').html('');
+                        $('#poi_body_' + selected_poi_id + ' .media-box .media-actions .add-actions').removeClass('d-none');
+                        $('#poi_body_' + selected_poi_id + ' .media-box .media-actions .delete-action').addClass('d-none');
+                    }
+                }
+            }
+        });
+    }
+
+    function updateMediaBox(resp) {
+        var scene = true;
+        if (resp['poi_image'] != undefined && resp['poi_image'] != '' && resp['poi_image'] != null) {
+            $('#poi_body_' + selected_poi_id + ' .media-box .added-media').html('<img class="w-100" height="200" src="{{ STATIC_URL }}'+resp['poi_image']+'" />');
+            scene = false;
+        }
+        else if (resp['scene_image'] != undefined && resp['scene_image'] != '' && resp['scene_image'] != null) {
+            $('.scene-added-media').html('<img class="w-100" height="200" src="{{ STATIC_URL }}'+resp['scene_image']+'" />');
+        }
+        else if (resp['poi_video'] != undefined && resp['poi_video'] != '' && resp['poi_video'] != null) {
+            $('#poi_body_' + selected_poi_id + ' .media-box .added-media').html('<iframe class="w-100 ml-auto mr-auto" height="200" src="'+resp['poi_video']+'"></iframe>');
+            scene = false;
+        }
+        else if (resp['scene_video'] != undefined && resp['scene_video'] != '' && resp['scene_video'] != null) {
+            $('.scene-added-media').html('<iframe class="w-100 ml-auto mr-auto" height="200" src="'+resp['scene_video']+'"></iframe>');
+        }
+
+        if (scene) {
+            $('.scene-media-actions .add-actions').addClass('d-none');
+            $('.scene-media-actions .delete-action').removeClass('d-none');
+        }
+        else {
+            $('#poi_body_' + selected_poi_id + ' .media-box .media-actions .add-actions').addClass('d-none');
+            $('#poi_body_' + selected_poi_id + ' .media-box .media-actions .delete-action').removeClass('d-none');
+        }
+
     }
 
     function uploadPOIImage() {
@@ -2002,6 +2075,8 @@
         myDropzone.options.url = url;
         $('#uploadPictureModal').modal('show');
     }
+
+
 
 
 </script>

@@ -42,4 +42,8 @@ urlpatterns = [
     path('<str:unique_id>/scene/<str:scene_id>/ajax_upload_poi_video/<str:poi_id>', views.ajax_upload_poi_video,
          name='guidebook.ajax_upload_poi_video'),
 
+    path('<str:unique_id>/scene/ajax_scene_media_delete/<str:scene_id>', views.ajax_scene_media_delete, name='guidebook.ajax_scene_media_delete'),
+    path('<str:unique_id>/scene/<str:scene_id>/ajax_poi_media_delete/<str:poi_id>', views.ajax_poi_media_delete,
+         name='guidebook.ajax_poi_media_delete'),
+
 ]
