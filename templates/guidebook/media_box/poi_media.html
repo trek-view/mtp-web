@@ -1,6 +1,0 @@
-{% if poi.video_url is not None and poi.video_url != '' %}
-    <iframe class="w-100 ml-auto mr-auto" height="200" src="{{ poi.video_url }}">
-    </iframe>
-{% elif poi.is_exist_image %}
-    <img class="w-100" height="200" src="{{ STATIC_URL }}{{ poi.image }}" />
-{% endif %}

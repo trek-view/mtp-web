@@ -455,19 +455,12 @@ def ajax_upload_scene_image(request, unique_id, scene_id):
             scene.image = form_data.image
             scene.video_url = ''
             scene.save()
-
-            scene_media_html = render_to_string(
-                'guidebook/media_box/scene_media.html',
-                {'scene': scene},
-                request
-            )
-
             return JsonResponse({
                 'status': 'success',
                 'message': 'Picture is uploaded successfully.',
                 'poi_image': '',
                 'poi_video': '',
-                'scene_image': scene_media_html,
+                'scene_image': scene.image.url,
                 'scene_video': ''
             })
         else:
@@ -509,20 +502,13 @@ def ajax_upload_scene_video(request, unique_id, scene_id):
             scene.video_url = get_youtube_embed_url(video_url)
             scene.image = None
             scene.save()
-
-            scene_media_html = render_to_string(
-                'guidebook/media_box/scene_media.html',
-                {'scene': scene},
-                request
-            )
-
             return JsonResponse({
                 'status': 'success',
                 'message': 'Video URL is saved successfully.',
                 'poi_image': '',
                 'poi_video': '',
                 'scene_image': '',
-                'scene_video': scene_media_html
+                'scene_video': scene.video_url
             })
         else:
             errors = []
@@ -601,16 +587,10 @@ def ajax_upload_poi_image(request, unique_id, scene_id, poi_id):
             poi.image = form_data.image
             poi.video_url = ''
             poi.save()
-
-            poi_media_html = render_to_string(
-                'guidebook/media_box/poi_media.html',
-                {'scene': poi},
-                request
-            )
             return JsonResponse({
                 'status': 'success',
                 'message': 'Picture is uploaded successfully.',
-                'poi_image': poi_media_html,
+                'poi_image': poi.image.url,
                 'poi_video': '',
                 'scene_image': '',
                 'scene_video': ''
@@ -658,16 +638,11 @@ def ajax_upload_poi_video(request, unique_id, scene_id, poi_id):
             poi.video_url = get_youtube_embed_url(video_url)
             poi.image = None
             poi.save()
-            poi_media_html = render_to_string(
-                'guidebook/media_box/poi_media.html',
-                {'scene': poi},
-                request
-            )
             return JsonResponse({
                 'status': 'success',
                 'message': 'Video URL is saved successfully.',
                 'poi_image': '',
-                'poi_video': poi_media_html,
+                'poi_video': poi.video_url,
                 'scene_image': '',
                 'scene_video': ''
             })
@@ -759,12 +734,6 @@ def ajax_add_scene(request, unique_id):
                     request
                 )
 
-                scene_media_html = render_to_string(
-                    'guidebook/media_box/scene_media.html',
-                    {'scene': old_scene},
-                    request
-                )
-
                 scene_json = serializers.serialize('json', [old_scene, ])
                 json_scene = json.loads(scene_json)
 
@@ -775,7 +744,6 @@ def ajax_add_scene(request, unique_id):
                     'title': old_scene.title,
                     'description': old_scene.description,
                     'scene': json_scene,
-                    'scene_media_html': scene_media_html,
                     'scene_external_html': scene_external_html,
                     'status': 'success',
                     'message': 'Scene is updated successfully.'
@@ -1273,12 +1241,6 @@ def ajax_get_edit_scene(request, unique_id):
             request
         )
 
-        scene_media_html = render_to_string(
-            'guidebook/media_box/scene_media.html',
-            {'scene': scene_first},
-            request
-        )
-
         scene_json = serializers.serialize('json', [scene_first, ])
         json_scene = json.loads(scene_json)
 
@@ -1286,7 +1248,6 @@ def ajax_get_edit_scene(request, unique_id):
             'status': 'success',
             'scene': json_scene,
             'poi_list': poi_list,
-            'scene_media_html': scene_media_html,
             'scene_external_html': scene_external_html
         })
 
