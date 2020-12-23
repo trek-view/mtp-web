@@ -882,7 +882,7 @@
 
                     $('.external-scene').html(data.scene_external_html);
                     console.log(data.scene[0]);
-                    var resp = {'poi_image': '', 'poi_video': '', 'scene_image': data.scene[0]['fields']['image_url'], 'scene_video': data.scene[0]['fields']['video_url']}
+                    var resp = {'poi_image': '', 'poi_video': '', 'scene_image': '{{ STATIC_URL }}' + data.scene[0]['fields']['image'], 'scene_video': data.scene[0]['fields']['video_url']}
                     updateMediaBox(resp);
                 }
                 set_select_scene();
