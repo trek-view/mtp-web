@@ -220,13 +220,13 @@ class Scene(models.Model):
     start_x = models.FloatField(default=0.5)
     start_y = models.FloatField(default=0.5)
     sort = models.IntegerField(default=1, null=True)
-    image_url = models.CharField(max_length=100, null=True)
+    image_url = models.CharField(max_length=100, null=True, blank=True)
     username = models.CharField(max_length=100, default='', null=True, blank=True, verbose_name="Mapillary Username", )
 
-    video_url = models.TextField(default='')
+    video_url = models.TextField(default='', blank=True)
     image = models.ImageField(upload_to=scene_image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
 
-    external_url = models.ManyToManyField(SceneExternalURL)
+    external_url = models.ManyToManyField(SceneExternalURL, blank=True)
 
     objects = models.Manager()
     vector_tiles = CustomSceneMVTManager(

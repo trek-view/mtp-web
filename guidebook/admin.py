@@ -81,6 +81,7 @@ class SceneAdmin(admin.ModelAdmin):
     )
 
 
+
 admin.site.register(Guidebook, GuidebookAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(POICategory, POICategoryAdmin)
