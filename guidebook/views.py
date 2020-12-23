@@ -460,7 +460,7 @@ def ajax_upload_scene_image(request, unique_id, scene_id):
                 'message': 'Picture is uploaded successfully.',
                 'poi_image': '',
                 'poi_video': '',
-                'scene_image': scene.image,
+                'scene_image': scene.image.url,
                 'scene_video': ''
             })
         else:
@@ -589,7 +589,7 @@ def ajax_upload_poi_image(request, unique_id, scene_id, poi_id):
             return JsonResponse({
                 'status': 'success',
                 'message': 'Picture is uploaded successfully.',
-                'poi_image': poi.image,
+                'poi_image': poi.image.url,
                 'poi_video': '',
                 'scene_image': '',
                 'scene_video': ''
