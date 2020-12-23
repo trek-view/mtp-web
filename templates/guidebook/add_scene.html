@@ -2041,6 +2041,7 @@
     }
 
     function updateMediaBox(resp) {
+        console.log(resp);
         var scene = true;
         if (resp['poi_image'] != undefined && resp['poi_image'] != '' && resp['poi_image'] != null) {
             $('#poi_body_' + selected_poi_id + ' .media-box .added-media').html('<img class="w-100" height="200" src="{{ STATIC_URL }}'+resp['poi_image']+'" />');
