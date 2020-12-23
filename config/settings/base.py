@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'mptt',
     'tags_input',
     'rest_framework',
-    'colorful'
+    'colorful',
+    'robots'
 ]
 
 REST_FRAMEWORK = {
@@ -120,10 +121,16 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'config.context_processors.get_settings',
                 'config.context_processors.baseurl',
+                'django.template.loaders.app_directories.Loader'
             ],
         },
     },
 ]
+
+ROBOTS_SITEMAP_VIEW_NAME = 'cached-sitemap'
+ROBOTS_USE_HOST = False
+ROBOTS_USE_SCHEME_IN_HOST = True
+ROBOTS_CACHE_TIMEOUT = 60*60*24
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
