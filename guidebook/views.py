@@ -547,9 +547,9 @@ def ajax_scene_media_delete(request, unique_id, scene_id):
         if bool(scene.image):
             print('test')
             # scene.image.delete(save=False)
-            storage_, path_ = scene.image.storage, scene.image.path
-            storage_.delete(path_)
-        print(scene.image)
+            storage = S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME)
+            storage.delete(scene.image.url)
+            print(scene.image.delete(save=False))
         scene.save()
 
         return JsonResponse({
