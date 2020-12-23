@@ -20,17 +20,17 @@ UserModel = get_user_model()
 
 def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'guidebook/{0}/cover_image/{1}.jpg'.format(instance.unique_id, filename)
+    return 'guidebook/{0}/cover_image/{1}'.format(instance.unique_id, filename)
 
 
 def scene_image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'guidebook/{}/scene/{}.jpg'.format(instance.guidebook.unique_id, instance.unique_id)
+    return 'guidebook/{}/scene/{}'.format(instance.guidebook.unique_id, str(instance.unique_id))
 
 
 def poi_image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'guidebook/{}/scene/{}/poi/{}.jpg'.format(instance.scene.guidebook.unique_id, instance.scene.unique_id, instance.pk)
+    return 'guidebook/{}/scene/{}/poi/{}'.format(instance.scene.guidebook.unique_id, instance.scene.unique_id, str(instance.pk))
 
 
 
