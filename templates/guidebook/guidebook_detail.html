@@ -170,6 +170,7 @@
                                     <p class="start_x">{{ scene.start_x }}</p>
                                     <p class="start_y">{{ scene.start_y }}</p>
                                 </div>
+
                             </div>
                         </div>
                     {% endfor %}
@@ -193,6 +194,9 @@
             <div class="scene-sequence-link">
                 <small>Sequence: </small><a href=""></a>
             </div>
+        </div>
+        <div class="pl-3 pr-3 external-scene">
+
         </div>
         <div class="poi-list">
             <div class="accordion" id="poi_list">
@@ -790,7 +794,7 @@
                 }
                 refresh_poi_list();
                 refresh_mapillery_classes();
-
+                $('.external-scene').html(data.scene_external_html);
             }
         });
     });

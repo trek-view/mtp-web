@@ -1,0 +1,10 @@
+<div class="d-flex justify-content-between">
+    <span>External URLs: </span>
+</div>
+<ul class="d-flex flex-column pl-1" style="list-style-type: none" >
+    {% for external_url in scene.get_external_urls %}
+        <li id="external_url_{{ external_url.pk }}">
+            <a href="{{ external_url.external_url }}" target="_blank">{{ external_url.short_external_url }}</a>
+        </li>
+    {% endfor %}
+</ul>

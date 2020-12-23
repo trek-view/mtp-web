@@ -300,6 +300,10 @@
 
             <hr class="mt-2 mb-2" />
 
+            <div class="external-scene">
+
+            </div>
+
             <div class="">
                 <div class="">
                     <p class="font-weight-bold">Link video or image to this scene.</p>
@@ -308,6 +312,8 @@
                         You can link video or upload image for your scene.
                     </p>
                 </div>
+
+
 
                 <div class="text-right mb-3">
 {#                    <button type="button" onclick="uploadSceneImage()" class="btn btn-sm btn-warning">#}
@@ -318,7 +324,7 @@
 {#                    </button>#}
                     <div class="btn-group">
                         <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Link Type
+                            Add photo or video
                         </button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="javascript:showSceneVideoModal();">Link Video</a>
@@ -869,6 +875,9 @@
                     }
                     refresh_poi_list();
                     refresh_mapillery_classes();
+
+                    $('.external-scene').html(data.scene_external_html);
+
                 }
                 set_select_scene();
                 if (is_show_poi_list) {
@@ -1314,6 +1323,57 @@
                 {
                     toastr.success(data.message);
                     $('#external_url_' + external_url_id).remove();
+                }
+            }
+        });
+    }
+
+    function addSceneExternalURL() {
+        let external_url = $('#input_scene_external_url_' + current_scene_id).val();
+        if (validURL(external_url)) {
+            $.ajax({
+                url: 'ajax/add_scene_external_url/' + current_scene_id + '/',
+                type: 'POST',
+                data: {
+                    'external_url': external_url
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                        toastr.error(data.message);
+                    else
+                    {
+                        toastr.success(data.message);
+                        let external_url_li = '<li id="scene_external_url_'+data.external_url_id+'">\n' +
+                            '                     <a href="'+external_url+'" target="_blank">'+data.short_external_url+'</a>\n' +
+                            '                         <i class="far fa-times-circle" onclick="deleteSceneExternalURL(\''+data.external_url_id+'\')" style="font-size: 15px; cursor: pointer"></i>\n' +
+                            '                  </li>';
+                        $('.scene-external-url-list ul').append(external_url_li);
+                        $('#input_scene_external_url_' + current_scene_id).val('');
+                    }
+                }
+            });
+        }
+        else {
+            toastr.error('The external URL is invalid.');
+        }
+    }
+
+    function deleteSceneExternalURL(external_url_id) {
+        $.ajax({
+            url: 'ajax/delete_scene_external_url/' + current_scene_id + '/',
+            type: 'POST',
+            data: {
+                'external_url_id': external_url_id
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else
+                {
+                    toastr.success(data.message);
+                    $('#scene_external_url_' + external_url_id).remove();
                 }
             }
         });

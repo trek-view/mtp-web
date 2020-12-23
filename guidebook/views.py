@@ -821,6 +821,89 @@ def ajax_save_poi(request, unique_id, pk):
 
 
 @my_login_required
+def ajax_add_scene_external_url(request, unique_id, pk):
+    guidebook = Guidebook.objects.get(unique_id=unique_id)
+    if not guidebook:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Guidebook does not exist or has no access.'
+        })
+    scene = Scene.objects.get(pk=pk)
+    if not scene or scene.guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Scene does not exist or has no access.'
+        })
+    if request.method == "POST":
+        external_url = request.POST.get('external_url')
+        if external_url is None or external_url == '':
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'External URL is required.'
+            })
+
+        external_url_obj = SceneExternalURL()
+        external_url_obj.external_url = external_url
+        external_url_obj.save()
+        scene.external_url.add(external_url_obj)
+        scene.save()
+
+        message = 'External URL is successfully added.'
+
+        return JsonResponse({
+            'status': 'success',
+            'message': message,
+            'external_url_id': external_url_obj.pk,
+            'short_external_url': external_url_obj.short_external_url()
+        })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'It failed to add External URL!'
+    })
+
+
+@my_login_required
+def ajax_delete_scene_external_url(request, unique_id, pk):
+    guidebook = Guidebook.objects.get(unique_id=unique_id)
+    if not guidebook:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Guidebook does not exist or has no access.'
+        })
+    scene = Scene.objects.get(pk=pk)
+    if not scene or scene.guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Scene does not exist or has no access.'
+        })
+    if request.method == "POST":
+
+        external_url_id = request.POST.get('external_url_id')
+        if external_url_id is None or external_url_id == '':
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'External URL is required.'
+            })
+
+        external_url = scene.external_url.filter(pk=external_url_id).first()
+        if external_url is not None:
+            external_url.delete()
+
+            message = 'External URL is successfully deleted.'
+
+            return JsonResponse({
+                'status': 'success',
+                'message': message,
+            })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'It failed to delete External URL!'
+    })
+
+
+@my_login_required
 def ajax_add_external_url(request, unique_id, pk):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
@@ -986,13 +1069,20 @@ def ajax_get_scene(request, unique_id):
         scene_first = scene[0]
         scene_first.poi_list = poi_list
 
+        scene_external_html = render_to_string(
+            'guidebook/scene_external_box.html',
+            {'scene': scene_first},
+            request
+        )
+
         scene_json = serializers.serialize('json', [scene_first, ])
         json_scene = json.loads(scene_json)
 
         return JsonResponse({
             'status': 'success',
             'scene': json_scene,
-            'poi_list': poi_list
+            'poi_list': poi_list,
+            'scene_external_html': scene_external_html
         })
 
 
@@ -1031,8 +1121,16 @@ def ajax_get_edit_scene(request, unique_id):
                 'poi_box_html': poi_box_html
             })
 
+
+
         scene_first = scene[0]
         scene_first.poi_list = poi_list
+
+        scene_external_html = render_to_string(
+            'guidebook/scene_external_edit_box.html',
+            {'scene': scene_first},
+            request
+        )
 
         scene_json = serializers.serialize('json', [scene_first, ])
         json_scene = json.loads(scene_json)
@@ -1040,7 +1138,8 @@ def ajax_get_edit_scene(request, unique_id):
         return JsonResponse({
             'status': 'success',
             'scene': json_scene,
-            'poi_list': poi_list
+            'poi_list': poi_list,
+            'scene_external_html': scene_external_html
         })
 
 
