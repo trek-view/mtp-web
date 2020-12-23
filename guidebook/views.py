@@ -545,6 +545,7 @@ def ajax_scene_media_delete(request, unique_id, scene_id):
 
         scene.video_url = ''
         scene.image = None
+        scene.save()
 
         return JsonResponse({
             'status': 'success',
@@ -684,6 +685,7 @@ def ajax_poi_media_delete(request, unique_id, scene_id, poi_id):
 
         poi.video_url = ''
         poi.image = None
+        poi.save()
 
         return JsonResponse({
             'status': 'success',
