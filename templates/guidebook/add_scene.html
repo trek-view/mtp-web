@@ -2045,11 +2045,11 @@
         console.log(resp);
         var scene = true;
         if (resp['poi_image'] != undefined && resp['poi_image'] != '' && resp['poi_image'] != null) {
-            $('#poi_body_' + selected_poi_id + ' .media-box .added-media').html('<img class="w-100" height="200" src="{{ STATIC_URL }}'+resp['poi_image']+'" />');
+            $('#poi_body_' + selected_poi_id + ' .media-box .added-media').html('<img class="w-100" height="200" src="'+resp['poi_image']+'" />');
             scene = false;
         }
         else if (resp['scene_image'] != undefined && resp['scene_image'] != '' && resp['scene_image'] != null) {
-            $('.scene-added-media').html('<img class="w-100" height="200" src="{{ STATIC_URL }}'+resp['scene_image']+'" />');
+            $('.scene-added-media').html('<img class="w-100" height="200" src="'+resp['scene_image']+'" />');
         }
         else if (resp['poi_video'] != undefined && resp['poi_video'] != '' && resp['poi_video'] != null) {
             $('#poi_body_' + selected_poi_id + ' .media-box .added-media').html('<iframe class="w-100 ml-auto mr-auto" height="200" src="'+resp['poi_video']+'"></iframe>');
