@@ -456,6 +456,9 @@ def ajax_upload_scene_image(request, unique_id, scene_id):
             scene.video_url = ''
             scene.save()
 
+            scene.image = form_data.image
+            scene.save()
+
             return JsonResponse({
                 'status': 'success',
                 'message': 'Picture is uploaded successfully.',
@@ -588,6 +591,9 @@ def ajax_upload_poi_image(request, unique_id, scene_id, poi_id):
             form_data = form.save(commit=False)
             poi.image = form_data.image
             poi.video_url = ''
+            poi.save()
+
+            poi.image = form_data.image
             poi.save()
 
             return JsonResponse({
