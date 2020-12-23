@@ -110,7 +110,7 @@ urlpatterns = [
 
 
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
-    path('robots\.txt', include('robots.urls')),
+    path('robots.txt', include('robots.urls')),
 
 
     path('mission-control/', admin.site.urls, name='admin'),
