@@ -263,6 +263,9 @@ class Scene(models.Model):
         external_urls = self.external_url.all()
         return external_urls
 
+    def is_exist_image(self):
+        return bool(self.image)
+
 
 class POIExternalURL(models.Model):
     external_url = models.TextField(default='')
