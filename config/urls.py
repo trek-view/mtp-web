@@ -107,8 +107,10 @@ urlpatterns = [
     path('user/<str:username>/profile/', account_views.profile, name="account.profile"),
 
     path('tags_input/', include('tags_input.urls', namespace='tags_input')),
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 
+
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('robots\.txt', include('robots.urls')),
 
 
     path('mission-control/', admin.site.urls, name='admin'),
