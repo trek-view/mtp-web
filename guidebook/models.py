@@ -233,7 +233,7 @@ class Scene(models.Model):
     username = models.CharField(max_length=100, default='', null=True, blank=True, verbose_name="Mapillary Username", )
 
     video_url = models.TextField(default='', blank=True)
-    image = models.ImageField(upload_to=scene_image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
+    image = models.ImageField(upload_to=scene_image_directory_path, max_length=255, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
 
     external_url = models.ManyToManyField(SceneExternalURL, blank=True)
 
@@ -298,7 +298,7 @@ class PointOfInterest(models.Model):
     position_y = models.FloatField(default=0)
     category = models.ForeignKey(POICategory, on_delete=models.CASCADE, default=1)
     video_url = models.TextField(default='')
-    image = models.ImageField(upload_to=poi_image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
+    image = models.ImageField(upload_to=poi_image_directory_path, max_length=255, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
 
     external_url = models.ManyToManyField(POIExternalURL)
 

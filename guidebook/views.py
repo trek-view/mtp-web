@@ -463,6 +463,8 @@ def ajax_upload_scene_image(request, unique_id, scene_id):
             scene.video_url = ''
             scene.save()
 
+            print(len('guidebook/8be5fa7c-7177-4ff5-90f3-3276ede68146/scene/6a20d470-c1e3-435b-825f-d92e464c741d_160882.jpg'))
+
             print('+++++')
             print(scene.image.url)
             print(str(scene.image))
