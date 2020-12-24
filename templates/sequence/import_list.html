@@ -599,7 +599,7 @@
         let url = "{% url 'sequence.ajax_import' seq_key='seq_key' %}";
         url = url.replace('seq_key', selected_sequence_id)
         let next_sequence_id = getNextSequenceId(selected_sequence_id);
-        selected_sequence_id = next_sequence_id;
+        {#selected_sequence_id = next_sequence_id;#}
         {#console.log('next: ', next_sequence_id)#}
         $.ajax({
             url: url,
@@ -635,14 +635,14 @@
                         $('#add_form_modal').modal('hide');
                     else
                     {
-                        if (next_sequence_id == '')
+                        selected_sequence_id = next_sequence_id
+                        if (selected_sequence_id == '')
                         {
                             toastr.info("Next sequence key doesn't exist.");
                             $('#add_form_modal').modal('hide');
                         }
                         else
                         {
-                            selected_sequence_id = next_sequence_id;
                             get_sequences(true);
 
                         }
