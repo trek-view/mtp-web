@@ -44,7 +44,7 @@ class CustomUserManager(BaseUserManager):
 
 def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'user/avatar/{}/{}'.format(instance.username, filename)
+    return 'user/avatar/{}'.format(instance.username)
 
 
 class Grade(models.Model):
@@ -81,7 +81,7 @@ class CustomUser(AbstractUser):
     mapillary_access_token = models.TextField(default='', null=True, blank=True)
     verify_email_key = models.CharField(max_length=100, default='')
 
-    avatar = models.ImageField(upload_to=image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME, file_overwrite=True))
+    avatar = models.ImageField(upload_to=image_directory_path, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
     first_name = models.CharField(max_length=30, null=True, blank=True, validators=[alpha])
     last_name = models.CharField(max_length=30, null=True, blank=True, validators=[alpha])
     website_url = models.TextField(null=True, blank=True)

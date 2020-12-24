@@ -7,6 +7,6 @@ class MediaStorage(S3Boto3Storage):
     bucket_name = os.environ.get("AWS_S3_MAPILLARY_BUCKET", None)
     if bucket_name is None:
         bucket_name = config('AWS_S3_MAPILLARY_BUCKET')
-    file_overwrite = True
+    # file_overwrite = True
     querystring_auth = False
     default_acl = None
