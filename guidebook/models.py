@@ -31,6 +31,7 @@ def image_directory_path(instance, filename):
 def scene_image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     current_time = get_current_timestamp()
+    print(current_time)
     return 'guidebook/{}/scene/{}_{}.jpg'.format(instance.guidebook.unique_id, instance.unique_id, current_time)
 
 

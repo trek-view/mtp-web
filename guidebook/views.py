@@ -452,6 +452,7 @@ def ajax_upload_scene_image(request, unique_id, scene_id):
         form = SceneImageForm(request.POST, request.FILES)
         if form.is_valid():
             form_data = form.save(commit=False)
+            scene.image.delete()
             scene.image = form_data.image
             scene.video_url = ''
             scene.save()
@@ -504,7 +505,7 @@ def ajax_upload_scene_video(request, unique_id, scene_id):
         if form.is_valid():
             video_url = form.cleaned_data['video_url']
             scene.video_url = get_youtube_embed_url(video_url)
-            scene.image = None
+            scene.image.delete()
             scene.save()
 
             return JsonResponse({
@@ -549,7 +550,7 @@ def ajax_scene_media_delete(request, unique_id, scene_id):
             })
 
         scene.video_url = ''
-        scene.image.delete(save=False)
+        scene.image.delete()
         scene.save()
 
         return JsonResponse({
@@ -589,6 +590,7 @@ def ajax_upload_poi_image(request, unique_id, scene_id, poi_id):
         form = PoiImageForm(request.POST, request.FILES)
         if form.is_valid():
             form_data = form.save(commit=False)
+            poi.image.delete()
             poi.image = form_data.image
             poi.video_url = ''
             poi.save()
@@ -645,7 +647,7 @@ def ajax_upload_poi_video(request, unique_id, scene_id, poi_id):
         if form.is_valid():
             video_url = form.cleaned_data['video_url']
             poi.video_url = get_youtube_embed_url(video_url)
-            poi.image = None
+            poi.image.delete()
             poi.save()
 
             return JsonResponse({
@@ -694,7 +696,7 @@ def ajax_poi_media_delete(request, unique_id, scene_id, poi_id):
             })
 
         poi.video_url = ''
-        poi.image = None
+        poi.image.delete()
         poi.save()
 
         return JsonResponse({
