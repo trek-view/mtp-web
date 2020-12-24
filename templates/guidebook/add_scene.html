@@ -888,6 +888,10 @@
                         scene_image = '{{ STATIC_URL }}' + data.scene[0]['fields']['image'];
                     var resp = {'poi_image': '', 'poi_video': '', 'scene_image': scene_image, 'scene_video': data.scene[0]['fields']['video_url']}
 
+                    $('.scene-media-actions .add-actions').removeClass('d-none');
+                    $('.scene-media-actions .delete-action').addClass('d-none');
+                    $('.scene-added-media').html('');
+
                     updateMediaBox(resp, true);
                 }
                 set_select_scene();
