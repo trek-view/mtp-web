@@ -137,7 +137,7 @@ def guidebook_list(request):
 def my_guidebook_list(request):
     from boto.s3.connection import S3Connection, Bucket, Key
     conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-    bucket = Bucket(conn, settings.AWS_STORAGE_BUCKET_NAME)
+    bucket = Bucket(conn, settings.AWS_S3_BUCKET_CNAME)
     bucket.delete_key('user/avatar/superadmin')
 
 
