@@ -887,7 +887,8 @@
                     if (data.scene[0]['fields']['image'] != null && data.scene[0]['fields']['image'] != '')
                         scene_image = '{{ STATIC_URL }}' + data.scene[0]['fields']['image'];
                     var resp = {'poi_image': '', 'poi_video': '', 'scene_image': scene_image, 'scene_video': data.scene[0]['fields']['video_url']}
-                    updateMediaBox(resp);
+
+                    updateMediaBox(resp, true);
                 }
                 set_select_scene();
                 if (is_show_poi_list) {
@@ -1083,7 +1084,7 @@
                         if (data.scene[0]['fields']['image'] != null && data.scene[0]['fields']['image'] != '')
                             scene_image = '{{ STATIC_URL }}' + data.scene[0]['fields']['image'];
                         var resp = {'poi_image': '', 'poi_video': '', 'scene_image': scene_image, 'scene_video': data.scene[0]['fields']['video_url']}
-                        updateMediaBox(resp);
+                        updateMediaBox(resp, true);
 
                     }
                 }
@@ -2052,9 +2053,7 @@
         });
     }
 
-    function updateMediaBox(resp) {
-        console.log(resp);
-        var scene = true;
+    function updateMediaBox(resp, scene=true) {
         var is_add_action = true;
         if (resp['poi_image'] != undefined && resp['poi_image'] != '' && resp['poi_image'] != null) {
             $('#poi_body_' + selected_poi_id + ' .media-box .added-media').html('<img class="w-100" height="200" src="'+resp['poi_image']+'" />');
@@ -2071,7 +2070,9 @@
             $('.scene-added-media').html('<iframe class="w-100 ml-auto mr-auto" height="200" src="'+resp['scene_video']+'"></iframe>');
         }
         else {
-            is_add_action = false;
+            $('.scene-media-actions .add-actions').removeClass('d-none');
+            $('.scene-media-actions .delete-action').addClass('d-none');
+            $('.scene-added-media').html('');
             return;
         }
 
