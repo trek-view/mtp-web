@@ -463,8 +463,10 @@ def ajax_upload_scene_image(request, unique_id, scene_id):
             scene.video_url = ''
             scene.save()
 
-            scene.image = form_data.image
-            scene.save()
+            print('+++++')
+            print(scene.image.url)
+            print(str(scene.image))
+            print(scene.image.name)
 
             return JsonResponse({
                 'status': 'success',
