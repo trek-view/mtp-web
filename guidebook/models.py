@@ -9,15 +9,39 @@ from django.contrib.gis.db import models
 from django.urls import reverse
 
 from lib.mvtManager import CustomMVTManager
+from lib.functions import get_current_timestamp
 from sys_setting.models import Tag
 from sequence.models import Sequence
+
+from django.conf import settings
+from storages.backends.s3boto3 import S3Boto3Storage
 
 UserModel = get_user_model()
 
 
+
+
+
 def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'guidebook/{0}/cover_image/{1}'.format(instance.unique_id, filename)
+    current_time = get_current_timestamp()
+    return 'guidebook/{0}/cover_image/{1}.jpg'.format(instance.unique_id, current_time)
+
+
+def scene_image_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    current_time = get_current_timestamp()
+    path = 'guidebook/{}/scene/{}_{}.jpg'.format(instance.guidebook.unique_id, instance.unique_id, current_time)
+    print(path)
+    return path
+
+
+def poi_image_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    current_time = get_current_timestamp()
+    return 'guidebook/{}/scene/{}/poi/{}_{}.jpg'.format(instance.scene.guidebook.unique_id, instance.scene.unique_id, instance.pk, current_time)
+
+
 
 # class Tag(models.Model):
 #     alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Only alphanumeric characters are allowed for Username.')
@@ -60,6 +84,8 @@ class Guidebook(models.Model):
     is_approved = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=datetime.now, blank=True)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)
+
+    like_count = models.IntegerField(default=0)
 
     def get_absolute_url(self):
         return reverse('guidebook.guidebook_detail', kwargs={'unique_id': str(self.unique_id)})
@@ -157,6 +183,7 @@ class POICategory(models.Model):
     class Meta:
         verbose_name_plural = 'POI Categories'
 
+
 class CustomSceneMVTManager(CustomMVTManager):
     def get_additional_where(self, additional_filters={}, request=None):
         from tour.models import Tour
@@ -173,6 +200,23 @@ class CustomSceneMVTManager(CustomMVTManager):
         return additional_where
 
 
+class SceneExternalURL(models.Model):
+    external_url = models.TextField(default='')
+
+    class Meta:
+        ordering = ['external_url']
+
+    def __str__(self):
+        return self.external_url
+
+    def short_external_url(self):
+        external_url = self.external_url
+        if len(external_url) > 30:
+            return external_url[0:30] + '...'
+        else:
+            return external_url
+
+
 class Scene(models.Model):
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     guidebook = models.ForeignKey(Guidebook, on_delete=models.CASCADE)
@@ -185,8 +229,13 @@ class Scene(models.Model):
     start_x = models.FloatField(default=0.5)
     start_y = models.FloatField(default=0.5)
     sort = models.IntegerField(default=1, null=True)
-    image_url = models.CharField(max_length=100, null=True)
+    image_url = models.CharField(max_length=100, null=True, blank=True)
     username = models.CharField(max_length=100, default='', null=True, blank=True, verbose_name="Mapillary Username", )
+
+    video_url = models.TextField(default='', blank=True)
+    image = models.ImageField(upload_to=scene_image_directory_path, max_length=255, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
+
+    external_url = models.ManyToManyField(SceneExternalURL, blank=True)
 
     objects = models.Manager()
     vector_tiles = CustomSceneMVTManager(
@@ -219,6 +268,27 @@ class Scene(models.Model):
         else:
             return sequences[0]
 
+    def get_external_urls(self):
+        external_urls = self.external_url.all()
+        return external_urls
+
+
+class POIExternalURL(models.Model):
+    external_url = models.TextField(default='')
+
+    class Meta:
+        ordering = ['external_url']
+
+    def __str__(self):
+        return self.external_url
+
+    def short_external_url(self):
+        external_url = self.external_url
+        if len(external_url) > 30:
+            return external_url[0:30] + '...'
+        else:
+            return external_url
+
 
 class PointOfInterest(models.Model):
     scene = models.ForeignKey(Scene, on_delete=models.CASCADE)
@@ -227,12 +297,21 @@ class PointOfInterest(models.Model):
     position_x = models.FloatField(default=0)
     position_y = models.FloatField(default=0)
     category = models.ForeignKey(POICategory, on_delete=models.CASCADE, default=1)
+    video_url = models.TextField(default='')
+    image = models.ImageField(upload_to=poi_image_directory_path, max_length=255, null=True, blank=True, storage=S3Boto3Storage(bucket=settings.AWS_STORAGE_BUCKET_NAME))
+
+    external_url = models.ManyToManyField(POIExternalURL)
+
 
     def __str__(self):
         return self.title
 
+    def get_external_urls(self):
+        external_urls = self.external_url.all()
+        return external_urls
 
-
+    def is_exist_image(self):
+        return bool(self.image)
 
 
 

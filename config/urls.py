@@ -49,6 +49,7 @@ sitemaps = {
     }, priority=0.9),
 }
 
+
 class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
     def login(self, request, extra_context=None):
         redirect_to = request.POST.get(
@@ -78,10 +79,13 @@ class AdminSiteOTPRequiredMixinRedirSetup(AdminSiteOTPRequired):
         return redirect_to_login(redirect_to)
 
 
-# handler404 = marketplaceViews.handler404
+handler404 = views.handler404
 # handler500 = marketplaceViews.handler500
 
-# admin.site.__class__ = AdminSiteOTPRequiredMixinRedirSetup
+
+if settings.USE_TWO_FACTOR_OAUTH == 1 or settings.USE_TWO_FACTOR_OAUTH == '1':
+    admin.site.__class__ = AdminSiteOTPRequiredMixinRedirSetup
+
 
 urlpatterns = [
     # path('', views.index, name='home'),
@@ -103,12 +107,19 @@ urlpatterns = [
     path('user/<str:username>/profile/', account_views.profile, name="account.profile"),
 
     path('tags_input/', include('tags_input.urls', namespace='tags_input')),
+
+
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
-    re_path(r'', include(tf_urls)),
+    path('robots.txt', include('robots.urls')),
+
+
     path('mission-control/', admin.site.urls, name='admin'),
+    re_path(r'', include(tf_urls)),
+
     path('api/', include('api.urls')),
     path('exchange_token', include('accounts.strava_url')),
 ]
+
 
 # This part is for deploying this project as a production(DEBUG=True) on heroku.
 if not settings.DEBUG:

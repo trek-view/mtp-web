@@ -74,6 +74,15 @@ class POICategoryAdmin(admin.ModelAdmin):
     )
 
 
+class SceneAdmin(admin.ModelAdmin):
+    list_display = (
+        'title',
+        'description'
+    )
+
+
+
 admin.site.register(Guidebook, GuidebookAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(POICategory, POICategoryAdmin)
+admin.site.register(Scene, SceneAdmin)

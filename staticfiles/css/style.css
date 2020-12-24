@@ -230,12 +230,19 @@ i.transport-type-icon {
     position: fixed;
     top: 110px;
     left: 10px;
-    opacity: .4;
+    opacity: 1;
+    background: #28a745!important;
+    padding: 1px;
+
+    color: white;
+}
+.close-sidebar {
+     border-radius: 50%;
 }
 
 i.open-sidebar {
     color: white;
-    background: black;
+    /*background: black;*/
     padding: 3px;
 }
 
@@ -419,6 +426,13 @@ i.fas, i.far {
     height: 160px !important;
 }
 
+@media only screen and (max-width: 768px) {
+    .right-board .paginator:first-child {
+        min-height: 38px;
+        margin-top: 70px;
+    }
+}
+
 
 @media only screen and (max-width: 600px) {
     .left-side {
@@ -456,10 +470,7 @@ i.fas, i.far {
         top: 80px;
     }
 
-    .right-board .paginator:first-child {
-        min-height: 38px;
-        margin-top: 70px;
-    }
+
 
     .detail-modal {
         width: 100% !important;
@@ -481,4 +492,45 @@ i.fas, i.far {
 .bootstrap-select .dropdown-menu.show {
     width: 100% !important;
     min-width: 100% !important;
+}
+
+.right-board .full-screen .mapillary-custom-banner {
+    font-size: 16px;
+    /* color: white; */
+
+    text-align: center;
+    z-index: 200;
+    position: absolute;
+    /* right: 10px; */
+    margin-left: auto;
+    top: 53px;
+    margin-right: auto;
+    width: calc(100% - 100px);
+    left: 50px;
+
+
+}
+
+.right-board .full-screen .mapillary-custom-banner a:hover, .right-board .full-screen .mapillary-custom-banner a {
+    color: white !important;
+    text-decoration: none;
+
+}
+.right-board .full-screen .mapillary-custom-banner > div span {
+    background: #00000057;
+    border-radius: 4px;
+    padding: 2px;
+    color: white;
+}
+
+.right-board .full-screen .mapillary-custom-banner > div span i {
+    font-size: 18px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+
+
+.right-board .small-screen .mapillary-custom-banner {
+    display: none;
 }

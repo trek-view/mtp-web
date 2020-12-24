@@ -56,6 +56,29 @@ class SequenceAdmin(tags_input_admin.TagsInputAdmin):
         'description'
     )
 
+    readonly_fields = [
+        "user",
+        "camera_make",
+        "captured_at",
+        'created_at',
+        'seq_key',
+        'pano',
+        'user_key',
+        'username',
+        'is_uploaded',
+        'is_private',
+        'imported_at',
+        'image_count',
+        'is_mapillary',
+        'is_image_download',
+        'is_map_feature',
+        'google_street_view',
+        'strava',
+        'distance',
+        'like_count',
+
+    ]
+
     def mapillary_sequence_key(self, obj):
         return obj.seq_key
 
@@ -64,6 +87,11 @@ class SequenceAdmin(tags_input_admin.TagsInputAdmin):
 
     def mapillary_username(self, obj):
         return obj.username
+
+    def get_form(self, request, obj=None, **kwargs):
+        self.exclude = ("geometry_coordinates", 'geometry_coordinates_ary', 'coordinates_cas', 'coordinates_image', )
+        form = super(SequenceAdmin, self).get_form(request, obj, **kwargs)
+        return form
 
     mapillary_sequence_key.short_description = 'Mapillary Sequence Key'
     mapillary_user_key.short_description = 'Mapillary User Key'
@@ -86,6 +114,34 @@ class ImageAdmin(admin.ModelAdmin):
     list_display = (
         'image_key',
     )
+
+    readonly_fields = [
+        "user",
+        "camera_make",
+        "camera_model",
+        'cas',
+        'captured_at',
+        'sequence',
+        'seq_key',
+        'image_key',
+        'pano',
+        'user_key',
+        'username',
+        'organization_key',
+        'is_uploaded',
+        'is_private',
+        'is_mapillary',
+        'lat',
+        'lng',
+        'ele',
+        'type',
+        'point',
+        'mapillary_image',
+        'image_label',
+        'map_feature_keys',
+        'map_feature_values',
+        'view_point_count'
+    ]
 
 
 class CameraMakeAdmin(admin.ModelAdmin):

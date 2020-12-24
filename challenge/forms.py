@@ -24,10 +24,13 @@ def camera_makes():
 
 
 def label_types():
-    lts = LabelType.objects.filter(parent__isnull=False, source='mtpw')
     label_type = [['all', 'All Types']]
-    for lt in lts:
-        label_type.append([lt.name, lt.getKey])
+    try:
+        lts = LabelType.objects.filter(parent__isnull=False, source='mtpw')
+        for lt in lts:
+            label_type.append([lt.name, lt.getKey])
+    except:
+        pass
     return label_type
 
 

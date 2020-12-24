@@ -1,0 +1,37 @@
+{% extends 'layouts/auth/base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <div class="container">
+        <div class="content pt-5">
+  <h1>{% block title %}{% trans "Enable Two-Factor Authentication" %}{% endblock %}</h1>
+
+  <p>{% blocktrans trimmed %}Congratulations, you've successfully enabled two-factor
+      authentication.{% endblocktrans %}</p>
+
+  {% if not phone_methods %}
+      <div>
+          <a href="{% url 'admin:index' %}" class="col-md-6btn btn btn-outline-primary">
+              {% trans "Admin Panel" %}
+          </a>
+          <a href="{% url 'two_factor:profile' %}" class="col-md-6btn btn btn-outline-info">
+              {% trans "Back to Profile" %}
+          </a>
+      </div>
+  {% else %}
+    <p>{% blocktrans trimmed %}However, it might happen that you don't have access to
+      your primary token device. To enable account recovery, add a phone
+      number.{% endblocktrans %}</p>
+    <div class="">
+        <a href="{% url 'two_factor:profile' %}"
+            class="col-md-6 btn btn-outline-info">{% trans "Back to Profile" %}</a>
+        <a href="{% url 'admin:index' %}"
+            class="col-md-6btn btn btn-outline-primary">{% trans "Admin Panel" %}</a>
+        <p><a href="{% url 'two_factor:phone_create' %}"
+            class="btn btn-success">{% trans "Add Phone Number" %}</a></p>
+    </div>
+
+  {% endif %}
+        </div>
+    </div>
+{% endblock %}

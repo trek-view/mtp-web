@@ -91,6 +91,7 @@ STATICFILES_FINDERS = (
 
 # mapbox
 MAPBOX_PUBLISH_TOKEN = os.environ.get('MAPBOX_TOKEN')
+MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN')
 
 # Setting for mailgun
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
@@ -127,3 +128,4 @@ FONT_AWESOME_KIT = os.environ.get('FONT_AWESOME_KIT')
 WEATHERSTACK_API_KEY = os.environ.get('WEATHERSTACK_API_KEY')
 OPENROUTESERVICE_API_KEY = os.environ.get('OPENROUTESERVICE_API_KEY')
 
+USE_TWO_FACTOR_OAUTH = os.environ.get('USE_TWO_FACTOR_OAUTH')

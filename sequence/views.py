@@ -7,7 +7,7 @@ from django.contrib.gis.geos import Point, Polygon, LineString
 from django.core import files
 from django.core import serializers
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.db.models.expressions import Window
 from django.db.models.functions.window import RowNumber
 from django.http import (
@@ -54,10 +54,12 @@ def import_sequence(request):
 def sequence_list(request):
     sequences = None
     page = 1
+    order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
             page = 1
+        order_type = request.GET.get('order_type')
         form = SequenceSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -158,8 +160,10 @@ def sequence_list(request):
         form = SequenceSearchForm()
 
     request.session['sequences_query'] = get_correct_sql(sequences)
-
-    paginator = Paginator(sequences.order_by('-captured_at'), 10)
+    if order_type == 'most_likes':
+        paginator = Paginator(sequences.order_by('-like_count', '-captured_at'), 10)
+    else:
+        paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
     try:
         pSequences = paginator.page(page)
@@ -196,7 +200,8 @@ def sequence_list(request):
         'pageName': 'Sequences',
         'pageTitle': 'Sequences',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
+        'page': page,
+        'order_type': order_type
     }
     return render(request, 'sequence/list.html', content)
 
@@ -205,10 +210,12 @@ def sequence_list(request):
 def my_sequence_list(request):
     sequences = None
     page = 1
+    order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
             page = 1
+        order_type = request.GET.get('order_type')
         form = SequenceSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -255,7 +262,10 @@ def my_sequence_list(request):
 
     request.session['sequences_query'] = get_correct_sql(sequences)
 
-    paginator = Paginator(sequences.order_by('-captured_at'), 10)
+    if order_type == 'most_likes':
+        paginator = Paginator(sequences.order_by('-like_count', '-captured_at'), 10)
+    else:
+        paginator = Paginator(sequences.order_by('-captured_at'), 10)
 
     try:
         pSequences = paginator.page(page)
@@ -292,7 +302,8 @@ def my_sequence_list(request):
         'pageName': 'My Sequences',
         'pageTitle': 'My Sequences',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
+        'page': page,
+        'order_type': order_type
     }
     return render(request, 'sequence/list.html', content)
 
@@ -407,10 +418,10 @@ def image_leaderboard(request):
         # image_json = image_view_points.filter(image__in=images).values('image').annotate(image_count=Count('image')).order_by('-image_count').annotate(
         #     rank=Window(expression=RowNumber()))
 
-        images = images.filter(pk__in=image_view_points.values_list('image_id'))
+        # images = images.filter(pk__in=image_view_points.values_list('image_id'))
         tmp_images = images
         image_json = images.values('id').annotate(
-            image_count=Count('id')).order_by('-image_count').annotate(
+            image_count=Sum('view_point_count')).order_by('-image_count').annotate(
             rank=Window(expression=RowNumber()))
     else:
         images = images.order_by('-captured_at')
@@ -743,8 +754,16 @@ def save_weather(sequence):
     return False
 
 
+def get_images_by_multi_sequences(sequences):
+    if isinstance(sequences, list) and len(sequences) > 0:
+        for sequence in sequences:
+            get_images_by_sequence(sequence)
+
+
 def get_images_by_sequence(sequence, source=None, token=None, image_insert=True, image_download=True, is_weather=True, mf_insert=True):
     seqs = Sequence.objects.filter(unique_id=sequence.unique_id)
+    print('sequence importing: ', sequence.seq_key)
+    is_print = True
     if seqs.count() == 0:
         print('Sequence is not existing.')
         return
@@ -758,7 +777,9 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
     image_json = mapillary.get_images_with_ele_by_seq_key([sequence.seq_key])
     if image_json and image_insert:
         image_features = image_json['features']
-        print('Images insert!')
+
+        if is_print:
+            print('Images insert!')
 
         image_keys = []
         image_position_ary = []
@@ -822,19 +843,23 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
 
             image.point = Point(image.lat, image.lng)
             image.save()
-            print('image key: ', image.image_key)
+            if is_print:
+                print('image key: ', image.image_key)
 
         if len(image_position_ary) > 0 and mf_insert:
-            print('Image len: ', len(image_position_ary))
+            if is_print:
+                print('Image len: ', len(image_position_ary))
             mm = 0
             for image_position in image_position_ary:
                 i_key = image_features[mm]['properties']['key']
                 mm += 1
-                print('===== {} ====='.format(mm))
+                if is_print:
+                    print('===== {} ====='.format(mm))
                 map_feature_json = mapillary.get_map_feature_by_close_to(image_position)
                 if map_feature_json:
                     map_features = map_feature_json['features']
-                    print('map_features len: ', len(map_features))
+                    if is_print:
+                        print('map_features len: ', len(map_features))
                     tt = 0
                     for map_feature in map_features:
                         tt += 1
@@ -924,16 +949,19 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
 
 
         if not settings.DEBUG and len(image_keys) > 0 and image_download:
-            print('image_download')
+            if is_print:
+                print('image_download')
             # Create the model you want to save the image to
             for image_key in image_keys:
                 images = Image.objects.filter(image_key=image_key)
                 if images.count() == 0:
-                    print('image_count: ', images.count())
+                    if is_print:
+                        print('image_count: ', images.count())
                     continue
                 if not images[0].mapillary_image is None and images[0].mapillary_image != '':
-                    print(images[0].mapillary_image)
-                    print('mapillary_image is not none')
+                    if is_print:
+                        print(images[0].mapillary_image)
+                        print('mapillary_image is not none')
                     continue
                 image = images[0]
 
@@ -941,6 +969,7 @@ def get_images_by_sequence(sequence, source=None, token=None, image_insert=True,
                 # Save the temporary image to the model#
                 # This saves the model so be sure that is it valid
                 if lf:
+                    print('image: ', image.image_key)
                     image.mapillary_image.save(image.image_key, files.File(lf))
                     image.save()
             sequence.is_image_download = True
@@ -967,6 +996,10 @@ def set_camera_make(sequence):
 
 
 def sequence_detail(request, unique_id):
+
+
+
+
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
     # if not sequence.is_published and request.user != sequence.user:
     #     messages.error(request, 'The sequence is not published.')
@@ -978,6 +1011,8 @@ def sequence_detail(request, unique_id):
     # set_camera_make(sequence)
 
     image_key = None
+
+
 
     page = 1
     if request.method == "GET":
@@ -1002,6 +1037,7 @@ def sequence_detail(request, unique_id):
     coordinates_image = sequence.coordinates_image
     coordinates_cas = sequence.coordinates_cas
 
+
     images = []
 
     for i in range(len(coordinates_image)):
@@ -1015,11 +1051,16 @@ def sequence_detail(request, unique_id):
         )
 
     view_points = 0
+    is_marked_point = False
     imgs = Image.objects.filter(image_key=coordinates_image[0])
     if imgs.count() > 0:
         i_vs = ImageViewPoint.objects.filter(image=imgs[0])
         view_points = i_vs.count()
-
+        if view_points > 0:
+            if request.user.is_authenticated:
+                i_vs_marked = i_vs.filter(user=request.user).first()
+                if i_vs_marked is not None:
+                    is_marked_point = True
     addSequenceForm = AddSequenceForm(instance=sequence)
 
     label_types = LabelType.objects.filter(parent__isnull=False)
@@ -1063,6 +1104,7 @@ def sequence_detail(request, unique_id):
         'first_image': images[0],
         'page': page,
         'view_points': view_points,
+        'is_marked_point': is_marked_point,
         'addSequenceForm': addSequenceForm,
         'label_types': label_types,
         'image_key': image_key,
@@ -1189,7 +1231,7 @@ def import_sequence_list(request):
         if action is None:
             action = 'filter'
 
-        if not month is None:
+        if month is not None:
             search_form.set_month(month)
 
             y = month.split('-')[0]
@@ -1204,6 +1246,7 @@ def import_sequence_list(request):
             features = []
             sequences_ary = []
 
+            # if page is none, then call mapillary api.
             if page is None:
                 start_time = month + '-01'
 
@@ -1229,14 +1272,18 @@ def import_sequence_list(request):
                 data = response.json()
                 features = data['features']
                 # features.sort(key=sort_by_captured_at)
-                request.session['sequences'] = features
+                # request.session['sequences'] = features
 
                 page = 1
 
-                for seq in features:
-                    seq_s = Sequence.objects.filter(seq_key=seq['properties']['key'])[:1]
-                    if seq_s.count() == 0:
-                        sequences_ary.append(seq)
+                features_len = len(features)
+
+                if features_len > 0:
+                    for feature_index in range(features_len):
+                        seq = features[features_len - 1 - feature_index]
+                        seq_s = Sequence.objects.filter(seq_key=seq['properties']['key']).first()
+                        if seq_s is None:
+                            sequences_ary.append(seq)
                 request.session['sequences'] = sequences_ary
 
             else:
@@ -1339,9 +1386,9 @@ def ajax_import(request, seq_key):
                 if feature['properties']['key'] == seq_key:
                     properties = feature['properties']
                     geometry = feature['geometry']
-                    sequence = Sequence.objects.filter(seq_key=seq_key)[:1]
+                    sequence = Sequence.objects.filter(seq_key=seq_key).first()
 
-                    if sequence.count() > 0:
+                    if sequence is not None:
                         continue
                     else:
                         sequence = Sequence()
@@ -1376,10 +1423,15 @@ def ajax_import(request, seq_key):
                     if 'private' in properties:
                         sequence.is_private = properties['private']
 
-                    sequence.name = form.cleaned_data['name']
+                    # if name empty, then use captured_at
+                    if form.cleaned_data['name'] is None or form.cleaned_data['name'] == '':
+                        captured_at = datetime.strptime(sequence.captured_at, '%Y-%m-%dT%H:%M:%S.000%z')
+                        sequence.name = captured_at.strftime("%Y-%m-%d %H:%M:%S")
+                    else:
+                        sequence.name = form.cleaned_data['name']
                     sequence.description = form.cleaned_data['description']
                     sequence.transport_type = form.cleaned_data['transport_type']
-                    sequence.is_published = True
+                    sequence.is_published = False
                     sequence.save()
 
                     sequence.distance = sequence.get_distance()
@@ -1425,6 +1477,100 @@ def ajax_import(request, seq_key):
     return JsonResponse({
         'status': 'failed',
         'message': 'Sequence was not imported.'
+    })
+
+
+@my_login_required
+def ajax_multi_import(request):
+    if request.method == 'POST':
+        sequence_keys_str = request.POST.get('sequence_keys')
+        transport_type = request.POST.get('transport_type')
+
+        if sequence_keys_str is not None and sequence_keys_str != '' and transport_type is not None and transport_type != '':
+            sequence_keys = sequence_keys_str.split(',')
+            sequences = []
+            sequence_unique_id = ""
+            for feature in request.session['sequences']:
+                # feature = request.session['sequences'][i]
+                if feature['properties']['key'] in sequence_keys:
+                    properties = feature['properties']
+                    geometry = feature['geometry']
+                    sequence = Sequence.objects.filter(seq_key=feature['properties']['key'])[:1]
+
+                    if sequence.count() > 0:
+                        continue
+                    else:
+                        sequence = Sequence()
+                    sequence.user = request.user
+                    if 'camera_make' in properties and properties['camera_make'] != '':
+                        camera_makes = CameraMake.objects.filter(name=properties['camera_make'])
+                        if camera_makes.count() > 0:
+                            c = camera_makes[0]
+                        else:
+                            c = CameraMake()
+                            c.name = properties['camera_make']
+                            c.save()
+                        sequence.camera_make = c
+
+                    sequence.captured_at = properties['captured_at']
+                    if 'created_at' in properties:
+                        sequence.created_at = properties['created_at']
+                    sequence.seq_key = properties['key']
+                    if 'pano' in properties:
+                        sequence.pano = properties['pano']
+                    if 'user_key' in properties:
+                        sequence.user_key = properties['user_key']
+                    if 'username' in properties:
+                        sequence.username = properties['username']
+                    sequence.geometry_coordinates_ary = geometry['coordinates']
+                    sequence.image_count = len(geometry['coordinates'])
+
+                    sequence.geometry_coordinates = LineString(sequence.geometry_coordinates_ary)
+
+                    sequence.coordinates_cas = properties['coordinateProperties']['cas']
+                    sequence.coordinates_image = properties['coordinateProperties']['image_keys']
+                    if 'private' in properties:
+                        sequence.is_private = properties['private']
+
+                    sequence.name = str(properties['captured_at'])
+                    sequence.description = None
+                    sequence.transport_type = transport_type
+                    sequence.is_published = True
+                    sequence.save()
+
+                    sequence.distance = sequence.get_distance()
+                    sequence.save()
+
+                    set_camera_make(sequence)
+
+                    continue
+
+                sequences.append(feature)
+
+            request.session['sequences'] = sequences
+
+            if len(sequences) > 0:
+                # get image data from mapillary with sequence_key
+                print('1')
+                p = threading.Thread(target=get_images_by_multi_sequences, args=(sequences,))
+                p.start()
+                print('2')
+                # messages.success(request, "Sequences successfully imported.")
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Sequences successfully imported. Sequences will be published in about 30 minutes or longer.'
+            })
+        else:
+            errors = []
+
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'Error'
+            })
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'Sequences were not imported.'
     })
 
 
@@ -1498,6 +1644,8 @@ def ajax_sequence_check_like(request, unique_id):
             liked_count = 0
         else:
             liked_count = liked_sequence.count()
+        sequence.like_count = liked_count
+        sequence.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Unliked',
@@ -1527,6 +1675,8 @@ def ajax_sequence_check_like(request, unique_id):
             liked_count = 0
         else:
             liked_count = liked_sequence.count()
+        sequence.like_count = liked_count
+        sequence.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Liked',
@@ -1560,6 +1710,12 @@ def ajax_get_image_detail(request, unique_id, image_key):
         })
 
     view_points = ImageViewPoint.objects.filter(image=image)
+    is_marked_point = False
+    if view_points.count() > 0:
+        if request.user.is_authenticated:
+            marked_point = view_points.filter(user=request.user).first()
+            if marked_point is not None:
+                is_marked_point = True
     scenes = Scene.objects.filter(image_key=image_key)
     content = {
         'image': image,
@@ -1576,7 +1732,8 @@ def ajax_get_image_detail(request, unique_id, image_key):
         'image_detail_box_html': image_detail_box_html,
         'status': 'success',
         'message': "",
-        'view_points': view_points.count()
+        'view_points': view_points.count(),
+        'is_marked_point': is_marked_point
     })
 
 
@@ -1805,8 +1962,8 @@ def ajax_add_image_label(request, unique_id, image_key):
 
 
 def ajax_get_image_list(request, unique_id):
-    sequence = Sequence.objects.get(unique_id=unique_id)
-    if not sequence:
+    sequence = Sequence.objects.filter(unique_id=unique_id).first()
+    if sequence is None:
         return JsonResponse({
             'status': 'failed',
             'message': 'The Sequence does not exist.'
@@ -1947,15 +2104,14 @@ def ajax_image_mark_view(request, unique_id, image_key):
             'message': "This sequence is not published."
         })
 
-    images = Image.objects.filter(seq_key=sequence.seq_key, image_key=image_key)
+    image = Image.objects.filter(seq_key=sequence.seq_key, image_key=image_key).first()
 
-    if images.count() == 0:
+    if image is None:
         return JsonResponse({
             'status': 'failed',
             'message': "The Image does not exist."
         })
 
-    image = images[0]
 
     image_view_points = ImageViewPoint.objects.filter(image=image, user=request.user)
     if image_view_points.count() > 0:
@@ -1969,7 +2125,9 @@ def ajax_image_mark_view(request, unique_id, image_key):
                     {'subject': subject, 'like': 'unviewed', 'sequence': sequence, 'image_key': image.image_key, 'sender': request.user},
                     request
                 )
-                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
+                email_thread = threading.Thread(target=send_mail_with_html, args=(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO,))
+                email_thread.start()
+                # send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         for v in image_view_points:
@@ -1979,6 +2137,8 @@ def ajax_image_mark_view(request, unique_id, image_key):
             view_points = 0
         else:
             view_points = marked_images.count()
+        image.view_point_count = view_points
+        image.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Unmarked',
@@ -1996,7 +2156,9 @@ def ajax_image_mark_view(request, unique_id, image_key):
                     {'subject': subject, 'like': 'viewed', 'sequence': sequence, 'image_key': image.image_key, 'sender': request.user},
                     request
                 )
-                send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
+                email_thread = threading.Thread(target=send_mail_with_html, args=(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO,))
+                email_thread.start()
+                # send_mail_with_html(subject, html_message, sequence.user.email, settings.SMTP_REPLY_TO)
             except:
                 print('email sending error!')
         image_view_point = ImageViewPoint()
@@ -2009,6 +2171,9 @@ def ajax_image_mark_view(request, unique_id, image_key):
             view_points = 0
         else:
             view_points = marked_images.count()
+
+        image.view_point_count = view_points
+        image.save()
         return JsonResponse({
 
             'status': 'success',
@@ -2081,6 +2246,7 @@ def ajax_image_map_feature(request, unique_id):
 
     image_key = request.GET.get('image_key', '')
     map_features_json = {}
+    features = []
     if image_key is not None and image_key != '':
         map_features = MapFeature.objects.filter(image_keys__contains=[image_key])
         for map_feature in map_features:
@@ -2089,8 +2255,20 @@ def ajax_image_map_feature(request, unique_id):
                 map_features_json[value] += 1
             else:
                 map_features_json[value] = 1
+            features.append({
+                'value': map_feature.value,
+                'mf_key': map_feature.mf_key,
+                'geometry_type': map_feature.geometry_type,
+                'lon': map_feature.geometry_point.coords[0],
+                'lat': map_feature.geometry_point.coords[1],
+                'accuracy': map_feature.accuracy,
+                'altitude': map_feature.altitude,
+                'direction': map_feature.direction,
+                'layer': map_feature.layer,
+            })
     data = {
-        'map_features': map_features_json
+        'map_features': map_features_json,
+        'features': features
     }
 
     return JsonResponse(data)
@@ -2248,9 +2426,57 @@ def ajax_get_import_sequence(request):
         })
 
 
-def insert_db(request):
+def ajax_get_import_next_sequence_id(request):
+    sequence_key = request.GET.get('sequence_key')
+    print(sequence_key)
+    is_seq = False
+    next_sequence_key = ''
+    for feature in request.session['sequences']:
+        # feature = request.session['sequences'][i]
+        if feature['properties']['key'] == sequence_key:
+            is_seq = True
+            continue
+        if is_seq:
+            next_sequence_key = feature['properties']['key']
+            break
+    print('next_sequence_key', next_sequence_key)
+    return JsonResponse({
+        'status': 'success',
+        'next_sequence_key': next_sequence_key,
+        'message': 'success'
+    })
 
 
+def ajax_check_import_limit(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You can't change the status."
+        })
+    user = request.user
+
+    user_grade = user.user_grade
+    sequence_limit_count = 5
+    if user_grade is not None:
+        sequence_limit_count = user_grade.sequence_limit_count
+
+    from datetime import timedelta, time
+    today = datetime.now().date()
+    tomorrow = today + timedelta(1)
+    today_start = datetime.combine(today, time())
+    today_end = datetime.combine(tomorrow, time())
+
+    today_imported_sequences = Sequence.objects.filter(user=user, is_mapillary=True, imported_at__gte=today_start, imported_at__lt=today_end)
+
+    today_count = len(today_imported_sequences)
+
+    return JsonResponse({
+        'status': 'success',
+        'sequence_limit_count': sequence_limit_count - today_count
+    })
+
+
+def manual_update(request):
 
     # for map_feature in map_features:
     #     image_keys = map_feature.image_keys
@@ -2259,11 +2485,43 @@ def insert_db(request):
     #         for image in images:
     #             print('sequence id: {}, image key: {}'.format(image.sequence.unique_id, image.image_key))
 
-    p = threading.Thread(target=update_mf_keys_with_thread)
-    p.start()
+    # p = threading.Thread(target=update_mf_keys_with_thread)
+    # p.start()
     #
     # p = threading.Thread(target=change_map_feature_field)
     # p.start()
+    method = request.GET.get('method')
+    if method == 'sort_by_like':
+        sequences = Sequence.objects.all()
+        for sequence in sequences:
+            sequence.like_count = sequence.get_like_count()
+            sequence.save()
+        guidebooks = Guidebook.objects.all()
+        for guidebook in guidebooks:
+            guidebook.like_count = guidebook.get_like_count()
+            guidebook.save()
+        tours = Tour.objects.all()
+        for tour in tours:
+            tour.like_count = tour.get_like_count()
+            tour.save()
+
+
+    if method == 'google_street_view':
+        sequences = Sequence.objects.all()
+        for sequence in sequences:
+            if sequence.google_street_view == False or sequence.google_street_view == 'false':
+                sequence.google_street_view = ''
+                sequence.save()
+
+
+    if method == 'view_point':
+        view_points = ImageViewPoint.objects.all()
+        for view_point in view_points:
+            if view_point.image.view_point_count is None:
+                view_point.image.view_point_count = 1
+            else:
+                view_point.image.view_point_count += 1
+            view_point.image.save()
 
     return redirect('home')
 

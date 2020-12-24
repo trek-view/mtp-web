@@ -8,7 +8,7 @@ from django.contrib.auth import (
 from django.utils.translation import gettext, gettext_lazy as _
 
 # App Packages
-from .models import CustomUser
+from .models import CustomUser, CustomBanner
 from django.utils.html import mark_safe
 
 UserModel = get_user_model()
@@ -216,3 +216,17 @@ class UserAvatarForm(forms.ModelForm):
         fields = (
             'avatar',
         )
+
+
+class CustomBannerForm(forms.ModelForm):
+    banner_text = forms.CharField(widget=forms.Textarea(
+        attrs={'class': 'form-control', 'data-validation': 'length', 'data-validation-length': 'max100', 'rows': 3}), required=False)
+
+    linked_url = forms.CharField(widget=forms.Textarea(
+        attrs={'class': 'form-control', 'data-validation': 'url', 'data-validation-optional': 'true', 'rows': 3}),
+        required=False)
+
+    class Meta:
+        model = CustomBanner
+        fields = ("banner_text", 'linked_url')
+

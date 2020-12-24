@@ -80,8 +80,10 @@ class AddSequenceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['name'] = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-validation': 'required'}),
-                           required=False)
+        self.fields['name'] = forms.CharField(
+            widget=forms.TextInput(attrs={'class': 'form-control'}),
+            required=False
+        )
 
         self.fields['description'] = forms.CharField(
             widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'data-validation-optional': 'true'}),

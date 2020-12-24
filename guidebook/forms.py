@@ -147,7 +147,7 @@ class PointOfInterestForm(forms.ModelForm):
         required=False,
         label='',
         widget=forms.Select(
-            attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}),
+            attrs={'class': 'form-control border', 'data-live-search': 'true'}),
         queryset=POICategory.objects.all(),
         to_field_name='pk',
         empty_label=None
@@ -157,7 +157,8 @@ class PointOfInterestForm(forms.ModelForm):
         model = PointOfInterest
         fields = (
             'title',
-            'description'
+            'category',
+            'description',
         )
 
 
@@ -211,3 +212,60 @@ class GuidebookSearchForm(forms.Form):
             required=False
         )
 
+
+class SceneImageForm(forms.ModelForm):
+    image = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        required=False
+    )
+
+    class Meta:
+        model = Scene
+
+        fields = (
+            'image',
+        )
+
+
+class SceneVideoForm(forms.ModelForm):
+    video_url = forms.CharField(
+        label='Guidebook Name',
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=False
+    )
+
+    class Meta:
+        model = Scene
+
+        fields = (
+            'video_url',
+        )
+
+
+class PoiImageForm(forms.ModelForm):
+    image = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        required=False
+    )
+
+    class Meta:
+        model = PointOfInterest
+
+        fields = (
+            'image',
+        )
+
+
+class PoiVideoForm(forms.ModelForm):
+    video_url = forms.CharField(
+        label='Guidebook Name',
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=False
+    )
+
+    class Meta:
+        model = PointOfInterest
+
+        fields = (
+            'video_url',
+        )

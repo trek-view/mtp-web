@@ -10,6 +10,8 @@ from accounts.models import CustomUser
 from sequence.models import Sequence, ImageViewPoint, CameraMake
 from .forms import *
 
+
+
 # Custom Libs ##
 # App packages
 
@@ -18,6 +20,7 @@ from .forms import *
 MAIN_PAGE_DESCRIPTION = "Leaderboard shows the ranking of users by Monthly and Transport type. One image is counted as 1 point."
 
 ############################################################################
+
 
 
 def index(request):

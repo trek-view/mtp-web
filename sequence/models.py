@@ -10,6 +10,7 @@ from django.contrib.auth import (
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 from mptt.models import MPTTModel, TreeForeignKey
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from lib.functions import *
 from lib.mvtManager import CustomMVTManager
@@ -19,7 +20,14 @@ UserModel = get_user_model()
 
 
 def image_directory_path(instance, filename):
-    path = 'sequence/{}/{}/{}.jpg'.format(instance.user.username, str(instance.sequence.unique_id), instance.image_key)
+    current_time = get_current_timestamp()
+    path = 'sequence/{}/{}/{}_{}.jpg'.format(instance.user.username, str(instance.sequence.unique_id), instance.image_key, current_time)
+    return path
+
+
+def sequence_image_directory_path(instance, filename):
+    current_time = get_current_timestamp()
+    path = 'sequence/{}/{}_{}.jpg'.format(instance.user.username, str(instance.unique_id), current_time)
     return path
 
 
@@ -182,12 +190,12 @@ class Sequence(models.Model):
     coordinates_image = ArrayField(models.CharField(default='', max_length=100), null=True, blank=True)
     is_uploaded = models.BooleanField(default=False)
     is_private = models.BooleanField(default=False)
-    updated_at = models.DateTimeField(default=datetime.now, blank=True)
+    imported_at = models.DateTimeField(default=datetime.now, blank=True)
 
-    name = models.CharField(max_length=100, default='')
-    description = models.TextField(default='')
+    name = models.CharField(max_length=100, default='', blank=True)
+    description = models.TextField(default='', blank=True)
     transport_type = models.ForeignKey(TransType, on_delete=models.CASCADE, null=True)
-    tag = models.ManyToManyField(Tag)
+    tag = models.ManyToManyField(Tag, null=True, blank=True)
 
     image_count = models.IntegerField(default=0)
 
@@ -196,10 +204,12 @@ class Sequence(models.Model):
     is_image_download = models.BooleanField(default=False)
     is_map_feature = models.BooleanField(default=False)
 
-    google_street_view = models.BooleanField(default=False)
+    google_street_view = models.TextField(default='', blank=True)
     strava = models.CharField(max_length=50, null=True, blank=True)
 
     distance = models.FloatField(null=True, blank=True)
+
+    like_count = models.IntegerField(default=0)
 
     objects = models.Manager()
     vector_tiles = CustomSequenceMVTManager(
@@ -208,6 +218,14 @@ class Sequence(models.Model):
         is_show_id=False,
         source_layer='mtp-sequences'
     )
+
+    def __str__(self):
+        if self.name is not None and self.name != '':
+            return self.name
+        elif self.seq_key is not None and self.seq_key != '':
+            return self.seq_key
+        else:
+            return self.unique_id
 
     def get_absolute_url(self):
         from django.urls import reverse
@@ -364,6 +382,8 @@ class Image(models.Model):
 
     map_feature_keys = ArrayField(ArrayField(models.CharField(max_length=50)), null=True, blank=True)
     map_feature_values = ArrayField(ArrayField(models.CharField(max_length=50)), null=True, blank=True)
+
+    view_point_count = models.IntegerField(default=0)
 
     objects = models.Manager()
     vector_tiles = CustomImageMVTManager(

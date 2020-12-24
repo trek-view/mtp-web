@@ -67,7 +67,13 @@
         {% include 'components/copyrite.html' %}
     </div>
     <div class="right-board list bg-light">
-        <div class="switch-list-viewer">
+        <div class="switch-list-viewer d-flex justify-content-between">
+            <div class="mr-2">
+                <select class="form-control" id="order_type" {{ order_type }} >
+                    <option value="latest_date" {% if order_type == 'latest_date' %}selected{% endif %}>Latest Date</option>
+                    <option value="most_likes" {% if order_type == 'most_likes' %}selected{% endif %}>Most Likes</option>
+                </select>
+            </div>
             <label for="switch-list-viewer"></label><input class="" type="checkbox" {% if request.GET.view_type is not None and request.GET.view_type == 'map-view' %}checked{% endif %} id="switch-list-viewer" data-toggle="toggle" data-on="Map View" data-off="List View" data-onstyle="success" data-offstyle="primary">
         </div>
         <div id="list-view" class="{% if request.GET.view_type is not None and request.GET.view_type == 'map-view' %}d-none{% endif %} list-view mt-4 mb-2 ml-auto mr-auto">
@@ -129,54 +135,59 @@
                                 <div class="detail-box col-md-7 col-lg-8">
                                     <div class="w-100">
                                         <div class="item-detail-box p-2">
-                                            <div class="guidebook-main ">
-                                                <div class="item-title text-info d-flex flex-row justify-content-between">
-                                                    <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
-                                                        <h5>
-                                                            {{ guidebook.name }}
-                                                        </h5>
-                                                    </a>
+                                            <div class="row align-items-center">
+                                                <div class="guidebook-main col-md-9">
+                                                    <div class="item-title text-info d-flex flex-row justify-content-between">
+                                                        <a href="{% url 'guidebook.guidebook_detail' unique_id=guidebook.unique_id %}">
+                                                            <h5>
+                                                                {{ guidebook.name }}
+                                                            </h5>
+                                                        </a>
+                                                    </div>
+
+                                                    <div class="item-description">
+                                                        <p class="mb-1">
+                                                            {{ guidebook.get_short_description }}
+                                                        </p>
+                                                    </div>
+
+                                                    <div class="guidebook-cetegory">
+                                                        <p class="mb-1">
+                                                            {{ guidebook.category }}
+                                                        </p>
+                                                    </div>
+
+                                                    <div class="w-100 d-flex flex-row">
+                                                         <p class="mb-1 mr-3 text-center">
+                                                             <i class="fas fa-image"></i>
+                                                             <br>
+                                                             {{ guidebook.getSceneCount }} Photos
+                                                         </p>
+                                                     </div>
+
+                                                    <div class="guidebook-tag" style="min-height: 24px;">
+                                                        {% for tag_name in guidebook.get_tags %}
+                                                            <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
+                                                                {{ tag_name }}
+                                                            </span>
+                                                        {% endfor %}
+                                                    </div>
+
+                                                    <div class="item-user d-flex justify-content-between">
+                                                        <a href="{% url 'account.profile' username=guidebook.user.username %}">
+                                                            <span class="user">{{ guidebook.user.username }}</span>
+                                                        </a>
+                                                        {% if guidebook.like_count > 0 %}
+                                                            <div><i class="fa-thumbs-up fas"></i><span class="ml-2" style="font-size: 15px">{{ guidebook.like_count }}</span></div>
+                                                        {% else %}
+                                                            <div><i class="fa-thumbs-up far"></i><span class="ml-2" style="font-size: 15px">0</span></div>
+                                                        {% endif %}
+                                                    </div>
+
                                                 </div>
-
-                                                <div class="item-description">
-                                                    <p class="mb-1">
-                                                        {{ guidebook.get_short_description }}
-                                                    </p>
+                                                <div class="col-md-3 text-center align-items-center">
+                                                    <div><p style="font-size: 13px">Created at: {{ guidebook.created_at }}</p></div>
                                                 </div>
-
-                                                <div class="guidebook-cetegory">
-                                                    <p class="mb-1">
-                                                        {{ guidebook.category }}
-                                                    </p>
-                                                </div>
-
-                                                <div class="w-100 d-flex flex-row">
-                                                     <p class="mb-1 mr-3 text-center">
-                                                         <i class="fas fa-image"></i>
-                                                         <br>
-                                                         {{ guidebook.getSceneCount }} Photos
-                                                     </p>
-                                                     <p class="mb-1 mr-3 text-center">
-                                                         <i class="far fa-thumbs-up"></i>
-                                                         <br>
-                                                         {{ guidebook.get_like_count }} Likes
-                                                     </p>
-                                                 </div>
-
-                                                <div class="guidebook-tag" style="min-height: 24px;">
-                                                    {% for tag_name in guidebook.get_tags %}
-                                                        <span class="tag pl-1 pr-1 mt-1 mb-1 mr-1">
-                                                            {{ tag_name }}
-                                                        </span>
-                                                    {% endfor %}
-                                                </div>
-
-                                                <div class="item-user">
-                                                    <a href="{% url 'account.profile' username=guidebook.user.username %}">
-                                                        <span class="user">{{ guidebook.user.username }}</span>
-                                                    </a>
-                                                </div>
-
                                             </div>
                                         </div>
                                     </div>

@@ -18,15 +18,32 @@ urlpatterns = [
     path('<str:unique_id>/ajax/upload_file/', views.ajax_upload_file, name='guidebook.ajax_upload_file'),
     path('<str:unique_id>/ajax/guidebook_update/', views.ajax_guidebook_update, name='guidebook.ajax_guidebook_update'),
     path('<str:unique_id>/ajax/order_scene/', views.ajax_order_scene, name='guidebook.ajax_order_scene'),
+
     path('<str:unique_id>/scene/ajax/save_poi/<int:pk>/', views.ajax_save_poi, name='guidebook.ajax_save_poi'),
     path('<str:unique_id>/scene/ajax/delete_poi/<int:pk>/', views.ajax_delete_poi, name='guidebook.ajax_delete_poi'),
+
     path('<str:unique_id>/scene/ajax/delete_scene/<int:pk>/', views.ajax_delete_scene, name='guidebook.ajax_delete_scene'),
+
+    path('<str:unique_id>/scene/ajax/add_scene_external_url/<int:pk>/', views.ajax_add_scene_external_url, name='guidebook.ajax_add_scene_external_url'),
+    path('<str:unique_id>/scene/ajax/delete_scene_external_url/<int:pk>/', views.ajax_delete_scene_external_url, name='guidebook.ajax_delete_scene_external_url'),
+    path('<str:unique_id>/scene/ajax/add_external_url/<int:pk>/', views.ajax_add_external_url, name='guidebook.ajax_add_external_url'),
+    path('<str:unique_id>/scene/ajax/delete_external_url/<int:pk>/', views.ajax_delete_external_url, name='guidebook.ajax_delete_external_url'),
+
     path('<str:unique_id>/ajax/edit/get_scene/', views.ajax_get_edit_scene, name='guidebook.ajax_get_edit_scene'),
     path('<str:unique_id>/ajax/edit/set_starting_view/', views.ajax_set_start_view, name='guidebook.ajax_set_start_view'),
     path('<str:unique_id>/ajax/get_scene/', views.ajax_get_scene, name='guidebook.ajax_get_scene'),
     path('<str:unique_id>/ajax/get_scene_list/', views.ajax_get_scene_list, name='guidebook.ajax_get_scene_list'),
 
-    path('ajax_get_detail_by_image_key/<str:image_key>', views.ajax_get_detail_by_image_key,
-         name='guidebook.ajax_get_detail_by_image_key'),
+    path('ajax_get_detail_by_image_key/<str:image_key>', views.ajax_get_detail_by_image_key, name='guidebook.ajax_get_detail_by_image_key'),
+
+    path('<str:unique_id>/scene/ajax_upload_scene_image/<str:scene_id>', views.ajax_upload_scene_image, name='guidebook.ajax_upload_scene_image'),
+    path('<str:unique_id>/scene/ajax_upload_scene_video/<str:scene_id>', views.ajax_upload_scene_video, name='guidebook.ajax_upload_scene_video'),
+    path('<str:unique_id>/scene/<str:scene_id>/ajax_upload_poi_image/<str:poi_id>', views.ajax_upload_poi_image, name='guidebook.ajax_upload_poi_image'),
+    path('<str:unique_id>/scene/<str:scene_id>/ajax_upload_poi_video/<str:poi_id>', views.ajax_upload_poi_video,
+         name='guidebook.ajax_upload_poi_video'),
+
+    path('<str:unique_id>/scene/ajax_scene_media_delete/<str:scene_id>', views.ajax_scene_media_delete, name='guidebook.ajax_scene_media_delete'),
+    path('<str:unique_id>/scene/<str:scene_id>/ajax_poi_media_delete/<str:poi_id>', views.ajax_poi_media_delete,
+         name='guidebook.ajax_poi_media_delete'),
 
 ]

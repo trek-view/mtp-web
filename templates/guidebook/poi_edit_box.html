@@ -13,15 +13,103 @@
             <form method="post">
                 {{ poi_form.as_p }}
 
+                <div class="external-url-list">
+                    <div class="d-flex justify-content-between">
+                        <span>External URLs: </span>
+                        <button type="button" class="save btn btn-warning btn-sm save-btn add-external-url" onclick="addExternalURL('{{ poi.pk }}')" data-poi-id="{{ poi.pk }}" >Add External URL</button>
+                    </div>
+                    <div>
+                        <textarea rows="1" class="form-control mt-1" placeholder="Please input external URL" id="input_external_url_{{ poi.pk }}"></textarea>
+                    </div>
+                    <ul class="d-flex flex-column" style="list-style-type: none" >
+                        {% for external_url in poi.get_external_urls %}
+                            <li id="external_url_{{ external_url.pk }}">
+                                <a href="{{ external_url.external_url }}" target="_blank">{{ external_url.short_external_url }}</a>
+                                <i class="far fa-times-circle" onclick="deleteExternalURL('{{ poi.pk }}', '{{ external_url.pk }}')" style="font-size: 15px; cursor: pointer"></i>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="text-left">
                         <div class="d-none"><span>X: </span><span class="position-x">{{ poi.position_x }}</span></div>
                         <div class="d-none"><span>Y: </span><span class="position-y">{{ poi.position_y }}</span></div>
                     </div>
 
-                    <div class="text-right">
-                        <button type="button" class="save btn btn-danger delete-btn delete-poi-button" data-poi-id="{{ poi.pk }}" >Delete</button>
-                        <button type="button" class="save btn btn-primary save-btn save-poi-button" data-poi-id="{{ poi.pk }}" >Save</button>
+                    <div class="w-100">
+                        <div class="media-box">
+                            <div class="added-media">
+                                {% if poi.video_url is not None and poi.video_url != '' %}
+                                    <iframe class="w-100 ml-auto mr-auto" height="200" src="{{ poi.video_url }}">
+                                    </iframe>
+                                {% elif poi.is_exist_image %}
+                                    <img class="w-100" height="200" src="{{ STATIC_URL }}{{ poi.image }}" />
+                                {% endif %}
+                            </div>
+                            <div class="w-100 btn-group dropup media-actions text-right">
+                                {% if poi.video_url is not None and poi.video_url != '' %}
+                                    <div class="w-100 add-actions d-none">
+                                        <div class="w-100 text-center mb-1">
+                                            <h6>Link video or image to this POI.</h6>
+
+                                            You can link video or upload image for your POI.
+                                        </div>
+                                        <a class="btn btn-warning btn-sm" href="javascript:showPOIVideoModal();">Add Video</a>
+                                        <a class="btn btn-warning btn-sm ml-3" href="javascript:uploadPOIImage();">Add Photo</a>
+                                    </div>
+
+                                    <div class="w-100 delete-action">
+                                        <a class="btn btn-danger btn-sm ml-3" href="javascript:deleteMedia();">Delete Media</a>
+                                    </div>
+                                {% elif poi.is_exist_image %}
+                                    <div class="w-100 add-actions d-none">
+                                        <div class="w-100 text-center mb-1">
+                                            <h6>Link video or image to this POI.</h6>
+
+                                            You can link video or upload image for your POI.
+                                        </div>
+                                        <a class="btn btn-warning btn-sm" href="javascript:showPOIVideoModal();">Add Video</a>
+                                        <a class="btn btn-warning btn-sm ml-3" href="javascript:uploadPOIImage();">Add Photo</a>
+                                    </div>
+
+                                    <div class="w-100 delete-action">
+                                        <a class="btn btn-danger btn-sm ml-3" href="javascript:deleteMedia();">Delete Media</a>
+                                    </div>
+                                {% else %}
+                                    <div class="w-100 add-actions">
+                                        <div class="w-100 text-center mb-1">
+                                            <h6>Link video or image to this POI.</h6>
+
+                                            You can link video or upload image for your POI.
+                                        </div>
+                                        <a class="btn btn-warning btn-sm" href="javascript:showPOIVideoModal();">Add Video</a>
+                                        <a class="btn btn-warning btn-sm ml-3" href="javascript:uploadPOIImage();">Add Photo</a>
+                                    </div>
+
+                                    <div class="w-100 delete-action d-none">
+                                        <a class="btn btn-danger btn-sm ml-3" href="javascript:deleteMedia();">Delete Media</a>
+                                    </div>
+                                {% endif %}
+
+
+
+{#                                <button type="button" class="btn btn-sm btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+{#                                    Add photo or video#}
+{#                                </button>#}
+{#                                <div class="dropdown-menu">#}
+{#                                    <a class="dropdown-item" href="javascript:showPOIVideoModal();">Link Video</a>#}
+{#                                    <a class="dropdown-item" href="javascript:uploadPOIImage();">Upload Image</a>#}
+{#                                </div>#}
+                            </div>
+                        </div>
+
+                        <hr class="mt-1 mb-1">
+
+                        <div class="w-100 text-right mt-2">
+                            <button type="button" class="save btn btn-danger btn-sm delete-btn delete-poi-button" data-poi-id="{{ poi.pk }}" >Delete</button>
+                            <button type="button" class="save btn btn-primary btn-sm save-btn save-poi-button" data-poi-id="{{ poi.pk }}" >Save</button>
+                        </div>
                     </div>
                 </div>
             </form>

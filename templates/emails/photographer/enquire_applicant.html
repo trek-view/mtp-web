@@ -1,5 +1,16 @@
 <body>
     <p>
-        Hi {{ request.user.username }}! You contacted {{ photographer.user.username }} about a job. We have sent your message to them. Please give them some time to respond. If needed, you can also contact them directly for more information by replying to this email.
+        Hi {{ request.user.username }}!
+    </p>
+    <p>
+    	You contacted {{ photographer.user.username }} about a job they posted. We have sent your message to them. Please give them some time to respond.
+    </p>
+    <p>
+    	You can also contact them directly for more information by replying to this email (but please give them sometime to respond to your first enquiry).
+    </p>
+    <p>
+        --<br/>
+        The Trek View team!<br/>
+        <a href="{{ BASE_URL }}">{{ BASE_URL }}</a>
     </p>
 </body>

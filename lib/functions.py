@@ -5,6 +5,12 @@ from django.conf import settings
 from django.core.mail.message import EmailMultiAlternatives
 from django.shortcuts import redirect
 from django.urls import reverse
+from datetime import datetime
+
+
+def get_current_timestamp():
+    current_time = str(int(datetime.now().timestamp()))
+    return current_time
 
 
 def send_mail_with_html(subject, html_message, to_email, reply_to, from_email=None):
@@ -81,3 +87,42 @@ def check_mapillary_token(user, token=None):
         return False
     else:
         return map_user_data
+
+
+def get_url_with_params(url, params=None):
+    if url is None or url == '':
+        return ''
+    import urllib.parse as urlparse
+    from urllib.parse import parse_qs
+    parsed = urlparse.urlparse(url)
+
+    # url doesn't have params.
+    main_url = url.split('?')[0]
+
+    # target url
+    url = ''
+
+    basic_params = parse_qs(parsed.query)
+    print(basic_params)
+
+    if params is not None and isinstance(params, list):
+        first = True
+        for param in params:
+            if param not in basic_params.keys():
+                print(param)
+                continue
+            if first:
+                url = '{}?{}={}'.format(main_url, param, parse_qs(parsed.query)[param][0])
+                first = False
+            else:
+                url = '{}&{}={}'.format(url, param, parse_qs(parsed.query)[param][0])
+
+    elif params is not None and isinstance(params, str) and params != '' and params in basic_params.keys():
+        url = '{}?{}={}'.format(main_url, params, parse_qs(parsed.query)[params][0])
+    return url
+
+
+def get_youtube_embed_url(url):
+    url = get_url_with_params(url, 'v')
+    return url.replace('watch?v=', 'embed/')
+

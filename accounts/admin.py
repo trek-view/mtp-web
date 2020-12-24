@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 ## App Packages
-from .models import CustomUser, MapillaryUser
+from .models import CustomUser, MapillaryUser, Grade
 
 
 class CustomUserAdmin(UserAdmin):
@@ -11,7 +11,8 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ('email', 'username', 'is_staff', 'date_joined', 'is_active', 'is_maillist')
     fieldsets = (
         (None, {'fields': ('email', 'username', 'password')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'user_permissions', 'mapillary_access_token')}),
+        ('Permissions', {'fields': ('user_permissions',)}),
+        ('Others', {'fields': ('user_grade', 'is_staff', 'is_active', 'mapillary_access_token')}),
     )
     add_fieldsets = (
         (None, {
@@ -22,8 +23,15 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('username',)
     ordering = ('username',)
 
+
 class MapillaryUserAdmin(admin.ModelAdmin):
     list_display = ('user', 'username', 'key', 'email', 'iamges_total_count', 'sequences_total_count', 'updated_at')
 
+
+class GradeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description', 'sequence_limit_count')
+
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(MapillaryUser, MapillaryUserAdmin)
+admin.site.register(Grade, GradeAdmin)

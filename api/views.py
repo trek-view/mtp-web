@@ -96,6 +96,9 @@ class SequenceImport(APIView):
             return Response({'error': 'Sequence id is invalid', 'status': False})
 
         data = request.data
+
+        print(data)
+
         message = ''
 
         if 'google_street_view' in data.keys():

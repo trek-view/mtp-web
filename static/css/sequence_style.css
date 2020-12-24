@@ -235,7 +235,7 @@ body {
     border-radius: 4px;
     text-align: center;
     z-index: 300;
-    position: absolute;
+    /*position: absolute;*/
     right: 15px;
 }
 
@@ -303,8 +303,12 @@ body {
     padding: 1px;
 }
 
-.switch-detection > div, .switch-gpx > div {
+.switch-detection > div, .switch-gpx > div, .switch-map-feature > div {
     width: 140px !important;
+}
+
+.switch-mtpw-labels > div{
+    width: 160px !important;
 }
 
 .switch-detection-auto > div, .switch-gpx > div {
@@ -326,4 +330,52 @@ body {
 
 .image-detection .detections > div.selected {
     background: #d6dad7;
+}
+
+.mapillary-right-actions .sidebar-icon i {
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.mapillary-right-actions .sidebar-icon i.small-icon {
+    font-size: 18px;
+}
+
+.mapillary-right-actions button, .mapillary-right-actions .image-view-point .view-icon {
+    height: 30px;
+}
+
+.mapillary-right-actions .default-icon, .mapillary-right-actions .share-icon {
+    height: 30px;
+    background: #00000057;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    min-width: 30px;
+}
+
+.mapillary-right-actions .image-view-point .view-icon i {
+    margin-right: 2px;
+}
+
+.mapillary-right-actions > div {
+    cursor: pointer;
+}
+
+.mapillary-right-actions .show-button {
+    transition: display 5s;
+}
+
+/*.mapillary-right-actions .hover-button:hover {*/
+/*    width: 130px;*/
+/*}*/
+
+.mapillary-right-actions .ui-accordion-header-icon {
+    display: none;
+}
+
+.mapillary-right-actions .ui-accordion-content-active {
+    height: 200px !important;
 }

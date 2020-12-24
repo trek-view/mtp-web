@@ -2,6 +2,8 @@
 {% load static %}
 {% block app_guidebook %}active{% endblock %}
 {% block app_style %}
+    <link href="{% static 'css/dropzone.min.css' %}" type='text/css' rel='stylesheet' />
+    <script src="{% static 'js/dropzone.min.js' %}" type='text/javascript'></script>
     <link rel="stylesheet" href="{% static 'css/guidebook_style.css' %}">
     <style>
         .TagContainer .TagVertex {
@@ -18,7 +20,50 @@
             height: 50px;
             border-radius: 50%;
         }
-    </style>
+
+    .dz-image img {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    .dz-image {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0px !important;
+    }
+    .dz-preview.dz-image-preview {
+        width: 100% !important;
+        height: 100% !important;
+        padding: 0px !important;
+        margin: 0px !important;
+    }
+    form.dropzone {
+        padding: 0px !important;
+        width: 200px !important;
+        height: 200px !important;
+    }
+    .dropzone .dz-preview .dz-error-message {
+        left: 103px;
+    }
+
+    .dropzone .dz-preview:hover .dz-image img {
+        -webkit-transform: unset;
+        transform: unset;
+        -webkit-filter: unset;
+        filter: unset;
+    }
+
+    .dz-image-cover img {
+        width: 120px !important;
+        height: 120px !important;
+        border-radius: 50% !important;
+    }
+
+
+    .modal-dialog {
+        margin-top: 130px;
+    }
+</style>
+
 {% endblock %}
 {% block content %}
     <link href='https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.css' rel='stylesheet' />
@@ -255,6 +300,46 @@
 
             <hr class="mt-2 mb-2" />
 
+            <div class="external-scene">
+
+            </div>
+
+            <div class="">
+                <div class="">
+                    <p class="font-weight-bold">Link video or image to this scene.</p>
+
+                    <p>
+                        You can link video or upload image for your scene.
+                    </p>
+                </div>
+
+
+
+                <div class="text-right mb-3">
+                    <div class="scene-added-media">
+                    </div>
+                    <div class="w-100 btn-group dropup scene-media-actions scene-add-media text-right">
+                        <div class="w-100 add-actions">
+                            <a class="btn btn-warning btn-sm" href="javascript:showSceneVideoModal();">Add Video</a>
+                            <a class="btn btn-warning btn-sm ml-3" href="javascript:uploadSceneImage();">Add Photo</a>
+                        </div>
+
+                        <div class="w-100 delete-action d-none">
+                            <a class="btn btn-danger btn-sm ml-3" href="javascript:deleteMedia(true);">Delete Media</a>
+                        </div>
+{#                                <button type="button" class="btn btn-sm btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+{#                                    Add photo or video#}
+{#                                </button>#}
+{#                                <div class="dropdown-menu">#}
+{#                                    <a class="dropdown-item" href="javascript:showPOIVideoModal();">Link Video</a>#}
+{#                                    <a class="dropdown-item" href="javascript:uploadPOIImage();">Upload Image</a>#}
+{#                                </div>#}
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mt-2 mb-2" />
+
             <div class="">
                 <p>
                     Add point's of interest to this scene to give viewers more information.
@@ -307,9 +392,93 @@
 
     </div>
 </div>
+
+    <!-- Modal -->
+<div class="modal fade" id="uploadPictureModal" tabindex="-1" role="dialog" aria-labelledby="uploadPictureModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadPictureModalLabel">Upload Picture</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="file-upload">
+                    <form action="{% url 'guidebook.ajax_upload_scene_image' unique_id=guidebook.unique_id scene_id='scene_id' %}" class="dropzone ml-auto mr-auto d-flex align-items-center justify-content-center">
+                        <div class="fallback">
+                            <input name="image" type="file" multiple="false" />
+                        </div>
+                    </form>
+                    <div class="text-right mt-3">
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary d-none" id='uploadfile'>Upload</button>
+                <button type="button" class="btn btn-danger d-none" id="removefile">Remove</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="uploadVideoModal" tabindex="-1" role="dialog" aria-labelledby="uploadVideoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadVideoModalLabel">Link Youtube Video.</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="">
+                    <form action="{% url 'guidebook.ajax_upload_scene_video' unique_id=guidebook.unique_id scene_id='scene_id' %}" class="">
+                        {% csrf_token %}
+                        <input name="video_url" type="text" class="form-control w-100" data-validation="custom" data-validation-regexp="youtube.com/watch" />
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="saveSceneVideoURL()">Save</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}
 
 {% block scripts %}
+<script>
+
+
+    var poi_clicking = false;
+
+    var poi_mouseup = function (e) {
+        poi_clicking = false;
+        var poi_id = e.target['data-poi-id'];
+    };
+    var poi_mousemove = function (e) {
+        console.log('mousemove', e.target['data-poi-id'])
+    };
+    var poi_mousedown = function (e) {
+        poi_clicking = true;
+        console.log('mousedown', e)
+    };
+    var poi_mouseover = function (e) {
+        console.log('mouseover', e)
+        refresh_mapillery_classes();
+    };
+    var poi_click = function (e) {
+        console.log('mouseclick', e)
+    };
+    var selected_poi_id = 0;
+</script>
+<script src="{% static 'js/mapillary.js' %}"></script>
 <script>
     var add_new_scene = false;
     $('#add_scene_button').click(function () {
@@ -356,32 +525,7 @@
             }
         });
     });
-</script>
-<script>
-    var poi_clicking = false;
 
-    var poi_mouseup = function (e) {
-        poi_clicking = false;
-        var poi_id = e.target['data-poi-id'];
-    };
-    var poi_mousemove = function (e) {
-        console.log('mousemove', e.target['data-poi-id'])
-    };
-    var poi_mousedown = function (e) {
-        poi_clicking = true;
-        console.log('mousedown', e)
-    };
-    var poi_mouseover = function (e) {
-        console.log('mouseover', e)
-        refresh_mapillery_classes();
-    };
-    var poi_click = function (e) {
-        console.log('mouseclick', e)
-    };
-    var selected_poi_id = 0;
-</script>
-<script src="{% static 'js/mapillary.js' %}"></script>
-<script>
     var is_show_poi_list = false;
     function hide_poi_box() {
         $('.left-side.poi-box').addClass('d-none');
@@ -681,9 +825,7 @@
         }, "waterway-label");
     }
 
-
-
-    var mapillery_clicking = false;
+    let mapillery_clicking = false;
     mapillaryViewer.on('mousedown', function () {
         mapillery_clicking = true;
     });
@@ -697,10 +839,19 @@
         }
     });
 
+
+    function clearSceneMedia() {
+        $('.scene-media-actions .add-actions').removeClass('d-none');
+        $('.scene-media-actions .delete-action').addClass('d-none');
+        $('.scene-added-media').html('');
+    }
+
     mapillaryViewer.on(Mapillary.Viewer.nodechanged, function (node) {
         current_node_point = [node.latLon.lat, node.latLon.lon];
         current_node_key = node.key;
         current_node_username = node.username;
+
+        clearSceneMedia()
 
         var href = location.protocol + '//' + location.host + location.pathname ;
         history.pushState({
@@ -737,6 +888,18 @@
                     }
                     refresh_poi_list();
                     refresh_mapillery_classes();
+
+                    $('.external-scene').html(data.scene_external_html);
+                    console.log(data.scene)
+
+                    var scene_image = '';
+                    if (data.scene[0]['fields']['image'] != null && data.scene[0]['fields']['image'] != '')
+                        scene_image = '{{ STATIC_URL }}' + data.scene[0]['fields']['image'];
+                    var resp = {'poi_image': '', 'poi_video': '', 'scene_image': scene_image, 'scene_video': data.scene[0]['fields']['video_url']}
+
+
+
+                    updateMediaBox(resp, true);
                 }
                 set_select_scene();
                 if (is_show_poi_list) {
@@ -926,6 +1089,13 @@
                             set_select_scene();
                         }
 
+                        $('.external-scene').html(data.scene_external_html);
+
+                        var scene_image = '';
+                        if (data.scene[0]['fields']['image'] != null && data.scene[0]['fields']['image'] != '')
+                            scene_image = '{{ STATIC_URL }}' + data.scene[0]['fields']['image'];
+                        var resp = {'poi_image': '', 'poi_video': '', 'scene_image': scene_image, 'scene_video': data.scene[0]['fields']['video_url']}
+                        updateMediaBox(resp, true);
 
                     }
                 }
@@ -1059,6 +1229,7 @@
             var title = poi_form.find("input[name=title]").val();
             var description = poi_form.find("textarea[name=description]").val();
             var category_id = poi_form.find("select[name=category]").val();
+            var external_url = poi_form.find("input[name=external_url]").val();
             $.ajax({
                 url: 'ajax/save_poi/' + current_scene_id + '/',
                 type: 'POST',
@@ -1067,7 +1238,8 @@
                     'poi_id': poi_id,
                     'title': title,
                     'category_id': category_id,
-                    'description': description
+                    'description': description,
+                    'external_url': external_url
                 },
                 dataType: 'json',
                 success: function (data) {
@@ -1120,6 +1292,120 @@
                 }
             })
         })
+    }
+
+    function validURL(str) {
+      var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+      return !!pattern.test(str);
+    }
+
+    function addExternalURL(poi_id) {
+        let external_url = $('#input_external_url_' + poi_id).val();
+        if (validURL(external_url)) {
+            $.ajax({
+                url: 'ajax/add_external_url/' + current_scene_id + '/',
+                type: 'POST',
+                data: {
+                    'poi_id': selected_poi_id,
+                    'external_url': external_url
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                        toastr.error(data.message);
+                    else
+                    {
+                        toastr.success(data.message);
+                        let external_url_li = '<li id="external_url_'+data.external_url_id+'">\n' +
+                            '                     <a href="'+external_url+'" target="_blank">'+data.short_external_url+'</a>\n' +
+                            '                         <i class="far fa-times-circle" onclick="deleteExternalURL(\''+poi_id+'\', \''+data.external_url_id+'\')" style="font-size: 15px; cursor: pointer"></i>\n' +
+                            '                  </li>';
+                        $('#poi_body_' + poi_id + ' .external-url-list ul').append(external_url_li);
+                        $('#input_external_url_' + poi_id).val('');
+                    }
+                }
+            });
+        }
+        else {
+            toastr.error('The external URL is invalid.');
+        }
+    }
+
+    function deleteExternalURL(poi_id, external_url_id) {
+        $.ajax({
+            url: 'ajax/delete_external_url/' + current_scene_id + '/',
+            type: 'POST',
+            data: {
+                'poi_id': poi_id,
+                'external_url_id': external_url_id
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else
+                {
+                    toastr.success(data.message);
+                    $('#external_url_' + external_url_id).remove();
+                }
+            }
+        });
+    }
+
+    function addSceneExternalURL() {
+        let external_url = $('#input_scene_external_url_' + current_scene_id).val();
+        if (validURL(external_url)) {
+            $.ajax({
+                url: 'ajax/add_scene_external_url/' + current_scene_id + '/',
+                type: 'POST',
+                data: {
+                    'external_url': external_url
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                        toastr.error(data.message);
+                    else
+                    {
+                        toastr.success(data.message);
+                        let external_url_li = '<li id="scene_external_url_'+data.external_url_id+'">\n' +
+                            '                     <a href="'+external_url+'" target="_blank">'+data.short_external_url+'</a>\n' +
+                            '                         <i class="far fa-times-circle" onclick="deleteSceneExternalURL(\''+data.external_url_id+'\')" style="font-size: 15px; cursor: pointer"></i>\n' +
+                            '                  </li>';
+                        $('.scene-external-url-list ul').append(external_url_li);
+                        $('#input_scene_external_url_' + current_scene_id).val('');
+                    }
+                }
+            });
+        }
+        else {
+            toastr.error('The external URL is invalid.');
+        }
+    }
+
+    function deleteSceneExternalURL(external_url_id) {
+        $.ajax({
+            url: 'ajax/delete_scene_external_url/' + current_scene_id + '/',
+            type: 'POST',
+            data: {
+                'external_url_id': external_url_id
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else
+                {
+                    toastr.success(data.message);
+                    $('#scene_external_url_' + external_url_id).remove();
+                }
+            }
+        });
     }
 
     function refresh_mapillery_classes() {
@@ -1620,5 +1906,206 @@
     });
 
     reorder_scene()
+
+    Dropzone.autoDiscover = false;
+    let server_image = false;
+
+    let myDropzone = new Dropzone(".dropzone", {
+        autoProcessQueue: false,
+        uploadMultiple: false,
+        parallelUploads: 1,
+        paramName: "image", // The name that will be used to transfer the file
+        maxFilesize: 20,
+        {#addRemoveLinks: true,#}
+        maxFiles: 1,
+        thumbnailWidth: 200,
+        thumbnailHeight: 200,
+        sending: function(file, xhr, formData) {
+            formData.append("csrfmiddlewaretoken", '{{ csrf_token }}');
+        },
+        init: function() {
+            this.on("maxfilesexceeded", function(file) {
+                this.removeAllFiles();
+                this.addFile(file);
+            });
+            this.on("success", function(file, response) {
+                updateMediaBox(response);
+                toastr.success('A picture is updated successfully.');
+            });
+            this.on("thumbnail", function(file, dataUrl) {
+                $('.dz-image').css('border-radius', '0px');
+                $('.dz-image img').css('width', '100%');
+                $('.dz-image img').css('height', '100%');
+                $('.dz-details').remove();
+                $('.dropzone .dz-preview').off('hover');
+            });
+            this.on('addedfile', function () {
+                $('#uploadfile').removeClass('d-none');
+                $('#removefile').removeClass('d-none');
+                if (server_image)
+                    $('#cancelfile').removeClass('d-none');
+                else
+                    $('#cancelfile').addClass('d-none');
+            });
+            this.on('removedfile', function () {
+                $('#uploadfile').addClass('d-none');
+                $('#removefile').addClass('d-none');
+            });
+            this.on('complete', function () {
+                var h = $('.dz-image').html();
+                $('.dz-image-cover').html(h);
+                server_image = true;
+                this.removeAllFiles();
+                $('#cancelfile').addClass('d-none');
+                $('#uploadPictureModal').modal('hide');
+                $('#user_cover_image').removeClass('d-none');
+            });
+
+            $('#change_file').click(function () {
+                $('#user_cover_image').addClass('d-none');
+                $('#file-upload').removeClass('d-none');
+            });
+        }
+    });
+
+    $('#cancelfile').click(function () {
+        myDropzone.removeAllFiles();
+        $('#user_cover_image').removeClass('d-none');
+        $('#file-upload').addClass('d-none');
+    });
+
+    $('#removefile').click(function () {
+        myDropzone.removeAllFiles();
+    });
+
+    $('#uploadfile').click(function(){
+        myDropzone.processQueue();
+    });
+
+
+    function uploadSceneImage() {
+        let url = "{% url 'guidebook.ajax_upload_scene_image' unique_id=guidebook.unique_id scene_id='scene_id' %}";
+        url = url.replace('scene_id', '' + current_scene_id);
+        myDropzone.options.url = url;
+        $('#uploadPictureModal').modal('show');
+    }
+
+    function showSceneVideoModal() {
+        let url = "{% url 'guidebook.ajax_upload_scene_video' unique_id=guidebook.unique_id scene_id='scene_id' %}";
+        url = url.replace('scene_id', '' + current_scene_id);
+        $('#uploadVideoModal form').attr('action', url);
+        $('#uploadVideoModal').modal('show');
+        $('#uploadVideoModal input[name="video_url"]').val('');
+    }
+
+    function showPOIVideoModal() {
+        let url = "{% url 'guidebook.ajax_upload_poi_video' unique_id=guidebook.unique_id scene_id='scene_id' poi_id='poi_id' %}";
+        url = url.replace('scene_id', '' + current_scene_id);
+        url = url.replace('poi_id', '' + selected_poi_id);
+        $('#uploadVideoModal form').attr('action', url);
+        $('#uploadVideoModal').modal('show');
+        $('#uploadVideoModal input[name="video_url"]').val('');
+    }
+
+    function saveSceneVideoURL() {
+        let url = $('#uploadVideoModal form').attr('action');
+        if ($('#uploadVideoModal form').isValid()) {
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: $('#uploadVideoModal form').serialize(),
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == 'failed')
+                        toastr.error(data.message);
+                    else {
+                        toastr.success(data.message);
+                        $('#uploadVideoModal').modal('hide');
+                        updateMediaBox(data);
+                    }
+                }
+            });
+        }
+    }
+
+    function deleteMedia(scene=false) {
+        if (scene) {
+            var url = "{% url 'guidebook.ajax_scene_media_delete' unique_id=guidebook.unique_id scene_id='scene_id' %}";
+            url = url.replace('scene_id', '' + current_scene_id);
+        }
+        else {
+            var url = "{% url 'guidebook.ajax_poi_media_delete' unique_id=guidebook.unique_id scene_id='scene_id' poi_id='poi_id' %}";
+            url = url.replace('scene_id', '' + current_scene_id);
+            url = url.replace('poi_id', '' + selected_poi_id);
+        }
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                    toastr.error(data.message);
+                else {
+                    toastr.success(data.message);
+                    if (scene) {
+                        $('.scene-added-media').html('');
+                        $('.scene-media-actions .add-actions').removeClass('d-none');
+                        $('.scene-media-actions .delete-action').addClass('d-none');
+                    }
+                    else {
+                        $('#poi_body_' + selected_poi_id + ' .media-box .added-media').html('');
+                        $('#poi_body_' + selected_poi_id + ' .media-box .media-actions .add-actions').removeClass('d-none');
+                        $('#poi_body_' + selected_poi_id + ' .media-box .media-actions .delete-action').addClass('d-none');
+                    }
+                }
+            }
+        });
+    }
+
+    function updateMediaBox(resp, scene=true) {
+        var is_add_action = true;
+        if (resp['poi_image'] != undefined && resp['poi_image'] != '' && resp['poi_image'] != null) {
+            $('#poi_body_' + selected_poi_id + ' .media-box .added-media').html('<img class="w-100" height="200" src="'+resp['poi_image']+'" />');
+            scene = false;
+        }
+        else if (resp['scene_image'] != undefined && resp['scene_image'] != '' && resp['scene_image'] != null) {
+            $('.scene-added-media').html('<img class="w-100" height="200" src="'+resp['scene_image']+'" />');
+        }
+        else if (resp['poi_video'] != undefined && resp['poi_video'] != '' && resp['poi_video'] != null) {
+            $('#poi_body_' + selected_poi_id + ' .media-box .added-media').html('<iframe class="w-100 ml-auto mr-auto" height="200" src="'+resp['poi_video']+'"></iframe>');
+            scene = false;
+        }
+        else if (resp['scene_video'] != undefined && resp['scene_video'] != '' && resp['scene_video'] != null) {
+            $('.scene-added-media').html('<iframe class="w-100 ml-auto mr-auto" height="200" src="'+resp['scene_video']+'"></iframe>');
+        }
+        else {
+            {#$('.scene-media-actions .add-actions').removeClass('d-none');#}
+            {#$('.scene-media-actions .delete-action').addClass('d-none');#}
+            {#$('.scene-added-media').html('');#}
+            return;
+        }
+
+
+        if (scene) {
+            $('.scene-media-actions .add-actions').addClass('d-none');
+            $('.scene-media-actions .delete-action').removeClass('d-none');
+        }
+        else {
+            $('#poi_body_' + selected_poi_id + ' .media-box .media-actions .add-actions').addClass('d-none');
+            $('#poi_body_' + selected_poi_id + ' .media-box .media-actions .delete-action').removeClass('d-none');
+        }
+
+    }
+
+    function uploadPOIImage() {
+        let url = "{% url 'guidebook.ajax_upload_poi_image' unique_id=guidebook.unique_id scene_id='scene_id' poi_id='poi_id' %}";
+        url = url.replace('scene_id', '' + current_scene_id);
+        url = url.replace('poi_id', '' + selected_poi_id);
+        myDropzone.options.url = url;
+        $('#uploadPictureModal').modal('show');
+    }
+
 </script>
 {% endblock %}

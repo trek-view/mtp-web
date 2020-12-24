@@ -17,8 +17,8 @@ from photographer.models import Photographer
 from sequence.models import Sequence, ImageViewPoint, SequenceLike, ImageLabel
 from tour.models import Tour, TourLike
 from .core import CustomRedirectView
-from .forms import UserSignUpForm, UserProfileForm, UserAvatarForm, UserUpdateForm
-from .models import CustomUser, MapillaryUser
+from .forms import UserSignUpForm, UserProfileForm, UserAvatarForm, UserUpdateForm, CustomBannerForm
+from .models import CustomUser, MapillaryUser, CustomBanner
 
 UserModel = get_user_model()
 
@@ -191,13 +191,13 @@ def account_close(request):
     return redirect('home')
 
 
-def check_mtpu_mapillary_oauth(request):
-    return redirect()
-
-
 def profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
+
     form = UserUpdateForm(instance=user)
+
+    custom_banner = CustomBanner.objects.filter(user=user).order_by('-updated_at').first()
+    banner_form = CustomBannerForm(instance=custom_banner)
 
     sequences = Sequence.objects.filter(user=user, is_published=True).exclude(image_count=0)
     imageCount = 0
@@ -253,6 +253,7 @@ def profile(request, username):
         'current_user': user,
         'username': username,
         'form': form,
+        'banner_form': banner_form,
         'mapper_label': mapper_label,
         'guidebook_label': guidebook_label,
         'finder_label': finder_label,
@@ -358,6 +359,34 @@ def ajax_user_update(request):
                 'last_name': user.last_name,
                 'website_url': user.website_url
             }
+        })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
+def ajax_custom_banner_update(request):
+    user = request.user
+
+    if request.method == "POST":
+
+        banner_text = request.POST.get('banner_text')
+        linked_url = request.POST.get('linked_url')
+        if banner_text is not None:
+            custom_banner = CustomBanner.objects.filter(user=user).order_by('-updated_at').first()
+            if custom_banner is None:
+                custom_banner = CustomBanner()
+                custom_banner.user = user
+            custom_banner.banner_text = banner_text
+            custom_banner.linked_url = linked_url
+            custom_banner.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Custom Banner was saved successfully.',
         })
 
     return JsonResponse({

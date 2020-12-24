@@ -39,14 +39,17 @@
     {% block app_style %}{% endblock %}
     <script src="{% static 'js/jquery.js' %}"></script>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-136706582-7"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '{{ GOOGLE_ANALYTICS }}');
-    </script>
+    {% if GOOGLE_ANALYTICS is not None and GOOGLE_ANALYTICS != '' %}
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ GOOGLE_ANALYTICS }}"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', '{{ GOOGLE_ANALYTICS }}');
+        </script>
+    {% endif %}
 <style>
     @media only screen and (max-width: 600px) {
         .right-board {
@@ -217,6 +220,14 @@
                 errorMessagePosition: 'top'
             });
 
+            $.formUtils.addValidator({
+                name : 'youtube',
+                    validatorFunction : function(value, $el, config, language, $form) {
+                        alert(value);
+                        return value.search('youtube.com/watch') >= 0;
+                    },
+                    errorMessage : 'Video must be youtube one.',
+                });
             $.validate();
         });
 
@@ -296,12 +307,23 @@
                 map.resize();
             }
 
+            if (typeof modal_map != 'undefined') {
+                modal_map.resize();
+            }
+
             if (typeof map_ary != 'undefined') {
                 for (var l=0; l < map_ary.length; l++) {
                     map_ary[l].resize();
                 }
             }
 
+        }
+
+        if (typeof modal_map != 'undefined') {
+            modal_map.addControl(new mapboxgl.NavigationControl({
+                showCompass: false,
+                showZoom: true
+            }), 'bottom-right');
         }
 
         if (typeof map != 'undefined') {
@@ -349,6 +371,16 @@
           let vh = window.innerHeight * 0.01;
           document.documentElement.style.setProperty('--vh', `${vh}px`);
         });
+
+        $('#order_type').change(function () {
+            let value = $(this).val();
+            let url = setParamInURL('order_type', value);
+            location.assign(url);
+        });
+
+        $('#close_banner_button').click(function () {
+            $(this).parent().addClass('d-none');
+        })
     </script>
 </body>
 </html>

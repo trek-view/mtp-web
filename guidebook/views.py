@@ -42,10 +42,12 @@ def guidebook_list(request):
         scene.save()
     guidebooks = None
     page = 1
+    order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
             page = 1
+        order_type = request.GET.get('order_type')
         form = GuidebookSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -92,7 +94,10 @@ def guidebook_list(request):
 
     request.session['guidebooks_query'] = get_correct_sql(guidebooks)
 
-    paginator = Paginator(guidebooks.order_by('-created_at'), 10)
+    if order_type == 'most_likes':
+        paginator = Paginator(guidebooks.order_by('-like_count', '-created_at'), 10)
+    else:
+        paginator = Paginator(guidebooks.order_by('-created_at'), 10)
 
     try:
         p_guidebooks = paginator.page(page)
@@ -121,7 +126,8 @@ def guidebook_list(request):
         'pageName': 'Guidebooks',
         'pageTitle': 'Guidebooks',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
+        'page': page,
+        'order_type': order_type
     }
     return render(request, 'guidebook/guidebook_list.html', content)
 
@@ -132,10 +138,12 @@ def my_guidebook_list(request):
     global form
     guidebooks = None
     page = 1
+    order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
             page = 1
+        order_type = request.GET.get('order_type')
         form = GuidebookSearchForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -184,7 +192,10 @@ def my_guidebook_list(request):
 
     request.session['guidebooks_query'] = get_correct_sql(guidebooks)
 
-    paginator = Paginator(guidebooks.order_by('-created_at'), 10)
+    if order_type == 'most_likes':
+        paginator = Paginator(guidebooks.order_by('-like_count', '-created_at'), 10)
+    else:
+        paginator = Paginator(guidebooks.order_by('-created_at'), 10)
 
     try:
         p_guidebooks = paginator.page(page)
@@ -214,7 +225,8 @@ def my_guidebook_list(request):
         'pageName': 'My Guidebooks',
         'pageTitle': 'My Guidebooks',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
-        'page': page
+        'page': page,
+        'order_type': order_type
     }
     return render(request, 'guidebook/guidebook_list.html', content)
 
@@ -421,6 +433,294 @@ def ajax_upload_file(request, unique_id):
 
 
 @my_login_required
+def ajax_upload_scene_image(request, unique_id, scene_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You can't access."
+        })
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+
+        form = SceneImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            form_data = form.save(commit=False)
+            scene.image.delete()
+            print('delete image')
+            scene.image = form_data.image
+            print('saved image')
+            print('-----')
+            print(scene.image.url)
+            print(str(scene.image))
+            print(scene.image.name)
+            scene.video_url = ''
+            scene.save()
+
+            print(len('guidebook/8be5fa7c-7177-4ff5-90f3-3276ede68146/scene/6a20d470-c1e3-435b-825f-d92e464c741d_160882.jpg'))
+
+            print('+++++')
+            print(scene.image.url)
+            print(str(scene.image))
+            print(scene.image.name)
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Picture is uploaded successfully.',
+                'poi_image': '',
+                'poi_video': '',
+                'scene_image': scene.image.url,
+                'scene_video': ''
+            })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
+def ajax_upload_scene_video(request, unique_id, scene_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You can't access."
+        })
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+
+        form = SceneVideoForm(request.POST)
+        if form.is_valid():
+            video_url = form.cleaned_data['video_url']
+            scene.video_url = get_youtube_embed_url(video_url)
+            scene.image.delete()
+            scene.save()
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Video URL is saved successfully.',
+                'poi_image': '',
+                'poi_video': '',
+                'scene_image': '',
+                'scene_video': scene.video_url
+            })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
+def ajax_scene_media_delete(request, unique_id, scene_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You can't access."
+        })
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+
+        scene.video_url = ''
+        scene.image.delete()
+        scene.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Media is deleted successfully.',
+        })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
+def ajax_upload_poi_image(request, unique_id, scene_id, poi_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        messages.error(request, "You can't access the page.")
+        return redirect('/')
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+
+        poi = PointOfInterest.objects.filter(scene=scene, pk=poi_id).first()
+        if poi is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Poi doesn't exist."
+            })
+
+
+        form = PoiImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            form_data = form.save(commit=False)
+            poi.image.delete()
+            poi.image = form_data.image
+            poi.video_url = ''
+            poi.save()
+
+            poi.image = form_data.image
+            poi.save()
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Picture is uploaded successfully.',
+                'poi_image': poi.image.url,
+                'poi_video': '',
+                'scene_image': '',
+                'scene_video': ''
+            })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
+def ajax_upload_poi_video(request, unique_id, scene_id, poi_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        messages.error(request, "You can't access the page.")
+        return redirect('/')
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+        poi = PointOfInterest.objects.filter(scene=scene, pk=poi_id).first()
+        if poi is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Poi doesn't exist."
+            })
+
+        form = PoiVideoForm(request.POST)
+        if form.is_valid():
+            video_url = form.cleaned_data['video_url']
+            poi.video_url = get_youtube_embed_url(video_url)
+            poi.image.delete()
+            poi.save()
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Video URL is saved successfully.',
+                'poi_image': '',
+                'poi_video': poi.video_url,
+                'scene_image': '',
+                'scene_video': ''
+            })
+        else:
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append(field.name + ': ' + error)
+            return JsonResponse({
+                'status': 'failed',
+                'message': '<br>'.join(errors)
+            })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
+def ajax_poi_media_delete(request, unique_id, scene_id, poi_id):
+    guidebook = get_object_or_404(Guidebook, unique_id=unique_id)
+    if guidebook.user != request.user:
+        messages.error(request, "You can't access the page.")
+        return redirect('/')
+
+    if request.method == "POST":
+        scene = Scene.objects.filter(guidebook=guidebook, pk=scene_id).first()
+        if scene is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Scene doesn't exist."
+            })
+        poi = PointOfInterest.objects.filter(scene=scene, pk=poi_id).first()
+        if poi is None:
+            return JsonResponse({
+                'status': 'failed',
+                'message': "Poi doesn't exist."
+            })
+
+        poi.video_url = ''
+        poi.image.delete()
+        poi.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Media is deleted successfully.',
+        })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': "You can't access."
+    })
+
+
+@my_login_required
 def ajax_add_scene(request, unique_id):
     guidebook = Guidebook.objects.get(unique_id=unique_id)
     if not guidebook:
@@ -449,11 +749,24 @@ def ajax_add_scene(request, unique_id):
                 old_scene.point = Point(lat, lng)
                 old_scene.username = username
                 old_scene.save()
+
+                scene_external_html = render_to_string(
+                    'guidebook/scene_external_edit_box.html',
+                    {'scene': old_scene},
+                    request
+                )
+
+                scene_json = serializers.serialize('json', [old_scene, ])
+                json_scene = json.loads(scene_json)
+
+
                 return JsonResponse({
                     'type': 'update',
                     'scene_id': old_scene.pk,
                     'title': old_scene.title,
                     'description': old_scene.description,
+                    'scene': json_scene,
+                    'scene_external_html': scene_external_html,
                     'status': 'success',
                     'message': 'Scene is updated successfully.'
                 })
@@ -487,11 +800,23 @@ def ajax_add_scene(request, unique_id):
                         guidebook.save()
                 else:
                     scene_count = 0
+
+                scene_external_html = render_to_string(
+                    'guidebook/scene_external_edit_box.html',
+                    {'scene': new_scene},
+                    request
+                )
+
+                scene_json = serializers.serialize('json', [new_scene, ])
+                json_scene = json.loads(scene_json)
+
                 return JsonResponse({
                     'type': 'new',
                     'scene_id': new_scene.pk,
                     'scene_box_html': scene_box_html,
                     'scene_count': scene_count,
+                    'scene': json_scene,
+                    'scene_external_html': scene_external_html,
                     'status': 'success',
                     'message': 'A new Scene is added successfully.'
                 })
@@ -570,6 +895,8 @@ def ajax_save_poi(request, unique_id, pk):
             poi.position_x = request.POST.get('position_x')
             poi.position_y = request.POST.get('position_y')
             poi.scene = scene
+            poi.image = None
+            poi.video_url = ''
             poi.save()
             message = 'A new Point of Interest is created successfully.'
 
@@ -622,6 +949,185 @@ def ajax_save_poi(request, unique_id, pk):
         'status': 'failed',
         'message': 'It failed to save Point of Interest!'
     })
+
+
+@my_login_required
+def ajax_add_scene_external_url(request, unique_id, pk):
+    guidebook = Guidebook.objects.get(unique_id=unique_id)
+    if not guidebook:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Guidebook does not exist or has no access.'
+        })
+    scene = Scene.objects.get(pk=pk)
+    if not scene or scene.guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Scene does not exist or has no access.'
+        })
+    if request.method == "POST":
+        external_url = request.POST.get('external_url')
+        if external_url is None or external_url == '':
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'External URL is required.'
+            })
+
+        external_url_obj = SceneExternalURL()
+        external_url_obj.external_url = external_url
+        external_url_obj.save()
+        scene.external_url.add(external_url_obj)
+        scene.save()
+
+        message = 'External URL is successfully added.'
+
+        return JsonResponse({
+            'status': 'success',
+            'message': message,
+            'external_url_id': external_url_obj.pk,
+            'short_external_url': external_url_obj.short_external_url()
+        })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'It failed to add External URL!'
+    })
+
+
+@my_login_required
+def ajax_delete_scene_external_url(request, unique_id, pk):
+    guidebook = Guidebook.objects.get(unique_id=unique_id)
+    if not guidebook:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Guidebook does not exist or has no access.'
+        })
+    scene = Scene.objects.get(pk=pk)
+    if not scene or scene.guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Scene does not exist or has no access.'
+        })
+    if request.method == "POST":
+
+        external_url_id = request.POST.get('external_url_id')
+        if external_url_id is None or external_url_id == '':
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'External URL is required.'
+            })
+
+        external_url = scene.external_url.filter(pk=external_url_id).first()
+        if external_url is not None:
+            external_url.delete()
+
+            message = 'External URL is successfully deleted.'
+
+            return JsonResponse({
+                'status': 'success',
+                'message': message,
+            })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'It failed to delete External URL!'
+    })
+
+
+@my_login_required
+def ajax_add_external_url(request, unique_id, pk):
+    guidebook = Guidebook.objects.get(unique_id=unique_id)
+    if not guidebook:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Guidebook does not exist or has no access.'
+        })
+    scene = Scene.objects.get(pk=pk)
+    if not scene or scene.guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Scene does not exist or has no access.'
+        })
+    if request.method == "POST":
+        poi = PointOfInterest.objects.get(pk=request.POST.get('poi_id'))
+        if not poi:
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'The Point of Interest does not exist or has no access.'
+            })
+        external_url = request.POST.get('external_url')
+        if external_url is None or external_url == '':
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'External URL is required.'
+            })
+
+        external_url_obj = POIExternalURL()
+        external_url_obj.external_url = external_url
+        external_url_obj.save()
+        poi.external_url.add(external_url_obj)
+        poi.save()
+
+        message = 'External URL is successfully added.'
+
+        return JsonResponse({
+            'status': 'success',
+            'message': message,
+            'poi_count': scene.get_poi_count(),
+            'external_url_id': external_url_obj.pk,
+            'short_external_url': external_url_obj.short_external_url()
+        })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'It failed to delete Point of Interest!'
+    })
+
+
+@my_login_required
+def ajax_delete_external_url(request, unique_id, pk):
+    guidebook = Guidebook.objects.get(unique_id=unique_id)
+    if not guidebook:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Guidebook does not exist or has no access.'
+        })
+    scene = Scene.objects.get(pk=pk)
+    if not scene or scene.guidebook.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The Scene does not exist or has no access.'
+        })
+    if request.method == "POST":
+        poi = PointOfInterest.objects.get(pk=request.POST.get('poi_id'))
+        if not poi:
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'The Point of Interest does not exist or has no access.'
+            })
+        external_url_id = request.POST.get('external_url_id')
+        if external_url_id is None or external_url_id == '':
+            return JsonResponse({
+                'status': 'failed',
+                'message': 'External URL is required.'
+            })
+
+        external_url = poi.external_url.filter(pk=external_url_id).first()
+        if external_url is not None:
+            external_url.delete()
+
+        message = 'External URL is successfully deleted.'
+
+        return JsonResponse({
+            'status': 'success',
+            'message': message,
+        })
+
+    return JsonResponse({
+        'status': 'failed',
+        'message': 'It failed to delete External URL of Interest!'
+    })
+
 
 
 @my_login_required
@@ -694,13 +1200,20 @@ def ajax_get_scene(request, unique_id):
         scene_first = scene[0]
         scene_first.poi_list = poi_list
 
+        scene_external_html = render_to_string(
+            'guidebook/scene_external_box.html',
+            {'scene': scene_first},
+            request
+        )
+
         scene_json = serializers.serialize('json', [scene_first, ])
         json_scene = json.loads(scene_json)
 
         return JsonResponse({
             'status': 'success',
             'scene': json_scene,
-            'poi_list': poi_list
+            'poi_list': poi_list,
+            'scene_external_html': scene_external_html
         })
 
 
@@ -725,6 +1238,8 @@ def ajax_get_edit_scene(request, unique_id):
         poi_list = []
         for poi in pois:
             poi_form = PointOfInterestForm(instance=poi)
+            for sss in poi.external_url.all():
+                print(sss.external_url)
             poi_box_html = render_to_string(
                 'guidebook/poi_edit_box.html',
                 {'poi': poi, 'poi_form': poi_form},
@@ -737,8 +1252,16 @@ def ajax_get_edit_scene(request, unique_id):
                 'poi_box_html': poi_box_html
             })
 
+
+
         scene_first = scene[0]
         scene_first.poi_list = poi_list
+
+        scene_external_html = render_to_string(
+            'guidebook/scene_external_edit_box.html',
+            {'scene': scene_first},
+            request
+        )
 
         scene_json = serializers.serialize('json', [scene_first, ])
         json_scene = json.loads(scene_json)
@@ -746,7 +1269,8 @@ def ajax_get_edit_scene(request, unique_id):
         return JsonResponse({
             'status': 'success',
             'scene': json_scene,
-            'poi_list': poi_list
+            'poi_list': poi_list,
+            'scene_external_html': scene_external_html
         })
 
 
@@ -904,6 +1428,8 @@ def check_like(request, unique_id):
             liked_count = 0
         else:
             liked_count = liked_guidebook.count()
+        guidebook.like_count = liked_count
+        guidebook.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Unliked',
@@ -932,6 +1458,8 @@ def check_like(request, unique_id):
             liked_count = 0
         else:
             liked_count = liked_guidebook.count()
+        guidebook.like_count = liked_count
+        guidebook.save()
         return JsonResponse({
             'status': 'success',
             'message': 'Liked',

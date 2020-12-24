@@ -1,8 +1,13 @@
 <body>
-    <div>
-        <h2>{{ subject }}</h2>
-    </div>
     <p>
-        Please click <a href="{{ BASE_URL }}{% url 'login' %}">here</a> to login.
+        Your email address is confirmed. Please click the link below to login into Map the Paths.
+    </p>
+    <p>
+    	<a href="{{ BASE_URL }}{% url 'login' %}">{{ BASE_URL }}{% url 'login' %}</a>
+    </p>
+    <p>
+        --<br/>
+        The Trek View team!<br/>
+        <a href="{{ BASE_URL }}">{{ BASE_URL }}</a>
     </p>
 </body>

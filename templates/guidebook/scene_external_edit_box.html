@@ -1,0 +1,17 @@
+<div class="scene-external-url-list">
+    <div class="d-flex justify-content-between">
+        <span>External URLs: </span>
+        <button type="button" class="save btn btn-warning btn-sm save-btn add-external-url" onclick="addSceneExternalURL()" >Add External URL</button>
+    </div>
+    <div>
+        <textarea rows="1" class="form-control mt-1" placeholder="Please input external URL" id="input_scene_external_url_{{ scene.pk }}"></textarea>
+    </div>
+    <ul class="d-flex flex-column" style="list-style-type: none" >
+        {% for external_url in scene.get_external_urls %}
+            <li id="scene_external_url_{{ external_url.pk }}">
+                <a href="{{ external_url.external_url }}" target="_blank">{{ external_url.short_external_url }}</a>
+                <i class="far fa-times-circle" onclick="deleteSceneExternalURL('{{ external_url.pk }}')" style="font-size: 15px; cursor: pointer"></i>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

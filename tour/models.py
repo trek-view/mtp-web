@@ -31,6 +31,7 @@ class Tour(models.Model):
     created_at = models.DateTimeField(default=datetime.now, blank=True)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)
     is_published = models.BooleanField(default=True)
+    like_count = models.IntegerField(default=0)
 
     def get_absolute_url(self):
         from django.urls import reverse

@@ -7,6 +7,8 @@ from django.conf import settings
 from django.core.validators import RegexValidator
 from storages.backends.s3boto3 import S3Boto3Storage
 from datetime import datetime
+from lib.functions import get_current_timestamp
+import time
 # Create your models here.
 
 
@@ -44,7 +46,30 @@ class CustomUserManager(BaseUserManager):
 
 def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'user/avatar/{}'.format(instance.username)
+    current_time = get_current_timestamp()
+    return 'user/avatar/{}_{}.jpg'.format(instance.username, current_time)
+
+
+class Grade(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(null=True, blank=True)
+    sequence_limit_count = models.IntegerField(default=5)
+    is_hall = models.BooleanField(default=False)
+    hall_title = models.CharField(max_length=100, default='')
+    is_hall_avatar = models.BooleanField(default=False)
+    hall_text = models.TextField(null=True, blank=True)
+    hall_link = models.TextField(null=True, blank=True)
+    user_type = models.CharField(
+        max_length=255,
+        choices=(
+            ('Free', 'Free'),
+            ('Paid', 'Paid'),
+        ),
+        default='Free',
+    )
+
+    def __str__(self):
+        return self.name
 
 
 class CustomUser(AbstractUser):
@@ -64,6 +89,8 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(max_length=30, null=True, blank=True, validators=[alpha])
     website_url = models.TextField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+
+    user_grade = models.ForeignKey(Grade, on_delete=models.CASCADE, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -91,6 +118,19 @@ class CustomUser(AbstractUser):
         else:
             return website_url
 
+    def get_sequence_limit(self):
+        if self.user_grade is None:
+            return 5
+        else:
+            return self.user_grade.sequence_limit_count
+
+    def get_custom_banner(self):
+        custom_banner = CustomBanner.objects.filter(user=self).order_by('-updated_at').first()
+        if custom_banner is None:
+            return None
+        else:
+            return custom_banner
+
 
 class MapillaryUser(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -103,4 +143,11 @@ class MapillaryUser(models.Model):
     is_active = models.BooleanField(default=True)
     iamges_total_count = models.IntegerField(default=0)
     sequences_total_count = models.IntegerField(default=0)
+    updated_at = models.DateTimeField(default=datetime.now, blank=True)
+
+
+class CustomBanner(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    banner_text = models.TextField(null=True)
+    linked_url = models.TextField(null=True)
     updated_at = models.DateTimeField(default=datetime.now, blank=True)

@@ -1,5 +1,16 @@
 <body>
     <p>
-        Hi {{ sequence.user.username }}! You received a view point for your photo: <a href="{{ BASE_URL }}{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}?image_key={{ image_key }}">{{ image_key }}</a> by <a href="{% url 'account.profile' username=sender.username %}">{{ sender.username }}</a>.
+        Hi {{ sequence.user.username }}!
+    </p>
+    <p>
+    	You received a view point for your photo: <a href="{{ BASE_URL }}{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}?image_key={{ image_key }}">{{ image_key }}</a> ({{ BASE_URL }}{% url 'sequence.sequence_detail' unique_id=sequence.unique_id %}?image_key={{ image_key }}) from <a href="{{ BASE_URL }}{% url 'account.profile' username=sender.username %}">{{ sender.username }}</a> ({{ BASE_URL }}{% url 'account.profile' username=sender.username %}).
+    </p>
+    <p>
+        --<br/>
+        The Trek View team!<br/>
+        <a href="{{ BASE_URL }}">{{ BASE_URL }}</a>
+    </p>
+    <p>
+    	<em>p.s You can stop these emails by logging into your Map the Paths account, and selecting <a href="{{ BASE_URL }}">My Profile > Edit Communication settings</a>.</em>
     </p>
 </body>
