@@ -453,7 +453,13 @@ def ajax_upload_scene_image(request, unique_id, scene_id):
         if form.is_valid():
             form_data = form.save(commit=False)
             scene.image.delete()
+            print('delete image')
             scene.image = form_data.image
+            print('saved image')
+            print('-----')
+            print(scene.image.url)
+            print(str(scene.image))
+            print(scene.image.name)
             scene.video_url = ''
             scene.save()
 
