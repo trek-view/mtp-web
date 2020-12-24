@@ -839,10 +839,19 @@
         }
     });
 
+
+    function clearSceneMedia() {
+        $('.scene-media-actions .add-actions').removeClass('d-none');
+        $('.scene-media-actions .delete-action').addClass('d-none');
+        $('.scene-added-media').html('');
+    }
+
     mapillaryViewer.on(Mapillary.Viewer.nodechanged, function (node) {
         current_node_point = [node.latLon.lat, node.latLon.lon];
         current_node_key = node.key;
         current_node_username = node.username;
+
+        clearSceneMedia()
 
         var href = location.protocol + '//' + location.host + location.pathname ;
         history.pushState({
@@ -888,9 +897,7 @@
                         scene_image = '{{ STATIC_URL }}' + data.scene[0]['fields']['image'];
                     var resp = {'poi_image': '', 'poi_video': '', 'scene_image': scene_image, 'scene_video': data.scene[0]['fields']['video_url']}
 
-                    $('.scene-media-actions .add-actions').removeClass('d-none');
-                    $('.scene-media-actions .delete-action').addClass('d-none');
-                    $('.scene-added-media').html('');
+
 
                     updateMediaBox(resp, true);
                 }
