@@ -191,71 +191,8 @@ def account_close(request):
     return redirect('home')
 
 
-def test_upload_image(user):
-    avatar = user.avatar
-    print(avatar)
-    print(avatar.name)
-    print(avatar.url)
-    # avatar.storage.delete(avatar.name)
-
-    # from boto.s3.connection import S3Connection, Bucket, Key
-    #
-    # conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-    #
-    # b = Bucket(conn, settings.AWS_S3_MAPILLARY_BUCKET)
-    #
-    # print(b.connection)
-    import boto3
-
-    s3 = boto3.resource(
-        service_name='s3',
-        region_name='us-east-2',
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
-    )
-
-    # for bucket in s3.buckets.all():
-    #     print(bucket.name)
-    #
-    #     for obj in s3.Bucket(bucket.name).objects.all():
-    #         print(obj)
-    bucket = s3.Bucket('staging-backpack.mtp.trekview.org')
-
-    for obj in s3.Bucket(bucket.name).objects.all():
-        # print(obj.key)
-        key_name = obj.key
-        if key_name.find('user/avatar') >= 0:
-            print(key_name)
-    #         obj.delete()
-    #
-    # for obj in s3.Bucket(bucket.name).objects.all():
-    #     # print(obj.key)
-    #     key_name = obj.key
-    #     if key_name.find('user/avatar/superadmin') >= 0:
-    #         print(key_name)
-
-    # k = Key(b)
-    #
-    # k.key = avatar.name
-    #
-    # for key in b.list(prefix='user/avatar'):
-    #     print(key)
-    # print(b.list())
-
-    # b.delete_key(avatar.name)
-
-    # my_bucket = b.('user/avatar/')
-    #
-    # for my_bucket_object in my_bucket.objects.all():
-    #     print(my_bucket_object)
-    #
-    # print('----test----')
-
-
 def profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
-
-    # test_upload_image(user)
 
     form = UserUpdateForm(instance=user)
 

@@ -7,6 +7,8 @@ from django.conf import settings
 from django.core.validators import RegexValidator
 from storages.backends.s3boto3 import S3Boto3Storage
 from datetime import datetime
+from lib.functions import get_current_timestamp
+import time
 # Create your models here.
 
 
@@ -44,7 +46,8 @@ class CustomUserManager(BaseUserManager):
 
 def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'user/avatar/{}'.format(instance.username)
+    current_time = get_current_timestamp()
+    return 'user/avatar/{}_{}.jpg'.format(instance.username, current_time)
 
 
 class Grade(models.Model):

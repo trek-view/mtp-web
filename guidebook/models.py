@@ -9,6 +9,7 @@ from django.contrib.gis.db import models
 from django.urls import reverse
 
 from lib.mvtManager import CustomMVTManager
+from lib.functions import get_current_timestamp
 from sys_setting.models import Tag
 from sequence.models import Sequence
 
@@ -18,19 +19,25 @@ from storages.backends.s3boto3 import S3Boto3Storage
 UserModel = get_user_model()
 
 
+
+
+
 def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'guidebook/{0}/cover_image/{1}.jpg'.format(instance.unique_id, filename)
+    current_time = get_current_timestamp()
+    return 'guidebook/{0}/cover_image/{1}.jpg'.format(instance.unique_id, current_time)
 
 
 def scene_image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'guidebook/{}/scene/{}.jpg'.format(instance.guidebook.unique_id, instance.unique_id)
+    current_time = get_current_timestamp()
+    return 'guidebook/{}/scene/{}_{}.jpg'.format(instance.guidebook.unique_id, instance.unique_id, current_time)
 
 
 def poi_image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'guidebook/{}/scene/{}/poi/{}.jpg'.format(instance.scene.guidebook.unique_id, instance.scene.unique_id, instance.pk)
+    current_time = get_current_timestamp()
+    return 'guidebook/{}/scene/{}/poi/{}_{}.jpg'.format(instance.scene.guidebook.unique_id, instance.scene.unique_id, instance.pk, current_time)
 
 
 

@@ -20,12 +20,14 @@ UserModel = get_user_model()
 
 
 def image_directory_path(instance, filename):
-    path = 'sequence/{}/{}/{}.jpg'.format(instance.user.username, str(instance.sequence.unique_id), instance.image_key)
+    current_time = get_current_timestamp()
+    path = 'sequence/{}/{}/{}_{}.jpg'.format(instance.user.username, str(instance.sequence.unique_id), instance.image_key, current_time)
     return path
 
 
 def sequence_image_directory_path(instance, filename):
-    path = 'sequence/{}/{}.jpg'.format(instance.user.username, str(instance.unique_id))
+    current_time = get_current_timestamp()
+    path = 'sequence/{}/{}_{}.jpg'.format(instance.user.username, str(instance.unique_id), current_time)
     return path
 
 

@@ -5,6 +5,12 @@ from django.conf import settings
 from django.core.mail.message import EmailMultiAlternatives
 from django.shortcuts import redirect
 from django.urls import reverse
+from datetime import datetime
+
+
+def get_current_timestamp():
+    current_time = str(int(datetime.now().timestamp()))
+    return current_time
 
 
 def send_mail_with_html(subject, html_message, to_email, reply_to, from_email=None):
