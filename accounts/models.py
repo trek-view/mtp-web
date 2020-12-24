@@ -44,7 +44,7 @@ class CustomUserManager(BaseUserManager):
 
 def image_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'user/avatar/{}'.format(instance.username)
+    return 'user/avatar/{}/{}'.format(instance.username, filename)
 
 
 class Grade(models.Model):
