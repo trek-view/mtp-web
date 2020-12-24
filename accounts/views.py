@@ -226,6 +226,13 @@ def test_upload_image(user):
         key_name = obj.key
         if key_name.find('user/avatar') >= 0:
             print(key_name)
+    #         obj.delete()
+    #
+    # for obj in s3.Bucket(bucket.name).objects.all():
+    #     # print(obj.key)
+    #     key_name = obj.key
+    #     if key_name.find('user/avatar/superadmin') >= 0:
+    #         print(key_name)
 
     # k = Key(b)
     #
@@ -248,7 +255,7 @@ def test_upload_image(user):
 def profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
 
-    test_upload_image(user)
+    # test_upload_image(user)
 
     form = UserUpdateForm(instance=user)
 
