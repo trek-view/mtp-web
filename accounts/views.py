@@ -193,6 +193,26 @@ def account_close(request):
 
 def profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
+    avatar = user.avatar
+    print(avatar)
+    print(avatar.name)
+    print(avatar.url)
+    # avatar.storage.delete(avatar.name)
+
+    from boto.s3.connection import S3Connection, Bucket, Key
+
+    conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+
+    b = Bucket(conn, settings.AWS_STORAGE_BUCKET_NAME)
+
+    k = Key(b)
+
+    k.key = avatar.name
+
+    b.delete_key(k)
+
+    print('----test----')
+
     form = UserUpdateForm(instance=user)
 
     custom_banner = CustomBanner.objects.filter(user=user).order_by('-updated_at').first()
