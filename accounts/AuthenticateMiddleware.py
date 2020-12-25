@@ -31,9 +31,12 @@ class AuthMd(MiddlewareMixin):
 def process_view(self, request, view_func, view_args, view_kwargs):
     # No need to process URLs if user already logged in
     print('======test=======')
+    print(request.path)
     if request.user.is_authenticated:
         if request.path == reverse('login') or request.path == reverse('signup'):
             return redirect('/')
         return None
+    # else:
+    #     request.path == ''
     # Explicitly return None for all non-matching requests
     return None
