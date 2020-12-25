@@ -30,13 +30,22 @@ class AuthMd(MiddlewareMixin):
     """
     def process_view(self, request, view_func, view_args, view_kwargs):
         # No need to process URLs if user already logged in
+        absolute_url = request.build_absolute_uri()
+        path = request.path
+        root_url = request.build_absolute_uri('/')[:-1].strip("/")
         print('======test=======')
         print(request.path)
+        print(request.build_absolute_uri())
+        print(request.build_absolute_uri('/')[:-1].strip("/"))
+        print(request.build_absolute_uri('/'))
         if request.user.is_authenticated:
             if request.path == reverse('login') or request.path == reverse('signup'):
                 return redirect('/')
             return None
-        # else:
-        #     request.path == ''
+        else:
+            if path == reverse('oauth2_provider:authorize'):
+                sec_url = absolute_url.replace(root_url, '')
+                print('sec_url', sec_url)
+                return redirect(reverse('login') + '?next=' + sec_url)
         # Explicitly return None for all non-matching requests
         return None
