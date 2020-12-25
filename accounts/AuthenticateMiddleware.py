@@ -28,15 +28,15 @@ class AuthMd(MiddlewareMixin):
         LOGIN_REQUIRED_URLS_EXCEPTIONS is, conversely, where you explicitly
         define any exceptions (like login and logout URLs).
     """
-def process_view(self, request, view_func, view_args, view_kwargs):
-    # No need to process URLs if user already logged in
-    print('======test=======')
-    print(request.path)
-    if request.user.is_authenticated:
-        if request.path == reverse('login') or request.path == reverse('signup'):
-            return redirect('/')
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        # No need to process URLs if user already logged in
+        print('======test=======')
+        print(request.path)
+        if request.user.is_authenticated:
+            if request.path == reverse('login') or request.path == reverse('signup'):
+                return redirect('/')
+            return None
+        # else:
+        #     request.path == ''
+        # Explicitly return None for all non-matching requests
         return None
-    # else:
-    #     request.path == ''
-    # Explicitly return None for all non-matching requests
-    return None
