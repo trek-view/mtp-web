@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
@@ -30,22 +30,23 @@ class AuthMd(MiddlewareMixin):
     """
     def process_view(self, request, view_func, view_args, view_kwargs):
         # No need to process URLs if user already logged in
+
+        # get next url from request
         absolute_url = request.build_absolute_uri()
         path = request.path
         root_url = request.build_absolute_uri('/')[:-1].strip("/")
-        print('======test=======')
-        print(request.path)
-        print(request.build_absolute_uri())
-        print(request.build_absolute_uri('/')[:-1].strip("/"))
-        print(request.build_absolute_uri('/'))
+        sec_url = absolute_url.replace(root_url, '')
+        q = QueryDict(mutable=True)
+        q['next'] = sec_url
+        next_url = q.urlencode(safe='/')
+
+
         if request.user.is_authenticated:
             if request.path == reverse('login') or request.path == reverse('signup'):
                 return redirect('/')
             return None
         else:
             if path == reverse('oauth2_provider:authorize'):
-                sec_url = absolute_url.replace(root_url, '')
-                print('sec_url', sec_url)
-                return redirect(reverse('login') + '?next=' + sec_url)
+                return redirect(reverse('login') + '?' + next_url)
         # Explicitly return None for all non-matching requests
         return None
