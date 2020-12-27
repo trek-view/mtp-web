@@ -81,7 +81,7 @@ def challenge_create(request):
 
             challenge.save()
             camera_make = form.cleaned_data['camera_make']
-            if not camera_make is None and len(camera_make) > 0:
+            if camera_make is not None and len(camera_make) > 0:
                 for cm in camera_make:
                     cam = CameraMake.objects.filter(name=cm).first()
                     if cam is not None:
@@ -122,12 +122,6 @@ def challenge_edit(request, unique_id):
             challenge.save()
 
             camera_make = form.cleaned_data['camera_make']
-            print(camera_make)
-            if not camera_make is None and len(camera_make) > 0:
-                challenge.transport_type.clear()
-                for cm in camera_make:
-                    challenge.camera_make.add(cm)
-
             geometry = json.loads(challenge.geometry)
 
             multipolygon = MultiPolygon()
@@ -153,12 +147,23 @@ def challenge_edit(request, unique_id):
                 geo['properties']['challenge_id'] = str(challenge.unique_id)
             challenge.geometry = json.dumps(geometry)
             challenge.save()
+
+            if camera_make is not None and len(camera_make) > 0:
+                for cm in camera_make:
+                    cam = CameraMake.objects.filter(name=cm).first()
+                    if cam is not None:
+                        challenge.camera_make.add(cam)
+
             transport_type = form.cleaned_data['transport_type']
-            print(transport_type.count())
             if transport_type is not None:
                 challenge.transport_type.clear()
-                for transport_t in transport_type:
-                    challenge.transport_type.add(transport_t)
+                if len(transport_type) > 0:
+                    for transport_t in transport_type:
+                        if transport_t != 'all':
+                            trans = TransType.objects.filter(name=transport_t).first()
+                            if trans is not None:
+                                challenge.transport_type.add(trans)
+
             messages.success(request, 'Challenge "%s" is updated successfully.' % challenge.name)
             return redirect('challenge.index')
     else:
