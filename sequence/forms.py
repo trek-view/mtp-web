@@ -15,10 +15,16 @@ from django.db.models.functions.window import RowNumber
 ############################################################################
 
 
-def transport_types():
+def transport_types(has_all=True, has_parent=True):
     types = TransType.objects.all()
-    ts_types = [['all', 'All Types']]
+    if has_all:
+        ts_types = [['all', 'All Types']]
+    else:
+        ts_types = []
     for t in types:
+        if not has_parent:
+            if t.parent is None:
+                continue
         ts_types.append([t.name, t.getFullName])
     ts_tuple = tuple(ts_types)
     return ts_tuple
@@ -90,12 +96,12 @@ class AddSequenceForm(forms.ModelForm):
             required=False
         )
 
-        self.fields['transport_type'] = forms.ModelChoiceField(
+        self.fields['transport_type'] = forms.ChoiceField(
             required=False,
             widget=forms.Select(
                 attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true', 'data-validation': 'required'}
             ),
-            queryset=TransType.objects.filter(parent__isnull=False),
+            choices=transport_types(has_all=False, has_parent=False),
         )
 
         self.fields['tag'] = CustomTagsInputField(

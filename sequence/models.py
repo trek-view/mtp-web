@@ -55,10 +55,7 @@ class TransType(MPTTModel):
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        if self.parent is None:
-            return self.name
-        else:
-            return self.parent.name + ' - ' + self.name
+        return self.name
 
     def getFullName(self):
         if self.parent is None:
