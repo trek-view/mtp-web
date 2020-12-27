@@ -88,14 +88,11 @@ def challenge_create(request):
                         challenge.camera_make.add(cam)
 
             transport_type = form.cleaned_data['transport_type']
-            if transport_type is not None:
+            if transport_type is not None and transport_type != 'all' and transport_type != '':
                 challenge.transport_type.clear()
-                if len(transport_type) > 0:
-                    for transport_t in transport_type:
-                        if transport_t != 'all':
-                            trans = TransType.objects.filter(name=transport_t).first()
-                            if trans is not None:
-                                challenge.transport_type.add(trans)
+                trans = TransType.objects.filter(name=transport_type).first()
+                if trans is not None:
+                    challenge.transport_type.add(trans)
 
             messages.success(request, 'A challenge was created successfully.')
 
@@ -155,14 +152,11 @@ def challenge_edit(request, unique_id):
                         challenge.camera_make.add(cam)
 
             transport_type = form.cleaned_data['transport_type']
-            if transport_type is not None:
+            if transport_type is not None and transport_type != 'all' and transport_type != '':
                 challenge.transport_type.clear()
-                if len(transport_type) > 0:
-                    for transport_t in transport_type:
-                        if transport_t != 'all':
-                            trans = TransType.objects.filter(name=transport_t).first()
-                            if trans is not None:
-                                challenge.transport_type.add(trans)
+                trans = TransType.objects.filter(name=transport_type).first()
+                if trans is not None:
+                    challenge.transport_type.add(trans)
 
             messages.success(request, 'Challenge "%s" is updated successfully.' % challenge.name)
             return redirect('challenge.index')
