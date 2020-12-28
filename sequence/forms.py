@@ -82,7 +82,7 @@ class TransportSearchForm(forms.Form):
         )
 
 
-class AddSequenceForm(forms.ModelForm):
+class AddSequenceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -111,14 +111,14 @@ class AddSequenceForm(forms.ModelForm):
             help_text='Add a tag'
         )
 
-    class Meta:
-        model = Sequence
-        fields = (
-            'name',
-            'description',
-            'transport_type',
-            'tag'
-        )
+    # class Meta:
+    #     model = Sequence
+    #     fields = (
+    #         'name',
+    #         'description',
+    #         'transport_type',
+    #         'tag'
+    #     )
 
 
 class SequenceSearchForm(forms.Form):
