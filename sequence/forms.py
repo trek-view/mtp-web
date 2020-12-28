@@ -15,16 +15,10 @@ from django.db.models.functions.window import RowNumber
 ############################################################################
 
 
-def transport_types(has_all=True, has_parent=True):
+def transport_types():
     types = TransType.objects.all()
-    if has_all:
-        ts_types = [['all', 'All Types']]
-    else:
-        ts_types = []
+    ts_types = [['all', 'All Types']]
     for t in types:
-        if not has_parent:
-            if t.parent is None:
-                continue
         ts_types.append([t.name, t.getFullName])
     ts_tuple = tuple(ts_types)
     return ts_tuple
@@ -82,7 +76,7 @@ class TransportSearchForm(forms.Form):
         )
 
 
-class AddSequenceForm(forms.Form):
+class AddSequenceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -96,12 +90,13 @@ class AddSequenceForm(forms.Form):
             required=False
         )
 
-        self.fields['transport_type'] = forms.ChoiceField(
+        self.fields['transport_type'] = forms.ModelChoiceField(
             required=False,
             widget=forms.Select(
                 attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true', 'data-validation': 'required'}
             ),
-            choices=transport_types(has_all=False, has_parent=False),
+            queryset=TransType.objects.filter(parent__isnull=False),
+            to_field_name='pk'
         )
 
         self.fields['tag'] = CustomTagsInputField(
@@ -111,14 +106,14 @@ class AddSequenceForm(forms.Form):
             help_text='Add a tag'
         )
 
-    # class Meta:
-    #     model = Sequence
-    #     fields = (
-    #         'name',
-    #         'description',
-    #         'transport_type',
-    #         'tag'
-    #     )
+    class Meta:
+        model = Sequence
+        fields = (
+            'name',
+            'description',
+            'transport_type',
+            'tag'
+        )
 
 
 class SequenceSearchForm(forms.Form):

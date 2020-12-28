@@ -17,7 +17,7 @@ class Challenge(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.TextField()
-    transport_type = models.ManyToManyField(TransType)
+    transport_type = models.ForeignKey(TransType, on_delete=models.CASCADE, null=True, blank=True)
     camera_make = models.ManyToManyField(CameraMake)
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)

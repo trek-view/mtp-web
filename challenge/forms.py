@@ -50,12 +50,14 @@ class ChallengeForm(forms.ModelForm):
         choices=camera_makes,
     )
 
-    transport_type = forms.ChoiceField(
+    transport_type = forms.ModelChoiceField(
         required=False,
         widget=forms.Select(
             attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}
         ),
-        choices=transport_types,
+        queryset=TransType.objects.filter(),
+        to_field_name='pk',
+        empty_label='All Types'
     )
 
     geometry = forms.CharField(widget=forms.Textarea(attrs={'class': 'd-none'}), label='', required=False)
@@ -128,12 +130,14 @@ class ChallengeSearchForm(forms.Form):
         label='Camera Make (leave blank for all)',
     )
 
-    transport_type = forms.ChoiceField(
+    transport_type = forms.ModelChoiceField(
         required=False,
         widget=forms.Select(
             attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true'}
         ),
-        choices=transport_types,
+        queryset=TransType.objects.filter(),
+        to_field_name='pk',
+        empty_label='All Types'
     )
 
     challenge_type = forms.ChoiceField(

@@ -19,7 +19,7 @@ class WeatherStack:
         try:
             data = api_result.json()
         except:
-            print('Response error')
+            print('Weatherstack Response error')
             return False
         if data is None or ('success' in data.keys() and not data['success']):
             return False

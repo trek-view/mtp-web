@@ -31,7 +31,7 @@ class Mapillary:
         try:
             data = response.json()
         except:
-            print('Response error')
+            print('Mapillary Response error')
             return False
         if data is None or 'message' in data.keys():
             return False

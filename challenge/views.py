@@ -81,16 +81,15 @@ def challenge_create(request):
 
             challenge.save()
             camera_make = form.cleaned_data['camera_make']
-            if not camera_make is None and len(camera_make) > 0:
+            if camera_make is not None and len(camera_make) > 0:
                 for cm in camera_make:
-                    challenge.camera_make.add(cm)
+                    cam = CameraMake.objects.filter(name=cm).first()
+                    if cam is not None:
+                        challenge.camera_make.add(cam)
 
             transport_type = form.cleaned_data['transport_type']
-            if not transport_type is None:
-                challenge.transport_type.clear()
-                if len(transport_type) > 0:
-                    for transport_t in transport_type:
-                        challenge.transport_type.add(transport_t)
+            if transport_type is not None:
+                challenge.transport_type = transport_type
 
             messages.success(request, 'A challenge was created successfully.')
 
@@ -117,12 +116,6 @@ def challenge_edit(request, unique_id):
             challenge.save()
 
             camera_make = form.cleaned_data['camera_make']
-            print(camera_make)
-            if not camera_make is None and len(camera_make) > 0:
-                challenge.transport_type.clear()
-                for cm in camera_make:
-                    challenge.camera_make.add(cm)
-
             geometry = json.loads(challenge.geometry)
 
             multipolygon = MultiPolygon()
@@ -148,12 +141,17 @@ def challenge_edit(request, unique_id):
                 geo['properties']['challenge_id'] = str(challenge.unique_id)
             challenge.geometry = json.dumps(geometry)
             challenge.save()
+
+            if camera_make is not None and len(camera_make) > 0:
+                for cm in camera_make:
+                    cam = CameraMake.objects.filter(name=cm).first()
+                    if cam is not None:
+                        challenge.camera_make.add(cam)
+
             transport_type = form.cleaned_data['transport_type']
-            print(transport_type.count())
             if transport_type is not None:
-                challenge.transport_type.clear()
-                for transport_t in transport_type:
-                    challenge.transport_type.add(transport_t)
+                challenge.transport_type = transport_type
+
             messages.success(request, 'Challenge "%s" is updated successfully.' % challenge.name)
             return redirect('challenge.index')
     else:
@@ -199,17 +197,15 @@ def challenge_list(request):
             if name is not None:
                 challenges = challenges.filter(name__icontains=name)
 
-            if transport_type is not None and transport_type != 'all' and transport_type != '':
-                transport_type_obj = TransType.objects.filter(name=transport_type).first()
-                if transport_type_obj is not None:
-                    children_trans_type = TransType.objects.filter(parent=transport_type_obj)
-                    if children_trans_type.count() > 0:
-                        types = [transport_type_obj]
-                        for t in children_trans_type:
-                            types.append(t)
-                        challenges = challenges.filter(transport_type__in=types)
-                    else:
-                        challenges = challenges.filter(transport_type=transport_type_obj)
+            if transport_type is not None:
+                children_trans_type = TransType.objects.filter(parent=transport_type)
+                if children_trans_type.count() > 0:
+                    types = [transport_type]
+                    for t in children_trans_type:
+                        types.append(t)
+                    challenges = challenges.filter(transport_type__in=types)
+                else:
+                    challenges = challenges.filter(transport_type=transport_type)
 
             current_time = datetime.now()
             if challenge_type is not None and challenge_type == 'active':
@@ -278,13 +274,13 @@ def my_challenge_list(request):
 
             if not name is None:
                 challenges = challenges.filter(name__icontains=name)
-            if not transport_type is None and transport_type != 0 and transport_type != '':
-                children_trans_type = TransType.objects.filter(parent_id=transport_type)
+            if transport_type is not None:
+                children_trans_type = TransType.objects.filter(parent=transport_type)
                 if children_trans_type.count() > 0:
                     types = [transport_type]
                     for t in children_trans_type:
-                        transport_types.append(t.pk)
-                    challenges = challenges.filter(transport_type_id__in=transport_types)
+                        types.append(t)
+                    challenges = challenges.filter(transport_type__in=types)
                 else:
                     challenges = challenges.filter(transport_type=transport_type)
 
