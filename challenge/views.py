@@ -83,19 +83,14 @@ def challenge_create(request):
             camera_make = form.cleaned_data['camera_make']
             if not camera_make is None and len(camera_make) > 0:
                 for cm in camera_make:
-                    cam = CameraMake.objects.filter(name=cm).first()
-                    if cam is not None:
-                        challenge.camera_make.add(cam)
+                    challenge.camera_make.add(cm)
 
             transport_type = form.cleaned_data['transport_type']
-            if transport_type is not None:
+            if not transport_type is None:
                 challenge.transport_type.clear()
                 if len(transport_type) > 0:
                     for transport_t in transport_type:
-                        if transport_t != 'all':
-                            trans = TransType.objects.filter(name=transport_t).first()
-                            if trans is not None:
-                                challenge.transport_type.add(trans)
+                        challenge.transport_type.add(transport_t)
 
             messages.success(request, 'A challenge was created successfully.')
 
