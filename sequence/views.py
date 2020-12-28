@@ -1430,9 +1430,7 @@ def ajax_import(request, seq_key):
                     else:
                         sequence.name = form.cleaned_data['name']
                     sequence.description = form.cleaned_data['description']
-                    transport_type_name = form.cleaned_data['transport_type']
-                    transport_type = TransType.objects.filter(name=transport_type_name).first()
-                    sequence.transport_type = transport_type
+                    sequence.transport_type = form.cleaned_data['transport_type']
                     sequence.is_published = False
                     sequence.save()
 
