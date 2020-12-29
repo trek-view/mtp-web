@@ -1364,10 +1364,10 @@ def import_sequence_list(request):
 
 @my_login_required
 def ajax_import(request, seq_key):
-    return JsonResponse({
-        'status': 'failed',
-        'message': 'Server is updating. you need to wait.'
-    })
+    # return JsonResponse({
+    #     'status': 'failed',
+    #     'message': 'Server is updating. you need to wait.'
+    # })
 
     if request.method == 'POST':
 
