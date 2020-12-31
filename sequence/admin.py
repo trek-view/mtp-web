@@ -67,7 +67,7 @@ class SequenceAdmin(tags_input_admin.TagsInputAdmin):
         'username',
         'is_uploaded',
         'is_private',
-        'imported_at',
+        # 'imported_at',
         'image_count',
         'is_mapillary',
         'is_image_download',
