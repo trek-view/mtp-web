@@ -57,6 +57,7 @@ class SequenceAdmin(tags_input_admin.TagsInputAdmin):
     )
 
     readonly_fields = [
+        "transport_type",
         "user",
         "camera_make",
         "captured_at",
