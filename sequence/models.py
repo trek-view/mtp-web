@@ -15,6 +15,8 @@ from storages.backends.s3boto3 import S3Boto3Storage
 from lib.functions import *
 from lib.mvtManager import CustomMVTManager
 from sys_setting.models import Tag
+from datetime import timezone
+
 
 UserModel = get_user_model()
 
@@ -68,6 +70,8 @@ class TransType(MPTTModel):
 
     def getPK(self):
         return self.pk
+
+
 
     class MPTTMeta:
         level_attr = 'mptt_level'
@@ -319,6 +323,21 @@ class Sequence(models.Model):
             return None
         lng = self.geometry_coordinates_ary[0][0]
         return lng
+
+    def check_enable_import(self):
+
+
+        t1 = datetime.now(timezone.utc)
+        t2 = self.imported_at
+        td = t1 - t2
+        print("td.days: ", td.days)
+        if td.days >= 1:
+            return True
+        else:
+            return False
+        # print(td.days > 1)
+        # print(td.seconds // 3600)
+        # print((td.seconds // 60) % 60)
 
 
 class CustomImageMVTManager(CustomMVTManager):

@@ -1488,6 +1488,54 @@ def ajax_import(request, seq_key):
 
 
 @my_login_required
+def ajax_reimport(request, unique_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You can't change the status."
+        })
+
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if not sequence:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The sequence does not exist.'
+        })
+
+    if sequence.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'This sequence is not created by you.'
+        })
+
+    if sequence.is_image_download:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You don't need to reimport sequence."
+        })
+
+    # get image data from mapillary with sequence_key
+
+
+
+
+
+    print('1')
+    p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
+    p.start()
+    print('2')
+
+    sequence.imported_at = datetime.now()
+    sequence.save()
+
+    return JsonResponse({
+        'status': 'success',
+        'message': 'Sequence successfully imported. Sequence will be published in about 30 minutes.',
+        'unique_id': unique_id
+    })
+
+
+@my_login_required
 def ajax_multi_import(request):
     if request.method == 'POST':
         sequence_keys_str = request.POST.get('sequence_keys')

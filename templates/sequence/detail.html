@@ -364,6 +364,12 @@
                                 {% endif %}
                             </div>
 
+                            {% if not sequence.is_image_download and sequence.check_enable_import %}
+                                <div class="col text-center delete-sequence">
+                                    <button type="button" id="reimport_sequence" class="btn btn-danger">Reimport</button>
+                                </div>
+                            {% endif %}
+
                             <div class="col text-center delete-sequence">
                                 <button type="button" id="delete_sequence" class="btn btn-danger">Delete</button>
                             </div>
@@ -1273,6 +1279,25 @@
                 $('#delete_sequence_form').submit()
             }
         })
+    });
+
+    $('#reimport_sequence').click(function () {
+        $.ajax({
+            url: "{% url 'sequence.ajax_reimport' unique_id=sequence.unique_id %}",
+            type: 'POST',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                {
+                    toastr.error(data.message)
+                }
+                else {
+                    toastr.success(data.message);
+                    $('#reimport_sequence').addClass('d-none');
+                }
+            }
+        });
     });
 
     $('.sequence-others .like i').css('cursor', 'pointer');
