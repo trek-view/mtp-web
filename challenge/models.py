@@ -41,11 +41,10 @@ class Challenge(models.Model):
             return description
 
     def getTrasTypes(self):
-        transport_types = self.transport_type.all()
+        transport_type = self.transport_type
         t = []
-        if transport_types.count() > 0:
-            for transport_type in transport_types:
-                t.append(transport_type.getFullName())
+        if transport_type is not None:
+            t.append(transport_type.getFullName())
 
         return ', '.join(t)
 
