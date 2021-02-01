@@ -58,6 +58,7 @@ class AuthenticationForm(forms.Form):
         password = self.cleaned_data.get('password')
 
         if email is not None and password:
+            email = email.lower()
             self.user_cache = authenticate(self.request, email=email, password=password)
             if self.user_cache is None:
 
@@ -131,6 +132,10 @@ class UserSignUpForm(UserCreationForm):
         label=mark_safe('<a href="https://www.trekview.org/terms" target="_blank">I agree to the Trek View terms of service</a>'),
         required=True
     )
+
+    def clean_email(self):
+        data = self.cleaned_data['email']
+        return data.lower()
 
     class Meta:
         model = CustomUser
