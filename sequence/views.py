@@ -352,9 +352,11 @@ def image_leaderboard(request):
             if username and username != '':
                 users = CustomUser.objects.filter(username__icontains=username)
                 if m_type is None or m_type == 'received':
-                    images = images.filter(user__in=users)
+                    image_view_points = image_view_points.filter(owner__in=users)
+                    images = images.filter(user__in=users, pk__in=image_view_points.values_list('image_id'))
                 elif m_type == 'marked':
                     image_view_points = image_view_points.filter(user__in=users)
+                    images = images.filter(pk__in=image_view_points.values_list('image_id'))
 
             challenge_id = request.GET.get('challenge_id')
             if challenge_id is not None and challenge_id != '':
