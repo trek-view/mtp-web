@@ -161,7 +161,7 @@ def my_guidebook_list(request):
             )
             if name is not None and name != '':
                 guidebooks = guidebooks.filter(name__icontains=name)
-            if category is not None and category != '':
+            if category is not None and category != '' and category != 'all':
                 guidebooks = guidebooks.filter(category__name=category)
 
             if len(tags) > 0:
