@@ -29,7 +29,11 @@ else:
 INSTALLED_APPS += ['whitenoise.runserver_nostatic']
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True
+
+if DEBUG:
+    SECURE_SSL_REDIRECT = False
+else:
+    SECURE_SSL_REDIRECT = True
 
 
 DATABASES = {
