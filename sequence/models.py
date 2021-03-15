@@ -173,8 +173,12 @@ class CustomSequenceMVTManager(CustomMVTManager):
         if page_name == 'tour_list' and request.session['tours_query'] is not None:
             additional_where = ' AND id in ( SELECT "tour_toursequence"."sequence_id" FROM "tour_toursequence" WHERE "tour_toursequence"."tour_id" in ( SELECT t.id as id FROM (' + request.session['tours_query'] + ') as t )) '
 
-        if page_name == 'sequence_list' and request.session['sequences_query'] is not None:
+        elif page_name == 'sequence_list' and request.session['sequences_query'] is not None:
             additional_where = ' AND id in ( SELECT t.id as id FROM (' + request.session['sequences_query'] + ') as t )'
+
+        elif page_name == 'sequence_others' and request.session['sequence_detail_id'] is not None:
+            additional_where = ' AND id != ' + str(request.session['sequence_detail_id'])
+
         return additional_where
 
 
@@ -366,6 +370,8 @@ class CustomImageMVTManager(CustomMVTManager):
 
         elif page_name == 'photo_list' and request.session['images_query'] is not None:
             additional_where = " AND id in ( SELECT t.id as id FROM (" + request.session['images_query'] + ") as t )"
+        elif page_name == 'sequence_others' and request.session['sequence_detail_id'] is not None:
+            additional_where = ' AND sequence_id != ' + str(request.session['sequence_detail_id'])
 
         return additional_where
 

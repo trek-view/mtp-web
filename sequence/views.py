@@ -1097,6 +1097,9 @@ def sequence_detail(request, unique_id):
                 ts_tours = []
             ts_tours.append(tour_sequence.tour)
 
+    # sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
+    request.session['sequence_detail_id'] = sequence.id
+
     content = {
         'sequence': sequence,
         'guidebooks': guidebooks,

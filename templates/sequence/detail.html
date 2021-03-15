@@ -1038,46 +1038,188 @@
         });
     });
 
-    map.on('mouseenter', 'mapillary-images', function(e) {
-      // Change the cursor style as a UI indicator.
-      map.getCanvas().style.cursor = 'pointer';
+    function drawMapByUserKey(userkey) {
+        console.log('userkey', userkey);
+        var filter = ['all',
+            ['==', 'userkey', userkey]
+        ]
+        if (typeof userkey == 'undefined' || userkey == '')
+            filter = ['all']
 
-      var coordinates = e.features[0].geometry.coordinates.slice();
-      var key = e.features[0].properties.key;
-      var url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+        if (map.getLayer('original_mapillary')) map.removeLayer('original_mapillary');
+        if (map.getLayer('original_mapillary-images')) map.removeLayer('original_mapillary-images');
+        if (map.getSource('original_mapillary-images')) map.removeSource('original_mapillary-images');
+        if (map.getSource('original_mapillary-sequences')) map.removeSource('original_mapillary-sequences');
 
-      // Ensure that if the map is zoomed out such that multiple
-      // copies of the feature are visible, the popup appears
-      // over the copy being pointed to.
-      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      }
+        map.addSource('original_mapillary-sequences', {
+            "type": "vector",
+            "tiles": ["https://tiles3.mapillary.com/v0.1/{z}/{x}/{y}.mvt"],
+        });
 
-      // Populate the popup and set its coordinates
-      // based on the feature found.
-      popup.setLngLat(coordinates)
-      .setHTML("<img src='" + url + "' width='160'/>")
-      .addTo(map);
-    });
+        map.addLayer({
+            "id": "original_mapillary",
+            "type": "line",
+            "source": 'original_mapillary-sequences',
+            "source-layer": 'mapillary-sequences',
+            'filter': filter,
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-opacity": 0.6,
+                "line-color": "grey",
+                "line-width": 2
+            }
+        }, "waterway-label");
 
-    map.on('click', 'mapillary-images', function (e) {
-        var key = e.features[0].properties.key;
-        selected_poi_id = 0;
-        if ($('.minimize-button').hasClass('d-none') && $('.maximize-button').hasClass('d-none'))
-        {
-            $('.small').each(function (i) {
-                $(this).removeClass('d-none');
+        map.addSource('original_mapillary-images', {
+            "type": "vector",
+            "tiles": ["https://tiles3.mapillary.com/v0.1/{z}/{x}/{y}.mvt"],
+            "minzoom": 6,
+            "maxzoom": 14
+        });
+
+        map.addLayer({
+            "id": "original_mapillary-images",
+            "type": "circle",
+            "source": 'original_mapillary-images',
+            "source-layer": 'mapillary-images',
+            'filter': filter,
+            "paint": {
+                "circle-color": "grey",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
+
+        map.on('mouseenter', 'original_mapillary-images', function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var key = e.features[0].properties.key;
+            var url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup.setLngLat(coordinates)
+            .setHTML("<img src='" + url + "' width='160'/>")
+            .addTo(map);
+        });
+
+        map.on('click', 'original_mapillary-images', function (e) {
+            console.log(e.features[0]);
+            var key = e.features[0].properties.key;
+            console.log(key)
+            selected_poi_id = 0;
+            if ($('.minimize-button').hasClass('d-none') && $('.maximize-button').hasClass('d-none'))
+            {
+                $('.small').each(function (i) {
+                    $(this).removeClass('d-none');
+                });
+                $('.minimize-button').removeClass('d-none');
+            }
+            mapillaryViewer.resize();
+            mapillaryViewer.moveToKey(key);
+        });
+        map.on('mouseleave', 'original_mapillary-images', function() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+    }
+
+    function drawOtherSequences(userkey) {
+        console.log('userkey', userkey);
+        let filter = ['all',
+            ['==', 'userkey', userkey]
+        ];
+        if (typeof userkey == 'undefined' || userkey === '')
+            filter = ['all']
+
+        if (map.getLayer('mtp-sequences')) map.removeLayer('mtp-sequences');
+        if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
+        if (map.getSource('mtp-images')) map.removeSource('mtp-images');
+        if (map.getSource('mtp-sequences')) map.removeSource('mtp-sequences');
+        {#if (map.getLayer('mtp-images-big')) map.removeLayer('mtp-images-big');#}
+        {#if (map.getSource('mtp-images-big')) map.removeSource('mtp-images-big');#}
+        map.addSource('mtp-sequences-all', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_others&limit=2500"],
+        });
+
+        map.addLayer({
+            "id": "mtp-sequences-all",
+            "type": "line",
+            "source": 'mtp-sequences-all',
+            "source-layer": 'mtp-sequences',
+            'filter': filter,
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-opacity": 0.6,
+                "line-color": "#7880bd",
+                "line-width": 2
+            }
+        }, "waterway-label");
+
+
+        map.addSource('mtp-images-all', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_others&limit=5000"],
+            {#"minzoom": 6,#}
+            {#"maxzoom": 14#}
+        });
+
+        map.addLayer({
+            "id": "mtp-images-all",
+            "type": "circle",
+            "source": 'mtp-images-all',
+            "source-layer": 'mtp-images',
+            'filter': filter,
+            "paint": {
+                "circle-color": "#7880bd",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
+        map.on('click', 'mtp-images-all', function (e) {
+            let image_key = e.features[0].properties.image_key;
+            let url = "{% url 'sequence.ajax_get_detail_by_image_key' image_key='init_image_key' %}";
+            url = url.replace('init_image_key', image_key);
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: {},
+                dataType: 'json',
+                success: function (data) {
+                    if (!data.sequence) {
+                        toastr.error(data.message);
+                    }
+                    else {
+                        console.log(data);
+                        let sequence_unique_id = data['sequence_unique_id'];
+                        let sequence_url = "{% url 'sequence.sequence_detail' unique_id='unique_id' %}";
+                        sequence_url = sequence_url.replace('unique_id', sequence_unique_id);
+                        location.assign(sequence_url);
+                    }
+                }
             });
-            $('.minimize-button').removeClass('d-none');
-        }
-        mapillaryViewer.resize();
-        mapillaryViewer.moveToKey(key);
+        });
+    }
+
+    map.on("load", function() {
+        drawMapByUserKey('');
+        drawOtherSequences('');
     });
 
-    map.on('mouseleave', 'mapillary-images', function() {
-      map.getCanvas().style.cursor = '';
-      popup.remove();
-    });
 
     $('.switch_screen').click(function () {
          var full_screen = $('.full-screen');
