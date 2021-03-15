@@ -1190,6 +1190,29 @@
                 "circle-radius": 6
             }
         }, "waterway-label");
+
+        map.on('mouseenter', 'original_mapillary-images', function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var key = e.features[0].properties.key;
+            var url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup.setLngLat(coordinates)
+            .setHTML("<img src='" + url + "' width='160'/>")
+            .addTo(map);
+        });
+
         map.on('click', 'mtp-images-all', function (e) {
             let image_key = e.features[0].properties.image_key;
             let url = "{% url 'sequence.ajax_get_detail_by_image_key' image_key='init_image_key' %}";
@@ -1206,12 +1229,17 @@
                     else {
                         console.log(data);
                         let sequence_unique_id = data['sequence_unique_id'];
-                        let sequence_url = "{% url 'sequence.sequence_detail' unique_id='unique_id' %}";
+                        let sequence_url = "{% url 'sequence.sequence_detail' unique_id='unique_id' %}?image_key=" + image_key;
                         sequence_url = sequence_url.replace('unique_id', sequence_unique_id);
                         location.assign(sequence_url);
                     }
                 }
             });
+        });
+
+        map.on('mouseleave', 'original_mapillary-images', function() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
         });
     }
 
