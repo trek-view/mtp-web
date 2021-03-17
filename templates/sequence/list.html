@@ -435,13 +435,17 @@
     });
 
     map.on('load', function() {
+        {% if is_filtered == False %}
+            drawMapillaryIamgeByUserKey('');
+        {% endif %}
         drawMapByUserKey('');
-        map.on('mouseenter', 'mtp-images', function(e) {
+
+        map.on('mouseenter', 'original_mapillary-images', function(e) {
           // Change the cursor style as a UI indicator.
           map.getCanvas().style.cursor = 'pointer';
 
             const coordinates = e.features[0].geometry.coordinates.slice();
-            const key = e.features[0].properties.image_key;
+            const key = e.features[0].properties.key;
             const url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
 
             // Ensure that if the map is zoomed out such that multiple
@@ -458,50 +462,72 @@
           .addTo(map);
         });
 
-        map.on('click', 'mtp-images', function (e) {
-            getSequenceDetailByImageKey(e.features[0].properties["image_key"]);
+        map.on('click', 'original_mapillary-images', function (e) {
+            getSequenceDetailByImageKey(e.features[0].properties.key);
         });
 
         // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'mtp-images', function () {
+        map.on('mouseleave', 'original_mapillary-images', function () {
             map.getCanvas().style.cursor = '';
             popup.remove();
         });
-
-        /*
-        map.on('mouseenter', 'mtp-images-big', function(e) {
-          // Change the cursor style as a UI indicator.
-          map.getCanvas().style.cursor = 'pointer';
-
-            const coordinates = e.features[0].geometry.coordinates.slice();
-            const key = e.features[0].properties.image_key;
-            const url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
-
-            // Ensure that if the map is zoomed out such that multiple
-          // copies of the feature are visible, the popup appears
-          // over the copy being pointed to.
-          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-          }
-
-          // Populate the popup and set its coordinates
-          // based on the feature found.
-          popup.setLngLat(coordinates)
-          .setHTML('<img src="' + url + '" width="160"  alt=""/>')
-          .addTo(map);
-        });
-
-        map.on('click', 'mtp-images-big', function (e) {
-            getSequenceDetailByImageKey(e.features[0].properties["image_key"]);
-        });
-
-        // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'mtp-images-big', function () {
-            map.getCanvas().style.cursor = '';
-            popup.remove();
-        });
-        */
     });
+
+    function drawMapillaryIamgeByUserKey(userkey) {
+        var filter = ['all',
+            ['==', 'userkey', userkey]
+        ]
+        if (typeof userkey == 'undefined' || userkey == '')
+            filter = ['all']
+
+        console.log('test')
+
+        if (map.getLayer('original_mapillary')) map.removeLayer('original_mapillary');
+        if (map.getLayer('original_mapillary-images')) map.removeLayer('original_mapillary-images');
+        if (map.getSource('original_mapillary-images')) map.removeSource('original_mapillary-images');
+        if (map.getSource('original_mapillary-sequences')) map.removeSource('original_mapillary-sequences');
+
+        map.addSource('original_mapillary-sequences', {
+            "type": "vector",
+            "tiles": ["https://tiles3.mapillary.com/v0.1/{z}/{x}/{y}.mvt"],
+        });
+
+        map.addLayer({
+            "id": "original_mapillary",
+            "type": "line",
+            "source": 'original_mapillary-sequences',
+            "source-layer": 'mapillary-sequences',
+            'filter': filter,
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-opacity": 0.6,
+                "line-color": "grey",
+                "line-width": 2
+            }
+        }, "waterway-label");
+
+        map.addSource('original_mapillary-images', {
+            "type": "vector",
+            "tiles": ["https://tiles3.mapillary.com/v0.1/{z}/{x}/{y}.mvt"],
+            "minzoom": 6,
+            "maxzoom": 14
+        });
+
+        map.addLayer({
+            "id": "original_mapillary-images",
+            "type": "circle",
+            "source": 'original_mapillary-images',
+            "source-layer": 'mapillary-images',
+            'filter': filter,
+            "paint": {
+                "circle-color": "grey",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
+    }
 
     function getParamsFromURL() {
         const queryString = window.location.search;

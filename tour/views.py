@@ -269,6 +269,7 @@ def tour_list(request):
     tours = None
     page = 1
     order_type = 'latest_at'
+    is_filtered = False
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
@@ -293,15 +294,19 @@ def tour_list(request):
                     for t in t_s:
                         t_ids.append(t.tour.pk)
                 tours = tours.filter(pk__in=t_ids)
+                is_filtered = True
 
             if name and name != '':
                 tours = tours.filter(name__icontains=name)
+                is_filtered = True
             if username and username != '':
                 users = CustomUser.objects.filter(username__icontains=username)
                 tours = tours.filter(user__in=users)
+                is_filtered = True
             if len(tags) > 0:
                 for tour_tag in tags:
                     tours = tours.filter(tour_tag=tour_tag)
+                is_filtered = True
             if like and like != 'all':
                 tour_likes = TourLike.objects.all().values('tour').annotate()
                 tour_ary = []
@@ -312,6 +317,7 @@ def tour_list(request):
                     tours = tours.filter(pk__in=tour_ary)
                 elif like == 'false':
                     tours = tours.exclude(pk__in=tour_ary)
+                is_filtered = True
 
             sequence_unique_id = request.GET.get('sequence_unique_id')
             if sequence_unique_id is not None and sequence_unique_id != '':
@@ -364,6 +370,7 @@ def tour_list(request):
         'pageName': 'Tours',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
         'pageTitle': 'Tours',
+        'is_filtered': is_filtered,
         'page': page,
         'order_type': order_type
     }
@@ -375,6 +382,7 @@ def my_tour_list(request):
     tours = None
     page = 1
     order_type = 'latest_at'
+    is_filtered = False
     if request.method == "GET":
         page = request.GET.get('page')
         if page is None:
@@ -385,14 +393,17 @@ def my_tour_list(request):
             name = form.cleaned_data['name']
             tags = form.cleaned_data['tour_tag']
             like = form.cleaned_data['like']
+
             tours = Tour.objects.all().filter(
                 user=request.user
             )
             if name and name != '':
                 tours = tours.filter(name__icontains=name)
+                is_filtered = True
             if len(tags) > 0:
                 for tour_tag in tags:
                     tours = tours.filter(tour_tag=tour_tag)
+                is_filtered = True
             if like and like != 'all':
                 tour_likes = TourLike.objects.all().values('tour').annotate()
                 tour_ary = []
@@ -403,6 +414,7 @@ def my_tour_list(request):
                     tours = tours.filter(pk__in=tour_ary)
                 elif like == 'false':
                     tours = tours.exclude(pk__in=tour_ary)
+                is_filtered = True
 
     if tours is None:
         tours = Tour.objects.all().filter(is_published=True)
@@ -443,6 +455,7 @@ def my_tour_list(request):
         'pageName': 'My Tours',
         'pageTitle': 'My Tours',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'is_filtered': is_filtered,
         'page': page,
         'order_type': order_type
 
@@ -846,7 +859,7 @@ def ajax_get_detail_by_image_key(request, image_key):
     if sequences.count() == 0:
         return JsonResponse({
             'status': 'failed',
-            'message': "Image key error."
+            'message': "Not imported from Mapillary."
         })
 
     tours = []
