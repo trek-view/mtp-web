@@ -515,6 +515,8 @@ def tour_detail(request, unique_id):
     pItems.paginator.pages = range(first_num, last_num + 1)
     pItems.count = len(pItems)
 
+    request.session['tour_detail_id'] = tour.id
+
     content = {
         'sequences': pItems,
         'sequence_count': len(sequence_ary),

@@ -396,6 +396,9 @@
                 <h4>
                     Not imported from Mapillary
                 </h4>
+                <button class="return-scene-left d-none btn btn-primary ml-auto" style="">
+                    Return to sequence
+                </button>
             </div>
         </div>
 
@@ -537,9 +540,9 @@
 
                 <div class="switch-cover"></div>
 
-                <div class="return-scene d-none" style="">
-                    Return to sequence
-                </div>
+{#                <div class="return-scene d-none" style="">#}
+{#                    Return to sequence#}
+{#                </div>#}
 
                 <div class="mapillary-custom-banner">
                     <div>
@@ -1506,14 +1509,29 @@
         if (image_keys.indexOf(image_key) == -1)
         {
             {#toastr.error('Image outside of current sequence');#}
-            $('.return-scene').removeClass('d-none');
+            $('.return-scene-left').removeClass('d-none');
             $('.non-mapillary-image').removeClass('d-none');
             $('.mapillary-image').addClass('d-none');
+
+            is_second_left_side = true;
+            console.log('is_second_left_side', is_second_left_side)
+            if (is_opened_side_bar) {
+                $('.left-side').eq(0).removeClass('d-flex').addClass('d-none');
+                $('.left-side').eq(1).removeClass('d-none');
+            }
+
             return;
         }
-        $('.return-scene').addClass('d-none');
+        $('.return-scene-left').addClass('d-none');
         $('.non-mapillary-image').addClass('d-none');
         $('.mapillary-image').removeClass('d-none');
+
+        is_second_left_side = true;
+            if (is_opened_side_bar) {
+                $('.left-side').eq(0).removeClass('d-flex').addClass('d-none');
+                $('.left-side').eq(1).removeClass('d-none');
+            }
+
         latest_image_key = image_key;
         var url = "{% url 'sequence.ajax_get_image_detail' unique_id=sequence.unique_id image_key='image_key' %}";
         url = url.replace('image_key', image_key);
@@ -1563,9 +1581,15 @@
         });
     }
 
-    $('.return-scene').click(function () {
+    $('.return-scene-left').click(function () {
         $('.non-mapillary-image').addClass('d-none');
         $('.mapillary-image').removeClass('d-none');
+
+        is_second_left_side = true;
+        if (is_opened_side_bar) {
+            $('.left-side').eq(0).removeClass('d-flex').addClass('d-none');
+            $('.left-side').eq(1).removeClass('d-none');
+        }
         mapillaryViewer.moveToKey(latest_image_key);
     });
 
