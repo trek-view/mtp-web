@@ -348,6 +348,7 @@ def image_leaderboard(request):
     image_view_points = ImageViewPoint.objects.filter()
     label_challenges = LabelChallenge.objects.filter()
     filter_type = None
+    is_filtered = False
 
     if request.method == "GET":
         page = request.GET.get('page')
@@ -366,6 +367,7 @@ def image_leaderboard(request):
 
             if camera_makes is not None and len(camera_makes) > 0:
                 images = images.filter(camera_make__name__in=camera_makes)
+                is_filtered = True
 
             if transport_type is not None and transport_type != 'all' and transport_type != '':
                 transport_type_obj = TransType.objects.filter(name=transport_type).first()
@@ -380,6 +382,7 @@ def image_leaderboard(request):
                         sequences = Sequence.objects.filter(transport_type=transport_type_obj)
 
                     images = images.filter(sequence__in=sequences)
+                is_filtered = True
 
             m_type = request.GET.get('type')
             users = None
@@ -391,6 +394,7 @@ def image_leaderboard(request):
                 elif m_type == 'marked':
                     image_view_points = image_view_points.filter(user__in=users)
                     images = images.filter(pk__in=image_view_points.values_list('image_id'))
+                is_filtered = True
 
             challenge_id = request.GET.get('challenge_id')
             if challenge_id is not None and challenge_id != '':
@@ -431,6 +435,7 @@ def image_leaderboard(request):
             if map_feature_value is not None and map_feature_value != '' and map_feature_value != 'all_values':
                 print(type(map_feature_value))
                 images = images.filter(map_feature_values__contains=tuple([map_feature_value]))
+                is_filtered = True
 
     if images is None:
         images = Image.objects.all()
@@ -598,6 +603,7 @@ def image_leaderboard(request):
         'form': form,
         'pageName': 'Images',
         'pageTitle': 'Images',
+        'is_filtered': is_filtered,
         'pageDescription': 'This page shows the photos that have been marked as view points the most number of times.',
         'page': page
     }
