@@ -54,6 +54,7 @@ def import_sequence(request):
 def sequence_list(request):
     sequences = None
     page = 1
+    is_filtered = False
     order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
@@ -77,9 +78,12 @@ def sequence_list(request):
             ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__icontains=name)
+                is_filtered = True
             if camera_makes is not None and len(camera_makes) > 0:
                 sequences = sequences.filter(camera_make__name__in=camera_makes)
+                is_filtered = True
             if transport_type is not None and transport_type != 'all' and transport_type != '':
+                is_filtered = True
                 transport_type_obj = TransType.objects.filter(name=transport_type).first()
                 if transport_type_obj is not None:
                     children_trans_type = TransType.objects.filter(parent=transport_type_obj)
@@ -93,9 +97,11 @@ def sequence_list(request):
             if username and username != '':
                 users = CustomUser.objects.filter(username__icontains=username)
                 sequences = sequences.filter(user__in=users)
+                is_filtered = True
             if len(tags) > 0:
                 for tag in tags:
                     sequences = sequences.filter(tag=tag)
+                is_filtered = True
             if like and like != 'all':
                 sequence_likes = SequenceLike.objects.all().values('sequence').annotate()
                 sequence_ary = []
@@ -145,15 +151,18 @@ def sequence_list(request):
 
             if start_time is not None and start_time != '':
                 sequences = sequences.filter(captured_at__gte=start_time)
+                is_filtered = True
 
             if end_time is not None and end_time != '':
                 sequences = sequences.filter(captured_at__lte=end_time)
+                is_filtered = True
 
             if pano is not None and pano != '' and pano != 'all':
                 if pano == 'true':
                     sequences = sequences.filter(pano=True)
                 elif pano == 'false':
                     sequences = sequences.filter(pano=False)
+                is_filtered = True
 
     if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
@@ -200,6 +209,7 @@ def sequence_list(request):
         'pageName': 'Sequences',
         'pageTitle': 'Sequences',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'is_filtered': is_filtered,
         'page': page,
         'order_type': order_type
     }
@@ -210,6 +220,7 @@ def sequence_list(request):
 def my_sequence_list(request):
     sequences = None
     page = 1
+    is_filtered = False
     order_type = 'latest_at'
     if request.method == "GET":
         page = request.GET.get('page')
@@ -223,16 +234,22 @@ def my_sequence_list(request):
             tags = form.cleaned_data['tag']
             transport_type = form.cleaned_data['transport_type']
             like = form.cleaned_data['like']
+            start_time = form.cleaned_data['start_time']
+            end_time = form.cleaned_data['end_time']
+            pano = form.cleaned_data['pano']
 
             sequences = Sequence.objects.all().filter(
                 user=request.user
             ).exclude(image_count=0)
             if name and name != '':
                 sequences = sequences.filter(name__icontains=name)
+                is_filtered = True
             if camera_makes is not None and len(camera_makes) > 0:
                 sequences = sequences.filter(camera_make__name__in=camera_makes)
+                is_filtered = True
             if transport_type is not None and transport_type != 'all' and transport_type != '':
                 transport_type_obj = TransType.objects.filter(name=transport_type).first()
+                is_filtered = True
                 if transport_type_obj is not None:
                     children_trans_type = TransType.objects.filter(parent=transport_type_obj)
                     if children_trans_type.count() > 0:
@@ -245,6 +262,7 @@ def my_sequence_list(request):
             if len(tags) > 0:
                 for tag in tags:
                     sequences = sequences.filter(tag=tag)
+                is_filtered = True
             if like and like != 'all':
                 sequence_likes = SequenceLike.objects.all().values('sequence').annotate()
                 sequence_ary = []
@@ -255,6 +273,21 @@ def my_sequence_list(request):
                     sequences = sequences.filter(pk__in=sequence_ary)
                 elif like == 'false':
                     sequences = sequences.exclude(pk__in=sequence_ary)
+
+            if start_time is not None and start_time != '':
+                sequences = sequences.filter(captured_at__gte=start_time)
+                is_filtered = True
+
+            if end_time is not None and end_time != '':
+                sequences = sequences.filter(captured_at__lte=end_time)
+                is_filtered = True
+
+            if pano is not None and pano != '' and pano != 'all':
+                if pano == 'true':
+                    sequences = sequences.filter(pano=True)
+                elif pano == 'false':
+                    sequences = sequences.filter(pano=False)
+                is_filtered = True
 
     if sequences is None:
         sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
@@ -302,6 +335,7 @@ def my_sequence_list(request):
         'pageName': 'My Sequences',
         'pageTitle': 'My Sequences',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
+        'is_filtered': is_filtered,
         'page': page,
         'order_type': order_type
     }
@@ -314,6 +348,7 @@ def image_leaderboard(request):
     image_view_points = ImageViewPoint.objects.filter()
     label_challenges = LabelChallenge.objects.filter()
     filter_type = None
+    is_filtered = False
 
     if request.method == "GET":
         page = request.GET.get('page')
@@ -332,6 +367,7 @@ def image_leaderboard(request):
 
             if camera_makes is not None and len(camera_makes) > 0:
                 images = images.filter(camera_make__name__in=camera_makes)
+                is_filtered = True
 
             if transport_type is not None and transport_type != 'all' and transport_type != '':
                 transport_type_obj = TransType.objects.filter(name=transport_type).first()
@@ -346,15 +382,19 @@ def image_leaderboard(request):
                         sequences = Sequence.objects.filter(transport_type=transport_type_obj)
 
                     images = images.filter(sequence__in=sequences)
+                is_filtered = True
 
             m_type = request.GET.get('type')
             users = None
             if username and username != '':
                 users = CustomUser.objects.filter(username__icontains=username)
                 if m_type is None or m_type == 'received':
-                    images = images.filter(user__in=users)
+                    image_view_points = image_view_points.filter(owner__in=users)
+                    images = images.filter(user__in=users, pk__in=image_view_points.values_list('image_id'))
                 elif m_type == 'marked':
                     image_view_points = image_view_points.filter(user__in=users)
+                    images = images.filter(pk__in=image_view_points.values_list('image_id'))
+                is_filtered = True
 
             challenge_id = request.GET.get('challenge_id')
             if challenge_id is not None and challenge_id != '':
@@ -395,6 +435,7 @@ def image_leaderboard(request):
             if map_feature_value is not None and map_feature_value != '' and map_feature_value != 'all_values':
                 print(type(map_feature_value))
                 images = images.filter(map_feature_values__contains=tuple([map_feature_value]))
+                is_filtered = True
 
     if images is None:
         images = Image.objects.all()
@@ -562,6 +603,7 @@ def image_leaderboard(request):
         'form': form,
         'pageName': 'Images',
         'pageTitle': 'Images',
+        'is_filtered': is_filtered,
         'pageDescription': 'This page shows the photos that have been marked as view points the most number of times.',
         'page': page
     }
@@ -1095,6 +1137,9 @@ def sequence_detail(request, unique_id):
                 ts_tours = []
             ts_tours.append(tour_sequence.tour)
 
+    # sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
+    request.session['sequence_detail_id'] = sequence.id
+
     content = {
         'sequence': sequence,
         'guidebooks': guidebooks,
@@ -1364,6 +1409,11 @@ def import_sequence_list(request):
 
 @my_login_required
 def ajax_import(request, seq_key):
+    # return JsonResponse({
+    #     'status': 'failed',
+    #     'message': 'Server is updating. you need to wait.'
+    # })
+
     if request.method == 'POST':
 
         # form = AddSequenceForm(request.POST)
@@ -1430,7 +1480,8 @@ def ajax_import(request, seq_key):
                     else:
                         sequence.name = form.cleaned_data['name']
                     sequence.description = form.cleaned_data['description']
-                    sequence.transport_type = form.cleaned_data['transport_type']
+                    transport_type = form.cleaned_data['transport_type']
+                    sequence.transport_type = transport_type
                     sequence.is_published = False
                     sequence.save()
 
@@ -1477,6 +1528,54 @@ def ajax_import(request, seq_key):
     return JsonResponse({
         'status': 'failed',
         'message': 'Sequence was not imported.'
+    })
+
+
+@my_login_required
+def ajax_reimport(request, unique_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You can't change the status."
+        })
+
+    sequence = Sequence.objects.get(unique_id=unique_id)
+    if not sequence:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'The sequence does not exist.'
+        })
+
+    if sequence.user != request.user:
+        return JsonResponse({
+            'status': 'failed',
+            'message': 'This sequence is not created by you.'
+        })
+
+    if sequence.is_image_download:
+        return JsonResponse({
+            'status': 'failed',
+            'message': "You don't need to reimport sequence."
+        })
+
+    # get image data from mapillary with sequence_key
+
+
+
+
+
+    print('1')
+    p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
+    p.start()
+    print('2')
+
+    sequence.imported_at = datetime.now()
+    sequence.save()
+
+    return JsonResponse({
+        'status': 'success',
+        'message': 'Sequence successfully imported. Sequence will be published in about 30 minutes.',
+        'unique_id': unique_id
     })
 
 
@@ -2357,7 +2456,7 @@ def ajax_get_detail_by_image_key(request, image_key):
     if images.count() == 0:
         return JsonResponse({
             'status': 'failed',
-            'message': "Image key error."
+            'message': "Not imported from Mapillary."
         })
     image = images[0]
     sequence = image.sequence

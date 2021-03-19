@@ -112,6 +112,9 @@
                 <li class="nav-item d-flex align-items-center dropdown">
                     <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">About</a>
                     <ul class="dropdown-menu">
+                        <li class="dropdown-item nav-item {% block getting_started %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'getting_started' %}">Getting Started</a>
+                        </li>
                         <li class="dropdown-item nav-item {% block about %}{% endblock %}">
                             <a class="nav-link" href="{% url 'about' %}">About</a>
                         </li>

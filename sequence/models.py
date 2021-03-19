@@ -15,6 +15,8 @@ from storages.backends.s3boto3 import S3Boto3Storage
 from lib.functions import *
 from lib.mvtManager import CustomMVTManager
 from sys_setting.models import Tag
+from datetime import timezone
+
 
 UserModel = get_user_model()
 
@@ -68,6 +70,8 @@ class TransType(MPTTModel):
 
     def getPK(self):
         return self.pk
+
+
 
     class MPTTMeta:
         level_attr = 'mptt_level'
@@ -169,8 +173,16 @@ class CustomSequenceMVTManager(CustomMVTManager):
         if page_name == 'tour_list' and request.session['tours_query'] is not None:
             additional_where = ' AND id in ( SELECT "tour_toursequence"."sequence_id" FROM "tour_toursequence" WHERE "tour_toursequence"."tour_id" in ( SELECT t.id as id FROM (' + request.session['tours_query'] + ') as t )) '
 
-        if page_name == 'sequence_list' and request.session['sequences_query'] is not None:
+        elif page_name == 'sequence_list' and request.session['sequences_query'] is not None:
             additional_where = ' AND id in ( SELECT t.id as id FROM (' + request.session['sequences_query'] + ') as t )'
+
+        elif page_name == 'sequence_others' and request.session['sequence_detail_id'] is not None:
+            additional_where = ' AND id != ' + str(request.session['sequence_detail_id'])
+
+        elif page_name == 'tour_others' and request.session['tour_detail_id'] is not None:
+            additional_where = ' AND id not in ( SELECT "tour_toursequence"."sequence_id" FROM "tour_toursequence" WHERE "tour_toursequence"."tour_id" = ' + str(request.session['tour_detail_id']) + ') '
+
+
         return additional_where
 
 
@@ -320,6 +332,21 @@ class Sequence(models.Model):
         lng = self.geometry_coordinates_ary[0][0]
         return lng
 
+    def check_enable_import(self):
+
+
+        t1 = datetime.now(timezone.utc)
+        t2 = self.imported_at
+        td = t1 - t2
+        print("td.days: ", td.days)
+        if td.days >= 1:
+            return True
+        else:
+            return False
+        # print(td.days > 1)
+        # print(td.seconds // 3600)
+        # print((td.seconds // 60) % 60)
+
 
 class CustomImageMVTManager(CustomMVTManager):
     def get_additional_where(self, additional_filters={}, request=None):
@@ -347,6 +374,11 @@ class CustomImageMVTManager(CustomMVTManager):
 
         elif page_name == 'photo_list' and request.session['images_query'] is not None:
             additional_where = " AND id in ( SELECT t.id as id FROM (" + request.session['images_query'] + ") as t )"
+        elif page_name == 'sequence_others' and request.session['sequence_detail_id'] is not None:
+            additional_where = ' AND sequence_id != ' + str(request.session['sequence_detail_id'])
+        elif page_name == 'tour_others' and request.session['tour_detail_id'] is not None:
+            additional_where = ' AND sequence_id in ( SELECT "tour_toursequence"."sequence_id" FROM "tour_toursequence" WHERE "tour_toursequence"."tour_id" != ' + str(request.session['tour_detail_id']) + ') '
+
 
         return additional_where
 

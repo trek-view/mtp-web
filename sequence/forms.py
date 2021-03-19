@@ -96,6 +96,7 @@ class AddSequenceForm(forms.ModelForm):
                 attrs={'class': 'selectpicker form-control border', 'data-live-search': 'true', 'data-validation': 'required'}
             ),
             queryset=TransType.objects.filter(parent__isnull=False),
+            to_field_name='pk'
         )
 
         self.fields['tag'] = CustomTagsInputField(

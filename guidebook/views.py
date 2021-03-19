@@ -92,7 +92,11 @@ def guidebook_list(request):
         guidebooks = Guidebook.objects.all().filter(is_published=True, is_approved=True)
         form = GuidebookSearchForm()
 
-    request.session['guidebooks_query'] = get_correct_sql(guidebooks)
+    if len(guidebooks) > 0:
+        request.session['guidebooks_query'] = get_correct_sql(guidebooks)
+    else:
+        request.session['guidebooks_query'] = ''
+
 
     if order_type == 'most_likes':
         paginator = Paginator(guidebooks.order_by('-like_count', '-created_at'), 10)
@@ -157,7 +161,7 @@ def my_guidebook_list(request):
             )
             if name is not None and name != '':
                 guidebooks = guidebooks.filter(name__icontains=name)
-            if category is not None and category != '':
+            if category is not None and category != '' and category != 'all':
                 guidebooks = guidebooks.filter(category__name=category)
 
             if len(tags) > 0:

@@ -65,6 +65,15 @@ def about(request):
 
     return render(request, 'about/about.html', content)
 
+def getting_started(request):
+    content = {
+        'pageName': 'Getting Started',
+        'pageTitle': 'Getting Started',
+        'pageDescription': ''
+    }
+
+    return render(request, 'about/getting-started.html', content)
+
 
 def handler404(request, *args, **argv):
     return render(request, '404.html')

@@ -320,7 +320,7 @@ body {
 
 .return-scene {
     font-size: 16px;
-    top: 50px;
+    /*top: 50px;*/
     color: white;
     width: 160px;
     border-radius: 4px;
@@ -328,8 +328,8 @@ body {
     text-align: center;
     background: #7082dc;
     z-index: 300;
-    position: absolute;
-    left: calc(50% - 74px);
+    /*position: absolute;*/
+    /*left: calc(50% - 74px);*/
 }
 
 

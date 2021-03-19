@@ -30,6 +30,11 @@ def signup(request):
             user = form.save()
 
             email = form.cleaned_data.get('email')
+            # When logging in, email field should be case-insensitive
+            email = email.lower()
+
+            print(email)
+
             password = form.cleaned_data.get('password1')
             authenticate(email=email, password=password)
             if user is not None:

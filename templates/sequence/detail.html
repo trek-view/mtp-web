@@ -364,6 +364,12 @@
                                 {% endif %}
                             </div>
 
+                            {% if not sequence.is_image_download and sequence.check_enable_import %}
+                                <div class="col text-center delete-sequence">
+                                    <button type="button" id="reimport_sequence" class="btn btn-primary">Reimport</button>
+                                </div>
+                            {% endif %}
+
                             <div class="col text-center delete-sequence">
                                 <button type="button" id="delete_sequence" class="btn btn-danger">Delete</button>
                             </div>
@@ -385,133 +391,196 @@
             </button>
         </div>
 
-        <div class="d-flex flex-row justify-content-between align-items-center mt-3">
+        <div class="non-mapillary-image d-none">
+            <div class="mt-3 ml-2 mr-2">
+                <h4>
+                    Not imported from Mapillary
+                </h4>
+                <button class="return-scene-left d-none btn btn-primary ml-auto" style="">
+                    Return to sequence
+                </button>
+            </div>
         </div>
 
-
-
-        <div class="image-detail {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
-            <div class="" id="image_detail_box">
+        <div class="mapillary-image">
+            <div class="d-flex flex-row justify-content-between align-items-center mt-3">
             </div>
-            <div id="accordion" class="mt-2">
-                <div class="card">
-                    <div class="card-header p-0" id="headingOne">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                Weather
-                            </button>
-                        </h5>
-                    </div>
 
-                    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                        <div class="card-body">
-                            <div class="sequence-weather pt-2" id="sequence_weather">
-                                <h6>Location Weather: </h6>
-                                <div class="mt-2">
-                                    <label class="col-6">Min Temp: </label>
-                                    <span class="col-6">{% if sequence_weather.his_mintemp > sequence_weather.his_hourly_temperature %}{{ sequence_weather.his_hourly_temperature }}{% else %}{{ sequence_weather.his_mintemp }}{% endif %} °C</span>
-                                </div>
-                                <div class="mt-2">
-                                    <label class="col-6">Max Temp: </label>
-                                    <span class="col-6">{% if sequence_weather.his_maxtemp < sequence_weather.his_hourly_temperature %}{{ sequence_weather.his_hourly_temperature }}{% else %}{{ sequence_weather.his_maxtemp }}{% endif %} °C</span>
-                                </div>
-                                <div class="mt-2">
-                                    <label class="col-6">Sunrise: </label>
-                                    <span class="col-6">{{ sequence_weather.his_astro_sunrise }}</span>
-                                </div>
-                                <div class="mt-2">
-                                    <label class="col-6">Sunset: </label>
-                                    <span class="col-6">{{ sequence_weather.his_astro_sunset }}</span>
-                                </div>
-                                <h6 class="mt-3">Conditions at time of sequence:</h6>
-                                <div class="mt-2">
-                                    <label class="col-6">Temperature: </label>
-                                    <span class="col-6">{{ sequence_weather.his_hourly_temperature }} °C</span>
-                                </div>
-                                <div class="mt-2">
-                                    <label class="col-6">Wind Speed: </label>
-                                    <span class="col-6">{{ sequence_weather.his_hourly_wind_speed }} Km/h</span>
-                                </div>
-                                <div class="mt-2">
-                                    <label class="col-6">Wind direction: </label>
-                                    <span class="col-6">{{ sequence_weather.his_hourly_wind_dir }}</span>
-                                </div>
-        {#                        <div class="mt-2">#}
-        {#                            <label class="col-4">Weather: </label>#}
-        {#                            <span class="col-8">{{ imagesequence_weather.his_astro_sunrise }}</span>#}
-        {#                        </div>#}
-                                <div class="mt-2">
-                                    <label class="col-6">Precip: </label>
-                                    <span class="col-6">{{ sequence_weather.his_hourly_precip }} mm</span>
-                                </div>
-                                <div class="mt-2">
-                                    <label class="col-6">Cloud Cover: </label>
-                                    <span class="col-6">{{ sequence_weather.his_hourly_cloudcover }}</span>
-                                </div>
-                                <div class="mt-2">
-                                    <label class="col-6">Visibility: </label>
-                                    <span class="col-6">{{ sequence_weather.his_hourly_visibility }} Km</span>
+            <div class="image-detail {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
+                <div class="" id="image_detail_box">
+                </div>
+                <div id="accordion" class="mt-2">
+                    <div class="card">
+                        <div class="card-header p-0" id="headingOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    Weather
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body">
+                                <div class="sequence-weather pt-2" id="sequence_weather">
+                                    <h6>Location Weather: </h6>
+                                    <div class="mt-2">
+                                        <label class="col-6">Min Temp: </label>
+                                        <span class="col-6">{% if sequence_weather.his_mintemp > sequence_weather.his_hourly_temperature %}{{ sequence_weather.his_hourly_temperature }}{% else %}{{ sequence_weather.his_mintemp }}{% endif %} °C</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="col-6">Max Temp: </label>
+                                        <span class="col-6">{% if sequence_weather.his_maxtemp < sequence_weather.his_hourly_temperature %}{{ sequence_weather.his_hourly_temperature }}{% else %}{{ sequence_weather.his_maxtemp }}{% endif %} °C</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="col-6">Sunrise: </label>
+                                        <span class="col-6">{{ sequence_weather.his_astro_sunrise }}</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="col-6">Sunset: </label>
+                                        <span class="col-6">{{ sequence_weather.his_astro_sunset }}</span>
+                                    </div>
+                                    <h6 class="mt-3">Conditions at time of sequence:</h6>
+                                    <div class="mt-2">
+                                        <label class="col-6">Temperature: </label>
+                                        <span class="col-6">{{ sequence_weather.his_hourly_temperature }} °C</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="col-6">Wind Speed: </label>
+                                        <span class="col-6">{{ sequence_weather.his_hourly_wind_speed }} Km/h</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="col-6">Wind direction: </label>
+                                        <span class="col-6">{{ sequence_weather.his_hourly_wind_dir }}</span>
+                                    </div>
+            {#                        <div class="mt-2">#}
+            {#                            <label class="col-4">Weather: </label>#}
+            {#                            <span class="col-8">{{ imagesequence_weather.his_astro_sunrise }}</span>#}
+            {#                        </div>#}
+                                    <div class="mt-2">
+                                        <label class="col-6">Precip: </label>
+                                        <span class="col-6">{{ sequence_weather.his_hourly_precip }} mm</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="col-6">Cloud Cover: </label>
+                                        <span class="col-6">{{ sequence_weather.his_hourly_cloudcover }}</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="col-6">Visibility: </label>
+                                        <span class="col-6">{{ sequence_weather.his_hourly_visibility }} Km</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="image-detection mt-3 {% if view_mode != 'mtpw_label' and view_mode != 'autodetected_label' and view_mode != 'map_features' %}d-none{% endif %}">
-{#            <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">#}
-{#                    <li class="nav-item mtpw-label-tab " style="width: 30%;">#}
-{#                        <a class="nav-link {% if view_mode == 'mtpw_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>#}
-{#                    </li>#}
-{#                    <li class="nav-item mapillary-label-tab border-bottom " style="width: 40%">#}
-{#                        <a class="nav-link {% if view_mode != 'mtpw_label' and view_mode != 'map_features' %}active{% endif %}" href="javascript: switchMpaillaryLable('mapillary');">Autodetected Labels</a>#}
-{#                    </li>#}
-{#                </ul>#}
-            <div class="card" style="border-radius: 0">
-                <div class="ml-2 mt-2 mr-2">
-                    <h5 class="label_type">
-                        {% if view_mode == 'mtpw_label' %}MTPW Labels{% else %}Autodetected Labels{% endif %}
-                    </h5>
-                </div>
-                <div class="p-2">
-                    <div class="actions text-right {% if view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
-                        {% if request.user.is_authenticated %}
-                            <div class="add-label-button w-100 d-flex justify-content-between">
-                                <button class="btn btn-primary" id="add_label_button">
-                                    Add Label
-                                </button>
-
-                                <button class="btn btn-secondary d-none" id="lbl_reset" onclick="labelReset()">
-                                    Cancel
-                                </button>
-
-                                <button class="btn btn-danger d-none" id="lbl_delete" onclick="labelDelete()">
-                                    Delete
-                                </button>
-                            </div>
-                            <div class="add-label-group d-none input-group mb-3">
-                                <div class="w-100 mt-2">
-                                    <select class="custom-select" id="add_label">
-                                        <option selected value="0">First select a label classification</option>
-                                        {% for label_type in label_types %}
-                                            <option value="{{ label_type.pk }}" data-color="{{ label_type.color }}" data-type="{{ label_type.type }}">{{ label_type }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                        {% endif %}
+            <div class="image-detection mt-3 {% if view_mode != 'mtpw_label' and view_mode != 'autodetected_label' and view_mode != 'map_features' %}d-none{% endif %}">
+                <div class="card" style="border-radius: 0">
+                    <div class="ml-2 mt-2 mr-2">
+                        <h5 class="label_type">
+                            {% if view_mode == 'mtpw_label' %}MTPW Labels{% else %}Autodetected Labels{% endif %}
+                        </h5>
                     </div>
-                    <div class="detections">
+                    <div class="p-2">
+                        <div class="actions text-right {% if view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
+                            {% if request.user.is_authenticated %}
+                                <div class="add-label-button w-100 d-flex justify-content-between">
+                                    <button class="btn btn-primary" id="add_label_button">
+                                        Add Label
+                                    </button>
+
+                                    <button class="btn btn-secondary d-none" id="lbl_reset" onclick="labelReset()">
+                                        Cancel
+                                    </button>
+
+                                    <button class="btn btn-danger d-none" id="lbl_delete" onclick="labelDelete()">
+                                        Delete
+                                    </button>
+                                </div>
+                                <div class="add-label-group d-none input-group mb-3">
+                                    <div class="w-100 mt-2">
+                                        <select class="custom-select" id="add_label">
+                                            <option selected value="0">First select a label classification</option>
+                                            {% for label_type in label_types %}
+                                                <option value="{{ label_type.pk }}" data-color="{{ label_type.color }}" data-type="{{ label_type.type }}">{{ label_type }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="detections">
 
                     </div>
                 </div>
             </div>
         </div>
-        <div class="user-comment mt-2 d-flex justify-content-center">
-            <div class="fb-comments w-100 border" data-href="{{ request.build_absolute_uri  }}" data-numposts="5" data-width="350" ></div>
-        </div>
 
+        <div id="accordion" class="mt-2">
+                        <div class="card">
+                            <div class="card-header p-0" id="headingOne">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        Weather
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body">
+                                    <div class="sequence-weather pt-2" id="sequence_weather">
+                                        <h6>Location Weather: </h6>
+                                        <div class="mt-2">
+                                            <label class="col-6">Min Temp: </label>
+                                            <span class="col-6">{{ sequence_weather.his_mintemp }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Max Temp: </label>
+                                            <span class="col-6">{{ sequence_weather.his_maxtemp }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Sunrise: </label>
+                                            <span class="col-6">{{ sequence_weather.his_astro_sunrise }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Sunset: </label>
+                                            <span class="col-6">{{ sequence_weather.his_astro_sunset }}</span>
+                                        </div>
+                                        <h6 class="mt-3">Conditions at time of sequence:</h6>
+                                        <div class="mt-2">
+                                            <label class="col-6">Temperature: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_temperature }} °C</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Wind Speed: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_wind_speed }} Km/h</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Wind direction: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_wind_dir }}</span>
+                                        </div>
+                {#                        <div class="mt-2">#}
+                {#                            <label class="col-4">Weather: </label>#}
+                {#                            <span class="col-8">{{ imagesequence_weather.his_astro_sunrise }}</span>#}
+                {#                        </div>#}
+                                        <div class="mt-2">
+                                            <label class="col-6">Precip: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_precip }} mm</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Cloud Cover: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_cloudcover }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="col-6">Visibility: </label>
+                                            <span class="col-6">{{ sequence_weather.his_hourly_visibility }} Km</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
     </div>
 
     <div class="right-board bg-light">
@@ -532,9 +601,9 @@
 
                 <div class="switch-cover"></div>
 
-                <div class="return-scene d-none" style="">
-                    Return to sequence
-                </div>
+{#                <div class="return-scene d-none" style="">#}
+{#                    Return to sequence#}
+{#                </div>#}
 
                 <div class="mapillary-custom-banner">
                     <div>
@@ -1032,46 +1101,213 @@
         });
     });
 
-    map.on('mouseenter', 'mapillary-images', function(e) {
-      // Change the cursor style as a UI indicator.
-      map.getCanvas().style.cursor = 'pointer';
+    function drawMapByUserKey(userkey) {
+        var filter = ['all',
+            ['==', 'userkey', userkey]
+        ]
+        if (typeof userkey == 'undefined' || userkey == '')
+            filter = ['all']
 
-      var coordinates = e.features[0].geometry.coordinates.slice();
-      var key = e.features[0].properties.key;
-      var url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+        if (map.getLayer('original_mapillary')) map.removeLayer('original_mapillary');
+        if (map.getLayer('original_mapillary-images')) map.removeLayer('original_mapillary-images');
+        if (map.getSource('original_mapillary-images')) map.removeSource('original_mapillary-images');
+        if (map.getSource('original_mapillary-sequences')) map.removeSource('original_mapillary-sequences');
 
-      // Ensure that if the map is zoomed out such that multiple
-      // copies of the feature are visible, the popup appears
-      // over the copy being pointed to.
-      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      }
+        map.addSource('original_mapillary-sequences', {
+            "type": "vector",
+            "tiles": ["https://tiles3.mapillary.com/v0.1/{z}/{x}/{y}.mvt"],
+        });
 
-      // Populate the popup and set its coordinates
-      // based on the feature found.
-      popup.setLngLat(coordinates)
-      .setHTML("<img src='" + url + "' width='160'/>")
-      .addTo(map);
-    });
+        map.addLayer({
+            "id": "original_mapillary",
+            "type": "line",
+            "source": 'original_mapillary-sequences',
+            "source-layer": 'mapillary-sequences',
+            'filter': filter,
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-opacity": 0.6,
+                "line-color": "grey",
+                "line-width": 2
+            }
+        }, "waterway-label");
 
-    map.on('click', 'mapillary-images', function (e) {
-        var key = e.features[0].properties.key;
-        selected_poi_id = 0;
-        if ($('.minimize-button').hasClass('d-none') && $('.maximize-button').hasClass('d-none'))
-        {
-            $('.small').each(function (i) {
-                $(this).removeClass('d-none');
+        map.addSource('original_mapillary-images', {
+            "type": "vector",
+            "tiles": ["https://tiles3.mapillary.com/v0.1/{z}/{x}/{y}.mvt"],
+            "minzoom": 6,
+            "maxzoom": 14
+        });
+
+        map.addLayer({
+            "id": "original_mapillary-images",
+            "type": "circle",
+            "source": 'original_mapillary-images',
+            "source-layer": 'mapillary-images',
+            'filter': filter,
+            "paint": {
+                "circle-color": "grey",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
+
+        map.on('mouseenter', 'original_mapillary-images', function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var key = e.features[0].properties.key;
+            var url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup.setLngLat(coordinates)
+            .setHTML("<img src='" + url + "' width='160'/>")
+            .addTo(map);
+        });
+
+        map.on('click', 'original_mapillary-images', function (e) {
+            var key = e.features[0].properties.key;
+            selected_poi_id = 0;
+            if ($('.minimize-button').hasClass('d-none') && $('.maximize-button').hasClass('d-none'))
+            {
+                $('.small').each(function (i) {
+                    $(this).removeClass('d-none');
+                });
+                $('.minimize-button').removeClass('d-none');
+            }
+            mapillaryViewer.resize();
+            mapillaryViewer.moveToKey(key);
+        });
+        map.on('mouseleave', 'original_mapillary-images', function() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+    }
+
+    function drawOtherSequences(userkey) {
+        console.log('userkey', userkey);
+        let filter = ['all',
+            ['==', 'userkey', userkey]
+        ];
+        if (typeof userkey == 'undefined' || userkey === '')
+            filter = ['all']
+
+        if (map.getLayer('mtp-sequences')) map.removeLayer('mtp-sequences');
+        if (map.getLayer('mtp-images')) map.removeLayer('mtp-images');
+        if (map.getSource('mtp-images')) map.removeSource('mtp-images');
+        if (map.getSource('mtp-sequences')) map.removeSource('mtp-sequences');
+        {#if (map.getLayer('mtp-images-big')) map.removeLayer('mtp-images-big');#}
+        {#if (map.getSource('mtp-images-big')) map.removeSource('mtp-images-big');#}
+        map.addSource('mtp-sequences-all', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_others&limit=2500"],
+        });
+
+        map.addLayer({
+            "id": "mtp-sequences-all",
+            "type": "line",
+            "source": 'mtp-sequences-all',
+            "source-layer": 'mtp-sequences',
+            'filter': filter,
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-opacity": 0.6,
+                "line-color": "#7880bd",
+                "line-width": 2
+            }
+        }, "waterway-label");
+
+
+        map.addSource('mtp-images-all', {
+            "type": "vector",
+            "tiles": ["{{ BASE_URL }}{% url 'api.sequence.image_mvt' version='v1' %}?tile={z}/{x}/{y}&page_name=sequence_others&limit=5000"],
+            {#"minzoom": 6,#}
+            {#"maxzoom": 14#}
+        });
+
+        map.addLayer({
+            "id": "mtp-images-all",
+            "type": "circle",
+            "source": 'mtp-images-all',
+            "source-layer": 'mtp-images',
+            'filter': filter,
+            "paint": {
+                "circle-color": "#7880bd",
+                "circle-radius": 6
+            }
+        }, "waterway-label");
+
+        map.on('mouseenter', 'original_mapillary-images', function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var key = e.features[0].properties.key;
+            var url = "https://images.mapillary.com/" + key + "/thumb-320.jpg";
+
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup.setLngLat(coordinates)
+            .setHTML("<img src='" + url + "' width='160'/>")
+            .addTo(map);
+        });
+
+        map.on('click', 'mtp-images-all', function (e) {
+            let image_key = e.features[0].properties.image_key;
+            let url = "{% url 'sequence.ajax_get_detail_by_image_key' image_key='init_image_key' %}";
+            url = url.replace('init_image_key', image_key);
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: {},
+                dataType: 'json',
+                success: function (data) {
+                    if (!data.sequence) {
+                        toastr.error(data.message);
+                    }
+                    else {
+                        console.log(data);
+                        let sequence_unique_id = data['sequence_unique_id'];
+                        let sequence_url = "{% url 'sequence.sequence_detail' unique_id='unique_id' %}?image_key=" + image_key;
+                        sequence_url = sequence_url.replace('unique_id', sequence_unique_id);
+                        location.assign(sequence_url);
+                    }
+                }
             });
-            $('.minimize-button').removeClass('d-none');
-        }
-        mapillaryViewer.resize();
-        mapillaryViewer.moveToKey(key);
+        });
+
+        map.on('mouseleave', 'original_mapillary-images', function() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+    }
+
+    map.on("load", function() {
+        drawMapByUserKey('');
+        drawOtherSequences('');
     });
 
-    map.on('mouseleave', 'mapillary-images', function() {
-      map.getCanvas().style.cursor = '';
-      popup.remove();
-    });
 
     $('.switch_screen').click(function () {
          var full_screen = $('.full-screen');
@@ -1275,6 +1511,25 @@
         })
     });
 
+    $('#reimport_sequence').click(function () {
+        $.ajax({
+            url: "{% url 'sequence.ajax_reimport' unique_id=sequence.unique_id %}",
+            type: 'POST',
+            data: {},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 'failed')
+                {
+                    toastr.error(data.message)
+                }
+                else {
+                    toastr.success(data.message);
+                    $('#reimport_sequence').addClass('d-none');
+                }
+            }
+        });
+    });
+
     $('.sequence-others .like i').css('cursor', 'pointer');
     {% if not request.user.is_authenticated %}
         $('.sequence-others .like i').click(function () {
@@ -1315,10 +1570,29 @@
         if (image_keys.indexOf(image_key) == -1)
         {
             {#toastr.error('Image outside of current sequence');#}
-            $('.return-scene').removeClass('d-none');
+            $('.return-scene-left').removeClass('d-none');
+            $('.non-mapillary-image').removeClass('d-none');
+            $('.mapillary-image').addClass('d-none');
+
+            is_second_left_side = true;
+            console.log('is_second_left_side', is_second_left_side)
+            if (is_opened_side_bar) {
+                $('.left-side').eq(0).removeClass('d-flex').addClass('d-none');
+                $('.left-side').eq(1).removeClass('d-none');
+            }
+
             return;
         }
-        $('.return-scene').addClass('d-none');
+        $('.return-scene-left').addClass('d-none');
+        $('.non-mapillary-image').addClass('d-none');
+        $('.mapillary-image').removeClass('d-none');
+
+        is_second_left_side = true;
+            if (is_opened_side_bar) {
+                $('.left-side').eq(0).removeClass('d-flex').addClass('d-none');
+                $('.left-side').eq(1).removeClass('d-none');
+            }
+
         latest_image_key = image_key;
         var url = "{% url 'sequence.ajax_get_image_detail' unique_id=sequence.unique_id image_key='image_key' %}";
         url = url.replace('image_key', image_key);
@@ -1368,7 +1642,15 @@
         });
     }
 
-    $('.return-scene').click(function () {
+    $('.return-scene-left').click(function () {
+        $('.non-mapillary-image').addClass('d-none');
+        $('.mapillary-image').removeClass('d-none');
+
+        is_second_left_side = true;
+        if (is_opened_side_bar) {
+            $('.left-side').eq(0).removeClass('d-flex').addClass('d-none');
+            $('.left-side').eq(1).removeClass('d-none');
+        }
         mapillaryViewer.moveToKey(latest_image_key);
     });
 
@@ -3693,7 +3975,7 @@
             {% else %}
                 Swal.fire({
                     title: 'I need your support...',
-                    html: 'It costs me over $200/mo to host this project. I try to keep as much of this app free as is possible, but for some premium features I need your support as a Patreon (from £5/mo). Your money will go directly to growing this project and awesome new features. <a target="_blank" href="https://www.patreon.com/trekview">Please click here to support the project and get access to this feature</a>.',
+                    html: 'It costs me over $70/mo to host this project. I try to keep as much of this app free as is possible, but for some premium features I need your support as a Patreon (from £5/mo). Your money will go directly to growing this project and awesome new features. <a target="_blank" href="https://www.patreon.com/trekview">Please click here to support the project and get access to this feature</a>.',
                     showCancelButton: false,
                     confirmButtonText: 'I do not want to support the project'
                 })
