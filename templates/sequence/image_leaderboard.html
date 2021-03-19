@@ -358,9 +358,9 @@
     });
 
     map.on('load', function() {
-        {% if is_filtered == False %}
-            drawMapillaryIamgeByUserKey('');
-        {% endif %}
+        // {% if is_filtered == False %}
+        //     drawMapillaryIamgeByUserKey('');
+        // {% endif %}
         drawMapByUserKey('');
         map.on('mouseenter', 'original_mapillary-images', function(e) {
           // Change the cursor style as a UI indicator.
