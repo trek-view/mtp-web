@@ -72,7 +72,7 @@ def getting_started(request):
         'pageDescription': ''
     }
 
-    return render(request, 'about/getting-started.html', content)
+    return render(request, 'about/getting_started.html', content)
 
 
 def handler404(request, *args, **argv):
