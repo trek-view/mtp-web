@@ -402,10 +402,10 @@
             </div>
         </div>
 
-        <div class="mapillary-image">
-            <div class="d-flex flex-row justify-content-between align-items-center mt-3">
-            </div>
+        <div class="d-flex flex-row justify-content-between align-items-center mt-3">
+        </div>
 
+        <div class="mapillary-image">
             <div class="image-detail {% if view_mode == 'mtpw_label' or view_mode == 'autodetected_label' or view_mode == 'map_features' %}d-none{% endif %}">
                 <div class="" id="image_detail_box">
                 </div>
@@ -476,6 +476,14 @@
             </div>
 
             <div class="image-detection mt-3 {% if view_mode != 'mtpw_label' and view_mode != 'autodetected_label' and view_mode != 'map_features' %}d-none{% endif %}">
+    {#            <ul class="nav nav-tabs text-center border-bottom-0 " id="myTab" role="tablist">#}
+    {#                    <li class="nav-item mtpw-label-tab " style="width: 30%;">#}
+    {#                        <a class="nav-link {% if view_mode == 'mtpw_label' %}active{% endif %}" href="javascript: switchMpaillaryLable('mtpw');">MTPW Labels</a>#}
+    {#                    </li>#}
+    {#                    <li class="nav-item mapillary-label-tab border-bottom " style="width: 40%">#}
+    {#                        <a class="nav-link {% if view_mode != 'mtpw_label' and view_mode != 'map_features' %}active{% endif %}" href="javascript: switchMpaillaryLable('mapillary');">Autodetected Labels</a>#}
+    {#                    </li>#}
+    {#                </ul>#}
                 <div class="card" style="border-radius: 0">
                     <div class="ml-2 mt-2 mr-2">
                         <h5 class="label_type">
@@ -512,75 +520,14 @@
                         </div>
                         <div class="detections">
 
+                        </div>
                     </div>
                 </div>
             </div>
+            <div class="user-comment mt-2 d-flex justify-content-center">
+                <div class="fb-comments w-100 border" data-href="{{ request.build_absolute_uri  }}" data-numposts="5" data-width="350" ></div>
+            </div>
         </div>
-
-        <div id="accordion" class="mt-2">
-                        <div class="card">
-                            <div class="card-header p-0" id="headingOne">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                        Weather
-                                    </button>
-                                </h5>
-                            </div>
-
-                            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                                <div class="card-body">
-                                    <div class="sequence-weather pt-2" id="sequence_weather">
-                                        <h6>Location Weather: </h6>
-                                        <div class="mt-2">
-                                            <label class="col-6">Min Temp: </label>
-                                            <span class="col-6">{{ sequence_weather.his_mintemp }}</span>
-                                        </div>
-                                        <div class="mt-2">
-                                            <label class="col-6">Max Temp: </label>
-                                            <span class="col-6">{{ sequence_weather.his_maxtemp }}</span>
-                                        </div>
-                                        <div class="mt-2">
-                                            <label class="col-6">Sunrise: </label>
-                                            <span class="col-6">{{ sequence_weather.his_astro_sunrise }}</span>
-                                        </div>
-                                        <div class="mt-2">
-                                            <label class="col-6">Sunset: </label>
-                                            <span class="col-6">{{ sequence_weather.his_astro_sunset }}</span>
-                                        </div>
-                                        <h6 class="mt-3">Conditions at time of sequence:</h6>
-                                        <div class="mt-2">
-                                            <label class="col-6">Temperature: </label>
-                                            <span class="col-6">{{ sequence_weather.his_hourly_temperature }} °C</span>
-                                        </div>
-                                        <div class="mt-2">
-                                            <label class="col-6">Wind Speed: </label>
-                                            <span class="col-6">{{ sequence_weather.his_hourly_wind_speed }} Km/h</span>
-                                        </div>
-                                        <div class="mt-2">
-                                            <label class="col-6">Wind direction: </label>
-                                            <span class="col-6">{{ sequence_weather.his_hourly_wind_dir }}</span>
-                                        </div>
-                {#                        <div class="mt-2">#}
-                {#                            <label class="col-4">Weather: </label>#}
-                {#                            <span class="col-8">{{ imagesequence_weather.his_astro_sunrise }}</span>#}
-                {#                        </div>#}
-                                        <div class="mt-2">
-                                            <label class="col-6">Precip: </label>
-                                            <span class="col-6">{{ sequence_weather.his_hourly_precip }} mm</span>
-                                        </div>
-                                        <div class="mt-2">
-                                            <label class="col-6">Cloud Cover: </label>
-                                            <span class="col-6">{{ sequence_weather.his_hourly_cloudcover }}</span>
-                                        </div>
-                                        <div class="mt-2">
-                                            <label class="col-6">Visibility: </label>
-                                            <span class="col-6">{{ sequence_weather.his_hourly_visibility }} Km</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
     </div>
 
     <div class="right-board bg-light">
@@ -601,9 +548,9 @@
 
                 <div class="switch-cover"></div>
 
-{#                <div class="return-scene d-none" style="">#}
-{#                    Return to sequence#}
-{#                </div>#}
+                <div class="return-scene d-none" style="">
+                    Return to sequence
+                </div>
 
                 <div class="mapillary-custom-banner">
                     <div>
@@ -1308,7 +1255,6 @@
         drawOtherSequences('');
     });
 
-
     $('.switch_screen').click(function () {
          var full_screen = $('.full-screen');
          var small_screen = $('.small-screen');
@@ -1663,6 +1609,12 @@
 
     function hide_image_detail_box() {
         $('.image-detail-box').addClass('d-none');
+        if (is_opened_side_bar)
+        {
+            $('.left-side').eq(0).removeClass('d-none').addClass('d-flex');
+            $('.left-side').eq(1).addClass('d-none');
+            is_second_left_side = false;
+        }
         goto_page(current_page);
         allClear();
     }
@@ -2634,14 +2586,14 @@
             layers.push(layer);
         }
     }
-    
+
     function moveCloseTo360(lat, lon){
-    
+
         const url = `https://a.mapillary.com/v3/images?client_id=${client_id}&pano=true&per_page=1&radius=1000&closeto=${lon},${lat}`;
         let request = new XMLHttpRequest();
         request.open('GET', url , true);
         request.onload = function () {
-        
+
             data = this.response;
             const json = JSON.parse(data);
             if (json.features.length < 1) {
@@ -2659,7 +2611,7 @@
         }
         request.send();
     }
-    
+
     function rgb2hex ( rgb ) {
         return "#" + rgb.map( function ( value ) {
             return ( "0" + value.toString( 16 ) ).slice( -2 ) ;
@@ -2748,11 +2700,11 @@
                 nearest_distance = distance ;
                 nearest_ele = gpx_points[i].ele;
             }
-            
+
         }
         return nearest_ele;
     }
-    
+
     function showGpxOnPhoto(points, node){
         if (view_mode != 'original')
         {
@@ -2775,7 +2727,7 @@
         }
         tagComponent.add(pointTags);
     }
-    
+
     function getPointsFromSequenceID(){
         let url = "{% url 'sequence.ajax_get_image_gpx_data' unique_id=sequence.unique_id %}";
         let points = []
@@ -2789,7 +2741,7 @@
         })
         return points;
     }
-    
+
     function getlatlngs(points){
         let latlngs = [];
         for (let i=0; i < points.length; i++){
@@ -2797,34 +2749,34 @@
         }
         return latlngs;
     }
-    
+
     function getXYs(target){
         const position = mly.getPosition();
     }
-    
+
     function getXY(base, target, height, bearing){
-        
+
         const dlat = target.lat - base.lat;
         const dlon = target.lon - base.lon;
-        
+
         const dy = R * Math.sin(dlat /180 * Math.PI);
         const dx = R * Math.cos(base.lat / 180 * Math.PI) * Math.sin(dlon / 180 * Math.PI);
-        
+
         let target_bearing = Math.atan(dx/dy) * 180 / Math.PI;
         if (dy < 0) {target_bearing += 180;}
-        
+
         const relative_bearing = target_bearing - bearing;
-        
+
         const distance = Math.pow(dx**2+dy**2,0.5);
-        
+
         const target_angle = Math.atan(height/distance) * 180 / Math.PI;
-        
+
         const theta = target_angle;
         const phi = relative_bearing;
-        
+
         const x = (((phi + 180) + 360) % 360)/360;
         const y = 0.5 + theta/90*0.5;
-        
+
         return {x:x, y:y, distance:distance, osm: target};
 
 
@@ -2878,18 +2830,18 @@
         const y1 = rad(base.lat);
         const x2 = rad(target.lng);
         const y2 = rad(target.lat);
-    
+
         const dx = x2 - x1;
-    
+
         const distance = R * Math.acos(Math.sin(y1)*Math.sin(y2) + Math.cos(y1)*Math.cos(y2)*Math.cos(dx));
         const phi = 90 - deg(Math.atan2( Math.cos(y1)*Math.tan(y2) - Math.sin(y1)*Math.cos(dx), Math.sin(dx)));
-    
+
         return [distance, phi];
     }
     function rad(deg){
         return deg/180*Math.PI;
     }
-    
+
     function deg(rad){
         return rad/Math.PI*180;
     }
@@ -3975,7 +3927,7 @@
             {% else %}
                 Swal.fire({
                     title: 'I need your support...',
-                    html: 'It costs me over $70/mo to host this project. I try to keep as much of this app free as is possible, but for some premium features I need your support as a Patreon (from £5/mo). Your money will go directly to growing this project and awesome new features. <a target="_blank" href="https://www.patreon.com/trekview">Please click here to support the project and get access to this feature</a>.',
+                    html: 'It costs me over $200/mo to host this project. I try to keep as much of this app free as is possible, but for some premium features I need your support as a Patreon (from £5/mo). Your money will go directly to growing this project and awesome new features. <a target="_blank" href="https://www.patreon.com/trekview">Please click here to support the project and get access to this feature</a>.',
                     showCancelButton: false,
                     confirmButtonText: 'I do not want to support the project'
                 })
