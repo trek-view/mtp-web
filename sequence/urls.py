@@ -13,6 +13,8 @@ urlpatterns = [
     path('<str:unique_id>/detail', views.sequence_detail, name='sequence.sequence_detail'),
     path('<str:unique_id>/delete', views.sequence_delete, name='sequence.sequence_delete'),
 
+    path('<str:unique_id>/tour/<str:tour_id>', views.tour_sequence_detail, name='sequence.tour_sequence_detail'),
+
     path('<str:unique_id>/ajax_save_sequence', views.ajax_save_sequence, name='sequence.ajax_save_sequence'),
     path('<str:unique_id>/ajax_sequence_check_publish', views.ajax_sequence_check_publish, name='sequence.ajax_sequence_check_publish'),
     path('<str:unique_id>/ajax_sequence_check_like', views.ajax_sequence_check_like, name='sequence.ajax_sequence_check_like'),

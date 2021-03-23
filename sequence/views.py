@@ -1038,10 +1038,6 @@ def set_camera_make(sequence):
 
 
 def sequence_detail(request, unique_id):
-
-
-
-
     sequence = get_object_or_404(Sequence, unique_id=unique_id)
     # if not sequence.is_published and request.user != sequence.user:
     #     messages.error(request, 'The sequence is not published.')
@@ -1164,6 +1160,148 @@ def sequence_detail(request, unique_id):
         'is_mine': is_mine
     }
     return render(request, 'sequence/detail.html', content)
+
+
+def tour_sequence_detail(request, unique_id, tour_id):
+    sequence = get_object_or_404(Sequence, unique_id=unique_id)
+    tour = Tour.objects.filter(unique_id=tour_id).first()
+
+    tour_sequence = TourSequence.objects.filter(tour=tour, sequence=sequence).first()
+    if tour_sequence is None:
+        tour = None
+
+    # if not sequence.is_published and request.user != sequence.user:
+    #     messages.error(request, 'The sequence is not published.')
+    #     return redirect('sequence.index')
+    # print('1')
+    # p = threading.Thread(target=get_images_by_sequence, args=(sequence,))
+    # p.start()
+    # print('2')
+    # set_camera_make(sequence)
+
+    image_key = None
+
+    page = 1
+    if request.method == "GET":
+        page = request.GET.get('page')
+        image_key = request.GET.get('image_key')
+        if page is None:
+            page = 1
+
+        view_mode = request.GET.get('view_mode')
+        if view_mode is None:
+            view_mode = 'original'
+
+        show_gpx = request.GET.get('show_gpx')
+        if show_gpx is None:
+            show_gpx = 'false'
+
+        show_street_level_poi = request.GET.get('show_street_level_poi')
+        if show_street_level_poi is None:
+            show_street_level_poi = 'false'
+
+    geometry_coordinates_ary = sequence.geometry_coordinates_ary
+    coordinates_image = sequence.coordinates_image
+    coordinates_cas = sequence.coordinates_cas
+
+
+    images = []
+
+    for i in range(len(coordinates_image)):
+        images.append(
+            {
+                'lat': geometry_coordinates_ary[i][0],
+                'lng': geometry_coordinates_ary[i][1],
+                'key': coordinates_image[i],
+                'cas': coordinates_cas[i]
+            }
+        )
+
+    view_points = 0
+    is_marked_point = False
+    imgs = Image.objects.filter(image_key=coordinates_image[0])
+    if imgs.count() > 0:
+        i_vs = ImageViewPoint.objects.filter(image=imgs[0])
+        view_points = i_vs.count()
+        if view_points > 0:
+            if request.user.is_authenticated:
+                i_vs_marked = i_vs.filter(user=request.user).first()
+                if i_vs_marked is not None:
+                    is_marked_point = True
+    addSequenceForm = AddSequenceForm(instance=sequence)
+
+    label_types = LabelType.objects.filter(parent__isnull=False)
+    tours = TourSequence.objects.filter(sequence=sequence)
+    tour_count = tours.count()
+    sequence_weathers = SequenceWeather.objects.filter(sequence=sequence)
+    sequence_weather = None
+    if sequence_weathers.count() > 0:
+        sequence_weather = sequence_weathers[0]
+
+    if image_key is not None and image_key != '':
+        firstImageKey = image_key
+    else:
+        firstImageKey = sequence.get_first_image_key()
+
+    guidebooks = None
+    if request.user.is_authenticated:
+        guidebooks = Guidebook.objects.filter(user=request.user)
+        if guidebooks.count() == 0:
+            guidebooks = None
+
+    is_mine = False
+    tours = None
+    ts_tours = None
+    if request.user.is_authenticated and request.user == sequence.user:
+        is_mine = True
+        tours = Tour.objects.filter(user=request.user)
+        tour_sequences = TourSequence.objects.filter(sequence=sequence)
+        ts_tours = None
+        for tour_sequence in tour_sequences:
+            if ts_tours is None:
+                ts_tours = []
+            ts_tours.append(tour_sequence.tour)
+
+    tour_other_sequences = TourSequence.objects.filter(tour=tour).exclude(sequence=sequence).order_by('sort')
+    other_sequences = []
+    for tour_other_sequence in tour_other_sequences:
+        other_sequences.append(tour_other_sequence.sequence)
+
+    # sequences = Sequence.objects.all().filter(is_published=True).exclude(image_count=0)
+    request.session['sequence_detail_id'] = sequence.id
+
+    content = {
+        'sequence': sequence,
+        'guidebooks': guidebooks,
+        'pageName': 'Sequence Detail',
+        'pageTitle': sequence.name + ' - Sequence',
+        'pageDescription': sequence.description,
+        'first_image': images[0],
+        'page': page,
+        'view_points': view_points,
+        'is_marked_point': is_marked_point,
+        'addSequenceForm': addSequenceForm,
+        'label_types': label_types,
+        'image_key': image_key,
+        'tour_count': tour_count,
+        'sequence_weather': sequence_weather,
+        'view_mode': view_mode,
+        'show_gpx': show_gpx,
+        'show_street_level_poi': show_street_level_poi,
+        'firstImageKey': firstImageKey,
+        'tours': tours,
+        'other_sequences': other_sequences,
+        'tour': tour,
+        'ts_tours': ts_tours,
+        'is_mine': is_mine
+    }
+    return render(request, 'sequence/detail.html', content)
+
+
+# def ajax_tour_other_sequences(request, unique_id, tour_id):
+#     sequence = get_object_or_404(Sequence, unique_id=unique_id)
+#     tour = get_object_or_404(Tour, unique_id=tour_id)
+
 
 
 @my_login_required

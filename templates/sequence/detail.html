@@ -969,7 +969,6 @@
                 "type": "Point"
             }
         };
-        console.log(item.toString())
         sceneData.push(item);
     }
 
@@ -1003,6 +1002,39 @@
             zoom: 14, // starting zoom
         });
     }
+
+    console.log('test')
+    {% if tour is not None %}
+        var tour_positions = [];
+        var tour_image_keys = [];
+        {% for other_sequence in other_sequences %}
+            {% for geometry_coordinates_ary in other_sequence.geometry_coordinates_ary %}
+                tour_positions.push({{ geometry_coordinates_ary }})
+            {% endfor %}
+            {% for image in other_sequence.coordinates_image %}
+                tour_image_keys.push("{{ image }}")
+            {% endfor %}
+        {% endfor %}
+
+        console.log(tour_positions)
+
+        var tourData = [];
+        var tourItem = {};
+        var tour_scene_positions = [];
+        for (var j = 0; j < tour_positions.length; j++)
+        {
+            tour_scene_positions.push([tour_positions[j][0], tour_positions[j][1]]);
+            tourItem = {
+                "type": "Feature",
+                "properties": {'key': tour_image_keys[j]},
+                "geometry": {
+                    "coordinates": [tour_positions[j][0], tour_positions[j][1]],
+                    "type": "Point"
+                }
+            };
+            tourData.push(tourItem);
+        }
+    {% endif %}
 
     map.on('load', function() {
         map.addSource('points', {
@@ -1236,7 +1268,11 @@
                     else {
                         console.log(data);
                         let sequence_unique_id = data['sequence_unique_id'];
-                        let sequence_url = "{% url 'sequence.sequence_detail' unique_id='unique_id' %}?image_key=" + image_key;
+                        {% if tour is None %}
+                            let sequence_url = "{% url 'sequence.sequence_detail' unique_id='unique_id' %}?image_key=" + image_key;
+                        {% else %}
+                            let sequence_url = "{% url 'sequence.tour_sequence_detail' unique_id='unique_id' tour_id=tour.unique_id %}?image_key=" + image_key;
+                        {% endif %}
                         sequence_url = sequence_url.replace('unique_id', sequence_unique_id);
                         location.assign(sequence_url);
                     }
@@ -1254,6 +1290,27 @@
         drawMapByUserKey('');
         drawOtherSequences('');
     });
+
+    map.on('load', function() {
+        map.addSource('tour_points', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': tourData
+            }
+        });
+        map.addLayer({
+            'id': 'tour_mapillary-images',
+            'type': 'circle',
+            'source': 'tour_points',
+            "paint": {
+                "circle-color": "yellow",
+                "circle-radius": 6
+            }
+        });
+    });
+
+
 
     $('.switch_screen').click(function () {
          var full_screen = $('.full-screen');
