@@ -147,8 +147,8 @@
                                 <div class="mt-3 ">
                                     {% for other_sequence in other_sequences %}
                                     <div class="d-flex justify-content-between">
-                                        <a href="{% url 'sequence.tour_sequence_detail' unique_id=other_sequence.unique_id tour_id=tour.unique_id %}">
-                                            <span>{{ other_sequence.name }}</span>
+                                        <a class="{% if other_sequence == sequence %}text-success{% endif %}" href="{% url 'sequence.tour_sequence_detail' unique_id=other_sequence.unique_id tour_id=tour.unique_id %}">
+                                            <span>{{ other_sequence.name }}</span>{% if other_sequence == sequence %}<span class="text-danger">(current sequence)</span>{% endif %}
                                         </a>
                                         <p>{{ other_sequence.captured_at }}</p>
                                     </div>
@@ -1063,12 +1063,14 @@
         var tour_positions = [];
         var tour_image_keys = [];
         {% for other_sequence in other_sequences %}
-            {% for geometry_coordinates_ary in other_sequence.geometry_coordinates_ary %}
-                tour_positions.push({{ geometry_coordinates_ary }})
-            {% endfor %}
-            {% for image in other_sequence.coordinates_image %}
-                tour_image_keys.push("{{ image }}")
-            {% endfor %}
+            {% if other_sequence != sequence %}
+                {% for geometry_coordinates_ary in other_sequence.geometry_coordinates_ary %}
+                    tour_positions.push({{ geometry_coordinates_ary }})
+                {% endfor %}
+                {% for image in other_sequence.coordinates_image %}
+                    tour_image_keys.push("{{ image }}")
+                {% endfor %}
+            {% endif %}
         {% endfor %}
 
         console.log(tour_positions)

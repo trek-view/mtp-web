@@ -1262,7 +1262,7 @@ def tour_sequence_detail(request, unique_id, tour_id):
                 ts_tours = []
             ts_tours.append(tour_sequence.tour)
 
-    tour_other_sequences = TourSequence.objects.filter(tour=tour).exclude(sequence=sequence).order_by('sort')
+    tour_other_sequences = TourSequence.objects.filter(tour=tour).order_by('sort')
     other_sequences = []
     for tour_other_sequence in tour_other_sequences:
         other_sequences.append(tour_other_sequence.sequence)
