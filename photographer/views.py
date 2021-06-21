@@ -31,7 +31,7 @@ from .forms import *
 
 ############################################################################
 
-MAIN_PAGE_DESCRIPTION = "Find or offer help on image collection projects to create fresh street level map data in locations where it's needed for Google Street View, Mapillary, and more..."
+MAIN_PAGE_DESCRIPTION = "Find photographers who are available for hire to conduct image capture projects."
 JOB_PAGE_DESCRIPTION = ""
 PHOTOGRAPHER_PAGE_DESCRIPTION = ""
 
@@ -213,9 +213,9 @@ def photographer_edit(request, unique_id):
         form = PhotographerForm(instance=photographer)
     content = {
         'form': form,
-        'pageName': 'Edit Photographer',
+        'pageName': 'Edit For Hire Profile',
         'photographer': photographer,
-        'pageTitle': photographer.name + ' - Edit Photographer'
+        'pageTitle': photographer.name + ' - Edit For Hire Profile'
     }
     return render(request, 'photographer/edit.html', content)
 

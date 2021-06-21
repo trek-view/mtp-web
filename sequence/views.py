@@ -32,8 +32,8 @@ from .forms import *
 
 ############################################################################
 
-MAIN_PAGE_DESCRIPTION = "Sequences are collections of images continuously captured by a user at a give time. Browse those created by others, or import your own from Mapillary."
-IMPORT_PAGE_DESCRIPTION = "First start by choosing the month your sequences we're captured. If they were taken over multiple months, don't worry, once you've selected all the ones you want from the current month you can change this filter to add more."
+MAIN_PAGE_DESCRIPTION = "Capture images or video of your adventure as sequences. Group collections of sequences as larger Tours."
+IMPORT_PAGE_DESCRIPTION = "First start by selecting the month your sequence was captured. Matching sequences will be shown on the right. If you haven't uploaded your imagery yet, you must first import it using the Map the Paths Uploader."
 
 ############################################################################
 
@@ -604,7 +604,7 @@ def image_leaderboard(request):
         'pageName': 'Images',
         'pageTitle': 'Images',
         'is_filtered': is_filtered,
-        'pageDescription': 'This page shows the photos that have been marked as view points the most number of times.',
+        'pageDescription': 'Browse a list of individual photos from all imported Sequences to easily uncover some of the most impressive locations around the world.',
         'page': page
     }
     return render(request, 'sequence/image_leaderboard.html', content)
@@ -1535,7 +1535,7 @@ def import_sequence_list(request):
         'seq_count': len(sequences),
         'sequences': sequences,
         'pageName': 'Sequences',
-        'pageTitle': 'Import Sequences',
+        'pageTitle': 'Import Uploaded Imagery',
         'pageDescription': IMPORT_PAGE_DESCRIPTION,
         'addSequenceForm': addSequenceForm,
         'all_transport_types': all_transport_types,

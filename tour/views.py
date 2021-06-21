@@ -22,7 +22,7 @@ from .forms import *
 
 # App packages
 
-MAIN_PAGE_DESCRIPTION = "Tours are collections of sequences that have been curated by their owner. Browse others' tours or create one using your own sequences."
+MAIN_PAGE_DESCRIPTION = "Create a tours from collections of sequences around a theme. Tour everything from local parks to National Parks."
 
 
 def index(request):

@@ -25,7 +25,7 @@ from .forms import *
 
 ############################################################################
 
-MAIN_PAGE_DESCRIPTION = """Create a guidebook of street-level photos to show people around a location. View others people have created to help plan your next adventure."""
+MAIN_PAGE_DESCRIPTION = """Create a guidebook of street-level photos to show people around a location. Use points of interest to bring your scenes to life."""
 
 ############################################################################
 

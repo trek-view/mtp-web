@@ -33,11 +33,11 @@
                 {% if photographer is None %}
                     <a href="{% url 'photographer.photographer_create' %}" class="btn btn-outline-primary">Create Photographer</a>
                 {% else %}
-                    <a href="{% url 'photographer.my_photographer_edit' unique_id=photographer.unique_id %}" class="btn btn-outline-primary">Edit Photographer</a>
+                    <a href="{% url 'photographer.my_photographer_edit' unique_id=photographer.unique_id %}" class="btn btn-outline-primary">Edit For Hire Profile</a>
                 {% endif %}
             </div>
             <div class="ml-3 mb-2 mr-3">
-                <h4>Filter Photographer</h4>
+                <h4>Filter Photographers</h4>
             </div>
 
             <div class="p-3" style="border-top: 1px solid #dee2e6;">

@@ -14,12 +14,18 @@
             <div class="pl-3 pr-3">
                 <div class="pt-3 mb-3">
                     <h3>
-                        Import Sequences
+                        Import Uploaded Imagery
                     </h3>
                 </div>
                 <p>
                     {{ pageDescription }}
                 </p>
+
+                <div class="w-100 mb-3 pr-3 pl-3">
+                    <a class="btn btn-outline-primary mt-2" href="{% url 'app_download' %}">
+                        Upload new imagery
+                    </a>
+                </div>
             </div>
 
             {% if messages %}

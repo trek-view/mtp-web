@@ -17,7 +17,7 @@ from .forms import *
 
 ############################################################################
 
-MAIN_PAGE_DESCRIPTION = "Leaderboard shows the ranking of users by Monthly and Transport type. One image is counted as 1 point."
+MAIN_PAGE_DESCRIPTION = "Browse our leaderboards showing the ranking of trekkers by captures uploaded. Can you top the list?"
 
 ############################################################################
 
@@ -194,8 +194,8 @@ def index(request):
     content = {
         'items': pItems,
         'form': form,
-        'pageName': 'Leaderboard',
-        'pageTitle': 'Leaderboard',
+        'pageName': 'Leaderboards',
+        'pageTitle': 'Leaderboards',
         'pageDescription': MAIN_PAGE_DESCRIPTION,
         'page': page,
         'time_type': time_type,

@@ -71,41 +71,37 @@
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
             <ul class="navbar-nav mr-4 ml-auto mt-2 mt-lg-0">
-                <li class="li-white d-flex align-items-center {% block app_leaderboard %}{% endblock %}">
-                    <a class="nav-link text-white" href="{% url 'leaderboard.index' %}">Leaderboard</a>
-                </li>
                 <li class="nav-item d-flex align-items-center dropdown">
                     <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">Explore</a>
                     <ul class="dropdown-menu">
                         <li class="dropdown-item nav-item {% block app_tour %}{% endblock %}">
-                            <a class="nav-link" href="{% url 'tour.index' %}">Tour</a>
+                            <a class="nav-link" href="{% url 'tour.index' %}">Tours</a>
                         </li>
 
                         <li class="dropdown-item nav-item {% block app_sequence %}{% endblock %}">
-                            <a class="nav-link" href="{% url 'sequence.index' %}">Sequence</a>
+                            <a class="nav-link" href="{% url 'sequence.index' %}">Sequences</a>
                         </li>
 
                         <li class="dropdown-item nav-item {% block app_image %}{% endblock %}">
-                            <a class="nav-link" href="{% url 'sequence.image_leaderboard' %}">Photo</a>
+                            <a class="nav-link" href="{% url 'sequence.image_leaderboard' %}">Photos</a>
                         </li>
 
                         <li class="dropdown-item nav-item {% block app_guidebook %}{% endblock %}">
-                            <a class="nav-link" href="{% url 'guidebook.home' %}">Guidebook</a>
+                            <a class="nav-link" href="{% url 'guidebook.home' %}">Guidebooks</a>
                         </li>
                     </ul>
                 </li>
                 <li class="nav-item d-flex align-items-center dropdown">
-                    <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">Challenge</a>
+                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Challenges</a>
                     <ul class="dropdown-menu">
-                        <li class="dropdown-item nav-item {% block app_hall_of_fame %}{% endblock %}">
-                            <a class="nav-link" href="{% url 'hall_of_fame' %}">Hall of Fame</a>
-                        </li>
                         <li class="dropdown-item nav-item {% block app_challenge %}{% endblock %}">
                             <a class="nav-link" href="{% url 'challenge.index' %}">Capture Challenge</a>
                         </li>
-
                         <li class="dropdown-item nav-item {% block app_label_challenge %}{% endblock %}">
                             <a class="nav-link" href="{% url 'challenge.label_challenge_list' %}">Label Challenge</a>
+                        </li>
+                        <li class="dropdown-item nav-item {% block app_leaderboard %}{% endblock %}">
+                            <a class="nav-link text-white" href="{% url 'leaderboard.index' %}">Leaderboards</a>
                         </li>
                     </ul>
                 </li>
@@ -122,10 +118,10 @@
                             <a class="nav-link" href="https://www.trekview.org" target="_blank">Trek View</a>
                         </li>
                         <li class="dropdown-item nav-item">
-                            <a class="nav-link" href="https://www.patreon.com/trekview?fan_landing=true" target="_blank">Support Us</a>
-                        </li>
-                        <li class="dropdown-item nav-item">
                             <a class="nav-link" href="https://github.com/trek-view/mtp-web" target="_blank">Source Code</a>
+                        </li>
+                        <li class="dropdown-item nav-item {% block app_hall_of_fame %}{% endblock %}">
+                            <a class="nav-link" href="{% url 'hall_of_fame' %}">Hall of Fame</a>
                         </li>
                     </ul>
                 </li>
@@ -142,7 +138,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li class="dropdown-item nav-item {% block app_photographer %}{% endblock %}">
-                            <a class="nav-link text-white" href="{% url 'photographer.index' %}">Hire List</a>
+                            <a class="nav-link text-white" href="{% url 'photographer.index' %}">For Hire List</a>
                         </li>
                         <li class="dropdown-item nav-item {% block app_profile %}{% endblock %}">
                             <a class="nav-link" href="{% url 'account.profile' username=request.user.username %}" >My Account</a>

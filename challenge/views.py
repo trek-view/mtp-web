@@ -35,8 +35,8 @@ from .forms import *
 
 ############################################################################
 
-CAPTURE_CHALLENGE_DESCRIPTION = "Find or offer help on image collection projects to create fresh street level map data in locations where it's needed for Google Street View, Mapillary, and more..."
-LABEL_CHALLENGE_DESCRIPTION = "Help label images to help researchers identify what's inside an image; from species of tree to road surface type."
+CAPTURE_CHALLENGE_DESCRIPTION = "Find or offer help on image collection projects to create fresh street-level imagery."
+LABEL_CHALLENGE_DESCRIPTION = "Help label images to help people search for what's inside of it; from species of tree to road surface type."
 
 
 ############################################################################
