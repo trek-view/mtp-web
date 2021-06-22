@@ -148,7 +148,7 @@
                                     {% for other_sequence in other_sequences %}
                                     <div class="d-flex justify-content-between">
                                         <a class="{% if other_sequence == sequence %}text-success{% endif %}" href="{% url 'sequence.tour_sequence_detail' unique_id=other_sequence.unique_id tour_id=tour.unique_id %}">
-                                            <span>{{ other_sequence.name }}</span>{% if other_sequence == sequence %}<span class="text-danger">(current sequence)</span>{% endif %}
+                                            <span>{{ other_sequence.name }}</span>{% if other_sequence == sequence %}<span class="text-danger"> (current sequence)</span>{% endif %}
                                         </a>
                                         <p>{{ other_sequence.captured_at }}</p>
                                     </div>
@@ -253,7 +253,7 @@
                     <div class="guidebook-created-at d-flex flex-row align-items-center justify-content-between mt-2">
                         <div class="text-secondary w-100">
                             <div class="w-100 p-1 ">
-                                <label class="" style="width: 40%">Capture at: </label>
+                                <label class="" style="width: 40%">First photo captured at: </label>
                                 <span class="" style="font-size: 13px; width: 60%">{{ sequence.captured_at }}</span>
                             </div>
 
